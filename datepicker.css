@@ -1,0 +1,121 @@
+.datepicker {
+  position: absolute;
+  width: 250px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+      flex-direction: column;
+  font-family: sans-serif;
+  font-size: 14px;
+  z-index: 9001;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  border: 1px solid gray;
+  border-radius: 4.22275px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 20px 20px -15px rgba(0, 0, 0, 0.3);
+}
+.datepicker * {
+  box-sizing: border-box;
+}
+.datepicker.hidden {
+  display: none;
+}
+.controls {
+  width: 100%;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-positive: 1;
+      flex-grow: 1;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  background: lightgray;
+}
+.arrow {
+  height: 25px;
+  width: 25px;
+  position: relative;
+  cursor: pointer;
+}
+.arrow:hover.left:after {
+  border-right-color: black;
+}
+.arrow:hover.right:after {
+  border-left-color: black;
+}
+.arrow:after {
+  content: '';
+  border: 6.25px solid transparent;
+  position: absolute;
+  top: 50%;
+  transition: border .2s;
+}
+.arrow.left:after {
+  border-right-color: gray;
+  right: 50%;
+  transform: translate(25%, -50%);
+}
+.arrow.right:after {
+  border-left-color: gray;
+  left: 50%;
+  transform: translate(-25%, -50%);
+}
+.month-year {
+  font-weight: bold;
+}
+.month {
+  padding-right: .5ex;
+}
+.year {
+  padding-left: .5ex;
+}
+.squares {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  padding: 5px;
+}
+.square {
+  width: 14.28571429%;
+  height: 25px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
+  cursor: pointer;
+  transition: background .1s;
+  border-radius: 4.22275px;
+}
+.square.current {
+  font-weight: bold;
+}
+.square.active {
+  background: lightblue;
+}
+.square.disabled span {
+  opacity: .2;
+}
+.square.empty {
+  cursor: default;
+}
+.square.disabled {
+  cursor: not-allowed;
+}
+.square.day {
+  cursor: default;
+  font-weight: bold;
+  color: gray;
+}
+.square:not(.empty):not(.disabled):not(.day):hover {
+  background: orange;
+}

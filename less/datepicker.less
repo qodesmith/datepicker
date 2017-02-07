@@ -1,0 +1,139 @@
+@width: 250px; // Small: 250px
+@border-width: 1px;
+@radius: @width * .016891; // 296px / 5px ratio.
+
+.datepicker {
+  position: absolute;
+  width: @width;
+  display: flex;
+  flex-direction: column;
+  font-family: sans-serif;
+  font-size: @width * .056;
+  z-index: 9001;
+  user-select: none;
+  border: @border-width solid gray;
+  border-radius: @radius;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 (@width * .08) (@width * .08) -(@width * .06) rgba(0,0,0,.3);
+
+  * {
+    box-sizing: border-box;
+  }
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.controls {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1;
+  flex-shrink: 0;
+  background: lightgray;
+}
+
+.arrow {
+  @arrow: @width / 10;
+  @offset: (@arrow / 4) - ((@arrow / 4) / 4);
+  height: @arrow;
+  width: @arrow;
+  position: relative;
+  cursor: pointer;
+
+  &:hover {
+    &.left:after {
+      border-right-color: black;
+    }
+
+    &.right:after {
+      border-left-color: black;
+    }
+  }
+
+  &:after {
+    content: '';
+    border: (@arrow / 4) solid transparent;
+    position: absolute;
+    top: 50%;
+    transition: border .2s;
+  }
+
+  &.left:after {
+    border-right-color: gray;
+    right: 50%;
+    transform: translate(25%, -50%);
+  }
+
+  &.right:after {
+    border-left-color: gray;
+    left: 50%;
+    transform: translate(-25%, -50%);
+  }
+}
+
+.month-year {
+  font-weight: bold;
+}
+
+.month {
+  padding-right: .5ex;
+}
+
+.year {
+  padding-left: .5ex;
+}
+
+.squares {
+  display: flex;
+  flex-wrap: wrap;
+  padding: @width * .02;
+}
+
+.square {
+  width: 100% / 7;
+  height: @width / 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .1s;
+  border-radius: @radius;
+
+  &.current {
+    font-weight: bold;
+  }
+
+  &.active {
+    background: lightblue;
+  }
+
+  &.disabled {
+    span {
+      opacity: .2;
+    }
+  }
+
+  &.empty {
+    cursor: default;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+  }
+
+  &.day {
+    cursor: default;
+    font-weight: bold;
+    color: gray;
+  }
+
+  &:not(.empty):not(.disabled):not(.day) {
+    &:hover {
+      background: orange;
+    }
+  }
+}

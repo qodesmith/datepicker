@@ -35,12 +35,12 @@ From the CLI run:
 
 Files & locations:
 
-|       File       |            Location             |           Description            |
-| ---------------- | ------------------------------- | -------------------------------- |
-| datepicker.js    | node_modules/js-datepicker/     | our main file                    |
-| dateicker.min.js | node_modules/js-datepicker/     | minified main file               |
-| datepicker.css   | node_modules/js-datepicker/     | stylesheet                       |
-| datepicker.less  | node_modules/js-datepicker/less | less: use it for your own builds |
+|       File       |            Location             |             Description             |
+| ---------------- | ------------------------------- | ----------------------------------- |
+| datepicker.js    | node_modules/js-datepicker/     | our main file                       |
+| dateicker.min.js | node_modules/js-datepicker/     | minified main file (2.4kb gzipped!) |
+| datepicker.css   | node_modules/js-datepicker/     | stylesheet                          |
+| datepicker.less  | node_modules/js-datepicker/less | less: use it for your own builds    |
 
 
 ## Usage
@@ -60,8 +60,9 @@ Datepicker works best with an `<input>` element but is by no means limited to th
 
 ## Options
 
-* `position` - (string) Can be 1 of 4 values: `'tr'`, `'tl'`, `'br'`, `'bl'` representing top-right, top-left, bottom-right, and bottom-left respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument.
-* `startDate` - (JS date object) This is the date that the calendar will start on. The default value is today. Example: `new Date()`
-* `dateSelected` - (JS date object) - This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well. Example: `new Date(2017, 0, 15)`
-* `minDate` - (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)`
-* `maxDate` - (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)`
+* `position` (string) Can be 1 of 4 values: `'tr'`, `'tl'`, `'br'`, `'bl'` representing top-right, top-left, bottom-right, and bottom-left respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument.
+* `startDate` (JS date object) This is the date that the calendar will start on. The default value is today. Example: `new Date()`
+* `dateSelected` (JS date object) - This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well. Example: `new Date(2017, 0, 15)`
+* `minDate` (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)`
+* `maxDate` (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)`
+* `noWeekends` (boolean) - Provied `true` to disable selecting weekends.

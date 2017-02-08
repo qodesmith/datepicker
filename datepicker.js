@@ -72,6 +72,9 @@
       // High end of selectable dates.
       maxDate: options.maxDate,
 
+      // Disabled the ability to select days on the weekend.
+      noWeekends: !!options.noWeekends,
+
       // The element our calendar is constructed in.
       calendar: calendar,
 
@@ -212,7 +215,14 @@
    *  Returns a string representation of DOM elements.
    */
   function createMonth(date, instance) {
-    const { minDate, maxDate, dateSelected, currentYear, currentMonth } = instance;
+    const {
+      minDate,
+      maxDate,
+      dateSelected,
+      currentYear,
+      currentMonth,
+      noWeekends
+    } = instance;
 
     // Same year, same month?
     const today = new Date();
@@ -247,7 +257,10 @@
       // Disabled & current squares.
       } else {
         let disabled = (minDate && thisDay < minDate) || (maxDate && thisDay > maxDate);
-        let currentValidDay = isThisMonth && !disabled && num === today.getDate();
+        const weekend = weekday === 'Sat' || weekday === 'Sun';
+        const currentValidDay = isThisMonth && !disabled && num === today.getDate();
+
+        disabled = disabled || (noWeekends && weekend);
         otherClass = disabled ? 'disabled' : currentValidDay ? 'current' : '';
       }
 

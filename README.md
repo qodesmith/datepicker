@@ -1,6 +1,8 @@
 # Datepicker.js
 Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **2.4kb gzipped**! I mean, do you even bandwidth, bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
+![Datepicker screenshot](./screenshot.png "Get a date with JavaScript!")
+
 <!-- [Live Demo](http://aaroncordova.xyz/datepicker) -->
 
 ## Installation

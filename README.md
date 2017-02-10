@@ -1,5 +1,5 @@
 # Datepicker.js
-Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **2.4kb gzipped**! I mean, do you even bandwidth, bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **2.6kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 ![Datepicker screenshot](./screenshot.png "Get a date with JavaScript!")
 
@@ -38,7 +38,7 @@ Files & locations:
 |       File       |            Location             |             Description             |
 | ---------------- | ------------------------------- | ----------------------------------- |
 | datepicker.js    | node_modules/js-datepicker/     | our main file                       |
-| dateicker.min.js | node_modules/js-datepicker/     | minified main file (2.4kb gzipped!) |
+| dateicker.min.js | node_modules/js-datepicker/     | minified main file (2.6kb gzipped!) |
 | datepicker.css   | node_modules/js-datepicker/     | stylesheet                          |
 | datepicker.less  | node_modules/js-datepicker/less | less: use it for your own builds    |
 
@@ -50,19 +50,26 @@ Datepicker takes 2 arguments:
 1. A string representing a CSS selector, such as `'.my-class'`, `'#my-id'`, or `'div'`.
 2. (optional) An object full of options (see below)
 
+You can use Datepicker with any type of element you want. If used with an `<input>` element (the common use case), then the `<input>`'s value will automatically be set when selecting a date.
+
 Simplest example:
 ```javascript
-datepicker('.some-element');
+const picker = datepicker('.some-element');
 ```
-
-Datepicker works best with an `<input>` element but is by no means limited to that. With the `<input>` element, Datepicker will automatically populate its value with the selected date. For `<input>`'s and any other element, Datepicker will set 3 attributes on the element - year, month, and day.
-
 
 ## Options
 
-* `position` (string) Can be 1 of 4 values: `'tr'`, `'tl'`, `'br'`, `'bl'` representing top-right, top-left, bottom-right, and bottom-left respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument.
-* `startDate` (JS date object) This is the date that the calendar will start on. The default value is today. Example: `new Date()`
-* `dateSelected` (JS date object) - This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well. Example: `new Date(2017, 0, 15)`
-* `minDate` (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)`
-* `maxDate` (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)`
-* `noWeekends` (boolean) - Provied `true` to disable selecting weekends.
+| Option | Description |
+| -------| ----------- |
+| `position` | (string) Can be 1 of 4 values: `'tr'`, `'tl'`, `'br'`, `'bl'` representing top-right, top-left, bottom-right, and bottom-left respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument. |
+| `startDate` | (JS date object) This is the date that the calendar will start on. The default value is today. Example: `new Date()` |
+| `dateSelected` | (JS date object) - This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well. Example: `new Date(2017, 0, 15)` |
+| `minDate` | (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)` |
+| `maxDate` | (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)` |
+| `noWeekends` | (boolean) - Provied `true` to disable selecting weekends. |
+| `onSelect` | (function) - Callback function after a date has been selected. |
+| `onShow` | (function) - Callback function when the calendar is shown. |
+| `onHide` | (function) - Callback function when the calendar is hidden. |
+| `onMonthchange` | (function) - Callback function when the month has changed. |
+
+_NOTE: All callback functions are both bound to the Datepicker instance and passed the instance as its 1st argument. So you can simply access the instance via the_ `this` _keyword or the 1st argument._

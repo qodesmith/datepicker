@@ -81,11 +81,26 @@
       // Month of `startDate`.
       currentMonth: startDate.getMonth(),
 
+      // Month name in plain english.
+      currentMonthName: months[startDate.getMonth()],
+
       // Year of `startDate`.
       currentYear: startDate.getFullYear(),
 
       // Method that removes the calendar from the DOM along with associated events.
-      remove: remove
+      remove: remove,
+
+      // Callback fired when a date is selected.
+      onSelect: options.onSelect,
+
+      // Callback fired when the calendar is shown.
+      onShow: options.onShow,
+
+      // Callback fired when the calendar is hidden.
+      onHide: options.onHide,
+
+      // Callback fired when the month is changed.
+      onMonthChange: options.onMonthChange
     };
 
     // Populate the <input> field or set attributes on the `el`.
@@ -96,9 +111,13 @@
     datepickers.push(el);
     calendarHtml(startDate, instance);
 
+    classChangeObserver(calendar, instance);
     window.addEventListener('resize', resize.bind(instance));
-    window.addEventListener('click', clickHandler.bind(instance));
-    el.addEventListener(instance.nonInput ? 'click': 'focus', toggleCalendar.bind(instance));
+
+    // window.addEventListener('click', clickHandler.bind(instance));
+    // el.addEventListener(instance.nonInput ? 'click': 'focus', toggleCalendar.bind(instance));
+    window.addEventListener('click', oneHandler.bind(instance));
+    window.addEventListener('focusin', oneHandler.bind(instance));
 
     document.body.appendChild(calendar);
 
@@ -156,6 +175,11 @@
         throw new Error('"dateSelected" in options is greater than "maxDate".');
       }
     }
+
+    // Callbacks.
+    ['onSelect', 'onShow', 'onHide', 'onMonthChange'].forEach(fxn => {
+      options[fxn] = typeof options[fxn] === 'function' && options[fxn];
+    });
 
     return options;
   }
@@ -306,19 +330,19 @@
 
     // Populate the <input> field (or not) with a readble value
     // and store the individual date values as attributes.
-    setElValues(el, instance, num);
+    setElValues(el, instance);
+
+    // Hide the calendar after a day has been selected.
+    instance.calendar.classList.add('hidden');
+
+    if (instance.onSelect) instance.onSelect(instance);
   }
 
   /*
    *  Populates the <input> fields with a readble value
    *  and stores the individual date values as attributes.
    */
-  function setElValues(el, instance, num) {
-    const { currentMonth, currentYear, dateSelected } = instance;
-
-    el.setAttribute('year', currentYear);
-    el.setAttribute('month', currentMonth);
-    el.setAttribute('day', num || dateSelected.getDate());
+  function setElValues(el, instance) {
     if (instance.nonInput) return;
     el.value = instance.dateSelected.toDateString();
   }
@@ -328,8 +352,8 @@
    *  Creates a `newDate` based on the updated month & year.
    *  Calls `calendarHtml` with the updated date.
    */
-  function changeMonth(classes, instance) {
-    instance.currentMonth += classes.contains('right') ? 1 : -1;
+  function changeMonth(classList, instance) {
+    instance.currentMonth += classList.contains('right') ? 1 : -1;
 
     if (instance.currentMonth === 12) {
       instance.currentMonth = 0;
@@ -341,6 +365,8 @@
 
     const newDate = new Date(instance.currentYear, instance.currentMonth, 1);
     calendarHtml(newDate, instance);
+    instance.currentMonthName = months[instance.currentMonth];
+    instance.onMonthChange && instance.onMonthChange(instance);
   }
 
   /*
@@ -389,9 +415,10 @@
    */
   function remove() {
     window.removeEventListener('resize', resize);
-    window.removeEventListener('click', clickHandler);
-    this.el.removeEventListener(instance.nonInput ? 'click' : 'focus', toggleCalendar);
+    window.removeEventListener('click', oneHandler);
+    window.removeEventListener('focusin', oneHandler);
     this.calendar.remove();
+    this.observer.disconnect(); // Stop the mutationObserver. https://goo.gl/PgFCEr
 
     // Remove this datepicker's `el` from the list.
     const index = datepickers.indexOf(this.el);
@@ -404,6 +431,31 @@
   /////////////////////
 
   /*
+   *  Mutation observer
+   *  1. Will trigger the user-provided `onShow` callback when the calendar is shown.
+   *  2. Will call `calculatePosition` when calendar is shown.
+   */
+  function classChangeObserver(calendar, instance) {
+    instance.observer = new MutationObserver((mutations, thing) => {
+      // Calendar has been shown.
+      if (mutations[0].oldValue.includes('hidden')) {
+        calculatePosition(instance);
+        instance.onShow && instance.onShow(instance);
+
+      // Calendar has been hidden.
+      } else {
+        instance.onHide && instance.onHide(instance);
+      }
+    });
+
+    instance.observer.observe(calendar, {
+      attributes: 1,
+      attributeFilter: ['class'],
+      attributeOldValue: 1
+    });
+  }
+
+  /*
    *  Calls `calculatePosition` whenever the browser is resized
    *  and the calendar is visible.
    */
@@ -412,52 +464,58 @@
     calculatePosition(this);
   }
 
-  /*
-   *  Handles 3 click event scenarios:
-   *  1 - A day on the calendar is selected (`selectDay`)
-   *  2 - The month is changed (`changeMonth`)
-   *  3 - Somewhere other than the calendar or calendar's node is clicked - closes the calendar.
-   */
-  function clickHandler(e) {
-    e = addPathToEvent(e);
+  function oneHandler(e) {
+    // Add `e.path` if it doesn't exist.
+    if (!e.path) {
+      let node = e.target;
+      e.path = [];
 
-    // Clicks outside of the calender or its `el`...
-    if (!e.path.includes(this.calendar) && !e.path.includes(this.el) && !this.noPosition) {
-      return this.calendar.classList.add('hidden');
+      while (node !== document) {
+        e.path.push(node);
+        node = node.parentNode;
+      }
     }
 
-    const target = e.target.nodeName === 'SPAN' ? e.target.parentNode : e.target;
-    const classes = target.classList;
-    const shouldReturn = ['active', 'empty', 'disabled'].some(name => classes.contains(name));
+    const calClasses = this.calendar.classList;
+    const hidden = calClasses.contains('hidden');
 
-    if (shouldReturn) return;
-    if (classes.contains('num')) {
-      selectDay(target, this);
-      this.calendar.classList.add('hidden');
-    } else if (classes.contains('arrow')) {
-      changeMonth(classes, this);
+    // Only pay attention to `focusin` events if the calendar's el is an <input>.
+    // `focusin` bubbles, `focus` does not.
+    if (e.type === 'focusin') return e.target === this.el && calClasses.remove('hidden');
+
+    // Calendar's el is 'html' or 'body'.
+    // Anything but the calendar was clicked.
+    if (this.noPosition) {
+      e.path.includes(this.calendar) ? calendarClicked(e, this) : calClasses.toggle('hidden');
+
+    // When the calendar is hidden...
+    } else if (hidden) {
+      e.target === this.el && calClasses.remove('hidden');
+
+    // Clicked on the calendar.
+    } else if (e.path.includes(this.calendar)) {
+      calendarClicked(e, this);
+    } else {
+      e.target !== this.el && calClasses.add('hidden');
     }
-  }
 
-  /*
-   *  Toggles the `hidden` class on the calendar.
-   *  Fired from the `focus` event on the <input> element
-   *  or `click` event on a non-<input> element.
-   */
-  function toggleCalendar(e) {
-    e = addPathToEvent(e);
-    const classList = this.calendar.classList;
-    const hidden = classList.contains('hidden');
+    function calendarClicked(e, instance) {
+      const classList = e.target.classList;
 
-    if (e.type === 'focus' && !hidden) return;
+      // A number was clicked.
+      if (classList.contains('num')) {
+        const target = e.target.nodeName === 'SPAN' ? e.target.parentNode : e.target;
+        const doNothing = ['disabled', 'active', 'empty'].some(name => {
+          return target.classList.contains(name);
+        });
 
-    if (!this.noPosition && (hidden || !e.path.includes(this.calendar))) {
-      classList.toggle('hidden');
-      return !classList.contains('hidden') ? calculatePosition(this) : null;
+        !doNothing && selectDay(target, instance);
+
+      // Month arrows were clicked.
+      } else if (classList.contains('arrow')) {
+        changeMonth(classList, instance);
+      }
     }
-    if (!e.path.includes(this.el) || !hidden) return;
-
-    classList.toggle('hidden');
   }
 
   return Datepicker;

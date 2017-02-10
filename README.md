@@ -66,7 +66,7 @@ const picker = datepicker('.some-element');
 | `dateSelected` | (JS date object) - This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well. Example: `new Date(2017, 0, 15)` |
 | `minDate` | (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)` |
 | `maxDate` | (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)` |
-| `noWeekends` | (boolean) - Provied `true` to disable selecting weekends. |
+| `noWeekends` | (boolean) - Provide `true` to disable selecting weekends. |
 | `onSelect` | (function) - Callback function after a date has been selected. |
 | `onShow` | (function) - Callback function when the calendar is shown. |
 | `onHide` | (function) - Callback function when the calendar is hidden. |

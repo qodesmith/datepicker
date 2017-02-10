@@ -45,7 +45,7 @@
     options = sanitizeOptions(options || defaults(), el, selector);
 
     const calendar = document.createElement('div');
-    const startDate = options.startDate || new Date();
+    const startDate = options.startDate || new Date(new Date().toLocaleDateString());
     const noPosition = selector === 'body' || selector === 'html';
     const instance = {
       // The calendar will be positioned relative to this element (except when 'body' or 'html').

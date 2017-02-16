@@ -88,6 +88,9 @@
       // Year of `startDate` or `dateSelected`.
       currentYear: (startDate || dateSelected).getFullYear(),
 
+      // Method to programatically set the calendar's date.
+      setDate: setDate,
+
       // Method that removes the calendar from the DOM along with associated events.
       remove: remove,
 
@@ -153,8 +156,7 @@
     // If so, strip the time from those dates (for accurate future comparisons).
     ['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(date => {
       if (options[date]) {
-        const type = ({}).toString.call(options[date]).slice(8, -1);
-        if (type !== 'Date' || isNaN(+options[date])) {
+        if (!dateCheck(options[date]) || isNaN(+options[date])) {
           throw new TypeError(`"options.${date}" needs to be a valid JavaScript Date object.`);
         }
 
@@ -397,6 +399,24 @@
   }
 
   /*
+   *  Method that programatically sets the date.
+   */
+  function setDate(date) {
+    if (!dateCheck(date)) throw new TypeError('`setDate` needs a JavaScript Date object.');
+    date = new Date(date.toLocaleDateString()); // Remove the time.
+    this.currentYear = date.getFullYear();
+    this.currentMonth = date.getMonth();
+    this.currentMonthName = months[date.getMonth()];
+    this.dateSelected = date;
+    setElValues(this.el, this);
+    calendarHtml(date, this);
+  }
+
+  function dateCheck(date) {
+    return ({}).toString.call(date) === '[object Date]';
+  }
+
+  /*
    *  Removes all event listeners added by the constructor.
    *  Removes the current instance from the array of instances.
    */
@@ -451,6 +471,10 @@
     calculatePosition(this);
   }
 
+  /*
+   *  Handles `click` events when the calendar's `el` is an <input>.
+   *  Handles `focusin` events for all other types of `el`'s.
+   */
   function oneHandler(e) {
     // Add `e.path` if it doesn't exist.
     if (!e.path) {

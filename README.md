@@ -1,5 +1,5 @@
 # Datepicker.js
-Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **2.6kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **2.7kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 ![Datepicker screenshot](./screenshot.png "Get a date with JavaScript!")
 
@@ -38,7 +38,7 @@ Files & locations:
 |       File       |            Location             |             Description             |
 | ---------------- | ------------------------------- | ----------------------------------- |
 | datepicker.js    | node_modules/js-datepicker/     | our main file                       |
-| dateicker.min.js | node_modules/js-datepicker/     | minified main file (2.6kb gzipped!) |
+| dateicker.min.js | node_modules/js-datepicker/     | minified main file (2.7kb gzipped!) |
 | datepicker.css   | node_modules/js-datepicker/     | stylesheet                          |
 | datepicker.less  | node_modules/js-datepicker/less | less: use it for your own builds    |
 
@@ -73,3 +73,31 @@ const picker = datepicker('.some-element');
 | `onMonthchange` | (function) - Callback function when the month has changed. |
 
 _NOTE: All callback functions are both bound to the Datepicker instance and passed the instance as its 1st argument. So you can simply access the instance via the_ `this` _keyword or the 1st argument._
+
+
+## Methods
+
+| Method | Description |
+| ------ | ----------- |
+| `.setDate` | Allows you to programmatically select a date on the calendar. It takes a JavaScript date object as it's only argument. E.x.: `picker.setDate(new Date(2099, 0, 5))` |
+| `.remove` | Performs cleanup. Will remove various event listeners and mutation observers _only_ for the instance it's called on. So if there are multiple Datepickers on the page, the others will be unaffected.
+
+
+## Properties & Values
+
+If you take a look at the datepicker instance, you'll notice plenty of values that you can grab and use however you'd like. Let's say you instantiated datepicker as such:
+
+```
+const picker = datepicker('.some-class', {dateSelected: new Date(2099, 0, 5)});
+```
+
+Below will detail the properties and values that are available on the `picker` example above.
+
+| Property | Value |
+| -------- | ----- |
+| `calendar` | The calendar element. |
+| `currentMonth` | A 0-index number representing the current month. For example, `0` represents January. |
+| `currentMonthName` | Calendar month in plain english. E.x. `January` |
+| `currentYear` | The current year. E.x. `2099` |
+| `dateSelected` | The value of the selected date. This will be `undefined` if no date has been selected yet. |
+| `el` | The element that datepicker "attached" to when instantiated. |

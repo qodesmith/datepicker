@@ -46,6 +46,7 @@
 
     const calendar = document.createElement('div');
     const startDate = options.startDate || new Date(new Date().toLocaleDateString());
+    const dateSelected = options.dateSelected;
     const noPosition = selector === 'body' || selector === 'html';
     const instance = {
       // The calendar will be positioned relative to this element (except when 'body' or 'html').
@@ -64,7 +65,7 @@
       startDate: startDate,
 
       // Starts the calendar with a date selected.
-      dateSelected: options.dateSelected,
+      dateSelected: dateSelected,
 
       // Low end of selectable dates.
       minDate: options.minDate,
@@ -78,14 +79,14 @@
       // The element our calendar is constructed in.
       calendar: calendar,
 
-      // Month of `startDate`.
-      currentMonth: startDate.getMonth(),
+      // Month of `startDate` or `dateSelected`.
+      currentMonth: (startDate || dateSelected).getMonth(),
 
       // Month name in plain english.
-      currentMonthName: months[startDate.getMonth()],
+      currentMonthName: months[(startDate || dateSelected).getMonth()],
 
-      // Year of `startDate`.
-      currentYear: startDate.getFullYear(),
+      // Year of `startDate` or `dateSelected`.
+      currentYear: (startDate || dateSelected).getFullYear(),
 
       // Method that removes the calendar from the DOM along with associated events.
       remove: remove,
@@ -104,12 +105,12 @@
     };
 
     // Populate the <input> field or set attributes on the `el`.
-    if (instance.dateSelected) setElValues(el, instance);
+    if (dateSelected) setElValues(el, instance);
 
     calendar.classList.add('datepicker');
     calendar.classList.add('hidden');
     datepickers.push(el);
-    calendarHtml(startDate, instance);
+    calendarHtml(startDate || dateSelected, instance);
 
     classChangeObserver(calendar, instance);
     window.addEventListener('resize', resize.bind(instance));
@@ -161,6 +162,8 @@
         options[date] = new Date(options[date].toLocaleDateString());
       }
     });
+
+    options.startDate = options.startDate || options.dateSelected;
 
     if (maxDate < minDate) {
       throw new Error('"maxDate" in options is less than "minDate".');
@@ -272,9 +275,10 @@
       let otherClass = '';
       let span = `<span class="num">${num}</span>`;
       let thisDay = new Date(currentYear, currentMonth, num);
+      let isEmpty = num < 1 || num > daysInMonth;
 
       // Empty squares.
-      if (num < 1 || num > daysInMonth) {
+      if (isEmpty) {
         otherClass = 'empty';
         span = '';
 
@@ -289,7 +293,7 @@
       }
 
       // Currently selected day.
-      if (+thisDay === +dateSelected) otherClass += ' active';
+      if (+thisDay === +dateSelected && !isEmpty) otherClass += ' active';
 
       calendarSquares.push(`<div class="square num ${weekday} ${otherClass}">${span}</div>`);
     }

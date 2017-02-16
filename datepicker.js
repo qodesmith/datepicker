@@ -1,7 +1,7 @@
 (function(root, returnDatepicker) {
   if (typeof exports === 'object') return module.exports = returnDatepicker();
   if (typeof define === 'function' && define.amd) return define(function() {return returnDatepicker()});
-  return root.Datepicker = returnDatepicker();
+  return root.datepicker = returnDatepicker();
 })(this, function() {
   'use strict';
 
@@ -390,23 +390,6 @@
     if (right) style += `right:${leftPercent}%;`;
 
     calendar.setAttribute('style', style);
-  }
-
-  /*
-   *  Adds a path array to the event object if it doesn't have it.
-   */
-  function addPathToEvent(e) {
-    if (!e.path) {
-      let node = e.target;
-      e.path = [];
-
-      while (node !== document) {
-        e.path.push(node);
-        node = node.parentNode;
-      }
-    }
-
-    return e;
   }
 
   /*

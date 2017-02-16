@@ -153,8 +153,8 @@
     ['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(date => {
       if (options[date]) {
         const type = ({}).toString.call(options[date]).slice(8, -1);
-        if (type !== 'Date') {
-          throw new TypeError(`"options.${date}" needs to be a JavaScript Date object.`);
+        if (type !== 'Date' || isNaN(+options[date])) {
+          throw new TypeError(`"options.${date}" needs to be a valid JavaScript Date object.`);
         }
 
         // Strip the time from the date.
@@ -289,7 +289,7 @@
       }
 
       // Currently selected day.
-      if (+thisDay === +dateSelected && isThisMonth) otherClass += ' active';
+      if (+thisDay === +dateSelected) otherClass += ' active';
 
       calendarSquares.push(`<div class="square num ${weekday} ${otherClass}">${span}</div>`);
     }

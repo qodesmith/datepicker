@@ -116,14 +116,17 @@
     calendarHtml(startDate || dateSelected, instance);
 
     classChangeObserver(calendar, instance);
-    window.addEventListener('resize', resize.bind(instance));
-
-    // window.addEventListener('click', clickHandler.bind(instance));
-    // el.addEventListener(instance.nonInput ? 'click': 'focus', toggleCalendar.bind(instance));
     window.addEventListener('click', oneHandler.bind(instance));
     window.addEventListener('focusin', oneHandler.bind(instance));
 
-    document.body.appendChild(calendar);
+    const parent = el.parentElement;
+
+    if (getComputedStyle(parent).position === 'static') {
+      instance.parent = parent;
+      parent.style.position = 'relative';
+    }
+
+    parent.appendChild(calendar);
 
     return instance;
   }
@@ -376,24 +379,24 @@
   }
 
   /*
-   *  Sets the `style` attribute on the calendar after calculating
-   *  some things when the browser is resized.
+   *  Sets the `style` attribute on the calendar after doing calculations.
    */
   function calculatePosition(instance) {
     // Don't position the calendar in reference to the <body> or <html> elements.
     if (instance.noPosition) return;
 
-    const {el, calendar, position} = instance;
+    const {el, calendar, position, parent} = instance;
     const {top, bottom, left, right} = position;
+
+    const parentRect = parent.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();
     const calRect = calendar.getBoundingClientRect();
-    const leftPercent = elRect.left / window.innerWidth * 100;
-    let style = '';
+    const offset = elRect.top - parentRect.top + parent.scrollTop;
 
-    if (top) style += `top:${window.scrollY + elRect.top - calRect.height}px;`;
-    if (bottom) style += `top:${window.scrollY + elRect.top + elRect.height}px;`;
-    if (left) style += `left:${leftPercent}%;`;
-    if (right) style += `right:${leftPercent}%;`;
+    const style = `
+      top:${offset - (top ? calRect.height : (elRect.height * -1))}px;
+      left:${elRect.left - parentRect.left + (right ? elRect.width - calRect.width : 0)}px;
+    `;
 
     calendar.setAttribute('style', style);
   }
@@ -421,11 +424,13 @@
    *  Removes the current instance from the array of instances.
    */
   function remove() {
-    window.removeEventListener('resize', resize);
     window.removeEventListener('click', oneHandler);
     window.removeEventListener('focusin', oneHandler);
     this.calendar.remove();
     this.observer.disconnect(); // Stop the mutationObserver. https://goo.gl/PgFCEr
+
+    // Remove styling done to the parent element.
+    if (this.calendar.hasOwnProperty('parentStyle')) this.parent.style.position = '';
 
     // Remove this datepicker's `el` from the list.
     const index = datepickers.indexOf(this.el);
@@ -460,15 +465,6 @@
       attributeFilter: ['class'],
       attributeOldValue: 1
     });
-  }
-
-  /*
-   *  Calls `calculatePosition` whenever the browser is resized
-   *  and the calendar is visible.
-   */
-  function resize() {
-    if (this.calendar.classList.contains('hidden')) return;
-    calculatePosition(this);
   }
 
   /*

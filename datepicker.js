@@ -386,7 +386,7 @@
     if (instance.noPosition) return;
 
     const {el, calendar, position, parent} = instance;
-    const {top, bottom, left, right} = position;
+    const {top, right} = position;
 
     const parentRect = parent.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();

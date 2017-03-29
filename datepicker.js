@@ -41,6 +41,7 @@
    */
   function Datepicker(selector, options) {
     const el = document.querySelector(selector);
+    const parent = el.parentElement;
 
     options = sanitizeOptions(options || defaults(), el, selector);
 
@@ -51,6 +52,8 @@
     const instance = {
       // The calendar will be positioned relative to this element (except when 'body' or 'html').
       el: el,
+
+      parent: parent,
 
       // Indicates whether to use a <input> element or not as the calendars anchor  .
       nonInput: el.nodeName !== 'INPUT',
@@ -118,8 +121,6 @@
     classChangeObserver(calendar, instance);
     window.addEventListener('click', oneHandler.bind(instance));
     window.addEventListener('focusin', oneHandler.bind(instance));
-
-    const parent = el.parentElement;
 
     if (getComputedStyle(parent).position === 'static') {
       instance.parent = parent;

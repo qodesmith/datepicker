@@ -52,6 +52,7 @@
       // The calendar will be positioned relative to this element (except when 'body' or 'html').
       el: el,
 
+      // The element that datepicker will be attached to.
       parent: parent,
 
       // Indicates whether to use a <input> element or not as the calendars anchor  .

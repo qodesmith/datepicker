@@ -121,6 +121,7 @@
     classChangeObserver(calendar, instance);
     window.addEventListener('click', oneHandler.bind(instance));
     window.addEventListener('focusin', oneHandler.bind(instance));
+    window.addEventListener('keyup', oneHandler.bind(instance));
 
     if (getComputedStyle(parent).position === 'static') {
       parent.style.position = 'relative';
@@ -433,6 +434,7 @@
   function remove() {
     window.removeEventListener('click', oneHandler);
     window.removeEventListener('focusin', oneHandler);
+    window.removeEventListener('keyup', oneHandler);
     this.calendar.remove();
     this.observer.disconnect(); // Stop the mutationObserver. https://goo.gl/PgFCEr
 
@@ -492,6 +494,9 @@
 
     const calClasses = this.calendar.classList;
     const hidden = calClasses.contains('hidden');
+
+    // Only pay attention to `keyup` events if the character is the TAB key.
+    if (e.type === 'keyup' && e.keyCode !== 9) return;
 
     // Only pay attention to `focusin` events if the calendar's el is an <input>.
     // `focusin` bubbles, `focus` does not.

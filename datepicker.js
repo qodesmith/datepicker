@@ -45,8 +45,7 @@
     options = sanitizeOptions(options || defaults(), el, selector);
 
     const calendar = document.createElement('div');
-    const startDate = options.startDate || new Date(new Date().toLocaleDateString());
-    const dateSelected = options.dateSelected;
+    const {startDate, dateSelected} = options;
     const noPosition = selector === 'body' || selector === 'html';
     const instance = {
       // The calendar will be positioned relative to this element (except when 'body' or 'html').
@@ -164,11 +163,11 @@
         }
 
         // Strip the time from the date.
-        options[date] = new Date(options[date].toLocaleDateString());
+        options[date] = stripTime(options[date]);
       }
     });
 
-    options.startDate = options.startDate || options.dateSelected;
+    options.startDate = options.startDate || options.dateSelected || stripTime(new Date());
 
     if (maxDate < minDate) {
       throw new Error('"maxDate" in options is less than "minDate".');
@@ -197,7 +196,7 @@
    */
   function defaults() {
     return {
-      startDate: new Date(new Date().toLocaleDateString()),
+      startDate: stripTime(new Date()),
       position: 'bl'
     };
   }
@@ -406,7 +405,7 @@
    */
   function setDate(date) {
     if (!dateCheck(date)) throw new TypeError('`setDate` needs a JavaScript Date object.');
-    date = new Date(date.toLocaleDateString()); // Remove the time.
+    date = stripTime(date); // Remove the time.
     this.currentYear = date.getFullYear();
     this.currentMonth = date.getMonth();
     this.currentMonthName = months[date.getMonth()];
@@ -417,6 +416,13 @@
 
   function dateCheck(date) {
     return ({}).toString.call(date) === '[object Date]';
+  }
+
+  /*
+   *  Takes a date and returns a date stripped of its time (hh:mm:ss:ms).
+   */
+  function stripTime(date) {
+    return new Date(date.toDateString());
   }
 
   /*

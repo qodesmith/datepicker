@@ -479,6 +479,7 @@
   /*
    *  Handles `click` events when the calendar's `el` is an <input>.
    *  Handles `focusin` events for all other types of `el`'s.
+   *  Handles `keyup` events when tabbing.
    */
   function oneHandler(e) {
     // Add `e.path` if it doesn't exist.

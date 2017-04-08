@@ -55,7 +55,7 @@
       // The element that datepicker will be attached to.
       parent: parent,
 
-      // Indicates whether to use a <input> element or not as the calendars anchor  .
+      // Indicates whether to use a <input> element or not as the calendars anchor.
       nonInput: el.nodeName !== 'INPUT',
 
       // Flag indicating if `el` is 'body' or 'html' for `calculatePosition`.
@@ -107,10 +107,17 @@
       onHide: options.onHide,
 
       // Callback fired when the month is changed.
-      onMonthChange: options.onMonthChange
+      onMonthChange: options.onMonthChange,
+
+      // Disable the datepicker on mobile devices.
+      // Allows the use of native datepicker if the input type is 'date'.
+      disableMobile: options.disableMobile,
+
+      // Used in conjuntion with `disableMobile` above within `oneHandler`.
+      isMobile: 'ontouchstart' in window
     };
 
-    // Populate the <input> field or set attributes on the `el`.
+    // Initially populate the <input> field / set attributes on the `el`.
     if (dateSelected) setElValues(el, instance);
 
     calendar.classList.add('datepicker');
@@ -492,6 +499,8 @@
         node = node.parentNode;
       }
     }
+
+    if (this.isMobile && this.disableMobile) return;
 
     const calClasses = this.calendar.classList;
     const hidden = calClasses.contains('hidden');

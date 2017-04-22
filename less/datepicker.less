@@ -44,6 +44,8 @@
   width: @arrow;
   position: relative;
   cursor: pointer;
+  border-radius: @arrow / 5;
+  transition: background .15s;
 
   &:hover {
     &.left:after {
@@ -53,6 +55,8 @@
     &.right:after {
       border-left-color: black;
     }
+
+    background: rgba(0,0,0,.1);
   }
 
   &:after {

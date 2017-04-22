@@ -40,14 +40,14 @@
    *
    */
   function Datepicker(selector, options) {
-    const el = document.querySelector(selector);
+    const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
     const parent = el.parentElement;
 
     options = sanitizeOptions(options || defaults(), el, selector);
 
     const calendar = document.createElement('div');
     const {startDate, dateSelected} = options;
-    const noPosition = selector === 'body' || selector === 'html';
+    const noPosition = el === document.body || el === document.querySelector('html');
     const instance = {
       // The calendar will be positioned relative to this element (except when 'body' or 'html').
       el: el,
@@ -143,9 +143,9 @@
    *  Will run checks on the provided options object to ensure correct types.
    *  Returns an options object if everything checks out.
    */
-  function sanitizeOptions(options, el, selector) {
-    // An invalid selected has been provided.
-    if (!el) throw new Error(`"${selector}" doesn't reference any element on the page.`);
+  function sanitizeOptions(options, el) {
+    // An invalid selector or non-DOM node has been provided.
+    if (!el) throw new Error('An invalid selector or non-DOM node has been provided.');
 
     // Check if the provided element already has a datepicker attached.
     if (datepickers.includes(el)) throw new Error('A datepicker already exists on that element.');

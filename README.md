@@ -46,9 +46,15 @@ Files & locations:
 
 ## Usage
 
+```
+const picker = datepicker(selector, options);
+```
+
 Datepicker takes 2 arguments:
 
-1. A string representing a CSS selector, such as `'.my-class'`, `'#my-id'`, or `'div'`.
+1. `selector` - two possibilities:
+    1. `string` - a CSS selector, such as `'.my-class'`, `'#my-id'`, or `'div'`.
+    2. `DOM node` - provide a DOM node, such as `document.querySelector('#my-id')`.
 2. (optional) An object full of options (see below)
 
 You can use Datepicker with any type of element you want. If used with an `<input>` element (the common use case), then the `<input>`'s value will automatically be set when selecting a date.
@@ -103,3 +109,12 @@ Below will detail some helpful properties and values that are available on the `
 | `currentYear` | The current year. E.x. `2099` |
 | `dateSelected` | The value of the selected date. This will be `undefined` if no date has been selected yet. |
 | `el` | The element datepicker is relatively positioned against. |
+
+
+## Sizing The Calendar
+
+Styles for the calendar are compiled down to CSS from the `datepicker.less` file with `gulp`. All the sizes for the various portions of the calendar are relative to a single value at the top of that file: `@width: 250px;`. To resize the calendar, simply rebuild `datepicker.css` by doing the following:
+
+1. Open `datepicker.less`
+2. Change the `@width` variable to whatever value you want (try `350px`) and save.
+3. From the command line run `gulp less`.

@@ -1,6 +1,6 @@
 {
   "name": "js-datepicker",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Get a date with JavaScript! A datepicker with no dependencies.",
   "main": "datepicker.js",
   "scripts": {
@@ -16,6 +16,11 @@
     "vanilla"
   ],
   "author": "Qodesmith",
+  "email": "theqodesmith@gmail.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qodesmith/typer"
+  },
   "license": "ISC",
   "devDependencies": {
     "babel-preset-latest": "^6.22.0",

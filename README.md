@@ -30,8 +30,9 @@ and include `datepicker.js` just above your closing `</body>` tag...
 ```
 
 #### Via NPM
-From the CLI run:
-`npm install js-datepicker`
+```
+npm install --save js-datepicker
+```
 
 Files & locations:
 

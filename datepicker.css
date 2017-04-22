@@ -44,6 +44,11 @@
   width: 25px;
   position: relative;
   cursor: pointer;
+  border-radius: 5px;
+  transition: background .15s;
+}
+.arrow:hover {
+  background: rgba(0, 0, 0, 0.1);
 }
 .arrow:hover.left:after {
   border-right-color: black;

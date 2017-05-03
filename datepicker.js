@@ -97,16 +97,16 @@
       // Method that removes the calendar from the DOM along with associated events.
       remove: remove,
 
-      // Callback fired when a date is selected.
+      // Callback fired when a date is selected - triggered in `selectDay`.
       onSelect: options.onSelect,
 
-      // Callback fired when the calendar is shown.
+      // Callback fired when the calendar is shown - triggered in `classChangeObserver`.
       onShow: options.onShow,
 
-      // Callback fired when the calendar is hidden.
+      // Callback fired when the calendar is hidden - triggered in `classChangeObserver`..
       onHide: options.onHide,
 
-      // Callback fired when the month is changed.
+      // Callback fired when the month is changed - triggered in `changeMonth`.
       onMonthChange: options.onMonthChange,
 
       // Disable the datepicker on mobile devices.

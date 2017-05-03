@@ -59,6 +59,8 @@ Datepicker takes 2 arguments:
 
 You can use Datepicker with any type of element you want. If used with an `<input>` element (the common use case), then the `<input>`'s value will automatically be set when selecting a date.
 
+NOTE: Using `<input type="date">` will cause issues as those inputs already have a built in calendar. `datepicker` will not change the value of those inputs. Use `<input type="text">` instead.
+
 Simplest example:
 ```javascript
 const picker = datepicker('.some-element');

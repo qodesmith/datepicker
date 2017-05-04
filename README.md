@@ -121,3 +121,42 @@ Styles for the calendar are compiled down to CSS from the `datepicker.less` file
 1. Open `datepicker.less`
 2. Change the `@width` variable to whatever value you want (try `350px`) and save.
 3. From the command line run `gulp less`.
+
+
+## Examples
+
+Simplest usage:
+```javascript
+const picker = datepicker('#some-id');
+```
+
+With all options declared:
+```javascript
+const picker = datepicker(document.querySelector('#some-id'), {
+  position: 'tr', // Top right.
+  startDate: new Date(), // This month.
+  dateSelected: new Date(), // Today is selected.
+  minDate: new Date(2016, 5, 1), // June 1st, 2016.
+  maxDate: new Date(2099, 0, 1), // Jan 1st, 2099.
+  noWeekends: true, // Weekends will be unselectable.
+  formatter: function(el, date) {
+    // This will display the date as `1/1/2017`.
+    el.value = date.toDateString();
+  },
+  onSelect: function(instance) {
+    // Show which date was selected.
+    console.log(instance.dateSelected);
+  },
+  onShow: function(instance) {
+    console.log('Calendar showing.');
+  },
+  onHide: function(instance) {
+    console.log('Calendar hidden.');
+  },
+  onMonthChange: function(instance) {
+    // Show the month of the selected date.
+    console.log(instance.currentMonthName);
+  },
+  disableMobile: true // Conditionally disabled on mobile devices.
+});
+```

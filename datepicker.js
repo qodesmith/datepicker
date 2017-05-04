@@ -103,11 +103,14 @@
       // Callback fired when the calendar is shown - triggered in `classChangeObserver`.
       onShow: options.onShow,
 
-      // Callback fired when the calendar is hidden - triggered in `classChangeObserver`..
+      // Callback fired when the calendar is hidden - triggered in `classChangeObserver`.
       onHide: options.onHide,
 
       // Callback fired when the month is changed - triggered in `changeMonth`.
       onMonthChange: options.onMonthChange,
+
+      // Function to customize the date format updated on <input> elements - triggered in `setElValues`.
+      formatter: options.formatter,
 
       // Disable the datepicker on mobile devices.
       // Allows the use of native datepicker if the input type is 'date'.
@@ -150,7 +153,8 @@
     // Check if the provided element already has a datepicker attached.
     if (datepickers.includes(el)) throw new Error('A datepicker already exists on that element.');
 
-    let {position, maxDate, minDate, dateSelected} = options;
+    let {position, maxDate, minDate, dateSelected, formatter} = options;
+
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
     if (position) {
@@ -177,6 +181,7 @@
     });
 
     options.startDate = options.startDate || options.dateSelected || stripTime(new Date());
+    options.formatter = typeof formatter === 'function' ? formatter : null;
 
     if (maxDate < minDate) {
       throw new Error('"maxDate" in options is less than "minDate".');
@@ -334,7 +339,7 @@
    *  Calls `setElValues`.
    */
   function selectDay(target, instance) {
-    const { currentMonth, currentYear, calendar, el } = instance;
+    const { currentMonth, currentYear, calendar, el, onSelect } = instance;
     const active = calendar.querySelector('.active');
     const num = target.textContent;
 
@@ -350,9 +355,9 @@
     setElValues(el, instance);
 
     // Hide the calendar after a day has been selected.
-    instance.calendar.classList.add('hidden');
+    calendar.classList.add('hidden');
 
-    if (instance.onSelect) instance.onSelect(instance);
+    if (onSelect) instance.onSelect(instance);
   }
 
   /*
@@ -361,6 +366,7 @@
    */
   function setElValues(el, instance) {
     if (instance.nonInput) return;
+    if (instance.formatter) return instance.formatter(el, instance.dateSelected);
     el.value = instance.dateSelected.toDateString();
   }
 

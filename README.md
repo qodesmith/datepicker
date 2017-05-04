@@ -76,6 +76,7 @@ const picker = datepicker('.some-element');
 | `minDate` | (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)` |
 | `maxDate` | (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)` |
 | `noWeekends` | (boolean) - Provide `true` to disable selecting weekends. |
+| `formatter` | (function) - Provide a function that manually sets the provided input's value with your own formatting. This function is passed two arguments. 1st argument is the element `datepicker` is triggered on. 2nd argument is a JavaScript date object for the selected date. |
 | `onSelect` | (function) - Callback function after a date has been selected. |
 | `onShow` | (function) - Callback function when the calendar is shown. |
 | `onHide` | (function) - Callback function when the calendar is hidden. |

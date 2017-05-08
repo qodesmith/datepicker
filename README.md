@@ -73,6 +73,8 @@ const picker = datepicker('.some-element');
 | `position` | (string) Can be 1 of 4 values: `'tr'`, `'tl'`, `'br'`, `'bl'` representing top-right, top-left, bottom-right, and bottom-left respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument. |
 | `startDate` | (JS date object) The month that the calendar will open up to. The default value is the current month. Example: `new Date()` |
 | `dateSelected` | (JS date object) - This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well. Example: `new Date(2017, 0, 15)` |
+| `customMonths` | (Array) - Custom labels for months. It's length has to be 12. Starts at January (jan).
+| `customDays`  | (Array) - Custom labels for days. It's length has to be 7. Starts at Sunday (sun).
 | `minDate` | (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)` |
 | `maxDate` | (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)` |
 | `noWeekends` | (boolean) - Provide `true` to disable selecting weekends. |
@@ -139,6 +141,9 @@ const picker = datepicker(document.querySelector('#some-id'), {
   minDate: new Date(2016, 5, 1), // June 1st, 2016.
   maxDate: new Date(2099, 0, 1), // Jan 1st, 2099.
   noWeekends: true, // Weekends will be unselectable.
+  customMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+    'August', 'September', 'October', 'November', 'December'], // Labels for months
+  customDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], // Labels for days
   formatter: function(el, date) {
     // This will display the date as `1/1/2017`.
     el.value = date.toDateString();

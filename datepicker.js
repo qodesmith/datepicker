@@ -5,7 +5,7 @@
 })(this, function() {
   'use strict';
 
-  const months = {
+  let months = {
     0: 'January',
     1: 'February',
     2: 'March',
@@ -19,7 +19,7 @@
     10: 'November',
     11: 'December'
   };
-  const days = {
+  let days = {
     1: 'Sun',
     2: 'Mon',
     3: 'Tue',
@@ -28,6 +28,8 @@
     6: 'Fri',
     0: 'Sat'
   };
+  let daysArray;
+
   const sides = {
     t: 'top',
     r: 'right',
@@ -153,7 +155,27 @@
     // Check if the provided element already has a datepicker attached.
     if (datepickers.includes(el)) throw new Error('A datepicker already exists on that element.');
 
-    let {position, maxDate, minDate, dateSelected, formatter} = options;
+    let {position, maxDate, minDate, dateSelected, formatter, customMonths, customDays} = options;
+
+    // Check if custom month labels are provided and set if the case
+    if (customMonths && (!(customMonths instanceof Array) || customMonths.length !== 12))
+      throw new Error('An invalid set of custom months has been provided.');
+    else if (customMonths && customMonths instanceof Array) months = customMonths.reduce((b, a, i) => {
+      b[i] = a;
+      return b;
+    }, {});
+
+
+    // Check if custom days labels are provided and set if the case
+    if (customDays && (!(customDays instanceof Array) || customDays.length !== 7))
+      throw new Error('An invalid set of custom days has been provided.');
+    else if (customDays && customDays instanceof Array) {
+      daysArray = customDays;
+      days = customDays.reduce((b, a, i) => {
+        b[i] = a;
+        return b;
+      }, {});
+    }
 
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
@@ -317,7 +339,7 @@
     }
 
     // Add the header row of days of the week.
-    const daysAndSquares = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => {
+    const daysAndSquares = daysArray.map(day => {
       return `<div class="square day">${day}</div>`;
     }).concat(calendarSquares);
 

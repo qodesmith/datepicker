@@ -159,6 +159,8 @@ const picker = datepicker(document.querySelector('#some-id'), {
     // Show the month of the selected date.
     console.log(instance.currentMonthName);
   },
+  customMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  customDays: ['S', 'M', 'T', 'W', 'Th', 'F', 'S'],
   disableMobile: true // Conditionally disabled on mobile devices.
 });
 ```

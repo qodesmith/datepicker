@@ -434,7 +434,7 @@
     date = stripTime(date); // Remove the time.
     this.currentYear = date.getFullYear();
     this.currentMonth = date.getMonth();
-    this.currentMonthName = (instance.months || months)[date.getMonth()];
+    this.currentMonthName = (this.months || months)[date.getMonth()];
     this.dateSelected = date;
     setElValues(this.el, this);
     calendarHtml(date, this);

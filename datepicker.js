@@ -5,6 +5,8 @@
 })(this, function() {
   'use strict';
 
+  const datepickers = [];
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = [
     'January',
     'February',
@@ -19,14 +21,12 @@
     'November',
     'December'
   ];
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const sides = {
     t: 'top',
     r: 'right',
     b: 'bottom',
     l: 'left'
   };
-  const datepickers = [];
 
   /*
    *
@@ -248,7 +248,7 @@
 
   /*
    *  Populates `calendar.innerHTML` with the contents
-   *  of the calendar controls and month.
+   *  of the calendar controls, month, and overlay.
    */
   function calendarHtml(date, instance) {
     const controls = createControls(date, instance);
@@ -560,7 +560,32 @@
       // Month arrows were clicked.
       } else if (classList.contains('arrow')) {
         changeMonth(classList, instance);
+
+      // Month or year was clicked.
+      } else if (classList.contains('month-year')) {
+        monthYearOverlay(e.target, instance);
       }
+    }
+
+    function monthYearOverlay(target, instance) {
+      const { calendar } = instance;
+      const overlay = document.createElement('div');
+      const dropMonths = (instance.months || months).map(month => {
+        return `<option value="${month}">${month}</option>`
+      }).join('');
+      const html = `
+        <div class="overlay">
+          <div class="overlay-close"></div>
+          <div>Choose month:</div>
+          <select class="month-dropdown">${dropMonths}</select>
+          <div>Enter year:</div>
+          <input type="text" class="enter-year" />
+        </div>
+      `;
+
+      overlay.classList.add('overlay');
+      overlay.innerHTML = html;
+      calendar.appendChild(overlay);
     }
   }
 

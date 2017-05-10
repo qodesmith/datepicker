@@ -25,7 +25,7 @@
 .datepicker.hidden {
   display: none;
 }
-.controls {
+.datepicker .controls {
   width: 100%;
   display: -ms-flexbox;
   display: flex;
@@ -39,7 +39,7 @@
       flex-shrink: 0;
   background: lightgray;
 }
-.arrow {
+.datepicker .arrow {
   height: 25px;
   width: 25px;
   position: relative;
@@ -47,49 +47,60 @@
   border-radius: 5px;
   transition: background .15s;
 }
-.arrow:hover {
+.datepicker .arrow:hover {
   background: rgba(0, 0, 0, 0.1);
 }
-.arrow:hover.left:after {
+.datepicker .arrow:hover.left:after {
   border-right-color: black;
 }
-.arrow:hover.right:after {
+.datepicker .arrow:hover.right:after {
   border-left-color: black;
 }
-.arrow:after {
+.datepicker .arrow:after {
   content: '';
   border: 6.25px solid transparent;
   position: absolute;
   top: 50%;
   transition: border .2s;
 }
-.arrow.left:after {
+.datepicker .arrow.left:after {
   border-right-color: gray;
   right: 50%;
   transform: translate(25%, -50%);
 }
-.arrow.right:after {
+.datepicker .arrow.right:after {
   border-left-color: gray;
   left: 50%;
   transform: translate(-25%, -50%);
 }
-.month-year {
+.datepicker .month-year {
   font-weight: bold;
 }
-.month {
+.datepicker .month {
   padding-right: .5ex;
+  cursor: default;
 }
-.year {
+.datepicker .year {
   padding-left: .5ex;
+  transition: border .2s;
+  border-bottom: 1px solid transparent;
+  cursor: text;
 }
-.squares {
+.datepicker .year:hover {
+  border-bottom: 1px solid gray;
+}
+.datepicker .year:focus,
+.datepicker .year:active:focus {
+  outline: none;
+}
+.datepicker .squares {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
       flex-wrap: wrap;
   padding: 5px;
 }
-.square {
+.datepicker .square {
   width: 14.28571429%;
   height: 25px;
   display: -ms-flexbox;
@@ -102,26 +113,26 @@
   transition: background .1s;
   border-radius: 4.22275px;
 }
-.square.current {
+.datepicker .square.current {
   font-weight: bold;
 }
-.square.active {
+.datepicker .square.active {
   background: lightblue;
 }
-.square.disabled span {
+.datepicker .square.disabled span {
   opacity: .2;
 }
-.square.empty {
+.datepicker .square.empty {
   cursor: default;
 }
-.square.disabled {
+.datepicker .square.disabled {
   cursor: not-allowed;
 }
-.square.day {
+.datepicker .square.day {
   cursor: default;
   font-weight: bold;
   color: gray;
 }
-.square:not(.empty):not(.disabled):not(.day):hover {
+.datepicker .square:not(.empty):not(.disabled):not(.day):hover {
   background: orange;
 }

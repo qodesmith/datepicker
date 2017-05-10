@@ -5,29 +5,21 @@
 })(this, function() {
   'use strict';
 
-  const months = {
-    0: 'January',
-    1: 'February',
-    2: 'March',
-    3: 'April',
-    4: 'May',
-    5: 'June',
-    6: 'July',
-    7: 'August',
-    8: 'September',
-    9: 'October',
-    10: 'November',
-    11: 'December'
-  };
-  const days = {
-    1: 'Sun',
-    2: 'Mon',
-    3: 'Tue',
-    4: 'Wed',
-    5: 'Thu',
-    6: 'Fri',
-    0: 'Sat'
-  };
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const sides = {
     t: 'top',
     r: 'right',
@@ -82,11 +74,11 @@
       // The element our calendar is constructed in.
       calendar: calendar,
 
-      // Month of `startDate` or `dateSelected`.
+      // Month of `startDate` or `dateSelected` (as a number).
       currentMonth: (startDate || dateSelected).getMonth(),
 
       // Month name in plain english.
-      currentMonthName: months[(startDate || dateSelected).getMonth()],
+      currentMonthName: (options.months || months)[(startDate || dateSelected).getMonth()],
 
       // Year of `startDate` or `dateSelected`.
       currentYear: (startDate || dateSelected).getFullYear(),
@@ -111,6 +103,12 @@
 
       // Function to customize the date format updated on <input> elements - triggered in `setElValues`.
       formatter: options.formatter,
+
+      // Custom labels for months.
+      months: options.months,
+
+      // Custom labels for days.
+      days: options.days,
 
       // Disable the datepicker on mobile devices.
       // Allows the use of native datepicker if the input type is 'date'.
@@ -153,7 +151,7 @@
     // Check if the provided element already has a datepicker attached.
     if (datepickers.includes(el)) throw new Error('A datepicker already exists on that element.');
 
-    let {position, maxDate, minDate, dateSelected, formatter} = options;
+    let {position, maxDate, minDate, dateSelected, formatter, customMonths, customDays} = options;
 
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
@@ -202,6 +200,26 @@
       options[fxn] = typeof options[fxn] === 'function' && options[fxn];
     });
 
+
+    // Custom labels for months & days.
+    [customMonths, customDays].forEach((custom, i) => {
+      if (custom === undefined) return;
+
+      const errorMsgs = [
+        '"customMonths" must be an array with 12 strings.',
+        '"customDays" must be an array with 7 strings.'
+      ];
+      const wrong = [
+        ({}).toString.call(custom) !== '[object Array]',
+        custom.length !== (i ? 7 : 12),
+        custom.some(item => typeof item !== 'string')
+      ].some(thing => thing);
+
+      if (wrong) throw new Error(errorMsgs[i]);
+
+      options[i ? 'days' : 'months'] = custom;
+    });
+
     return options;
   }
 
@@ -242,12 +260,12 @@
    *  Creates the calendar controls.
    *  Returns a string representation of DOM elements.
    */
-  function createControls(date) {
+  function createControls(date, instance) {
     return [
       '<div class="controls">',
       '<div class="arrow left"></div>',
       '<div class="month-year">',
-      `<span class="month">${months[date.getMonth()]}</span>`,
+      `<span class="month">${(instance.months || months)[date.getMonth()]}</span>`,
       `<span class="year">${date.getFullYear()}</span>`,
       '</div>',
       '<div class="arrow right"></div>',
@@ -260,14 +278,7 @@
    *  Returns a string representation of DOM elements.
    */
   function createMonth(date, instance) {
-    const {
-      minDate,
-      maxDate,
-      dateSelected,
-      currentYear,
-      currentMonth,
-      noWeekends
-    } = instance;
+    const {minDate, maxDate, dateSelected, currentYear, currentMonth, noWeekends} = instance;
 
     // Same year, same month?
     const today = new Date();
@@ -288,7 +299,7 @@
     totalSquares += (offset + daysInMonth) % 7 ? 7 : 0;
 
     for (let i = 1; i <= totalSquares; i++) {
-      let weekday = days[i % 7];
+      let weekday = (instance.days || days)[(i - 1) % 7];
       let num = i - offset;
       let otherClass = '';
       let span = `<span class="num">${num}</span>`;
@@ -317,7 +328,7 @@
     }
 
     // Add the header row of days of the week.
-    const daysAndSquares = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => {
+    const daysAndSquares = (instance.days || days).map(day => {
       return `<div class="square day">${day}</div>`;
     }).concat(calendarSquares);
 
@@ -388,7 +399,7 @@
 
     const newDate = new Date(instance.currentYear, instance.currentMonth, 1);
     calendarHtml(newDate, instance);
-    instance.currentMonthName = months[instance.currentMonth];
+    instance.currentMonthName = (instance.months || months)[instance.currentMonth];
     instance.onMonthChange && instance.onMonthChange(instance);
   }
 
@@ -423,7 +434,7 @@
     date = stripTime(date); // Remove the time.
     this.currentYear = date.getFullYear();
     this.currentMonth = date.getMonth();
-    this.currentMonthName = months[date.getMonth()];
+    this.currentMonthName = (instance.months || months)[date.getMonth()];
     this.dateSelected = date;
     setElValues(this.el, this);
     calendarHtml(date, this);

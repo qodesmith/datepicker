@@ -46,7 +46,7 @@ Files & locations:
 
 ## Usage
 
-```
+```javascript
 const picker = datepicker(selector, options);
 ```
 
@@ -100,7 +100,7 @@ _NOTE: All callback functions are both bound to the Datepicker instance and pass
 
 If you take a look at the datepicker instance, you'll notice plenty of values that you can grab and use however you'd like. Let's say you instantiated datepicker as such:
 
-```
+```javascript
 const picker = datepicker('.some-class', {dateSelected: new Date(2099, 0, 5)});
 ```
 

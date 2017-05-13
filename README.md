@@ -1,7 +1,7 @@
 # Datepicker.js
-Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **2.9kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **3.3kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
-![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/screenshot.png "Get a date with JavaScript!")
+![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/calendar.png "Get a date with JavaScript!")
 
 <!-- [Live Demo](http://aaroncordova.xyz/datepicker) -->
 
@@ -39,7 +39,7 @@ Files & locations:
 |       File       |            Location             |             Description             |
 | ---------------- | ------------------------------- | ----------------------------------- |
 | datepicker.js    | node_modules/js-datepicker/     | our main file                       |
-| dateicker.min.js | node_modules/js-datepicker/     | minified main file (2.8kb gzipped!) |
+| dateicker.min.js | node_modules/js-datepicker/     | minified main file (3.3kb gzipped!) |
 | datepicker.css   | node_modules/js-datepicker/     | stylesheet                          |
 | datepicker.less  | node_modules/js-datepicker/less | less: use it for your own builds    |
 
@@ -65,6 +65,12 @@ Simplest example:
 ```javascript
 const picker = datepicker('.some-element');
 ```
+
+### Manual Year Navigation
+
+By clicking on the year or month, an overlay will show revealing an input field where you can enter a year:
+![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/calendar.png "Get a date with JavaScript!")
+
 
 ## Options
 

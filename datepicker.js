@@ -122,8 +122,8 @@
     // Initially populate the <input> field / set attributes on the `el`.
     if (dateSelected) setElValues(el, instance);
 
-    calendar.classList.add('datepicker');
-    calendar.classList.add('hidden');
+    calendar.classList.add('qs-datepicker');
+    calendar.classList.add('qs-hidden');
     datepickers.push(el);
     calendarHtml(startDate || dateSelected, instance);
 
@@ -265,13 +265,13 @@
    */
   function createControls(date, instance) {
     return [
-      '<div class="controls">',
-      '<div class="arrow left"></div>',
-      '<div class="month-year">',
-      `<span class="month">${(instance.months || months)[date.getMonth()]}</span>`,
-      `<span class="year">${date.getFullYear()}</span>`,
+      '<div class="qs-controls">',
+      '<div class="qs-arrow qs-left"></div>',
+      '<div class="qs-month-year">',
+      `<span class="qs-month">${(instance.months || months)[date.getMonth()]}</span>`,
+      `<span class="qs-year">${date.getFullYear()}</span>`,
       '</div>',
-      '<div class="arrow right"></div>',
+      '<div class="qs-arrow qs-right"></div>',
       '</div>'
     ].join('');
   }
@@ -305,13 +305,13 @@
       let weekday = (instance.days || days)[(i - 1) % 7];
       let num = i - offset;
       let otherClass = '';
-      let span = `<span class="num">${num}</span>`;
+      let span = `<span class="qs-num">${num}</span>`;
       let thisDay = new Date(currentYear, currentMonth, num);
       let isEmpty = num < 1 || num > daysInMonth;
 
       // Empty squares.
       if (isEmpty) {
-        otherClass = 'empty';
+        otherClass = 'qs-empty';
         span = '';
 
       // Disabled & current squares.
@@ -321,18 +321,18 @@
         const currentValidDay = isThisMonth && !disabled && num === today.getDate();
 
         disabled = disabled || (noWeekends && weekend);
-        otherClass = disabled ? 'disabled' : currentValidDay ? 'current' : '';
+        otherClass = disabled ? 'qs-disabled' : currentValidDay ? 'qs-current' : '';
       }
 
       // Currently selected day.
-      if (+thisDay === +dateSelected && !isEmpty) otherClass += ' active';
+      if (+thisDay === +dateSelected && !isEmpty) otherClass += ' qs-active';
 
-      calendarSquares.push(`<div class="square num ${weekday} ${otherClass}">${span}</div>`);
+      calendarSquares.push(`<div class="qs-square qs-num ${weekday} ${otherClass}">${span}</div>`);
     }
 
     // Add the header row of days of the week.
     const daysAndSquares = (instance.days || days).map(day => {
-      return `<div class="square day">${day}</div>`;
+      return `<div class="qs-square qs-day">${day}</div>`;
     }).concat(calendarSquares);
 
     // Throw error...
@@ -343,7 +343,7 @@
     }
 
     // Wrap it all in a tidy div.
-    daysAndSquares.unshift('<div class="squares">');
+    daysAndSquares.unshift('<div class="qs-squares">');
     daysAndSquares.push('</div>');
     return daysAndSquares.join('');
   }
@@ -354,10 +354,10 @@
    */
   function createOverlay(instance) {
     return `
-      <div class="overlay hidden">
-        <div class="close">&#10005;</div>
-        <input type="number" class="overlay-year" placeholder="4-digit year" />
-        <div class="submit disabled">Submit</div>
+      <div class="qs-overlay qs-hidden">
+        <div class="qs-close">&#10005;</div>
+        <input type="number" class="qs-overlay-year" placeholder="4-digit year" />
+        <div class="qs-submit qs-disabled">Submit</div>
       </div>
     `;
   }
@@ -368,22 +368,22 @@
    */
   function selectDay(target, instance) {
     const { currentMonth, currentYear, calendar, el, onSelect } = instance;
-    const active = calendar.querySelector('.active');
+    const active = calendar.querySelector('.qs-active');
     const num = target.textContent;
 
     // Keep track of the currently selected date.
     instance.dateSelected = new Date(currentYear, currentMonth, num);
 
     // Re-establish the active (highlighted) date.
-    if (active) active.classList.remove('active');
-    target.classList.add('active');
+    if (active) active.classList.remove('qs-active');
+    target.classList.add('qs-active');
 
     // Populate the <input> field (or not) with a readble value
     // and store the individual date values as attributes.
     setElValues(el, instance);
 
     // Hide the calendar after a day has been selected.
-    calendar.classList.add('hidden');
+    calendar.classList.add('qs-hidden');
 
     if (onSelect) instance.onSelect(instance);
   }
@@ -416,7 +416,7 @@
 
     // Month change.
     } else {
-      instance.currentMonth += classList.contains('right') ? 1 : -1;
+      instance.currentMonth += classList.contains('qs-right') ? 1 : -1;
 
       if (instance.currentMonth === 12) {
         instance.currentMonth = 0;
@@ -517,7 +517,7 @@
   function classChangeObserver(calendar, instance) {
     instance.observer = new MutationObserver((mutations, thing) => {
       // Calendar has been shown.
-      if (mutations[0].oldValue.includes('hidden')) {
+      if (mutations[0].oldValue.includes('qs-hidden')) {
         calculatePosition(instance);
         instance.onShow && instance.onShow(instance);
 
@@ -559,15 +559,15 @@
     if (this.isMobile && this.disableMobile) return;
 
     const calClasses = this.calendar.classList;
-    const hidden = calClasses.contains('hidden');
+    const hidden = calClasses.contains('qs-hidden');
     const onCal = path.includes(this.calendar);
 
     // Enter, ESC, or tabbing.
     if (type === 'keyup') {
-      const overlay = this.calendar.querySelector('.overlay');
+      const overlay = this.calendar.querySelector('.qs-overlay');
 
       // Pressing enter while the overlay is open.
-      if (e.which === 13 && !overlay.classList.contains('hidden')) {
+      if (e.which === 13 && !overlay.classList.contains('qs-hidden')) {
         return overlayYearEntry(e, target, this);
 
       // ESC key pressed.
@@ -587,11 +587,11 @@
     // Calendar's el is 'html' or 'body'.
     // Anything but the calendar was clicked.
     if (this.noPosition) {
-      onCal ? calendarClicked(this) : calClasses.toggle('hidden');
+      onCal ? calendarClicked(this) : calClasses.toggle('qs-hidden');
 
     // When the calendar is hidden...
     } else if (hidden) {
-      target === this.el && calClasses.remove('hidden');
+      target === this.el && calClasses.remove('qs-hidden');
 
     // Clicked on the calendar.
     } else if (type === 'click' && onCal) {
@@ -601,26 +601,26 @@
     } else if (type === 'input') {
       overlayYearEntry(e, target, this);
     } else {
-      target !== this.el && calClasses.add('hidden');
+      target !== this.el && calClasses.add('qs-hidden');
     }
 
     function calendarClicked(instance) {
       const { calendar } = instance;
       const classList = target.classList;
-      const monthYear = calendar.querySelector('.month-year');
-      const isClose = classList.contains('close');
+      const monthYear = calendar.querySelector('.qs-month-year');
+      const isClose = classList.contains('qs-close');
 
       // A number was clicked.
-      if (classList.contains('num')) {
+      if (classList.contains('qs-num')) {
         const targ = target.nodeName === 'SPAN' ? target.parentNode : target;
-        const doNothing = ['disabled', 'active', 'empty'].some(name => {
-          return targ.classList.contains(name);
+        const doNothing = ['qs-disabled', 'qs-active', 'qs-empty'].some(cls => {
+          return targ.classList.contains(cls);
         });
 
         !doNothing && selectDay(targ, instance);
 
       // Month arrows were clicked.
-      } else if (classList.contains('arrow')) {
+      } else if (classList.contains('qs-arrow')) {
         changeMonthYear(classList, instance);
 
       // Month / year was clicked OR closing the overlay.
@@ -628,18 +628,18 @@
         toggleOverlay(calendar, isClose, instance);
 
       // Overlay submit button clicked.
-      } else if (target.classList.contains('submit')) {
-        const input = calendar.querySelector('.overlay-year');
+      } else if (target.classList.contains('qs-submit')) {
+        const input = calendar.querySelector('.qs-overlay-year');
         overlayYearEntry(e, input, instance);
       }
     }
 
     function toggleOverlay(calendar, closing, instance) {
-      ['.overlay', '.controls', '.squares'].forEach((cls, i) => {
-        calendar.querySelector(cls).classList.toggle(i ? 'blur' : 'hidden');
+      ['.qs-overlay', '.qs-controls', '.qs-squares'].forEach((cls, i) => {
+        calendar.querySelector(cls).classList.toggle(i ? 'qs-blur' : 'qs-hidden');
       });
 
-      const overlayYear = calendar.querySelector('.overlay-year');
+      const overlayYear = calendar.querySelector('.qs-overlay-year');
       closing ? overlayYear.value = '' : overlayYear.focus();
     }
 
@@ -650,14 +650,14 @@
 
       // Enter has been pressed OR submit was clicked.
       if (e.which === 13 || e.type === 'click') {
-        if (badDate || input.classList.contains('disabled')) return;
+        if (badDate || input.classList.contains('qs-disabled')) return;
         changeMonthYear(null, instance, input.value);
 
       // Enable / disabled the submit button.
       } else {
-        const addRemove = badDate ? 'add' : 'remove';
-        const submit = instance.calendar.querySelector('.submit');
-        submit.classList[addRemove]('disabled');
+        const addRemove = badDate ? 'qs-add' : 'qs-remove';
+        const submit = instance.calendar.querySelector('.qs-submit');
+        submit.classList[addRemove]('qs-disabled');
       }
     }
   }

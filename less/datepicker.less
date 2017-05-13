@@ -4,7 +4,7 @@
 @transition: .3s;
 @font-size: @width * .056;
 
-.datepicker {
+.qs-datepicker {
   color: black;
   position: absolute;
   width: @width;
@@ -29,11 +29,11 @@
     }
   }
 
-  &.hidden {
+  &.qs-hidden {
     display: none;
   }
 
-  .overlay {
+  .qs-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -49,12 +49,12 @@
     flex-direction: column;
     align-items: center;
 
-    &.hidden {
+    &.qs-hidden {
       opacity: 0;
       z-index: -1;
     }
 
-    .close {
+    .qs-close {
       align-self: flex-end;
       display: inline-table;
       padding: .5em;
@@ -63,7 +63,7 @@
       position: absolute;
     }
 
-    .overlay-year {
+    .qs-overlay-year {
       display: block;
       border: none;
       background: transparent;
@@ -79,7 +79,7 @@
       }
     }
 
-    .submit {
+    .qs-submit {
       border: 1px solid white;
       border-radius: @radius;
       padding: .5em;
@@ -87,7 +87,7 @@
       cursor: pointer;
       background: rgba(128,128,128,.4);
 
-      &.disabled {
+      &.qs-disabled {
         color: gray;
         border-color: gray;
         cursor: not-allowed;
@@ -95,7 +95,7 @@
     }
   }
 
-  .controls {
+  .qs-controls {
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -106,12 +106,12 @@
     filter: blur(0px);
     transition: filter @transition;
 
-    &.blur {
+    &.qs-blur {
       filter: blur(5px);
     }
   }
 
-  .arrow {
+  .qs-arrow {
     @arrow: @width / 10;
     @offset: (@arrow / 4) - ((@arrow / 4) / 4);
     height: @arrow;
@@ -122,11 +122,11 @@
     transition: background .15s;
 
     &:hover {
-      &.left:after {
+      &.qs-left:after {
         border-right-color: black;
       }
 
-      &.right:after {
+      &.qs-right:after {
         border-left-color: black;
       }
 
@@ -141,20 +141,20 @@
       transition: border .2s;
     }
 
-    &.left:after {
+    &.qs-left:after {
       border-right-color: gray;
       right: 50%;
       transform: translate(25%, -50%);
     }
 
-    &.right:after {
+    &.qs-right:after {
       border-left-color: gray;
       left: 50%;
       transform: translate(-25%, -50%);
     }
   }
 
-  .month-year {
+  .qs-month-year {
     font-weight: bold;
     transition: border .2s;
     border-bottom: 1px solid transparent;
@@ -170,27 +170,27 @@
     }
   }
 
-  .month {
+  .qs-month {
     padding-right: .5ex;
   }
 
-  .year {
+  .qs-year {
     padding-left: .5ex;
   }
 
-  .squares {
+  .qs-squares {
     display: flex;
     flex-wrap: wrap;
     padding: @width * .02;
     filter: blur(0px);
     transition: filter @transition;
 
-    &.blur {
+    &.qs-blur {
       filter: blur(5px);
     }
   }
 
-  .square {
+  .qs-square {
     width: 100% / 7;
     height: @width / 10;
     display: flex;
@@ -200,35 +200,35 @@
     transition: background .1s;
     border-radius: @radius;
 
-    &.current {
+    &.qs-current {
       font-weight: bold;
     }
 
-    &.active {
+    &.qs-active {
       background: lightblue;
     }
 
-    &.disabled {
+    &.qs-disabled {
       span {
         opacity: .2;
       }
     }
 
-    &.empty {
+    &.qs-empty {
       cursor: default;
     }
 
-    &.disabled {
+    &.qs-disabled {
       cursor: not-allowed;
     }
 
-    &.day {
+    &.qs-day {
       cursor: default;
       font-weight: bold;
       color: gray;
     }
 
-    &:not(.empty):not(.disabled):not(.day) {
+    &:not(.qs-empty):not(.qs-disabled):not(.qs-day) {
       &:hover {
         background: orange;
       }

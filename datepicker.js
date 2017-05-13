@@ -317,7 +317,10 @@
       // Disabled & current squares.
       } else {
         let disabled = (minDate && thisDay < minDate) || (maxDate && thisDay > maxDate);
-        const weekend = weekday === 'Sat' || weekday === 'Sun';
+        const weekdays = instance.days || days;
+        const sat = weekdays[6];
+        const sun = weekdays[0];
+        const weekend = weekday === sat || weekday === sun;
         const currentValidDay = isThisMonth && !disabled && num === today.getDate();
 
         disabled = disabled || (noWeekends && weekend);

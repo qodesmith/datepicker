@@ -69,6 +69,9 @@
   padding: .25em 0;
   margin: auto .5em .5em;
 }
+.datepicker .overlay .overlay-year::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
 .datepicker .overlay .submit {
   border: 1px solid white;
   border-radius: 5.91185px;

@@ -6,7 +6,7 @@
   'use strict';
 
   const datepickers = [];
-  const listeners = ['click', 'focusin', 'keyup', 'keydown'];
+  const listeners = ['click', 'focusin', 'keyup', 'input'];
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = [
     'January',
@@ -356,7 +356,7 @@
     return `
       <div class="overlay hidden">
         <div class="close">&#10005;</div>
-        <input type="text" class="overlay-year" placeholder="4-digit year" />
+        <input type="number" class="overlay-year" placeholder="4-digit year" />
         <div class="submit disabled">Submit</div>
       </div>
     `;
@@ -538,7 +538,7 @@
    *  Handles `click` events when the calendar's `el` is an <input>.
    *  Handles `focusin` events for all other types of `el`'s.
    *  Handles `keyup` events when tabbing.
-   *  Handles `keydown` events for the overlay.
+   *  Handles `input` events for the overlay.
    */
   function oneHandler(e) {
     let { type, path, target } = e;
@@ -560,8 +560,23 @@
     const hidden = calClasses.contains('hidden');
     const onCal = path.includes(this.calendar);
 
-    // Tabbing.
-    if (type === 'keyup' && e.which !== 9) return;
+    // Enter, ESC, or tabbing.
+    if (type === 'keyup') {
+      const overlay = this.calendar.querySelector('.overlay');
+
+      // Pressing enter while the overlay is open.
+      if (e.which === 13 && !overlay.classList.contains('hidden')) {
+        return overlayYearEntry(e, target, this);
+
+      // ESC key pressed.
+      } else if (e.which === 27) {
+        return toggleOverlay(this.calendar, true, this);
+
+      // Tabbing.
+      } else if (e.which !== 9) {
+        return;
+      }
+    }
 
     // Only pay attention to `focusin` events if the calendar's el is an <input>.
     // `focusin` bubbles, `focus` does not.
@@ -581,7 +596,7 @@
       calendarClicked(this);
 
     // Typing in the overlay year input.
-    } else if (type === 'keydown' && target.className === 'overlay-year') {
+    } else if (type === 'input') {
       overlayYearEntry(e, target, this);
     } else {
       target !== this.el && calClasses.add('hidden');
@@ -607,8 +622,13 @@
         changeMonthYear(classList, instance);
 
       // Month / year was clicked OR closing the overlay.
-      } else if (e.path.includes(monthYear) || isClose) {
+      } else if (path.includes(monthYear) || isClose) {
         toggleOverlay(calendar, isClose, instance);
+
+      // Overlay submit button clicked.
+      } else if (target.classList.contains('submit')) {
+        const input = calendar.querySelector('.overlay-year');
+        overlayYearEntry(e, input, instance);
       }
     }
 
@@ -622,38 +642,14 @@
     }
 
     function overlayYearEntry(e, input, instance) {
-      /*
-        Keycodes | Association
-        ------------------------
-        48 - 57  | Numbers 0 - 9
-        32       | Space bar
-        13       | Enter
-        8        | Backspace
+      // Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
 
-        Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
-      */
+      const badDate = isNaN(new Date().setFullYear(input.value || undefined));
 
-      // Defining these codes because the input's value isn't available on `keydown`.
-      // We have the correct keycode, so we'll use `codes` to know the value up front.
-      const codes = {48: 0, 49: 1, 50: 2, 51: 3, 52: 4, 53: 5, 54: 6, 55: 7, 56: 8, 57: 9};
-
-      const code = e.which;
-      const numbers = codes[code];
-      const year = (() => {
-        let value = input.value;
-        if (code === 8) value = value.slice(0, -1); // Manually adjust the value to reflect a backspace.
-        return value + ((numbers || numbers === 0) ? numbers : ''); // Existing input value + the newly typed value.
-      })();
-      const badDate = isNaN(new Date().setFullYear(year || undefined));
-
-      // Enter has been pressed.
-      if (code === 13) {
+      // Enter has been pressed OR submit was clicked.
+      if (e.which === 13 || e.type === 'click') {
         if (badDate || input.classList.contains('disabled')) return;
-        changeMonthYear(null, instance, year);
-
-      // Prevent certain characters from being typed.
-      } else if ((!numbers && numbers !== 0 && code !== 8) || code === 32 || (numbers && e.shiftKey)) {
-        e.preventDefault();
+        changeMonthYear(null, instance, input.value);
 
       // Enable / disabled the submit button.
       } else {

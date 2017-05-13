@@ -1,29 +1,86 @@
 .datepicker {
   color: black;
   position: absolute;
-  width: 250px;
+  width: 350px;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
       flex-direction: column;
   font-family: sans-serif;
-  font-size: 14px;
+  font-size: 19.6px;
   z-index: 9001;
   -webkit-user-select: none;
      -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   border: 1px solid gray;
-  border-radius: 4.22275px;
+  border-radius: 5.91185px;
   overflow: hidden;
   background: white;
-  box-shadow: 0 20px 20px -15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 28px 28px -21px rgba(0, 0, 0, 0.3);
 }
 .datepicker * {
   box-sizing: border-box;
 }
+.datepicker *:focus,
+.datepicker *:active:focus {
+  outline: none;
+}
 .datepicker.hidden {
   display: none;
+}
+.datepicker .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  width: 100%;
+  height: 100%;
+  padding: .5em;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.3s;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+      flex-direction: column;
+}
+.datepicker .overlay.hidden {
+  opacity: 0;
+  z-index: -1;
+}
+.datepicker .overlay .close {
+  -ms-flex-item-align: end;
+      align-self: flex-end;
+  display: inline-table;
+  padding: .5em;
+  line-height: .77;
+  cursor: pointer;
+  position: absolute;
+}
+.datepicker .overlay .overlay-year {
+  display: block;
+  border: none;
+  background: transparent;
+  border-bottom: 1px solid white;
+  color: white;
+  font-size: 19.6px;
+  padding: .25em 0;
+  margin: auto .5em .5em;
+}
+.datepicker .overlay .submit {
+  border: 1px solid white;
+  border-radius: 5.91185px;
+  padding: .5em;
+  margin: 0 auto auto;
+  cursor: pointer;
+  background: rgba(128, 128, 128, 0.4);
+}
+.datepicker .overlay .submit.disabled {
+  color: gray;
+  border-color: gray;
+  cursor: not-allowed;
 }
 .datepicker .controls {
   width: 100%;
@@ -38,13 +95,18 @@
   -ms-flex-negative: 0;
       flex-shrink: 0;
   background: lightgray;
+  filter: blur(0px);
+  transition: filter 0.3s;
+}
+.datepicker .controls.blur {
+  filter: blur(5px);
 }
 .datepicker .arrow {
-  height: 25px;
-  width: 25px;
+  height: 35px;
+  width: 35px;
   position: relative;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 7px;
   transition: background .15s;
 }
 .datepicker .arrow:hover {
@@ -58,7 +120,7 @@
 }
 .datepicker .arrow:after {
   content: '';
-  border: 6.25px solid transparent;
+  border: 8.75px solid transparent;
   position: absolute;
   top: 50%;
   transition: border .2s;
@@ -75,34 +137,38 @@
 }
 .datepicker .month-year {
   font-weight: bold;
+  transition: border .2s;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+}
+.datepicker .month-year:hover {
+  border-bottom: 1px solid gray;
+}
+.datepicker .month-year:focus,
+.datepicker .month-year:active:focus {
+  outline: none;
 }
 .datepicker .month {
   padding-right: .5ex;
-  cursor: default;
 }
 .datepicker .year {
   padding-left: .5ex;
-  transition: border .2s;
-  border-bottom: 1px solid transparent;
-  cursor: text;
-}
-.datepicker .year:hover {
-  border-bottom: 1px solid gray;
-}
-.datepicker .year:focus,
-.datepicker .year:active:focus {
-  outline: none;
 }
 .datepicker .squares {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
       flex-wrap: wrap;
-  padding: 5px;
+  padding: 7px;
+  filter: blur(0px);
+  transition: filter 0.3s;
+}
+.datepicker .squares.blur {
+  filter: blur(5px);
 }
 .datepicker .square {
   width: 14.28571429%;
-  height: 25px;
+  height: 35px;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
@@ -111,7 +177,7 @@
       justify-content: center;
   cursor: pointer;
   transition: background .1s;
-  border-radius: 4.22275px;
+  border-radius: 5.91185px;
 }
 .datepicker .square.current {
   font-weight: bold;

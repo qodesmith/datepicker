@@ -1,6 +1,8 @@
-@width: 250px; // Regular: 250px
+@width: 350px; // Regular: 250px
 @border-width: 1px;
 @radius: @width * .016891; // 296px / 5px ratio.
+@transition: .3s;
+@font-size: @width * .056;
 
 .datepicker {
   color: black;
@@ -9,7 +11,7 @@
   display: flex;
   flex-direction: column;
   font-family: sans-serif;
-  font-size: @width * .056;
+  font-size: @font-size;
   z-index: 9001;
   user-select: none;
   border: @border-width solid gray;
@@ -20,10 +22,71 @@
 
   * {
     box-sizing: border-box;
+
+    &:focus,
+    &:active:focus {
+      outline: none;
+    }
   }
 
   &.hidden {
     display: none;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,.75);
+    color: white;
+    width: 100%;
+    height: 100%;
+    padding: .5em;
+    z-index: 1;
+    opacity: 1;
+    transition: opacity @transition;
+    display: flex;
+    flex-direction: column;
+
+    &.hidden {
+      opacity: 0;
+      z-index: -1;
+    }
+
+    .close {
+      align-self: flex-end;
+      display: inline-table;
+      padding: .5em;
+      line-height: .77;
+      cursor: pointer;
+      position: absolute;
+    }
+
+    .overlay-year {
+      display: block;
+      border: none;
+      background: transparent;
+      border-bottom: 1px solid white;
+      color: white;
+      font-size: @font-size;
+      padding: .25em 0;
+      margin: auto .5em .5em;
+    }
+
+    .submit {
+      border: 1px solid white;
+      border-radius: @radius;
+      padding: .5em;
+      margin: 0 auto auto;
+      cursor: pointer;
+      background: rgba(128,128,128,.4);
+
+      &.disabled {
+        color: gray;
+        border-color: gray;
+        cursor: not-allowed;
+      }
+    }
   }
 
   .controls {
@@ -34,6 +97,12 @@
     flex-grow: 1;
     flex-shrink: 0;
     background: lightgray;
+    filter: blur(0px);
+    transition: filter @transition;
+
+    &.blur {
+      filter: blur(5px);
+    }
   }
 
   .arrow {
@@ -81,18 +150,9 @@
 
   .month-year {
     font-weight: bold;
-  }
-
-  .month {
-    padding-right: .5ex;
-    cursor: default;
-  }
-
-  .year {
-    padding-left: .5ex;
     transition: border .2s;
     border-bottom: 1px solid transparent;
-    cursor: text;
+    cursor: pointer;
 
     &:hover {
       border-bottom: 1px solid gray;
@@ -104,10 +164,24 @@
     }
   }
 
+  .month {
+    padding-right: .5ex;
+  }
+
+  .year {
+    padding-left: .5ex;
+  }
+
   .squares {
     display: flex;
     flex-wrap: wrap;
     padding: @width * .02;
+    filter: blur(0px);
+    transition: filter @transition;
+
+    &.blur {
+      filter: blur(5px);
+    }
   }
 
   .square {

@@ -6,6 +6,7 @@
   'use strict';
 
   const datepickers = [];
+  const listeners = ['click', 'focusin', 'keyup', 'keydown'];
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = [
     'January',
@@ -98,7 +99,7 @@
       // Callback fired when the calendar is hidden - triggered in `classChangeObserver`.
       onHide: options.onHide,
 
-      // Callback fired when the month is changed - triggered in `changeMonth`.
+      // Callback fired when the month is changed - triggered in `changeMonthYear`.
       onMonthChange: options.onMonthChange,
 
       // Function to customize the date format updated on <input> elements - triggered in `setElValues`.
@@ -127,9 +128,9 @@
     calendarHtml(startDate || dateSelected, instance);
 
     classChangeObserver(calendar, instance);
-    window.addEventListener('click', oneHandler.bind(instance));
-    window.addEventListener('focusin', oneHandler.bind(instance));
-    window.addEventListener('keyup', oneHandler.bind(instance));
+    listeners.forEach(e => { // Declared at the top.
+      window.addEventListener(e, oneHandler.bind(instance));
+    });
 
     if (getComputedStyle(parent).position === 'static') {
       parent.style.position = 'relative';
@@ -251,9 +252,11 @@
    *  of the calendar controls, month, and overlay.
    */
   function calendarHtml(date, instance) {
+    const { calendar } = instance;
     const controls = createControls(date, instance);
     const month = createMonth(date, instance);
-    instance.calendar.innerHTML = controls + month;
+    const overlay = createOverlay(instance);
+    calendar.innerHTML = controls + month + overlay;
   }
 
   /*
@@ -346,6 +349,20 @@
   }
 
   /*
+   *  Creates the overlay for users to
+   *  manually navigate to a month & year.
+   */
+  function createOverlay(instance) {
+    return `
+      <div class="overlay hidden">
+        <div class="close">&#10005;</div>
+        <input type="text" class="overlay-year" placeholder="4-digit year" />
+        <div class="submit disabled">Submit</div>
+      </div>
+    `;
+  }
+
+  /*
    *  Highlights the selected date.
    *  Calls `setElValues`.
    */
@@ -382,25 +399,38 @@
   }
 
   /*
+   *  2 Scenarios:
+   *
    *  Updates `this.currentMonth` & `this.currentYear` based on right or left arrows.
    *  Creates a `newDate` based on the updated month & year.
    *  Calls `calendarHtml` with the updated date.
+   *
+   *  Changes the calendar to a different year
+   *  from a users manual input on the overlay.
+   *  Calls `calendarHtml` with the updated date.
    */
-  function changeMonth(classList, instance) {
-    instance.currentMonth += classList.contains('right') ? 1 : -1;
+  function changeMonthYear(classList, instance, year) {
+    // Overlay.
+    if (year) {
+      instance.currentYear = year;
 
-    if (instance.currentMonth === 12) {
-      instance.currentMonth = 0;
-      instance.currentYear++
-    } else if (instance.currentMonth === -1) {
-      instance.currentMonth = 11;
-      instance.currentYear--;
+    // Month change.
+    } else {
+      instance.currentMonth += classList.contains('right') ? 1 : -1;
+
+      if (instance.currentMonth === 12) {
+        instance.currentMonth = 0;
+        instance.currentYear++
+      } else if (instance.currentMonth === -1) {
+        instance.currentMonth = 11;
+        instance.currentYear--;
+      }
     }
 
     const newDate = new Date(instance.currentYear, instance.currentMonth, 1);
     calendarHtml(newDate, instance);
     instance.currentMonthName = (instance.months || months)[instance.currentMonth];
-    instance.onMonthChange && instance.onMonthChange(instance);
+    instance.onMonthChange && year && instance.onMonthChange(instance);
   }
 
   /*
@@ -456,14 +486,18 @@
    *  Removes the current instance from the array of instances.
    */
   function remove() {
-    window.removeEventListener('click', oneHandler);
-    window.removeEventListener('focusin', oneHandler);
-    window.removeEventListener('keyup', oneHandler);
-    this.calendar.remove();
-    this.observer.disconnect(); // Stop the mutationObserver. https://goo.gl/PgFCEr
+    const { calendar, observer, parent } = this;
+
+    // Remove event listeners (declared at the top).
+    listeners.forEach(e => {
+      window.removeEventListener(e, oneHandler);
+    });
+
+    calendar.remove();
+    observer.disconnect(); // Stop the mutationObserver. https://goo.gl/PgFCEr
 
     // Remove styling done to the parent element.
-    if (this.calendar.hasOwnProperty('parentStyle')) this.parent.style.position = '';
+    if (calendar.hasOwnProperty('parentStyle')) parent.style.position = '';
 
     // Remove this datepicker's `el` from the list.
     const index = datepickers.indexOf(this.el);
@@ -504,15 +538,18 @@
    *  Handles `click` events when the calendar's `el` is an <input>.
    *  Handles `focusin` events for all other types of `el`'s.
    *  Handles `keyup` events when tabbing.
+   *  Handles `keydown` events for the overlay.
    */
   function oneHandler(e) {
+    let { type, path, target } = e;
+
     // Add `e.path` if it doesn't exist.
-    if (!e.path) {
-      let node = e.target;
-      e.path = [];
+    if (!path) {
+      let node = target;
+      path = [];
 
       while (node !== document) {
-        e.path.push(node);
+        path.push(node);
         node = node.parentNode;
       }
     }
@@ -521,71 +558,109 @@
 
     const calClasses = this.calendar.classList;
     const hidden = calClasses.contains('hidden');
+    const onCal = path.includes(this.calendar);
 
-    // Only pay attention to `keyup` events if the character is the TAB key.
-    if (e.type === 'keyup' && e.keyCode !== 9) return;
+    // Tabbing.
+    if (type === 'keyup' && e.which !== 9) return;
 
     // Only pay attention to `focusin` events if the calendar's el is an <input>.
     // `focusin` bubbles, `focus` does not.
-    if (e.type === 'focusin') return e.target === this.el && calClasses.remove('hidden');
+    if (type === 'focusin') return target === this.el && calClasses.remove('hidden');
 
     // Calendar's el is 'html' or 'body'.
     // Anything but the calendar was clicked.
     if (this.noPosition) {
-      e.path.includes(this.calendar) ? calendarClicked(e, this) : calClasses.toggle('hidden');
+      onCal ? calendarClicked(this) : calClasses.toggle('hidden');
 
     // When the calendar is hidden...
     } else if (hidden) {
-      e.target === this.el && calClasses.remove('hidden');
+      target === this.el && calClasses.remove('hidden');
 
     // Clicked on the calendar.
-    } else if (e.path.includes(this.calendar)) {
-      calendarClicked(e, this);
+    } else if (type === 'click' && onCal) {
+      calendarClicked(this);
+
+    // Typing in the overlay year input.
+    } else if (type === 'keydown' && target.className === 'overlay-year') {
+      overlayYearEntry(e, target, this);
     } else {
-      e.target !== this.el && calClasses.add('hidden');
+      target !== this.el && calClasses.add('hidden');
     }
 
-    function calendarClicked(e, instance) {
-      const classList = e.target.classList;
+    function calendarClicked(instance) {
+      const { calendar } = instance;
+      const classList = target.classList;
+      const monthYear = calendar.querySelector('.month-year');
+      const isClose = classList.contains('close');
 
       // A number was clicked.
       if (classList.contains('num')) {
-        const target = e.target.nodeName === 'SPAN' ? e.target.parentNode : e.target;
+        const targ = target.nodeName === 'SPAN' ? target.parentNode : target;
         const doNothing = ['disabled', 'active', 'empty'].some(name => {
-          return target.classList.contains(name);
+          return targ.classList.contains(name);
         });
 
-        !doNothing && selectDay(target, instance);
+        !doNothing && selectDay(targ, instance);
 
       // Month arrows were clicked.
       } else if (classList.contains('arrow')) {
-        changeMonth(classList, instance);
+        changeMonthYear(classList, instance);
 
-      // Month or year was clicked.
-      } else if (classList.contains('month-year')) {
-        monthYearOverlay(e.target, instance);
+      // Month / year was clicked OR closing the overlay.
+      } else if (e.path.includes(monthYear) || isClose) {
+        toggleOverlay(calendar, isClose, instance);
       }
     }
 
-    function monthYearOverlay(target, instance) {
-      const { calendar } = instance;
-      const overlay = document.createElement('div');
-      const dropMonths = (instance.months || months).map(month => {
-        return `<option value="${month}">${month}</option>`
-      }).join('');
-      const html = `
-        <div class="overlay">
-          <div class="overlay-close"></div>
-          <div>Choose month:</div>
-          <select class="month-dropdown">${dropMonths}</select>
-          <div>Enter year:</div>
-          <input type="text" class="enter-year" />
-        </div>
-      `;
+    function toggleOverlay(calendar, closing, instance) {
+      ['.overlay', '.controls', '.squares'].forEach((cls, i) => {
+        calendar.querySelector(cls).classList.toggle(i ? 'blur' : 'hidden');
+      });
 
-      overlay.classList.add('overlay');
-      overlay.innerHTML = html;
-      calendar.appendChild(overlay);
+      const overlayYear = calendar.querySelector('.overlay-year');
+      closing ? overlayYear.value = '' : overlayYear.focus();
+    }
+
+    function overlayYearEntry(e, input, instance) {
+      /*
+        Keycodes | Association
+        ------------------------
+        48 - 57  | Numbers 0 - 9
+        32       | Space bar
+        13       | Enter
+        8        | Backspace
+
+        Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
+      */
+
+      // Defining these codes because the input's value isn't available on `keydown`.
+      // We have the correct keycode, so we'll use `codes` to know the value up front.
+      const codes = {48: 0, 49: 1, 50: 2, 51: 3, 52: 4, 53: 5, 54: 6, 55: 7, 56: 8, 57: 9};
+
+      const code = e.which;
+      const numbers = codes[code];
+      const year = (() => {
+        let value = input.value;
+        if (code === 8) value = value.slice(0, -1); // Manually adjust the value to reflect a backspace.
+        return value + ((numbers || numbers === 0) ? numbers : ''); // Existing input value + the newly typed value.
+      })();
+      const badDate = isNaN(new Date().setFullYear(year || undefined));
+
+      // Enter has been pressed.
+      if (code === 13) {
+        if (badDate || input.classList.contains('disabled')) return;
+        changeMonthYear(null, instance, year);
+
+      // Prevent certain characters from being typed.
+      } else if ((!numbers && numbers !== 0 && code !== 8) || code === 32 || (numbers && e.shiftKey)) {
+        e.preventDefault();
+
+      // Enable / disabled the submit button.
+      } else {
+        const addRemove = badDate ? 'add' : 'remove';
+        const submit = instance.calendar.querySelector('.submit');
+        submit.classList[addRemove]('disabled');
+      }
     }
   }
 

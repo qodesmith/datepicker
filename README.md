@@ -69,7 +69,7 @@ const picker = datepicker('.some-element');
 ### Manual Year Navigation
 
 By clicking on the year or month, an overlay will show revealing an input field where you can enter a year:
-![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/calendar.png "Get a date with JavaScript!")
+![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/overlay.png "Get a date with JavaScript!")
 
 
 ## Options

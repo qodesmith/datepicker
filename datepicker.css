@@ -45,6 +45,8 @@
   display: flex;
   -ms-flex-direction: column;
       flex-direction: column;
+  -ms-flex-align: center;
+      align-items: center;
 }
 .datepicker .overlay.hidden {
   opacity: 0;
@@ -67,7 +69,8 @@
   color: white;
   font-size: 19.6px;
   padding: .25em 0;
-  margin: auto .5em .5em;
+  margin: auto 0 .5em;
+  width: calc(100% - 1em);
 }
 .datepicker .overlay .overlay-year::-webkit-inner-spin-button {
   -webkit-appearance: none;

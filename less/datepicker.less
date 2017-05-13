@@ -47,6 +47,7 @@
     transition: opacity @transition;
     display: flex;
     flex-direction: column;
+    align-items: center;
 
     &.hidden {
       opacity: 0;
@@ -70,7 +71,8 @@
       color: white;
       font-size: @font-size;
       padding: .25em 0;
-      margin: auto .5em .5em;
+      margin: auto 0 .5em;
+      width: calc(~'100% - 1em');
 
       &::-webkit-inner-spin-button {
         -webkit-appearance: none;

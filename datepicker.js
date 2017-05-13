@@ -541,18 +541,20 @@
    *  Handles `input` events for the overlay.
    */
   function oneHandler(e) {
-    let { type, path, target } = e;
-
     // Add `e.path` if it doesn't exist.
-    if (!path) {
-      let node = target;
-      path = [];
+    if (!e.path) {
+      let node = e.target;
+      let path = [];
 
       while (node !== document) {
         path.push(node);
         node = node.parentNode;
       }
+
+      e.path = path;
     }
+
+    let { type, path, target } = e;
 
     if (this.isMobile && this.disableMobile) return;
 

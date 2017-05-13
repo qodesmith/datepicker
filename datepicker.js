@@ -264,16 +264,16 @@
    *  Returns a string representation of DOM elements.
    */
   function createControls(date, instance) {
-    return [
-      '<div class="qs-controls">',
-      '<div class="qs-arrow qs-left"></div>',
-      '<div class="qs-month-year">',
-      `<span class="qs-month">${(instance.months || months)[date.getMonth()]}</span>`,
-      `<span class="qs-year">${date.getFullYear()}</span>`,
-      '</div>',
-      '<div class="qs-arrow qs-right"></div>',
-      '</div>'
-    ].join('');
+    return `
+      <div class="qs-controls">
+        <div class="qs-arrow qs-left"></div>
+        <div class="qs-month-year">
+          <span class="qs-month">${(instance.months || months)[date.getMonth()]}</span>
+          <span class="qs-year">${date.getFullYear()}</span>
+        </div>
+        <div class="qs-arrow qs-right"></div>
+      </div>
+    `;
   }
 
   /*
@@ -585,7 +585,7 @@
 
     // Only pay attention to `focusin` events if the calendar's el is an <input>.
     // `focusin` bubbles, `focus` does not.
-    if (type === 'focusin') return target === this.el && calClasses.remove('hidden');
+    if (type === 'focusin') return target === this.el && calClasses.remove('qs-hidden');
 
     // Calendar's el is 'html' or 'body'.
     // Anything but the calendar was clicked.

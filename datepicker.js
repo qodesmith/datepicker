@@ -658,9 +658,8 @@
 
       // Enable / disabled the submit button.
       } else {
-        const addRemove = badDate ? 'qs-add' : 'qs-remove';
         const submit = instance.calendar.querySelector('.qs-submit');
-        submit.classList[addRemove]('qs-disabled');
+        submit.classList[badDate ? 'add' : 'remove']('qs-disabled');
       }
     }
   }

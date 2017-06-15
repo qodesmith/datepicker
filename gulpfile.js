@@ -60,7 +60,7 @@ gulp.task('uglify-js', function(done) {
   compressed_ast.mangle_names();
 
   fs.writeFileSync('datepicker.min.js', compressed_ast.print_to_string());
-  // fs.unlinkSync('./datepicker-es5.js');
+  // fs.unlinkSync('./datepicker-es5.js'); // Delete file.
   return done(); // Async completion.
 });
 

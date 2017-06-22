@@ -1,0 +1,37 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+}
+
+.container {
+  border: 1px solid gray;
+  padding: 20px;
+  border-radius: 5px;
+  width: 600px;
+  max-width: 95vw;
+}
+
+section {
+  margin-bottom: 30px;
+}
+
+section:last-of-type {
+  margin: 0;
+}
+
+input {
+  width: 100%;
+  font-size: initial;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}

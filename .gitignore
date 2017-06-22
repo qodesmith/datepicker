@@ -1,7 +1,7 @@
-
+# Files
 .DS_Store
-node_modules
-sandbox
-datepicker-es5.js
-sandboxServer.js
 .idea
+datepicker-es5.js
+
+# Folders
+node_modules

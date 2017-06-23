@@ -6,7 +6,7 @@
   'use strict';
 
   const datepickers = [];
-  const listeners = ['click', 'focusin', 'keyup', 'input'];
+  const listeners = ['click', 'focusin', 'keydown', 'input'];
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = [
     'January',
@@ -566,11 +566,12 @@
     const onCal = path.includes(this.calendar);
 
     // Enter, ESC, or tabbing.
-    if (type === 'keyup') {
+    if (type === 'keydown') {
       const overlay = this.calendar.querySelector('.qs-overlay');
 
       // Pressing enter while the overlay is open.
       if (e.which === 13 && !overlay.classList.contains('qs-hidden')) {
+        e.stopPropagation(); // Avoid submitting <form>'s.
         return overlayYearEntry(e, target, this);
 
       // ESC key pressed.

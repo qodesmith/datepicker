@@ -173,4 +173,4 @@ const picker = datepicker(document.querySelector('#some-id'), {
   customYearInputPlaceholder: '4-digit year',
   disableMobile: true // Conditionally disabled on mobile devices.
 });
--```
+```

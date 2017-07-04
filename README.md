@@ -169,7 +169,7 @@ const picker = datepicker(document.querySelector('#some-id'), {
   },
   customMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   customDays: ['S', 'M', 'T', 'W', 'Th', 'F', 'S'],
-  customYearSubmitLabel: 'Submit'
+  customYearSubmitLabel: 'Submit',
   customYearInputPlaceholder: '4-digit year',
   disableMobile: true // Conditionally disabled on mobile devices.
 });

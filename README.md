@@ -90,6 +90,9 @@ By clicking on the year or month, an overlay will show revealing an input field 
 | `customMonths` | (array) - Custom labels for months. Provide an array of 12 strings. |
 | `customdays` | (array) - Custom labels for days. Provide an array of 7 strings. |
 | `disableMobile` | (boolean) - Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. |
+| `customYearSubmitLabel` | (string) - Optionally change the submit button label for the year input overlay. |
+| `customYearInputPlaceholder` | (string) - Optionally change the placeholder text for the year input overlay. |
+| `disableMobile` | (boolean) - Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. |
 
 _NOTE: All callback functions are both bound to the Datepicker instance and passed the instance as its 1st argument. So you can simply access the instance via the_ `this` _keyword or the 1st argument._
 

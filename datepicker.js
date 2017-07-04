@@ -115,6 +115,12 @@
       // Allows the use of native datepicker if the input type is 'date'.
       disableMobile: options.disableMobile,
 
+      // Custom submit button text for year input overlay
+      customYearSubmitLabel: options.customYearSubmitLabel ,
+
+      // Custom placeholder text for year input
+      customYearInputPlaceholder: options.customYearInputPlaceholder,
+
       // Used in conjuntion with `disableMobile` above within `oneHandler`.
       isMobile: 'ontouchstart' in window
     };
@@ -152,7 +158,7 @@
     // Check if the provided element already has a datepicker attached.
     if (datepickers.includes(el)) throw new Error('A datepicker already exists on that element.');
 
-    let {position, maxDate, minDate, dateSelected, formatter, customMonths, customDays} = options;
+    let {position, maxDate, minDate, dateSelected, formatter, customMonths, customDays, customYearSubmitLabel, customYearInputText} = options;
 
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
@@ -200,7 +206,6 @@
     ['onSelect', 'onShow', 'onHide', 'onMonthChange'].forEach(fxn => {
       options[fxn] = typeof options[fxn] === 'function' && options[fxn];
     });
-
 
     // Custom labels for months & days.
     [customMonths, customDays].forEach((custom, i) => {
@@ -356,11 +361,15 @@
    *  manually navigate to a month & year.
    */
   function createOverlay(instance) {
+
+    const customPlaceholder = typeof(instance.customYearInputPlaceholder) == 'undefined' ? '4-digit year' : instance.customYearInputPlaceholder;
+    const submitLabel = typeof(instance.customYearSubmitLabel) == 'undefined' ? `Submit` : instance.customYearSubmitLabel;
+
     return `
       <div class="qs-overlay qs-hidden">
         <div class="qs-close">&#10005;</div>
-        <input type="number" class="qs-overlay-year" placeholder="4-digit year" />
-        <div class="qs-submit qs-disabled">Submit</div>
+        <input type="number" class="qs-overlay-year" placeholder="` + customPlaceholder + `" />
+        <div class="qs-submit qs-disabled">` + submitLabel + `</div>
       </div>
     `;
   }

@@ -8,6 +8,7 @@
   const datepickers = [];
   const listeners = ['click', 'focusin', 'keydown', 'input'];
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
   const months = [
     'January',
     'February',
@@ -22,6 +23,7 @@
     'November',
     'December'
   ];
+
   const sides = {
     t: 'top',
     r: 'right',
@@ -39,7 +41,10 @@
     options = sanitizeOptions(options || defaults(), el, selector);
 
     const calendar = document.createElement('div');
-    const {startDate, dateSelected} = options;
+//    const {startDate, dateSelected} = options;
+    const startDate = options.startDate || new Date(new Date().toLocaleDateString());
+    const dateSelected = options.dateSelected || new Date(new Date().toLocaleDateString());
+
     const noPosition = el === document.body || el === document.querySelector('html');
     const instance = {
       // The calendar will be positioned relative to this element (except when 'body' or 'html').
@@ -156,10 +161,19 @@
     if (!el) throw new Error('An invalid selector or non-DOM node has been provided.');
 
     // Check if the provided element already has a datepicker attached.
-    if (datepickers.includes(el)) throw new Error('A datepicker already exists on that element.');
+    //if (datepickers.includes(el)) throw new Error('A datepicker already exists on that element.');
+    if (datepickers.indexOf(el) > 1) throw new Error('A datepicker already exists on that element.');
 
-    let {position, maxDate, minDate, dateSelected, formatter, customMonths, customDays, customYearSubmitLabel, customYearInputText} = options;
-
+//    let {position, maxDate, minDate, dateSelected, formatter, customMonths, customDays, customYearSubmitLabel, customYearInputText} = options;
+    let position = options.position;
+    let maxDate = options.maxDate;
+    let minDate = options.minDate;
+    let dateSelected = options.dateSelected;
+    let formatter = options.formatter;
+    let customMonths = options.customMonths;
+    let customDays = options.customDays;
+    let customYearSubmitLabel = options.customYearSubmitLabel;
+    let customYearInputText = options.customYearInputText;
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
     if (position) {
@@ -257,7 +271,8 @@
    *  of the calendar controls, month, and overlay.
    */
   function calendarHtml(date, instance) {
-    const { calendar } = instance;
+    //const { calendar } = instance;
+    const calendar = instance.calendar;
     const controls = createControls(date, instance);
     const month = createMonth(date, instance);
     const overlay = createOverlay(instance);
@@ -286,7 +301,13 @@
    *  Returns a string representation of DOM elements.
    */
   function createMonth(date, instance) {
-    const {minDate, maxDate, dateSelected, currentYear, currentMonth, noWeekends} = instance;
+    //const {minDate, maxDate, dateSelected, currentYear, currentMonth, noWeekends} = instance;
+    const minDate = instance.minDate;
+    const maxDate = instance.maxDate;
+    const dateSelected = instance.dateSelected;
+    const currentYear = instance.currentYear;
+    const currentMonth = instance.currentMonth;
+    const noWeekends = instance.noWeekends;
 
     // Same year, same month?
     const today = new Date();
@@ -379,13 +400,18 @@
    *  Calls `setElValues`.
    */
   function selectDay(target, instance) {
-    const { currentMonth, currentYear, calendar, el, onSelect } = instance;
+    //const { currentMonth, currentYear, calendar, el, onSelect } = instance;
+    const currentMonth = instance.currentMonth;
+    const currentYear = instance.currentYear;
+    const calendar = instance.calendar;
+    const el = instance.el;
+    const onSelect = instance.onSelect;
+
     const active = calendar.querySelector('.qs-active');
     const num = target.textContent;
 
     // Keep track of the currently selected date.
     instance.dateSelected = new Date(currentYear, currentMonth, num);
-
     // Re-establish the active (highlighted) date.
     if (active) active.classList.remove('qs-active');
     target.classList.add('qs-active');
@@ -452,8 +478,15 @@
     // Don't position the calendar in reference to the <body> or <html> elements.
     if (instance.noPosition) return;
 
-    const {el, calendar, position, parent} = instance;
-    const {top, right} = position;
+//    const {el, calendar, position, parent} = instance;
+    const el = instance.el;
+    const calendar = instance.calendar;
+    const position = instance.position;
+    const parent = instance.parent;
+
+//    const {top, right} = position;
+    const top = position.top;
+    const right = position.right;
 
     const parentRect = parent.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();
@@ -498,7 +531,10 @@
    *  Removes the current instance from the array of instances.
    */
   function remove() {
-    const { calendar, observer, parent } = this;
+//    const { calendar, observer, parent } = this;
+    const calendar= this.calendar;
+    const observer = this.observer;
+    const parent = this.parent;
 
     // Remove event listeners (declared at the top).
     listeners.forEach(e => {
@@ -529,7 +565,8 @@
   function classChangeObserver(calendar, instance) {
     instance.observer = new MutationObserver((mutations, thing) => {
       // Calendar has been shown.
-      if (mutations[0].oldValue.includes('qs-hidden')) {
+      // if (mutations[0].oldValue.includes('qs-hidden')) {
+      if (mutations[0].oldValue.indexOf('qs-hidden') > -1) {
         calculatePosition(instance);
         instance.onShow && instance.onShow(instance);
 
@@ -562,17 +599,20 @@
         path.push(node);
         node = node.parentNode;
       }
-
       e.path = path;
     }
 
-    let { type, path, target } = e;
+    // let { type, path, target } = e;
+    let type = e.type;
+    let path = e.path;
+    let target = e.target;
 
     if (this.isMobile && this.disableMobile) return;
 
     const calClasses = this.calendar.classList;
     const hidden = calClasses.contains('qs-hidden');
-    const onCal = path.includes(this.calendar);
+    //const onCal = path.includes(this.calendar);
+    const onCal = path.indexOf(this.calendar) > -1 ? true : false;
 
     // Enter, ESC, or tabbing.
     if (type === 'keydown') {
@@ -618,7 +658,8 @@
     }
 
     function calendarClicked(instance) {
-      const { calendar } = instance;
+//      const { calendar } = instance;
+      const calendar = instance.calendar;
       const classList = target.classList;
       const monthYear = calendar.querySelector('.qs-month-year');
       const isClose = classList.contains('qs-close');
@@ -637,7 +678,8 @@
         changeMonthYear(classList, instance);
 
       // Month / year was clicked OR closing the overlay.
-      } else if (path.includes(monthYear) || isClose) {
+      //} else if (path.includes(monthYear) || isClose) {
+      } else if (path.indexOf(monthYear) > -1 || isClose) {
         toggleOverlay(calendar, isClose, instance);
 
       // Overlay submit button clicked.

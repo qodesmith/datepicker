@@ -22,11 +22,6 @@
 
   * {
     box-sizing: border-box;
-
-    &:focus,
-    &:active:focus {
-      outline: none;
-    }
   }
 
   &.qs-hidden {
@@ -68,12 +63,14 @@
       border: none;
       background: transparent;
       border-bottom: 1px solid white;
+      border-radius: 0;
       color: white;
       font-size: @font-size;
       padding: .25em 0;
       margin: auto 0 .5em;
       width: calc(~'100% - 1em');
 
+      // https://goo.gl/oUuGkG
       &::-webkit-inner-spin-button {
         -webkit-appearance: none;
       }

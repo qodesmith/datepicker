@@ -22,10 +22,6 @@
 .qs-datepicker * {
   box-sizing: border-box;
 }
-.qs-datepicker *:focus,
-.qs-datepicker *:active:focus {
-  outline: none;
-}
 .qs-datepicker.qs-hidden {
   display: none;
 }
@@ -66,6 +62,7 @@
   border: none;
   background: transparent;
   border-bottom: 1px solid white;
+  border-radius: 0;
   color: white;
   font-size: 14px;
   padding: .25em 0;

@@ -1,5 +1,5 @@
 # Datepicker.js
-Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **3.3kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **3.4kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 ![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/calendar.png "Get a date with JavaScript!")
 
@@ -23,7 +23,7 @@ and include `datepicker.js` just above your closing `</body>` tag...
 ```html
 <body>
   ...
-  <script src="datepicker.js"></script>
+  <script src="datepicker.min.js"></script>
   <!-- Via Unpkg CDN -->
   <!-- <script src="https://unpkg.com/js-datepicker"></script> -->
 </body>
@@ -39,7 +39,7 @@ Files & locations:
 |       File       |            Location             |             Description             |
 | ---------------- | ------------------------------- | ----------------------------------- |
 | datepicker.js    | node_modules/js-datepicker/     | our main file                       |
-| dateicker.min.js | node_modules/js-datepicker/     | minified main file (3.3kb gzipped!) |
+| dateicker.min.js | node_modules/js-datepicker/     | minified main file (3.4kb gzipped!) |
 | datepicker.css   | node_modules/js-datepicker/     | stylesheet                          |
 | datepicker.less  | node_modules/js-datepicker/less | less: use it for your own builds    |
 
@@ -89,6 +89,8 @@ By clicking on the year or month, an overlay will show revealing an input field 
 | `onMonthchange` | (function) - Callback function when the month has changed. |
 | `customMonths` | (array) - Custom labels for months. Provide an array of 12 strings. |
 | `customdays` | (array) - Custom labels for days. Provide an array of 7 strings. |
+| `overlayPlaceholder` | (string) - Custom placeholder text for the year overlay (defaults to "4-digit year"). |
+| `overlayButton` | (string) - Custom text for the year overlay submit button (defaults to "Submit"). |
 | `disableMobile` | (boolean) - Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. |
 
 _NOTE: All callback functions are both bound to the Datepicker instance and passed the instance as its 1st argument. So you can simply access the instance via the_ `this` _keyword or the 1st argument._
@@ -167,6 +169,8 @@ const picker = datepicker(document.querySelector('#some-id'), {
   },
   customMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   customDays: ['S', 'M', 'T', 'W', 'Th', 'F', 'S'],
+  overlayPlaceholder: 'Enter a 4-digit year',
+  overlayButton: 'Go!',
   disableMobile: true // Conditionally disabled on mobile devices.
 });
 ```

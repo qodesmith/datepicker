@@ -1,8 +1,8 @@
 {
   "name": "js-datepicker",
-  "version": "2.0.6",
+  "version": "2.1.0",
   "description": "Get a date with JavaScript! A datepicker with no dependencies.",
-  "main": "datepicker.js",
+  "main": "datepicker.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node sandboxServer.js"

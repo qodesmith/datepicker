@@ -111,6 +111,12 @@
       // Custom labels for days.
       days: options.days,
 
+      // Custom overlay placeholder.
+      overlayPlaceholder: options.overlayPlaceholder || '4-digit year',
+
+      // Custom overlay submit button.
+      overlayButton: options.overlayButton || 'Submit',
+
       // Disable the datepicker on mobile devices.
       // Allows the use of native datepicker if the input type is 'date'.
       disableMobile: options.disableMobile,
@@ -152,8 +158,17 @@
     // Check if the provided element already has a datepicker attached.
     if (datepickers.includes(el)) throw new Error('A datepicker already exists on that element.');
 
-    let {position, maxDate, minDate, dateSelected, formatter, customMonths, customDays} = options;
-
+    let {
+      position,
+      maxDate,
+      minDate,
+      dateSelected,
+      formatter,
+      customMonths,
+      customDays,
+      overlayPlaceholder,
+      overlayButton
+    } = options;
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
     if (position) {
@@ -219,6 +234,17 @@
       if (wrong) throw new Error(errorMsgs[i]);
 
       options[i ? 'days' : 'months'] = custom;
+    });
+
+    // Custom text for overlay placeholder & button.
+    [overlayPlaceholder, overlayButton].forEach((thing, i) => {
+      if (thing && typeof thing === 'string') {
+        if (i) { // Button.
+          options.overlayButton = thing;
+        } else { // Placeholder.
+          options.overlayPlaceholder = thing;
+        }
+      }
     });
 
     return options;
@@ -356,11 +382,13 @@
    *  manually navigate to a month & year.
    */
   function createOverlay(instance) {
+    const { overlayPlaceholder, overlaySubmit } = instance;
+
     return `
       <div class="qs-overlay qs-hidden">
         <div class="qs-close">&#10005;</div>
-        <input type="number" class="qs-overlay-year" placeholder="4-digit year" />
-        <div class="qs-submit qs-disabled">Submit</div>
+        <input type="number" class="qs-overlay-year" placeholder="${overlayPlaceholder}" />
+        <div class="qs-submit qs-disabled">${overlaySubmit}</div>
       </div>
     `;
   }

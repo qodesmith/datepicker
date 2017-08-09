@@ -125,8 +125,6 @@
       isMobile: 'ontouchstart' in window
     };
 
-    debugger;
-
     // Initially populate the <input> field / set attributes on the `el`.
     if (dateSelected) setElValues(el, instance);
 

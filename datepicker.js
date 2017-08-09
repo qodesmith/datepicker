@@ -125,6 +125,8 @@
       isMobile: 'ontouchstart' in window
     };
 
+    debugger;
+
     // Initially populate the <input> field / set attributes on the `el`.
     if (dateSelected) setElValues(el, instance);
 
@@ -382,13 +384,13 @@
    *  manually navigate to a month & year.
    */
   function createOverlay(instance) {
-    const { overlayPlaceholder, overlaySubmit } = instance;
+    const { overlayPlaceholder, overlayButton } = instance;
 
     return `
       <div class="qs-overlay qs-hidden">
         <div class="qs-close">&#10005;</div>
         <input type="number" class="qs-overlay-year" placeholder="${overlayPlaceholder}" />
-        <div class="qs-submit qs-disabled">${overlaySubmit}</div>
+        <div class="qs-submit qs-disabled">${overlayButton}</div>
       </div>
     `;
   }

@@ -5,7 +5,21 @@
 })(this, function() {
   'use strict';
 
-  const datepickers = [];
+  /*
+    A small polyfill is only intended to satisfy
+    the usage in this datepicker. #BecauseIE.
+  */
+  if (!Array.prototype.includes) {
+    Array.prototype.includes = function(thing) {
+      let found = false;
+      this.forEach(item => {
+        if (item === thing) found = true;
+      });
+      return found;
+    }
+  }
+
+  let datepickers = [];
   const listeners = ['click', 'focusin', 'keydown', 'input'];
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = [
@@ -33,13 +47,13 @@
    *
    */
   function Datepicker(selector, options) {
-    const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
-    const parent = el.parentElement;
+    const el = selector.split ? document.querySelector(selector) : selector;
 
     options = sanitizeOptions(options || defaults(), el, selector);
 
+    const parent = el.parentElement;
     const calendar = document.createElement('div');
-    const {startDate, dateSelected} = options;
+    const { startDate, dateSelected } = options;
     const noPosition = el === document.body || el === document.querySelector('html');
     const instance = {
       // The calendar will be positioned relative to this element (except when 'body' or 'html').
@@ -48,7 +62,7 @@
       // The element that datepicker will be attached to.
       parent: parent,
 
-      // Indicates whether to use a <input> element or not as the calendars anchor.
+      // Indicates whether to use an <input> element or not as the calendar's anchor.
       nonInput: el.nodeName !== 'INPUT',
 
       // Flag indicating if `el` is 'body' or 'html' for `calculatePosition`.
@@ -78,7 +92,7 @@
       // Month of `startDate` or `dateSelected` (as a number).
       currentMonth: (startDate || dateSelected).getMonth(),
 
-      // Month name in plain english.
+      // Month name in plain english - or not.
       currentMonthName: (options.months || months)[(startDate || dateSelected).getMonth()],
 
       // Year of `startDate` or `dateSelected`.
@@ -93,10 +107,10 @@
       // Callback fired when a date is selected - triggered in `selectDay`.
       onSelect: options.onSelect,
 
-      // Callback fired when the calendar is shown - triggered in `classChangeObserver`.
+      // Callback fired when the calendar is shown - triggered in `showCal`.
       onShow: options.onShow,
 
-      // Callback fired when the calendar is hidden - triggered in `classChangeObserver`.
+      // Callback fired when the calendar is hidden - triggered in `hideCal`.
       onHide: options.onHide,
 
       // Callback fired when the month is changed - triggered in `changeMonthYear`.
@@ -105,11 +119,11 @@
       // Function to customize the date format updated on <input> elements - triggered in `setElValues`.
       formatter: options.formatter,
 
-      // Custom labels for months.
-      months: options.months,
+      // Labels for months - custom or default.
+      months: options.months || months,
 
-      // Custom labels for days.
-      days: options.days,
+      // Labels for days - custom or default.
+      days: options.days || days,
 
       // Custom overlay placeholder.
       overlayPlaceholder: options.overlayPlaceholder || '4-digit year',
@@ -133,7 +147,6 @@
     datepickers.push(el);
     calendarHtml(startDate || dateSelected, instance);
 
-    classChangeObserver(calendar, instance);
     listeners.forEach(e => { // Declared at the top.
       window.addEventListener(e, oneHandler.bind(instance));
     });
@@ -152,9 +165,6 @@
    *  Returns an options object if everything checks out.
    */
   function sanitizeOptions(options, el) {
-    // An invalid selector or non-DOM node has been provided.
-    if (!el) throw new Error('An invalid selector or non-DOM node has been provided.');
-
     // Check if the provided element already has a datepicker attached.
     if (datepickers.includes(el)) throw new Error('A datepicker already exists on that element.');
 
@@ -173,7 +183,7 @@
     // Ensure the accuracy of `options.position` & call `establishPosition`.
     if (position) {
       const found = ['tr', 'tl', 'br', 'bl'].some(dir => position === dir);
-      const msg = '"options.position" needs to be one of the following: tl, tr, bl, or br.';
+      const msg = '"options.position" must be one of the following: tl, tr, bl, or br.';
 
       if (!found) throw new Error(msg);
       options.position = establishPosition(position);
@@ -219,7 +229,7 @@
 
     // Custom labels for months & days.
     [customMonths, customDays].forEach((custom, i) => {
-      if (custom === undefined) return;
+      if (!custom) return;
 
       const errorMsgs = [
         '"customMonths" must be an array with 12 strings.',
@@ -228,7 +238,7 @@
       const wrong = [
         ({}).toString.call(custom) !== '[object Array]',
         custom.length !== (i ? 7 : 12),
-        custom.some(item => typeof item !== 'string')
+        custom.some(item => !item.split)
       ].some(thing => thing);
 
       if (wrong) throw new Error(errorMsgs[i]);
@@ -238,7 +248,7 @@
 
     // Custom text for overlay placeholder & button.
     [overlayPlaceholder, overlayButton].forEach((thing, i) => {
-      if (thing && typeof thing === 'string') {
+      if (thing && thing.split) {
         if (i) { // Button.
           options.overlayButton = thing;
         } else { // Placeholder.
@@ -262,7 +272,7 @@
 
   /*
    *  Returns an object representing the position of the calendar
-   *  relative to the calendars <input> element.
+   *  relative to the calendar's <input> element.
    */
   function establishPosition(position) {
     const obj = {};
@@ -278,11 +288,10 @@
    *  of the calendar controls, month, and overlay.
    */
   function calendarHtml(date, instance) {
-    const { calendar } = instance;
     const controls = createControls(date, instance);
     const month = createMonth(date, instance);
     const overlay = createOverlay(instance);
-    calendar.innerHTML = controls + month + overlay;
+    instance.calendar.innerHTML = controls + month + overlay;
   }
 
   /*
@@ -294,7 +303,7 @@
       <div class="qs-controls">
         <div class="qs-arrow qs-left"></div>
         <div class="qs-month-year">
-          <span class="qs-month">${(instance.months || months)[date.getMonth()]}</span>
+          <span class="qs-month">${instance.months[date.getMonth()]}</span>
           <span class="qs-year">${date.getFullYear()}</span>
         </div>
         <div class="qs-arrow qs-right"></div>
@@ -307,7 +316,15 @@
    *  Returns a string representation of DOM elements.
    */
   function createMonth(date, instance) {
-    const {minDate, maxDate, dateSelected, currentYear, currentMonth, noWeekends} = instance;
+    const {
+      minDate,
+      maxDate,
+      dateSelected,
+      currentYear,
+      currentMonth,
+      noWeekends,
+      days
+    } = instance;
 
     // Same year, same month?
     const today = new Date();
@@ -328,7 +345,7 @@
     totalSquares += (offset + daysInMonth) % 7 ? 7 : 0;
 
     for (let i = 1; i <= totalSquares; i++) {
-      let weekday = (instance.days || days)[(i - 1) % 7];
+      let weekday = days[(i - 1) % 7];
       let num = i - offset;
       let otherClass = '';
       let span = `<span class="qs-num">${num}</span>`;
@@ -343,9 +360,8 @@
       // Disabled & current squares.
       } else {
         let disabled = (minDate && thisDay < minDate) || (maxDate && thisDay > maxDate);
-        const weekdays = instance.days || days;
-        const sat = weekdays[6];
-        const sun = weekdays[0];
+        const sat = days[6];
+        const sun = days[0];
         const weekend = weekday === sat || weekday === sun;
         const currentValidDay = isThisMonth && !disabled && num === today.getDate();
 
@@ -360,7 +376,7 @@
     }
 
     // Add the header row of days of the week.
-    const daysAndSquares = (instance.days || days).map(day => {
+    const daysAndSquares = days.map(day => {
       return `<div class="qs-square qs-day">${day}</div>`;
     }).concat(calendarSquares);
 
@@ -414,9 +430,10 @@
     setElValues(el, instance);
 
     // Hide the calendar after a day has been selected.
-    calendar.classList.add('qs-hidden');
+    hideCal(instance);
 
-    if (onSelect) instance.onSelect(instance);
+    // Call the user-provided `onSelect` callback.
+    onSelect && onSelect(instance);
   }
 
   /*
@@ -449,6 +466,7 @@
     } else {
       instance.currentMonth += classList.contains('qs-right') ? 1 : -1;
 
+      // Month = 0 - 11
       if (instance.currentMonth === 12) {
         instance.currentMonth = 0;
         instance.currentYear++
@@ -460,7 +478,7 @@
 
     const newDate = new Date(instance.currentYear, instance.currentMonth, 1);
     calendarHtml(newDate, instance);
-    instance.currentMonthName = (instance.months || months)[instance.currentMonth];
+    instance.currentMonthName = instance.months[instance.currentMonth];
     instance.onMonthChange && year && instance.onMonthChange(instance);
   }
 
@@ -471,8 +489,8 @@
     // Don't position the calendar in reference to the <body> or <html> elements.
     if (instance.noPosition) return;
 
-    const {el, calendar, position, parent} = instance;
-    const {top, right} = position;
+    const { el, calendar, position, parent } = instance;
+    const { top, right } = position;
 
     const parentRect = parent.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();
@@ -495,7 +513,7 @@
     date = stripTime(date); // Remove the time.
     this.currentYear = date.getFullYear();
     this.currentMonth = date.getMonth();
-    this.currentMonthName = (this.months || months)[date.getMonth()];
+    this.currentMonthName = this.months[date.getMonth()];
     this.dateSelected = date;
     setElValues(this.el, this);
     calendarHtml(date, this);
@@ -517,7 +535,7 @@
    *  Removes the current instance from the array of instances.
    */
   function remove() {
-    const { calendar, observer, parent } = this;
+    const { calendar, parent, el } = this;
 
     // Remove event listeners (declared at the top).
     listeners.forEach(e => {
@@ -525,14 +543,29 @@
     });
 
     calendar.remove();
-    observer.disconnect(); // Stop the mutationObserver. https://goo.gl/PgFCEr
 
     // Remove styling done to the parent element.
     if (calendar.hasOwnProperty('parentStyle')) parent.style.position = '';
 
     // Remove this datepicker's `el` from the list.
-    const index = datepickers.indexOf(this.el);
-    if (index > -1) datepickers.splice(index, 1);
+    datepickers = datepickers.filter(dpEl => dpEl !== el);
+  }
+
+  /*
+   *  Hides the calendar and calls the `onHide` callback.
+   */
+  function hideCal(instance) {
+    instance.calendar.classList.add('qs-hidden');
+    instance.onHide && instance.onHide(instance);
+  }
+
+  /*
+   *  Shows the calendar and calls the `onShow` callback.
+   */
+  function showCal(instance) {
+    instance.calendar.classList.remove('qs-hidden');
+    calculatePosition(instance);
+    instance.onShow && instance.onShow(instance);
   }
 
 
@@ -541,37 +574,14 @@
   /////////////////////
 
   /*
-   *  Mutation observer
-   *  1. Will trigger the user-provided `onShow` callback when the calendar is shown.
-   *  2. Will call `calculatePosition` when calendar is shown.
-   */
-  function classChangeObserver(calendar, instance) {
-    instance.observer = new MutationObserver((mutations, thing) => {
-      // Calendar has been shown.
-      if (mutations[0].oldValue.includes('qs-hidden')) {
-        calculatePosition(instance);
-        instance.onShow && instance.onShow(instance);
-
-      // Calendar has been hidden.
-      } else {
-        instance.onHide && instance.onHide(instance);
-      }
-    });
-
-    instance.observer.observe(calendar, {
-      attributes: 1,
-      attributeFilter: ['class'],
-      attributeOldValue: 1
-    });
-  }
-
-  /*
    *  Handles `click` events when the calendar's `el` is an <input>.
    *  Handles `focusin` events for all other types of `el`'s.
    *  Handles `keyup` events when tabbing.
    *  Handles `input` events for the overlay.
    */
   function oneHandler(e) {
+    if (this.isMobile && this.disableMobile) return;
+
     // Add `e.path` if it doesn't exist.
     if (!e.path) {
       let node = e.target;
@@ -585,17 +595,15 @@
       e.path = path;
     }
 
-    let { type, path, target } = e;
-
-    if (this.isMobile && this.disableMobile) return;
-
-    const calClasses = this.calendar.classList;
+    const { type, path, target } = e;
+    const { calendar, el } = this;
+    const calClasses = calendar.classList;
     const hidden = calClasses.contains('qs-hidden');
-    const onCal = path.includes(this.calendar);
+    const onCal = path.includes(calendar);
 
     // Enter, ESC, or tabbing.
     if (type === 'keydown') {
-      const overlay = this.calendar.querySelector('.qs-overlay');
+      const overlay = calendar.querySelector('.qs-overlay');
 
       // Pressing enter while the overlay is open.
       if (e.which === 13 && !overlay.classList.contains('qs-hidden')) {
@@ -604,7 +612,7 @@
 
       // ESC key pressed.
       } else if (e.which === 27) {
-        return toggleOverlay(this.calendar, true, this);
+        return toggleOverlay(calendar, true, this);
 
       // Tabbing.
       } else if (e.which !== 9) {
@@ -614,16 +622,22 @@
 
     // Only pay attention to `focusin` events if the calendar's el is an <input>.
     // `focusin` bubbles, `focus` does not.
-    if (type === 'focusin') return target === this.el && calClasses.remove('qs-hidden');
+    if (type === 'focusin') return target === el && showCal(this);
 
     // Calendar's el is 'html' or 'body'.
     // Anything but the calendar was clicked.
     if (this.noPosition) {
-      onCal ? calendarClicked(this) : calClasses.toggle('qs-hidden');
+      if (onCal) {
+        calendarClicked(this);
+      } else if (hidden) {
+        showCal(this);
+      } else {
+        hideCal(this);
+      }
 
     // When the calendar is hidden...
     } else if (hidden) {
-      target === this.el && calClasses.remove('qs-hidden');
+      target === el && showCal(this);
 
     // Clicked on the calendar.
     } else if (type === 'click' && onCal) {
@@ -633,14 +647,14 @@
     } else if (type === 'input') {
       overlayYearEntry(e, target, this);
     } else {
-      target !== this.el && calClasses.add('qs-hidden');
+      target !== el && hideCal(this);
     }
 
     function calendarClicked(instance) {
       const { calendar } = instance;
       const classList = target.classList;
       const monthYear = calendar.querySelector('.qs-month-year');
-      const isClose = classList.contains('qs-close');
+      const isClosed = classList.contains('qs-close');
 
       // A number was clicked.
       if (classList.contains('qs-num')) {
@@ -656,8 +670,8 @@
         changeMonthYear(classList, instance);
 
       // Month / year was clicked OR closing the overlay.
-      } else if (path.includes(monthYear) || isClose) {
-        toggleOverlay(calendar, isClose, instance);
+      } else if (path.includes(monthYear) || isClosed) {
+        toggleOverlay(calendar, isClosed, instance);
 
       // Overlay submit button clicked.
       } else if (target.classList.contains('qs-submit')) {

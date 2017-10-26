@@ -1,5 +1,5 @@
 # Datepicker.js
-Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **3.4kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **3.3kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 
@@ -41,7 +41,7 @@ Files & locations:
 |       File       |            Location             |                 Description                |
 | ---------------- | ------------------------------- | ------------------------------------------ |
 | datepicker.js    | node_modules/js-datepicker/     | our main file - (ES7)                      |
-| dateicker.min.js | node_modules/js-datepicker/     | minified main file - (ES5, 3.4kb gzipped!) |
+| dateicker.min.js | node_modules/js-datepicker/     | minified main file - (ES5, 3.3kb gzipped!) |
 | datepicker.css   | node_modules/js-datepicker/     | stylesheet                                 |
 | datepicker.less  | node_modules/js-datepicker/less | less: use it for your own builds           |
 
@@ -90,7 +90,7 @@ By clicking on the year or month, an overlay will show revealing an input field 
 | `onHide` | (function) - Callback function when the calendar is hidden. |
 | `onMonthchange` | (function) - Callback function when the month has changed. |
 | `customMonths` | (array) - Custom labels for months. Provide an array of 12 strings. |
-| `customdays` | (array) - Custom labels for days. Provide an array of 7 strings. |
+| `customDays` | (array) - Custom labels for days. Provide an array of 7 strings. |
 | `overlayPlaceholder` | (string) - Custom placeholder text for the year overlay (defaults to "4-digit year"). |
 | `overlayButton` | (string) - Custom text for the year overlay submit button (defaults to "Submit"). |
 | `disableMobile` | (boolean) - Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. |
@@ -103,7 +103,7 @@ _NOTE: All callback functions are both bound to the Datepicker instance and pass
 | Method | Description |
 | ------ | ----------- |
 | `.setDate` | Allows you to programmatically select a date on the calendar. It takes a JavaScript date object as it's only argument. E.x.: `picker.setDate(new Date(2099, 0, 5))` |
-| `.remove` | Performs cleanup. Will remove various event listeners and mutation observers _only_ for the instance it's called on. So if there are multiple Datepickers on the page, the others will be unaffected.
+| `.remove` | Performs cleanup. Will remove various event listeners _only_ for the instance it's called on. So if there are multiple Datepickers on the page, the others will be unaffected.
 
 
 ## Properties & Values

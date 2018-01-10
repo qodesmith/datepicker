@@ -101,6 +101,9 @@
       // Method to programatically set the calendar's date.
       setDate: setDate,
 
+      // Method to programatically reset the calendar.
+      reset: reset,
+
       // Method that removes the calendar from the DOM along with associated events.
       remove: remove,
 
@@ -526,15 +529,20 @@
   /*
    *  Method that programatically sets the date.
    */
-  function setDate(date) {
+  function setDate(date, reset) {
     if (!dateCheck(date)) throw new TypeError('`setDate` needs a JavaScript Date object.');
     date = stripTime(date); // Remove the time.
     this.currentYear = date.getFullYear();
     this.currentMonth = date.getMonth();
     this.currentMonthName = this.months[date.getMonth()];
-    this.dateSelected = date;
-    setElValues(this.el, this);
+    this.dateSelected = reset ? undefined : date;
+    !reset && setElValues(this.el, this);
     calendarHtml(date, this);
+    if (reset) this.el.value = '';
+  }
+
+  function reset() {
+    this.setDate(this.startDate, true);
   }
 
   function dateCheck(date) {

@@ -123,7 +123,10 @@
       months: options.months || months,
 
       // Labels for days - custom or default.
-      days: options.days || days,
+      days: options.customDays || days,
+
+      // Start day of the week - indexed from `days` above.
+      startDay: options.startDay,
 
       // Custom overlay placeholder.
       overlayPlaceholder: options.overlayPlaceholder || '4-digit year',
@@ -177,7 +180,8 @@
       customMonths,
       customDays,
       overlayPlaceholder,
-      overlayButton
+      overlayButton,
+      startDay
     } = options;
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
@@ -235,16 +239,25 @@
         '"customMonths" must be an array with 12 strings.',
         '"customDays" must be an array with 7 strings.'
       ];
-      const wrong = [
-        ({}).toString.call(custom) !== '[object Array]',
-        custom.length !== (i ? 7 : 12),
-        custom.some(item => !item.split)
-      ].some(thing => thing);
+      const wrong = (
+        ({}).toString.call(custom) !== '[object Array]' ||
+        custom.length !== (i ? 7 : 12)
+      );
 
       if (wrong) throw new Error(errorMsgs[i]);
 
       options[i ? 'days' : 'months'] = custom;
     });
+
+    // Adjust days of the week for user-provided start day.
+    if (startDay !== undefined && +startDay && +startDay > 0 && +startDay < 7) {
+      let daysCopy = (options.customDays || days).slice();
+      const chunk = daysCopy.splice(0, startDay);
+      options.customDays = daysCopy.concat(chunk);
+      options.startDay = +startDay;
+    } else {
+      options.startDay = 0;
+    }
 
     // Custom text for overlay placeholder & button.
     [overlayPlaceholder, overlayButton].forEach((thing, i) => {
@@ -332,7 +345,8 @@
 
     // Calculations for the squares on the calendar.
     const copy = new Date(new Date(date).setDate(1));
-    const offset = copy.getDay(); // Preceding empty squares.
+    const offset = copy.getDay() - instance.startDay; // Preceding empty squares.
+    const precedingRow = offset < 0 ? 7 : 0; // Offsetting the start day may move back to a new 1st row.
     copy.setMonth(copy.getMonth() + 1);
     copy.setDate(0); // Last day in the current month.
     const daysInMonth = copy.getDate(); // Squares with a number.
@@ -341,16 +355,20 @@
     const calendarSquares = [];
 
     // Fancy calculations for the total # of squares.
-    let totalSquares = ((offset + daysInMonth) / 7 | 0) * 7;
+    let totalSquares = precedingRow + (((offset + daysInMonth) / 7 | 0) * 7);
     totalSquares += (offset + daysInMonth) % 7 ? 7 : 0;
 
+    // If the offest happens to be 0 but we did specify a `startDay`,
+    // add 7 to prevent a missing row at the end of the calendar.
+    if (instance.startDay !== 0 && offset === 0) totalSquares += 7;
+
     for (let i = 1; i <= totalSquares; i++) {
-      let weekday = days[(i - 1) % 7];
-      let num = i - offset;
+      const weekday = days[(i - 1) % 7];
+      const num = i - (offset >= 0 ? offset : (7 + offset));
+      const thisDay = new Date(currentYear, currentMonth, num);
+      const isEmpty = num < 1 || num > daysInMonth;
       let otherClass = '';
       let span = `<span class="qs-num">${num}</span>`;
-      let thisDay = new Date(currentYear, currentMonth, num);
-      let isEmpty = num < 1 || num > daysInMonth;
 
       // Empty squares.
       if (isEmpty) {

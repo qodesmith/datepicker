@@ -38,7 +38,13 @@
 
   <script src="datepicker.js"></script>
   <script>
-    const picker = datepicker('#date');
+    // Feb 1 1997 = saturday
+    const picker = datepicker('#date', {
+      // startDate: new Date('2/1/1998'),
+      startDay: 2,
+    });
+
+    document.querySelector('#date').focus();
   </script>
 </body>
 </html>

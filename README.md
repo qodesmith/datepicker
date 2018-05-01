@@ -41,7 +41,7 @@ Files & locations:
 |       File       |            Location             |                 Description                |
 | ---------------- | ------------------------------- | ------------------------------------------ |
 | datepicker.js    | node_modules/js-datepicker/     | our main file - (ES7)                      |
-| dateicker.min.js | node_modules/js-datepicker/     | minified main file - (ES5, 3.3kb gzipped!) |
+| datepicker.min.js | node_modules/js-datepicker/    | minified main file - (ES5, 3.3kb gzipped!) |
 | datepicker.css   | node_modules/js-datepicker/     | stylesheet                                 |
 | datepicker.less  | node_modules/js-datepicker/less | less: use it for your own builds           |
 

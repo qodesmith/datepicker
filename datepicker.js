@@ -189,12 +189,14 @@
 
     // Checks around disabled dates.
     const dateSelectedStripped = +stripTime(dateSelected)
-    disabledDates.forEach(date => {
+    options.disabledDates = (disabledDates || []).map(date => {
       if (!dateCheck(date)) {
         throw 'You supplied a non-date object to "options.disabledDates".';
       } else if (+stripTime(date) === dateSelectedStripped) {
         throw '"disabledDates" cannot contain the same date as "dateSelected".';
       }
+
+      return +stripTime(date);
     });
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
@@ -347,7 +349,8 @@
       currentYear,
       currentMonth,
       noWeekends,
-      days
+      days,
+      disabledDates
     } = instance;
 
     // Same year, same month?
@@ -388,7 +391,9 @@
 
       // Disabled & current squares.
       } else {
-        let disabled = (minDate && thisDay < minDate) || (maxDate && thisDay > maxDate);
+        let disabled = (minDate && thisDay < minDate) ||
+          (maxDate && thisDay > maxDate) ||
+          disabledDates.includes(+stripTime(thisDay));
         const sat = days[6];
         const sun = days[0];
         const weekend = weekday === sat || weekday === sun;

@@ -11,11 +11,7 @@
   */
   if (!Array.prototype.includes) {
     Array.prototype.includes = function(thing) {
-      let found = false;
-      this.forEach(item => {
-        if (item === thing) found = true;
-      });
-      return found;
+      return this.reduce((acc, item) => (acc || (item === thing)), false);
     }
   }
 

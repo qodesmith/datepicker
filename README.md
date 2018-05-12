@@ -82,6 +82,7 @@ By clicking on the year or month, an overlay will show revealing an input field 
 | `startDate` | (JS date object) The month that the calendar will open up to. The default value is the current month. Example: `new Date()` |
 | `startDay` | (number, 0 - 6) - Specify the day of the week your calendar starts on. 0 = Sunday, 1 = Monday, etc. Plays nice with the `customDays` option. |
 | `dateSelected` | (JS date object) - This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well. Example: `new Date(2017, 0, 15)` |
+| `disabledDates` | (array of JS date objects) - Provide an array of JS date objects that will be disabled on the calendar. This array cannot include the same date as `dateSelected`. |
 | `minDate` | (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)` |
 | `maxDate` | (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)` |
 | `noWeekends` | (boolean) - Provide `true` to disable selecting weekends. |
@@ -151,6 +152,7 @@ const picker = datepicker(document.querySelector('#some-id'), {
   startDate: new Date(), // This month.
   startDay: 1, // Calendar week starts on a Monday.
   dateSelected: new Date(), // Today is selected.
+  disabledDates: [new Date('1/1/2050'), new Date('1/3/2050')], // Disabled dates.
   minDate: new Date(2016, 5, 1), // June 1st, 2016.
   maxDate: new Date(2099, 0, 1), // Jan 1st, 2099.
   noWeekends: true, // Weekends will be unselectable.

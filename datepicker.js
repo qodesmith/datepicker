@@ -626,14 +626,15 @@
     // Enter, ESC, or tabbing.
     if (type === 'keydown') {
       const overlay = calendar.querySelector('.qs-overlay');
+      const overlayShowing = !overlay.classList.contains('qs-hidden');
 
       // Pressing enter while the overlay is open.
-      if (e.which === 13 && !overlay.classList.contains('qs-hidden')) {
+      if (e.which === 13 && overlayShowing) {
         e.stopPropagation(); // Avoid submitting <form>'s.
         return overlayYearEntry(e, target, this);
 
       // ESC key pressed.
-      } else if (e.which === 27) {
+      } else if (e.which === 27 && overlayShowing) {
         return toggleOverlay(calendar, true, this);
 
       // Tabbing.

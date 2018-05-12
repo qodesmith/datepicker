@@ -496,7 +496,7 @@
     const newDate = new Date(instance.currentYear, instance.currentMonth, 1);
     calendarHtml(newDate, instance);
     instance.currentMonthName = instance.months[instance.currentMonth];
-    instance.onMonthChange && year && instance.onMonthChange(instance);
+    instance.onMonthChange && instance.onMonthChange(instance);
   }
 
   /*

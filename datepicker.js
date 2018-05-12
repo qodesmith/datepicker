@@ -73,6 +73,9 @@
       // Starts the calendar with a date selected.
       dateSelected: dateSelected,
 
+      // An array of dates to disable.
+      disabledDates: options.disabledDates,
+
       // Low end of selectable dates.
       minDate: options.minDate,
 
@@ -168,7 +171,7 @@
    */
   function sanitizeOptions(options, el) {
     // Check if the provided element already has a datepicker attached.
-    if (datepickers.includes(el)) throw new Error('A datepicker already exists on that element.');
+    if (datepickers.includes(el)) throw 'A datepicker already exists on that element.';
 
     let {
       position,
@@ -180,15 +183,24 @@
       customDays,
       overlayPlaceholder,
       overlayButton,
-      startDay
+      startDay,
+      disabledDates
     } = options;
+
+    // Checks around disabled dates.
+    const dateSelectedStripped = +stripTime(dateSelected)
+    disabledDates.forEach(date => {
+      if (!dateCheck(date)) {
+        throw 'You supplied a non-date object to "options.disabledDates".';
+      } else if (+stripTime(date) === dateSelectedStripped) {
+        throw '"disabledDates" cannot contain the same date as "dateSelected".';
+      }
+    });
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
     if (position) {
       const found = ['tr', 'tl', 'br', 'bl'].some(dir => position === dir);
-      const msg = '"options.position" must be one of the following: tl, tr, bl, or br.';
-
-      if (!found) throw new Error(msg);
+      if (!found) throw '"options.position" must be one of the following: tl, tr, bl, or br.';
       options.position = establishPosition(position);
     } else {
       options.position = establishPosition('bl');
@@ -199,7 +211,7 @@
     ['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(date => {
       if (options[date]) {
         if (!dateCheck(options[date]) || isNaN(+options[date])) {
-          throw new TypeError(`"options.${date}" needs to be a valid JavaScript Date object.`);
+          throw `"options.${date}" needs to be a valid JavaScript Date object.`;
         }
 
         // Strip the time from the date.
@@ -207,20 +219,20 @@
       }
     });
 
-    options.startDate = options.startDate || options.dateSelected || stripTime(new Date());
+    options.startDate = stripTime(options.startDate || options.dateSelected || new Date());
     options.formatter = typeof formatter === 'function' ? formatter : null;
 
     if (maxDate < minDate) {
-      throw new Error('"maxDate" in options is less than "minDate".');
+      throw '"maxDate" in options is less than "minDate".';
     }
 
     if (dateSelected) {
       if (minDate > dateSelected) {
-        throw new Error('"dateSelected" in options is less than "minDate".');
+        throw '"dateSelected" in options is less than "minDate".';
       }
 
       if (maxDate < dateSelected) {
-        throw new Error('"dateSelected" in options is greater than "maxDate".');
+        throw '"dateSelected" in options is greater than "maxDate".';
       }
     }
 
@@ -243,7 +255,7 @@
         custom.length !== (i ? 7 : 12)
       );
 
-      if (wrong) throw new Error(errorMsgs[i]);
+      if (wrong) throw errorMsgs[i];
 
       options[i ? 'days' : 'months'] = custom;
     });
@@ -400,8 +412,7 @@
     // Throw error...
     // The # of squares on the calendar should ALWAYS be a multiple of 7.
     if (daysAndSquares.length % 7 !== 0 ) {
-      const msg = 'Calendar not constructed properly. The # of squares should be a multiple of 7.';
-      throw new Error(msg);
+      throw 'Calendar not constructed properly. The # of squares should be a multiple of 7.';
     }
 
     // Wrap it all in a tidy div.
@@ -526,7 +537,7 @@
    *  Method that programatically sets the date.
    */
   function setDate(date, reset) {
-    if (!dateCheck(date)) throw new TypeError('`setDate` needs a JavaScript Date object.');
+    if (!dateCheck(date)) throw '`setDate` needs a JavaScript Date object.';
     date = stripTime(date); // Remove the time.
     this.currentYear = date.getFullYear();
     this.currentMonth = date.getMonth();

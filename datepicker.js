@@ -565,7 +565,7 @@
    *  Takes a date and returns a date stripped of its time (hh:mm:ss:ms).
    */
   function stripTime(date) {
-    return new Date(date.toDateString());
+    return date ? new Date(date.toDateString()) : date;
   }
 
   /*

@@ -36,7 +36,8 @@
     t: 'top',
     r: 'right',
     b: 'bottom',
-    l: 'left'
+    l: 'left',
+    c: 'centered' // This fixes the calendar smack in the middle of the screen.
   };
 
   /*
@@ -201,8 +202,8 @@
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
     if (position) {
-      const found = ['tr', 'tl', 'br', 'bl'].some(dir => position === dir);
-      if (!found) throw '"options.position" must be one of the following: tl, tr, bl, or br.';
+      const found = ['tr', 'tl', 'br', 'bl', 'c'].some(dir => position === dir);
+      if (!found) throw '"options.position" must be one of the following: tl, tr, bl, br, or c.';
       options.position = establishPosition(position);
     } else {
       options.position = establishPosition('bl');
@@ -304,6 +305,7 @@
     const obj = {};
 
     obj[sides[position[0]]] = 1;
+    if (position === 'c') return obj;
     obj[sides[position[1]]] = 1;
 
     return obj;
@@ -523,7 +525,9 @@
     if (instance.noPosition) return;
 
     const { el, calendar, position, parent } = instance;
-    const { top, right } = position;
+    const { top, right, centered } = position;
+
+    if (centered) return calendar.classList.add('qs-centered');
 
     const parentRect = parent.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();

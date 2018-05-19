@@ -22,7 +22,7 @@
     <section>
       <form action="">
         <div class="title">Date</div>
-        <input id="date" type="text">
+        <input id="date" type="text" readonly="true">
       </form>
     </section>
 
@@ -38,8 +38,7 @@
 
   <script src="datepicker.js"></script>
   <script>
-    // Feb 1 1997 = saturday
-    const picker = datepicker('#date');
+    const picker = datepicker('#date', { position: 'c' });
 
     document.querySelector('#date').focus();
   </script>

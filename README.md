@@ -41,7 +41,7 @@ Files & locations:
 |       File       |            Location             |                 Description                |
 | ---------------- | ------------------------------- | ------------------------------------------ |
 | datepicker.js    | node_modules/js-datepicker/     | our main file - (ES7)                      |
-| datepicker.min.js | node_modules/js-datepicker/    | minified main file - (ES5, 3.3kb gzipped!) |
+| datepicker.min.js | node_modules/js-datepicker/    | minified main file - (ES5, 3.6kb gzipped!) |
 | datepicker.css   | node_modules/js-datepicker/     | stylesheet                                 |
 | datepicker.less  | node_modules/js-datepicker/less | less: use it for your own builds           |
 
@@ -78,7 +78,7 @@ By clicking on the year or month, an overlay will show revealing an input field 
 
 | Option | Description |
 | -------| ----------- |
-| `position` | (string) Can be 1 of 4 values: `'tr'`, `'tl'`, `'br'`, `'bl'` representing top-right, top-left, bottom-right, and bottom-left respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument. |
+| `position` | (string) Can be 1 of 5 values: `'tr'`, `'tl'`, `'br'`, `'bl'`, `'c'` representing top-right, top-left, bottom-right, bottom-left, and centered respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument. For a value of `'c'`, Datepicker will position itself fixed, smack in the middle of the screen. This can be desirable for mobile devices. |
 | `startDate` | (JS date object) The month that the calendar will open up to. The default value is the current month. Example: `new Date()` |
 | `startDay` | (number, 0 - 6) - Specify the day of the week your calendar starts on. 0 = Sunday, 1 = Monday, etc. Plays nice with the `customDays` option. |
 | `dateSelected` | (JS date object) - This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well. Example: `new Date(2017, 0, 15)` |
@@ -126,7 +126,7 @@ Below will detail some helpful properties and values that are available on the `
 | `currentMonthName` | Calendar month in plain english. E.x. `January` |
 | `currentYear` | The current year. E.x. `2099` |
 | `dateSelected` | The value of the selected date. This will be `undefined` if no date has been selected yet. |
-| `el` | The element datepicker is relatively positioned against. |
+| `el` | The element datepicker is relatively positioned against (unless centered). |
 
 
 ## Sizing The Calendar

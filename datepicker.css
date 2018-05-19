@@ -22,6 +22,12 @@
 .qs-datepicker * {
   box-sizing: border-box;
 }
+.qs-datepicker.qs-centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 .qs-datepicker.qs-hidden {
   display: none;
 }

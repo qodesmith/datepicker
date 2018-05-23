@@ -192,7 +192,7 @@
     const dateSelectedStripped = +stripTime(dateSelected)
     options.disabledDates = (disabledDates || []).map(date => {
       if (!dateCheck(date)) {
-        throw 'You supplied a non-date object to "options.disabledDates".';
+        throw 'You supplied an invalid date to "options.disabledDates".';
       } else if (+stripTime(date) === dateSelectedStripped) {
         throw '"disabledDates" cannot contain the same date as "dateSelected".';
       }
@@ -562,7 +562,10 @@
   }
 
   function dateCheck(date) {
-    return ({}).toString.call(date) === '[object Date]';
+    return [
+      ({}).toString.call(date) === '[object Date]',
+      date.toString() !== 'Invalid Date'
+    ].every(Boolean)
   }
 
   /*

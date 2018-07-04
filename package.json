@@ -1,6 +1,6 @@
 {
   "name": "js-datepicker",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "description": "Get a date with JavaScript! A datepicker with no dependencies.",
   "main": "datepicker.min.js",
   "scripts": {

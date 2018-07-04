@@ -628,24 +628,11 @@
   function oneHandler(e) {
     if (this.isMobile && this.disableMobile) return;
 
-    // Add `e.path` if it doesn't exist.
-    if (!e.path) {
-      let node = e.target;
-      let path = [];
-
-      while (node !== document) {
-        path.push(node);
-        node = node.parentNode;
-      }
-
-      e.path = path;
-    }
-
-    const { type, path, target } = e;
+    const { type, target } = e;
     const { calendar, el } = this;
     const calClasses = calendar.classList;
     const hidden = calClasses.contains('qs-hidden');
-    const onCal = path.includes(calendar);
+    const onCal = calendar.contains(target);
 
     // Enter, ESC, or tabbing.
     if (type === 'keydown') {
@@ -717,7 +704,7 @@
         changeMonthYear(classList, instance);
 
       // Month / year was clicked OR closing the overlay.
-      } else if (path.includes(monthYear) || isClosed) {
+      } else if (monthYear.contains(target) || isClosed) {
         toggleOverlay(calendar, isClosed, instance);
 
       // Overlay submit button clicked.

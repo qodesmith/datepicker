@@ -254,8 +254,9 @@
         '"customDays" must be an array with 7 strings.'
       ];
       const wrong = (
-        ({}).toString.call(custom) !== '[object Array]' ||
-        custom.length !== (i ? 7 : 12)
+        ({}).toString.call(custom) !== '[object Array]' || // Must be an array.
+        custom.length !== (i ? 7 : 12) || // Must have the corrent length.
+        custom.some(item => typeof item !== 'string') // Must contain only strings.
       );
 
       if (wrong) throw errorMsgs[i];
@@ -477,7 +478,7 @@
    */
   function setElValues(el, instance) {
     if (instance.nonInput) return;
-    if (instance.formatter) return instance.formatter(el, instance.dateSelected);
+    if (instance.formatter) return instance.formatter(el, instance.dateSelected, instance);
     el.value = instance.dateSelected.toDateString();
   }
 

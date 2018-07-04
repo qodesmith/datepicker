@@ -86,7 +86,7 @@ By clicking on the year or month, an overlay will show revealing an input field 
 | `minDate` | (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)` |
 | `maxDate` | (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)` |
 | `noWeekends` | (boolean) - Provide `true` to disable selecting weekends. |
-| `formatter` | (function) - Provide a function that manually sets the provided input's value with your own formatting. This function is passed two arguments. 1st argument is the element `datepicker` is triggered on. 2nd argument is a JavaScript date object for the selected date. |
+| `formatter` | (function) - Provide a function that manually sets the provided input's value with your own formatting. This function is passed three arguments. 1st argument is the DOM element `datepicker` is triggered on. 2nd argument is a JavaScript date object for the selected date. 3rd argument is the datepicker instance itself. |
 | `onSelect` | (function) - Callback function after a date has been selected. |
 | `onShow` | (function) - Callback function when the calendar is shown. |
 | `onHide` | (function) - Callback function when the calendar is hidden. |
@@ -156,7 +156,7 @@ const picker = datepicker(document.querySelector('#some-id'), {
   minDate: new Date(2016, 5, 1), // June 1st, 2016.
   maxDate: new Date(2099, 0, 1), // Jan 1st, 2099.
   noWeekends: true, // Weekends will be unselectable.
-  formatter: function(el, date) {
+  formatter: function(el, date, instance) {
     // This will display the date as `1/1/2017`.
     el.value = date.toDateString();
   },

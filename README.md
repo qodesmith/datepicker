@@ -21,7 +21,7 @@ Simply include `datepicker.css` in the `<head>`...
 </head>
 ```
 
-and include `datepicker.js` just above your closing `</body>` tag...
+and include `datepicker.min.js` just above your closing `</body>` tag...
 ```html
 <body>
   ...
@@ -38,12 +38,12 @@ npm install --save js-datepicker
 
 Files & locations:
 
-|       File       |            Location             |                 Description                |
-| ---------------- | ------------------------------- | ------------------------------------------ |
-| datepicker.js    | node_modules/js-datepicker/     | our main file - (ES7)                      |
-| datepicker.min.js | node_modules/js-datepicker/    | minified main file - (ES5, 3.6kb gzipped!) |
-| datepicker.css   | node_modules/js-datepicker/     | stylesheet                                 |
-| datepicker.less  | node_modules/js-datepicker/less | less: use it for your own builds           |
+|       File        |            Location             |                 Description                |
+| ----------------- | ------------------------------- | ------------------------------------------ |
+| datepicker.js     | node_modules/js-datepicker/     | our main file - (ES7)                      |
+| datepicker.min.js | node_modules/js-datepicker/     | minified main file - (ES5, 3.6kb gzipped!) |
+| datepicker.css    | node_modules/js-datepicker/     | stylesheet                                 |
+| datepicker.less   | node_modules/js-datepicker/less | less: use it for your own builds           |
 
 
 ## Usage
@@ -95,6 +95,7 @@ By clicking on the year or month, an overlay will show revealing an input field 
 | `customDays` | (array) - Custom labels for days. Provide an array of 7 things. |
 | `overlayPlaceholder` | (string) - Custom placeholder text for the year overlay (defaults to "4-digit year"). |
 | `overlayButton` | (string) - Custom text for the year overlay submit button (defaults to "Submit"). |
+| `disableYearOverlay` | (boolean) - Disable the year overlay. Clicking the year will have no effect. |
 | `disableMobile` | (boolean) - Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. |
 
 _NOTE: All callback functions are both bound to the Datepicker instance and passed the instance as its 1st argument. So you can simply access the instance via the_ `this` _keyword or the 1st argument._
@@ -104,9 +105,9 @@ _NOTE: All callback functions are both bound to the Datepicker instance and pass
 
 | Method | Description |
 | ------ | ----------- |
-| `.setDate` | Allows you to programmatically select a date on the calendar. It takes a JavaScript date object as it's only argument. E.x.: `picker.setDate(new Date(2099, 0, 5))` |
-| `.reset` | Resets the calendar to the original date provided or today. |
-| `.remove` | Performs cleanup. Will remove various event listeners _only_ for the instance it's called on. So if there are multiple Datepickers on the page, the others will be unaffected.
+| `.setDate(date)` | Allows you to programmatically select a date on the calendar. It takes a JavaScript date object as it's only argument. E.x.: `picker.setDate(new Date(2099, 0, 5))` |
+| `.reset()` | Resets the calendar to the original date provided or today. |
+| `.remove()` | Performs cleanup. Will remove various event listeners _only_ for the instance it's called on. So if there are multiple Datepickers on the page, the others will be unaffected.
 
 
 ## Properties & Values

@@ -44,6 +44,7 @@
       dateSelected: new Date('7/8/2018'),
       customMonths: [1,2,3,4,5,6,7,8,9,10,11,12].map(x => x.toString()),
       customDays: ['a','b','c','d','e','f','g'],
+      disableYearOverlay: !true,
       formatter: (el, date, instance) => {
         // Collect all the data we need to form the final value.
         const dayName = instance.days[date.getDay()];

@@ -137,6 +137,9 @@
       // Custom overlay submit button.
       overlayButton: options.overlayButton || 'Submit',
 
+      // Disable the overlay for changing the year.
+      disableYearOverlay: options.disableYearOverlay,
+
       // Disable the datepicker on mobile devices.
       // Allows the use of native datepicker if the input type is 'date'.
       disableMobile: options.disableMobile,
@@ -629,7 +632,7 @@
     if (this.isMobile && this.disableMobile) return;
 
     const { type, target } = e;
-    const { calendar, el } = this;
+    const { calendar, el, disableYearOverlay } = this;
     const calClasses = calendar.classList;
     const hidden = calClasses.contains('qs-hidden');
     const onCal = calendar.contains(target);
@@ -704,7 +707,7 @@
         changeMonthYear(classList, instance);
 
       // Month / year was clicked OR closing the overlay.
-      } else if (monthYear.contains(target) || isClosed) {
+      } else if (!disableYearOverlay && (monthYear.contains(target) || isClosed)) {
         toggleOverlay(calendar, isClosed, instance);
 
       // Overlay submit button clicked.

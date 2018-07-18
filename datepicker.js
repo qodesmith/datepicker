@@ -86,6 +86,9 @@
       // Disabled the ability to select days on the weekend.
       noWeekends: !!options.noWeekends,
 
+      // Indices for "Saturday" and "Sunday" repsectively.
+      weekendIndices: options.weekendIndices,
+
       // The element our calendar is constructed in.
       calendar: calendar,
 
@@ -269,12 +272,25 @@
 
     // Adjust days of the week for user-provided start day.
     if (startDay !== undefined && +startDay && +startDay > 0 && +startDay < 7) {
+      // [sun, mon, tues, wed, thurs, fri, sat]             (1) - original supplied days of the week
       let daysCopy = (options.customDays || days).slice();
+
+      // Example with startDay of 3 (Wednesday)
+      // daysCopy => [wed, thurs, fri, sat]                 (2) - the 1st hald of the new array
+      // chunk    => [sun, mon, tues]                       (3) - the 2nd half of the new array
       const chunk = daysCopy.splice(0, startDay);
+
+      // [wed, thurs, fri, sat, sun, mon, tues]             (4) - the new days of the week
       options.customDays = daysCopy.concat(chunk);
+
       options.startDay = +startDay;
+      options.weekendIndices = [
+        daysCopy.length - 1, // Last item in the 1st half of the edited array.
+        daysCopy.length // Next item in the array, 1st item in the 2nd half of the edited array.
+      ];
     } else {
       options.startDay = 0;
+      options.weekendIndices = [6, 0]; // Indices of "Saturday" and "Sunday".
     }
 
     // Custom text for overlay placeholder & button.
@@ -356,7 +372,9 @@
       currentMonth,
       noWeekends,
       days,
-      disabledDates
+      disabledDates,
+      startDay,
+      weekendIndices
     } = instance;
 
     // Same year, same month?
@@ -365,7 +383,7 @@
 
     // Calculations for the squares on the calendar.
     const copy = new Date(new Date(date).setDate(1));
-    const offset = copy.getDay() - instance.startDay; // Preceding empty squares.
+    const offset = copy.getDay() - startDay; // Preceding empty squares.
     const precedingRow = offset < 0 ? 7 : 0; // Offsetting the start day may move back to a new 1st row.
     copy.setMonth(copy.getMonth() + 1);
     copy.setDate(0); // Last day in the current month.
@@ -380,10 +398,11 @@
 
     // If the offest happens to be 0 but we did specify a `startDay`,
     // add 7 to prevent a missing row at the end of the calendar.
-    if (instance.startDay !== 0 && offset === 0) totalSquares += 7;
+    if (startDay !== 0 && offset === 0) totalSquares += 7;
 
     for (let i = 1; i <= totalSquares; i++) {
-      const weekday = days[(i - 1) % 7];
+      const weekdayIndex = (i - 1) % 7
+      const weekday = days[weekdayIndex];
       const num = i - (offset >= 0 ? offset : (7 + offset));
       const thisDay = new Date(currentYear, currentMonth, num);
       const isEmpty = num < 1 || num > daysInMonth;
@@ -400,12 +419,10 @@
         let disabled = (minDate && thisDay < minDate) ||
           (maxDate && thisDay > maxDate) ||
           disabledDates.includes(+stripTime(thisDay));
-        const sat = days[6];
-        const sun = days[0];
-        const weekend = weekday === sat || weekday === sun;
+        const isWeekend = weekendIndices.includes(weekdayIndex);
         const currentValidDay = isThisMonth && !disabled && num === today.getDate();
 
-        disabled = disabled || (noWeekends && weekend);
+        disabled = disabled || (noWeekends && isWeekend);
         otherClass = disabled ? 'qs-disabled' : currentValidDay ? 'qs-current' : '';
       }
 
@@ -416,9 +433,9 @@
     }
 
     // Add the header row of days of the week.
-    const daysAndSquares = days.map(day => {
-      return `<div class="qs-square qs-day">${day}</div>`;
-    }).concat(calendarSquares);
+    const daysAndSquares = days
+      .map(day =>`<div class="qs-square qs-day">${day}</div>`)
+      .concat(calendarSquares);
 
     // Throw error...
     // The # of squares on the calendar should ALWAYS be a multiple of 7.

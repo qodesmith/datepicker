@@ -39,20 +39,15 @@
   <script src="datepicker.js"></script>
   <script>
     const picker = datepicker('#date', {
-      position: 'c',
-      startDate: new Date('7/1/2018'),
-      dateSelected: new Date('7/8/2018'),
-      customMonths: [1,2,3,4,5,6,7,8,9,10,11,12].map(x => x.toString()),
-      customDays: ['a','b','c','d','e','f','g'],
-      disableYearOverlay: !true,
-      formatter: (el, date, instance) => {
-        // Collect all the data we need to form the final value.
-        const dayName = instance.days[date.getDay()];
-        const dayNumber = date.getDate();
-        const monthName = instance.months[date.getMonth()];
-        const year = date.getFullYear();
+      minDate:   new Date(),
+      startDate: new Date(),
+      startDay: 3,
+      noWeekends: true,
+      formatter: function (a, b) {
+        var day = (b.getDate().toString().length === 1) ? "0" + b.getDate() : b.getDate();
+        var month = (b.getMonth().toString().length === 1) ? "0" + b.getMonth() : b.getMonth();
 
-        el.value = `${dayName}, ${dayNumber} ${monthName} ${year}`;
+        a.value = day + "-" + month + "-" + b.getFullYear();
       }
     });
 

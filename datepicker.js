@@ -379,7 +379,7 @@
 
     // Same year, same month?
     const today = new Date();
-    const isThisMonth = today.toJSON().slice(0, 7) === date.toJSON().slice(0, 7);
+    const isThisMonth = currentYear === today.getFullYear() && currentMonth === today.getMonth();
 
     // Calculations for the squares on the calendar.
     const copy = new Date(new Date(date).setDate(1));

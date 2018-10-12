@@ -29,7 +29,7 @@
     "gulp-autoprefixer": "^3.1.1",
     "gulp-babel": "^6.1.2",
     "gulp-concat-util": "^0.5.5",
-    "gulp-less": "^3.3.0",
+    "gulp-less": "^4.0.1",
     "uglify-js": "^2.7.5"
   }
 }

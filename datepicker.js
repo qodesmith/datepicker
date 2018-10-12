@@ -148,7 +148,10 @@
       disableMobile: options.disableMobile,
 
       // Used in conjuntion with `disableMobile` above within `oneHandler`.
-      isMobile: 'ontouchstart' in window
+      isMobile: 'ontouchstart' in window,
+
+      // Prevents the calendar from hiding.
+      alwaysShow: !!options.alwaysShow
     };
 
     // Initially populate the <input> field / set attributes on the `el`.
@@ -168,6 +171,7 @@
     }
 
     parent.appendChild(calendar);
+    instance.alwaysShow && showCal(instance);
 
     return instance;
   }
@@ -621,7 +625,7 @@
    *  Hides the calendar and calls the `onHide` callback.
    */
   function hideCal(instance) {
-    instance.calendar.classList.add('qs-hidden');
+    !instance.alwaysShow && instance.calendar.classList.add('qs-hidden');
     instance.onHide && instance.onHide(instance);
   }
 
@@ -660,12 +664,12 @@
       const overlayShowing = !overlay.classList.contains('qs-hidden');
 
       // Pressing enter while the overlay is open.
-      if (e.which === 13 && overlayShowing) {
+      if (e.which === 13 && overlayShowing && onCal) {
         e.stopPropagation(); // Avoid submitting <form>'s.
         return overlayYearEntry(e, target, this);
 
       // ESC key pressed.
-      } else if (e.which === 27 && overlayShowing) {
+      } else if (e.which === 27 && overlayShowing && onCal) {
         return toggleOverlay(calendar, true, this);
 
       // Tabbing.
@@ -754,7 +758,7 @@
         changeMonthYear(null, instance, input.value);
 
       // Enable / disabled the submit button.
-      } else {
+      } else if (instance.calendar.contains(input)) { // Scope to one calendar instance.
         const submit = instance.calendar.querySelector('.qs-submit');
         submit.classList[badDate ? 'add' : 'remove']('qs-disabled');
       }

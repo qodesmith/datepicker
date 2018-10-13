@@ -43,7 +43,7 @@
   /*
    *
    */
-  function Datepicker(selector, options) {
+  function datepicker(selector, options) {
     const el = selector.split ? document.querySelector(selector) : selector;
 
     options = sanitizeOptions(options || defaults(), el, selector);
@@ -151,7 +151,10 @@
       isMobile: 'ontouchstart' in window,
 
       // Prevents the calendar from hiding.
-      alwaysShow: !!options.alwaysShow
+      alwaysShow: !!options.alwaysShow,
+
+      // Used to connect two calendar instances for a date range picker.
+      id: options.id
     };
 
     // Initially populate the <input> field / set attributes on the `el`.
@@ -159,7 +162,7 @@
 
     calendar.classList.add('qs-datepicker');
     calendar.classList.add('qs-hidden');
-    datepickers.push(el);
+    datepickers.push(instance);
     calendarHtml(startDate || dateSelected, instance);
 
     listeners.forEach(e => { // Declared at the top.
@@ -182,7 +185,9 @@
    */
   function sanitizeOptions(options, el) {
     // Check if the provided element already has a datepicker attached.
-    if (datepickers.includes(el)) throw 'A datepicker already exists on that element.';
+    if (datepickers.find(picker => picker.el === el)) {
+      throw 'A datepicker already exists on that element.';
+    }
 
     let {
       position,
@@ -195,8 +200,18 @@
       overlayPlaceholder,
       overlayButton,
       startDay,
-      disabledDates
+      disabledDates,
+      id
     } = options;
+
+    // Check if more than 2 datepickers have the same id.
+    if (id != null) { // `id` can be anything but undefined or null.
+      const ids = datepickers.reduce((acc, picker) => {
+        return picker.id === id ? (acc + 1) : acc;
+      }, 0)
+
+      if (ids > 1) throw 'Only 2 datepickers can have the same id.'
+    }
 
     // Checks around disabled dates.
     const dateSelectedStripped = +stripTime(dateSelected)
@@ -587,10 +602,10 @@
   }
 
   function dateCheck(date) {
-    return [
-      ({}).toString.call(date) === '[object Date]',
+    return (
+      ({}).toString.call(date) === '[object Date]' &&
       date.toString() !== 'Invalid Date'
-    ].every(Boolean)
+    );
   }
 
   /*
@@ -617,8 +632,8 @@
     // Remove styling done to the parent element.
     if (calendar.hasOwnProperty('parentStyle')) parent.style.position = '';
 
-    // Remove this datepicker's `el` from the list.
-    datepickers = datepickers.filter(dpEl => dpEl !== el);
+    // Remove this datepicker from the list.
+    datepickers = datepickers.filter(picker => picker.el !== el);
   }
 
   /*
@@ -654,8 +669,7 @@
 
     const { type, target } = e;
     const { calendar, el, disableYearOverlay } = this;
-    const calClasses = calendar.classList;
-    const hidden = calClasses.contains('qs-hidden');
+    const hidden = calendar.classList.contains('qs-hidden');
     const onCal = calendar.contains(target);
 
     // Enter, ESC, or tabbing.
@@ -666,11 +680,11 @@
       // Pressing enter while the overlay is open.
       if (e.which === 13 && overlayShowing && onCal) {
         e.stopPropagation(); // Avoid submitting <form>'s.
-        return overlayYearEntry(e, target, this);
+        return overlayYearEntry(target, this);
 
       // ESC key pressed.
       } else if (e.which === 27 && overlayShowing && onCal) {
-        return toggleOverlay(calendar, true, this);
+        return toggleOverlay(true, this);
 
       // Tabbing.
       } else if (e.which !== 9) {
@@ -703,13 +717,12 @@
 
     // Typing in the overlay year input.
     } else if (type === 'input') {
-      overlayYearEntry(e, target, this);
+      overlayYearEntry(target, this);
     } else {
       target !== el && hideCal(this);
     }
 
     function calendarClicked(instance) {
-      const { calendar } = instance;
       const classList = target.classList;
       const monthYear = calendar.querySelector('.qs-month-year');
       const isClosed = classList.contains('qs-close');
@@ -729,16 +742,16 @@
 
       // Month / year was clicked OR closing the overlay.
       } else if (!disableYearOverlay && (monthYear.contains(target) || isClosed)) {
-        toggleOverlay(calendar, isClosed, instance);
+        toggleOverlay(isClosed, instance);
 
       // Overlay submit button clicked.
       } else if (target.classList.contains('qs-submit')) {
         const input = calendar.querySelector('.qs-overlay-year');
-        overlayYearEntry(e, input, instance);
+        overlayYearEntry(input, instance);
       }
     }
 
-    function toggleOverlay(calendar, closing, instance) {
+    function toggleOverlay(closing, instance) {
       ['.qs-overlay', '.qs-controls', '.qs-squares'].forEach((cls, i) => {
         calendar.querySelector(cls).classList.toggle(i ? 'qs-blur' : 'qs-hidden');
       });
@@ -747,7 +760,7 @@
       closing ? overlayYear.value = '' : overlayYear.focus();
     }
 
-    function overlayYearEntry(e, input, instance) {
+    function overlayYearEntry(input, instance) {
       // Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
 
       const badDate = isNaN(new Date().setFullYear(input.value || undefined));
@@ -765,5 +778,5 @@
     }
   }
 
-  return Datepicker;
+  return datepicker;
 });

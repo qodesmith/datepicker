@@ -15,7 +15,7 @@
     }
   }
 
-  let datepickers = [];
+  let datepickers = []; // Get's reassigned in `remove()` below.
   const listeners = ['click', 'focusin', 'keydown', 'input'];
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = [
@@ -44,6 +44,7 @@
    *
    */
   function datepicker(selector, options) {
+    // Determine whether a string was passed or not.
     const el = selector.split ? document.querySelector(selector) : selector;
 
     options = sanitizeOptions(options || defaults(), el, selector);
@@ -153,15 +154,33 @@
       // Prevents the calendar from hiding.
       alwaysShow: !!options.alwaysShow,
 
+
+      ////////////////////////////////////////////////////////
+      // The options below are for date range pickers only. //
+      ////////////////////////////////////////////////////////
+
       // Used to connect two calendar instances for a date range picker.
-      id: options.id
+      id: options.id,
+
+      // Valid values are `1` or `2`.
+      range: options.range,
+
+      // Tells us which picker this one is connected to.
+      sibling: options.sibling
     };
+
+    /*
+      A sibling would have previously been set in `sanitizeOptions` only after
+      two matching range pickers were identified. Since we don't have access to
+      the current `instance` within `sanitizeOptions` since `instance` hasn't
+      been created yet, we must set the previous range picker's sibling here.
+    */
+    if (instance.sibling) instance.sibling.sibling = instance;
 
     // Initially populate the <input> field / set attributes on the `el`.
     if (dateSelected) setElValues(el, instance);
 
-    calendar.classList.add('qs-datepicker');
-    calendar.classList.add('qs-hidden');
+    calendar.className = 'qs-datepicker qs-hidden';
     datepickers.push(instance);
     calendarHtml(startDate || dateSelected, instance);
 
@@ -201,16 +220,43 @@
       overlayButton,
       startDay,
       disabledDates,
-      id
+      id,
+      range
     } = options;
 
-    // Check if more than 2 datepickers have the same id.
+    // Checks around id and range.
+    if (range && id == null) throw 'Both range & id must be supplied.';
     if (id != null) { // `id` can be anything but undefined or null.
-      const ids = datepickers.reduce((acc, picker) => {
-        return picker.id === id ? (acc + 1) : acc;
-      }, 0)
+      const pickers = datepickers.filter(picker => picker.id === id);
+      const validRange = range === 1 || range === 2;
 
-      if (ids > 1) throw 'Only 2 datepickers can have the same id.'
+      /*
+        NOTE: We don't hold a strict adherence to the 1st picker
+        encountered having a range of 1 because pickers might be
+        established after a fetch request or something async.
+      */
+
+      // Check for a valid range.
+      if (!validRange) {
+        throw '`range` must be 1 or 2.';
+
+      // This is the 2nd range picker encountered.
+      } else if (pickers.length === 1) {
+
+        // Ensure the ranges aren't the same.
+        if (range === pickers[0].range) throw 'Two pickers cannot have the same range.';
+
+        /*
+          Set the sibling property on this picker.
+          We will set the sibling property on pickers[0] further
+          down the chain of events once this instance is created.
+        */
+        options.sibling = pickers[0];
+
+      // More than 2 pickers with the same id.
+      } else if (pickers.length > 1) {
+        throw 'A max of two datepickers can share an id.';
+      }
     }
 
     // Checks around disabled dates.

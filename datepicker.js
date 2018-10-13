@@ -386,12 +386,11 @@
    *  Returns an object representing the position of the calendar
    *  relative to the calendar's <input> element.
    */
-  function establishPosition(position) {
+  function establishPosition([p1, p2]) {
     const obj = {};
 
-    obj[sides[position[0]]] = 1;
-    if (position === 'c') return obj;
-    obj[sides[position[1]]] = 1;
+    obj[sides[p1]] = 1;
+    if (p2) obj[sides[p2]] = 1;
 
     return obj;
   }

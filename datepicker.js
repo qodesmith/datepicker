@@ -400,10 +400,11 @@
    *  of the calendar controls, month, and overlay.
    */
   function calendarHtml(date, instance) {
-    const controls = createControls(date, instance);
-    const month = createMonth(date, instance);
-    const overlay = createOverlay(instance);
-    instance.calendar.innerHTML = controls + month + overlay;
+    instance.calendar.innerHTML = [
+      createControls(date, instance),
+      createMonth(date, instance),
+      createOverlay(instance)
+    ].join('');
   }
 
   /*
@@ -685,6 +686,7 @@
    *  Hides the calendar and calls the `onHide` callback.
    */
   function hideCal(instance) {
+    toggleOverlay(true, instance);
     !instance.alwaysShow && instance.calendar.classList.add('qs-hidden');
     instance.onHide && instance.onHide(instance);
   }
@@ -696,6 +698,34 @@
     instance.calendar.classList.remove('qs-hidden');
     calculatePosition(instance);
     instance.onShow && instance.onShow(instance);
+  }
+
+  /*
+   *  Show / hide the change-year overlay.
+   */
+  function toggleOverlay(closing, { calendar }) {
+    /*
+      .qs-overlay  - The dark overlay element containing the year input & submit button.
+      .qs-controls - The header of the calendar containing the left / right arrows & month / year.
+      .qs-squares  - The container for all the squares making up the grid of the calendar.
+    */
+
+    const overlay = calendar.querySelector('.qs-overlay');
+    const yearInput = overlay.querySelector('.qs-overlay-year');
+    const controls = calendar.querySelector('.qs-controls');
+    const squaresContainer = calendar.querySelector('.qs-squares');
+
+    if (closing) {
+      overlay.classList.add('qs-hidden');
+      controls.classList.remove('qs-blur');
+      squaresContainer.classList.remove('qs-blur');
+      yearInput.value = '';
+    } else {
+      overlay.classList.remove('qs-hidden');
+      controls.classList.add('qs-blur');
+      squaresContainer.classList.add('qs-blur');
+      yearInput.focus();
+    }
   }
 
   /*
@@ -789,15 +819,6 @@
         const input = calendar.querySelector('.qs-overlay-year');
         overlayYearEntry(input, instance);
       }
-    }
-
-    function toggleOverlay(closing, instance) {
-      ['.qs-overlay', '.qs-controls', '.qs-squares'].forEach((cls, i) => {
-        calendar.querySelector(cls).classList.toggle(i ? 'qs-blur' : 'qs-hidden');
-      });
-
-      const overlayYear = calendar.querySelector('.qs-overlay-year');
-      closing ? overlayYear.value = '' : overlayYear.focus();
     }
 
     function overlayYearEntry(input, instance) {

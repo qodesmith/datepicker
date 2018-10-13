@@ -612,7 +612,7 @@
    *  Takes a date and returns a date stripped of its time (hh:mm:ss:ms).
    */
   function stripTime(date) {
-    return date ? new Date(date.toDateString()) : date;
+    return date ? new Date(date.getFullYear(), date.getMonth(), date.getDate()) : date;
   }
 
   /*
@@ -652,11 +652,6 @@
     calculatePosition(instance);
     instance.onShow && instance.onShow(instance);
   }
-
-
-  /////////////////////
-  // EVENT FUNCTIONS //
-  /////////////////////
 
   /*
    *  Handles `click` events when the calendar's `el` is an <input>.

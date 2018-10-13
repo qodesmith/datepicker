@@ -66,11 +66,10 @@ gulp.task('uglify-js', function(done) {
 
 gulp.task('less', function() {
   return gulp.src('less/datepicker.less')
-    .pipe(less()) // datepicker.less > datepicker.css
+    .pipe(less()) // datepicker.less => datepicker.css
     .on('error', onError)
     .pipe(prefix({browsers: ['last 2 versions']})) // browserslist: https://github.com/ai/browserslist
     .on('error', onError)
-    .pipe(concat('datepicker.css'))
     .pipe(gulp.dest('./'));
 });
 

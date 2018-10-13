@@ -104,11 +104,11 @@ _NOTE: All callback functions are both bound to the Datepicker instance and pass
 
 ## Daterange Options
 
-To make a date***range*** picker, simply provide these two options.
+To make a date-***range*** picker, simply provide these two options.
 
 | Option | Description |
 | ------ | ----------- |
-| `id` | (any) This can be anything but `null` or `undefined`. You must provide two pickers with the same `id`. |
+| `id` | (any) This can be anything but `null` or `undefined`. You must give two pickers the same `id`. |
 | `range` | (`1` or `2`) Provide either the number `1` or the number `2`. `1` is the calendar representing the lower limit in the date range while `2` is the calendar representing the upper limit in the date range. |
 
 

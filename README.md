@@ -78,6 +78,7 @@ By clicking on the year or month, an overlay will show revealing an input field 
 
 | Option | Description |
 | -------| ----------- |
+| `alwaysShow` | (boolean) Pass a value of `true` to prevent the datepicker from hiding. |
 | `position` | (string) Can be 1 of 5 values: `'tr'`, `'tl'`, `'br'`, `'bl'`, `'c'` representing top-right, top-left, bottom-right, bottom-left, and centered respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument. For a value of `'c'`, Datepicker will position itself fixed, smack in the middle of the screen. This can be desirable for mobile devices. |
 | `startDate` | (JS date object) The month that the calendar will open up to. The default value is the current month. Example: `new Date()` |
 | `startDay` | (number, 0 - 6) - Specify the day of the week your calendar starts on. 0 = Sunday, 1 = Monday, etc. Plays nice with the `customDays` option. |
@@ -99,6 +100,16 @@ By clicking on the year or month, an overlay will show revealing an input field 
 | `disableMobile` | (boolean) - Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. |
 
 _NOTE: All callback functions are both bound to the Datepicker instance and passed the instance as its 1st argument. So you can simply access the instance via the_ `this` _keyword or the 1st argument._
+
+
+## Daterange Options
+
+To make a date***range*** picker, simply provide these two options.
+
+| Option | Description |
+| ------ | ----------- |
+| `id` | (any) This can be anything but `null` or `undefined`. You must provide two pickers with the same `id`. |
+| `range` | (`1` or `2`) Provide either the number `1` or the number `2`. `1` is the calendar representing the lower limit in the date range while `2` is the calendar representing the upper limit in the date range. |
 
 
 ## Methods

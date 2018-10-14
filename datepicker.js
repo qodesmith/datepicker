@@ -42,7 +42,7 @@
   // Add a single function as the handler for a few events for ALL datepickers.
   // Storing events in an array to access later in the `remove` fxn below.
   const events = ['click', 'focusin', 'keydown', 'input'];
-  events.forEach(event => window.addEventListener(event, oneHandler2));
+  events.forEach(event => window.addEventListener(event, oneHandler));
 
   /*
    *
@@ -746,100 +746,6 @@
     }
   }
 
-  /*
-   *  Handles `click` events when the calendar's `el` is an <input>.
-   *  Handles `focusin` events for all other types of `el`'s.
-   *  Handles `keyup` events when tabbing.
-   *  Handles `input` events for the overlay.
-   */
-  function oneHandler(e) {
-    if (this.isMobile && this.disableMobile) return;
-
-    const { type, target } = e;
-    const { calendar, el, disableYearOverlay } = this;
-    const hidden = calendar.classList.contains('qs-hidden');
-    const onCal = calendar.contains(target);
-
-    // Enter, ESC, or tabbing.
-    if (type === 'keydown') {
-      const overlay = calendar.querySelector('.qs-overlay');
-      const overlayShowing = !overlay.classList.contains('qs-hidden');
-
-      // Pressing enter while the overlay is open.
-      if (e.which === 13 && overlayShowing && onCal) {
-        e.stopPropagation(); // Avoid submitting <form>'s.
-        return overlayYearEntry(target, this);
-
-      // ESC key pressed.
-      } else if (e.which === 27 && overlayShowing && onCal) {
-        return toggleOverlay(true, this);
-
-      // Tabbing.
-      } else if (e.which !== 9) {
-        return;
-      }
-    }
-
-    // Only pay attention to `focusin` events if the calendar's el is an <input>.
-    // `focusin` bubbles, `focus` does not.
-    if (type === 'focusin') return target === el && showCal(this);
-
-    // Calendar's el is 'html' or 'body'.
-    // Anything but the calendar was clicked.
-    if (this.noPosition) {
-      if (onCal) {
-        calendarClicked(this);
-      } else if (hidden) {
-        showCal(this);
-      } else {
-        hideCal(this);
-      }
-
-    // When the calendar is hidden...
-    } else if (hidden) {
-      target === el && showCal(this);
-
-    // Clicked on the calendar.
-    } else if (type === 'click' && onCal) {
-      calendarClicked(this);
-
-    // Typing in the overlay year input.
-    } else if (type === 'input') {
-      overlayYearEntry(target, this);
-    } else {
-      target !== el && hideCal(this);
-    }
-
-    function calendarClicked(instance) {
-      const classList = target.classList;
-      const monthYear = calendar.querySelector('.qs-month-year');
-      const isClosed = classList.contains('qs-close');
-
-      // A number was clicked.
-      if (classList.contains('qs-num')) {
-        const targ = target.nodeName === 'SPAN' ? target.parentNode : target;
-        const doNothing = ['qs-disabled', 'qs-active', 'qs-empty'].some(cls => {
-          return targ.classList.contains(cls);
-        });
-
-        !doNothing && selectDay(targ, instance);
-
-      // Month arrows were clicked.
-      } else if (classList.contains('qs-arrow')) {
-        changeMonthYear(classList, instance);
-
-      // Month / year was clicked OR closing the overlay.
-      } else if (!disableYearOverlay && (monthYear.contains(target) || isClosed)) {
-        toggleOverlay(isClosed, instance);
-
-      // Overlay submit button clicked.
-      } else if (target.classList.contains('qs-submit')) {
-        const input = calendar.querySelector('.qs-overlay-year');
-        overlayYearEntry(input, instance);
-      }
-    }
-  }
-
   function overlayYearEntry(e, input, instance) {
     // Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
 
@@ -857,29 +763,46 @@
     }
   }
 
-  function oneHandler2(e) {
+  function oneHandler(e) {
     const { type, target } = e;
     const { classList } = target;
     const instance = datepickers.find(({ calendar, el }) => {
       return calendar.contains(target) || el === target;
     });
+    const onCal = instance && instance.calendar.contains(target);
+    const { noPosition } = instance || {};
+
+    // Ignore event handling for mobile devices when disableMobile is true.
+    if (instance && instance.isMobile && instance.disableMobile) return;
+
+
+    ////////////
+    // EVENTS //
+    ////////////
 
     if (type === 'click') {
       // Anywhere other than the calendar - close the calendar.
       if (!instance) return datepickers.forEach(hideCal);
 
       const { calendar, disableYearOverlay } = instance;
-      const isClosed = !!calendar.querySelector('.qs-hidden');
+      const overlayClosed = !!calendar.querySelector('.qs-hidden');
       const monthYearClicked = calendar.querySelector('.qs-month-year').contains(target);
 
+      // Calendar's el is 'html' or 'body'.
+      // Anything but the calendar was clicked.
+      if (instance.noPosition && !onCal) {
+        // Show / hide a calendar whose el is html or body.
+        const calendarClosed = calendar.classList.contains('qs-hidden');
+        (calendarClosed ? showCal : hideCal)(instance);
+
       // Clicking the arrow buttons - change the calendar month.
-      if (classList.contains('qs-arrow')) {
+      } else if (classList.contains('qs-arrow')) {
         changeMonthYear(classList, instance);
 
       // Clicking the month/year - open the overlay.
       // Clicking the X on the overlay - close the overlay.
       } else if (monthYearClicked || classList.contains('qs-close')) {
-        !disableYearOverlay && toggleOverlay(!isClosed, instance);
+        !disableYearOverlay && toggleOverlay(!overlayClosed, instance);
 
       // Clicking a number square - process whether to select that day or not.
       } else if (classList.contains('qs-num')) {
@@ -909,7 +832,6 @@
     } else if (type === 'keydown' && instance) {
       const overlay = instance.calendar.querySelector('.qs-overlay');
       const overlayShowing = !overlay.classList.contains('qs-hidden');
-      const onCal = instance.calendar.contains(target);
 
       // Pressing enter while the overlay is open.
       if (e.which === 13 && overlayShowing && onCal) {

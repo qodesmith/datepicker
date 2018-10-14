@@ -656,6 +656,9 @@
     this.setDate(this.startDate, true);
   }
 
+  /*
+   *  Checks for a valid date object.
+   */
   function dateCheck(date) {
     return (
       ({}).toString.call(date) === '[object Date]' &&
@@ -746,6 +749,10 @@
     }
   }
 
+  /*
+   *  Calls `changeMonthYear` when a year is submitted and
+   *  conditionally enables / disables the submit button.
+   */
   function overlayYearEntry(e, input, instance) {
     // Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
 
@@ -763,6 +770,11 @@
     }
   }
 
+  /*
+   *  A single function to handle the 4 events we track - click, focusin, keydown, & input.
+   *  Only one listener is applied to the window. It is removed once
+   *  all datepicker instances have had their `remove` method called.
+   */
   function oneHandler(e) {
     const { type, target } = e;
     const { classList } = target;

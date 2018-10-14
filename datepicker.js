@@ -16,7 +16,6 @@
   }
 
   let datepickers = []; // Get's reassigned in `remove()` below.
-  const listeners = ['click', 'focusin', 'keydown', 'input'];
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = [
     'January',
@@ -39,6 +38,11 @@
     l: 'left',
     c: 'centered' // This fixes the calendar smack in the middle of the screen.
   };
+
+  // Add a single function as the handler for a few events for ALL datepickers.
+  // Storing events in an array to access later in the `remove` fxn below.
+  const events = ['click', 'focusin', 'keydown', 'input'];
+  events.forEach(event => window.addEventListener(event, oneHandler2));
 
   /*
    *
@@ -184,12 +188,9 @@
     datepickers.push(instance);
     calendarHtml(startDate || dateSelected, instance);
 
-    listeners.forEach(e => { // Declared at the top.
-      window.addEventListener(e, oneHandler.bind(instance));
-    });
-
     if (getComputedStyle(parent).position === 'static') {
-      parent.style.position = 'relative';
+      instance.parentCssText = parent.style.cssText;
+      parent.style.cssText += 'position: relative;';
     }
 
     parent.appendChild(calendar);
@@ -399,21 +400,29 @@
    *  Populates `calendar.innerHTML` with the contents
    *  of the calendar controls, month, and overlay.
    */
-  function calendarHtml(date, instance) {
+  function calendarHtml(date, instance, overlayOpen) {
     instance.calendar.innerHTML = [
-      createControls(date, instance),
-      createMonth(date, instance),
-      createOverlay(instance)
+      createControls(date, instance, overlayOpen),
+      createMonth(date, instance, overlayOpen),
+      createOverlay(instance, overlayOpen)
     ].join('');
+
+    /*
+      When the overlay is open and we submit a year, the calendar's html
+      is recreated here. To make the overlay fade out the same way it faded in,
+      we need to create it with the appropriate classes (triggered by `overlayOpen`),
+      and then wait 10ms to take those classes back off, triggering a fade out.
+    */
+    if (overlayOpen) setTimeout(() => toggleOverlay(true, instance), 10);
   }
 
   /*
    *  Creates the calendar controls.
    *  Returns a string representation of DOM elements.
    */
-  function createControls(date, instance) {
+  function createControls(date, instance, overlayOpen) {
     return `
-      <div class="qs-controls">
+      <div class="qs-controls ${overlayOpen ? 'qs-blur' : ''}">
         <div class="qs-arrow qs-left"></div>
         <div class="qs-month-year">
           <span class="qs-month">${instance.months[date.getMonth()]}</span>
@@ -428,7 +437,7 @@
    *  Creates the calendar month structure.
    *  Returns a string representation of DOM elements.
    */
-  function createMonth(date, instance) {
+  function createMonth(date, instance, overlayOpen) {
     const {
       minDate,
       maxDate,
@@ -509,7 +518,7 @@
     }
 
     // Wrap it all in a tidy div.
-    daysAndSquares.unshift('<div class="qs-squares">');
+    daysAndSquares.unshift(`<div class="qs-squares ${overlayOpen ? 'qs-blur' : ''}">`);
     daysAndSquares.push('</div>');
     return daysAndSquares.join('');
   }
@@ -518,13 +527,13 @@
    *  Creates the overlay for users to
    *  manually navigate to a month & year.
    */
-  function createOverlay(instance) {
+  function createOverlay(instance, overlayOpen) {
     const { overlayPlaceholder, overlayButton } = instance;
 
     return `
-      <div class="qs-overlay qs-hidden">
+      <div class="qs-overlay ${overlayOpen ? '' : 'qs-hidden'}">
         <div class="qs-close">&#10005;</div>
-        <input type="number" class="qs-overlay-year" placeholder="${overlayPlaceholder}" />
+        <input class="qs-overlay-year" placeholder="${overlayPlaceholder}" />
         <div class="qs-submit qs-disabled">${overlayButton}</div>
       </div>
     `;
@@ -578,7 +587,7 @@
    *  from a users manual input on the overlay.
    *  Calls `calendarHtml` with the updated date.
    */
-  function changeMonthYear(classList, instance, year) {
+  function changeMonthYear(classList, instance, year, overlayOpen) {
     // Overlay.
     if (year) {
       instance.currentYear = year;
@@ -598,7 +607,7 @@
     }
 
     const newDate = new Date(instance.currentYear, instance.currentMonth, 1);
-    calendarHtml(newDate, instance);
+    calendarHtml(newDate, instance, overlayOpen);
     instance.currentMonthName = instance.months[instance.currentMonth];
     instance.onMonthChange && instance.onMonthChange(instance);
   }
@@ -666,20 +675,28 @@
    *  Removes the current instance from the array of instances.
    */
   function remove() {
-    const { calendar, parent, el } = this;
+    // NOTE: `this` is the datepicker instance.
+    const { parentCssText, parent, calendar, sibling, el } = this
 
-    // Remove event listeners (declared at the top).
-    listeners.forEach(e => {
-      window.removeEventListener(e, oneHandler);
-    });
+    // Remove styling done to the parent element and reset it back to its original.
+    if (parentCssText !== undefined) parent.style.cssText = parentCssText;
 
+    // Remove the calendar from the DOM.
     calendar.remove();
 
-    // Remove styling done to the parent element.
-    if (calendar.hasOwnProperty('parentStyle')) parent.style.position = '';
+    // If this instance had a sibling, call its remove method as well.
+    if (sibling) {
+      sibling.sibling = null;
+      sibling.remove();
+    }
 
-    // Remove this datepicker from the list.
+    // Remove this instance from the list.
     datepickers = datepickers.filter(picker => picker.el !== el);
+
+    // If this was the last datepicker in the list, remove the event handlers.
+    if (!datepickers.length) {
+      events.forEach(event => window.removeEventListener(event, oneHandler));
+    }
   }
 
   /*
@@ -703,13 +720,14 @@
   /*
    *  Show / hide the change-year overlay.
    */
-  function toggleOverlay(closing, { calendar }) {
+  function toggleOverlay(closing, instance) {
     /*
       .qs-overlay  - The dark overlay element containing the year input & submit button.
       .qs-controls - The header of the calendar containing the left / right arrows & month / year.
       .qs-squares  - The container for all the squares making up the grid of the calendar.
     */
 
+    const { calendar } = instance;
     const overlay = calendar.querySelector('.qs-overlay');
     const yearInput = overlay.querySelector('.qs-overlay-year');
     const controls = calendar.querySelector('.qs-controls');
@@ -820,22 +838,79 @@
         overlayYearEntry(input, instance);
       }
     }
+  }
 
-    function overlayYearEntry(input, instance) {
-      // Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
+  function overlayYearEntry(e, input, instance) {
+    // Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
 
-      const badDate = isNaN(new Date().setFullYear(input.value || undefined));
+    const badDate = isNaN(+new Date().setFullYear(input.value || undefined));
 
-      // Enter has been pressed OR submit was clicked.
-      if (e.which === 13 || e.type === 'click') {
-        if (badDate || input.classList.contains('qs-disabled')) return;
-        changeMonthYear(null, instance, input.value);
+    // Enter has been pressed OR submit was clicked.
+    if (e.which === 13 || e.type === 'click') {
+      if (badDate || input.classList.contains('qs-disabled')) return;
+      changeMonthYear(null, instance, input.value, true);
 
-      // Enable / disabled the submit button.
-      } else if (instance.calendar.contains(input)) { // Scope to one calendar instance.
-        const submit = instance.calendar.querySelector('.qs-submit');
-        submit.classList[badDate ? 'add' : 'remove']('qs-disabled');
+    // Enable / disabled the submit button.
+    } else if (instance.calendar.contains(input)) { // Scope to one calendar instance.
+      const submit = instance.calendar.querySelector('.qs-submit');
+      submit.classList[badDate ? 'add' : 'remove']('qs-disabled');
+    }
+  }
+
+  function oneHandler2(e) {
+    const { type, target } = e;
+    const { classList } = target;
+    const instance = datepickers.find(({ calendar }) => calendar.contains(target));
+
+    if (type === 'click') {
+      // Anywhere other than the calendar - close the calendar.
+      if (!instance) return datepickers.forEach(hideCal);
+
+      const { calendar, disableYearOverlay } = instance;
+      const isClosed = !!calendar.querySelector('.qs-hidden');
+      const monthYearClicked = calendar.querySelector('.qs-month-year').contains(target);
+
+      // Clicking the arrow buttons - change the calendar month.
+      if (classList.contains('qs-arrow')) {
+        changeMonthYear(classList, instance);
+
+      // Clicking the month/year - open the overlay.
+      // Clicking the X on the overlay - close the overlay.
+      } else if (monthYearClicked || classList.contains('qs-close')) {
+        !disableYearOverlay && toggleOverlay(!isClosed, instance);
+
+      // Clicking a number square - process whether to select that day or not.
+      } else if (classList.contains('qs-num')) {
+        const targ = target.nodeName === 'SPAN' ? target.parentNode : target;
+        const doNothing = ['qs-disabled', 'qs-active', 'qs-empty'].some(cls => {
+          return targ.classList.contains(cls);
+        });
+
+        return !doNothing && selectDay(targ, instance);
+
+      // Clicking the submit button in the overlay.
+      } else if (classList.contains('qs-submit') && !classList.contains('qs-disabled')) {
+        const input = calendar.querySelector('.qs-overlay-year');
+        overlayYearEntry(e, input, instance);
       }
+    } else if (type === 'focusin') {
+
+    } else if (type === 'keyup') {
+
+    } else if (type === 'input') {
+      if (!instance) return;
+
+      // Only allow numbers & a max length of 4 characters.
+      const submitButton = target.parentElement.querySelector('.qs-submit');
+      const newValue = target.value
+        .split('')
+        .filter(char => char.match(/[0-9]/))
+        .join('')
+        .slice(0, 4);
+
+      // Set the new value of the input and conditionally enable / disable the submit button.
+      target.value = newValue;
+      submitButton.classList[newValue.length === 4 ? 'remove' : 'add']('qs-disabled');
     }
   }
 

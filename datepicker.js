@@ -906,8 +906,19 @@
 
       // Hide all other instances.
       datepickers.forEach(picker => picker !== instance && hideCal(picker));
-    } else if (type === 'keyup') {
+    } else if (type === 'keydown' && instance) {
+      const overlay = instance.calendar.querySelector('.qs-overlay');
+      const overlayShowing = !overlay.classList.contains('qs-hidden');
+      const onCal = instance.calendar.contains(target);
 
+      // Pressing enter while the overlay is open.
+      if (e.which === 13 && overlayShowing && onCal) {
+        overlayYearEntry(e, target, instance);
+
+      // ESC key pressed.
+      } else if (e.which === 27 && overlayShowing && onCal) {
+        toggleOverlay(true, instance);
+      }
     } else if (type === 'input') {
       if (!instance) return;
 

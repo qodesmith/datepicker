@@ -860,7 +860,9 @@
   function oneHandler2(e) {
     const { type, target } = e;
     const { classList } = target;
-    const instance = datepickers.find(({ calendar }) => calendar.contains(target));
+    const instance = datepickers.find(({ calendar, el }) => {
+      return calendar.contains(target) || el === target;
+    });
 
     if (type === 'click') {
       // Anywhere other than the calendar - close the calendar.
@@ -893,8 +895,17 @@
         const input = calendar.querySelector('.qs-overlay-year');
         overlayYearEntry(e, input, instance);
       }
-    } else if (type === 'focusin') {
 
+    /*
+      Only pay attention to `focusin` events if the calendar's el is an <input>.
+      `focusin` bubbles, `focus` does not.
+    */
+    } else if (type === 'focusin' && instance) {
+      // Show this intance.
+      showCal(instance);
+
+      // Hide all other instances.
+      datepickers.forEach(picker => picker !== instance && hideCal(picker));
     } else if (type === 'keyup') {
 
     } else if (type === 'input') {

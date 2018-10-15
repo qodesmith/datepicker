@@ -164,7 +164,7 @@
 
     calendar.className = 'qs-datepicker qs-hidden';
     datepickers.push(instance);
-    calendarHtml(startDate || dateSelected, instance);
+    renderCalendar(startDate || dateSelected, instance);
 
     if (!noPosition && getComputedStyle(parent).position === 'static') {
       instance.parentCssText = parent.style.cssText;
@@ -331,10 +331,11 @@
   }
 
   /*
+   *  Renders a calendar.
    *  Populates `calendar.innerHTML` with the contents
    *  of the calendar controls, month, and overlay.
    */
-  function calendarHtml(date, instance, overlayOpen) {
+  function renderCalendar(date, instance, overlayOpen) {
     instance.calendar.innerHTML = [
       createControls(date, instance, overlayOpen),
       createMonth(date, instance, overlayOpen),
@@ -527,11 +528,11 @@
    *
    *  Updates `this.currentMonth` & `this.currentYear` based on right or left arrows.
    *  Creates a `newDate` based on the updated month & year.
-   *  Calls `calendarHtml` with the updated date.
+   *  Calls `renderCalendar` with the updated date.
    *
    *  Changes the calendar to a different year
    *  from a users manual input on the overlay.
-   *  Calls `calendarHtml` with the updated date.
+   *  Calls `renderCalendar` with the updated date.
    */
   function changeMonthYear(classList, instance, year, overlayOpen) {
     // Overlay.
@@ -553,7 +554,7 @@
     }
 
     const newDate = new Date(instance.currentYear, instance.currentMonth, 1);
-    calendarHtml(newDate, instance, overlayOpen);
+    renderCalendar(newDate, instance, overlayOpen);
     instance.currentMonthName = instance.months[instance.currentMonth];
     instance.onMonthChange && instance.onMonthChange(instance);
   }
@@ -594,7 +595,7 @@
     this.currentMonthName = this.months[date.getMonth()];
     this.dateSelected = reset ? undefined : date;
     !reset && setElValues(this.el, this);
-    calendarHtml(date, this);
+    renderCalendar(date, this);
     if (reset) this.el.value = '';
   }
 

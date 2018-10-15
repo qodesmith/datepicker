@@ -79,25 +79,25 @@ By clicking on the year or month, an overlay will show revealing an input field 
 | Option | Description |
 | -------| ----------- |
 | `alwaysShow` | (boolean) Pass a value of `true` to prevent the datepicker from hiding. |
+| `customDays` | (array) - Custom labels for days. Provide an array of 7 things. |
+| `customMonths` | (array) - Custom labels for months. Provide an array of 12 things. |
+| `dateSelected` | (JS date object) - This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well. Example: `new Date(2017, 0, 15)` |
+| `disabledDates` | (array of JS date objects) - Provide an array of JS date objects that will be disabled on the calendar. This array cannot include the same date as `dateSelected`. |
+| `disableMobile` | (boolean) - Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. |
+| `disableYearOverlay` | (boolean) - Disable the year overlay. Clicking the year will have no effect. |
+| `formatter` | (function) - Provide a function that manually sets the provided input's value with your own formatting. This function is passed three arguments. 1st argument is the DOM element `datepicker` is triggered on. 2nd argument is a JavaScript date object for the selected date. 3rd argument is the datepicker instance itself. |
 | `position` | (string) Can be 1 of 5 values: `'tr'`, `'tl'`, `'br'`, `'bl'`, `'c'` representing top-right, top-left, bottom-right, bottom-left, and centered respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument. For a value of `'c'`, Datepicker will position itself fixed, smack in the middle of the screen. This can be desirable for mobile devices. |
 | `startDate` | (JS date object) The month that the calendar will open up to. The default value is the current month. Example: `new Date()` |
 | `startDay` | (number, 0 - 6) - Specify the day of the week your calendar starts on. 0 = Sunday, 1 = Monday, etc. Plays nice with the `customDays` option. |
-| `dateSelected` | (JS date object) - This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well. Example: `new Date(2017, 0, 15)` |
-| `disabledDates` | (array of JS date objects) - Provide an array of JS date objects that will be disabled on the calendar. This array cannot include the same date as `dateSelected`. |
-| `minDate` | (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)` |
 | `maxDate` | (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)` |
+| `minDate` | (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)` |
 | `noWeekends` | (boolean) - Provide `true` to disable selecting weekends. |
-| `formatter` | (function) - Provide a function that manually sets the provided input's value with your own formatting. This function is passed three arguments. 1st argument is the DOM element `datepicker` is triggered on. 2nd argument is a JavaScript date object for the selected date. 3rd argument is the datepicker instance itself. |
-| `onSelect` | (function) - Callback function after a date has been selected. |
-| `onShow` | (function) - Callback function when the calendar is shown. |
 | `onHide` | (function) - Callback function when the calendar is hidden. |
 | `onMonthchange` | (function) - Callback function when the month has changed. |
-| `customMonths` | (array) - Custom labels for months. Provide an array of 12 things. |
-| `customDays` | (array) - Custom labels for days. Provide an array of 7 things. |
-| `overlayPlaceholder` | (string) - Custom placeholder text for the year overlay (defaults to "4-digit year"). |
+| `onSelect` | (function) - Callback function after a date has been selected. |
+| `onShow` | (function) - Callback function when the calendar is shown. |
 | `overlayButton` | (string) - Custom text for the year overlay submit button (defaults to "Submit"). |
-| `disableYearOverlay` | (boolean) - Disable the year overlay. Clicking the year will have no effect. |
-| `disableMobile` | (boolean) - Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. |
+| `overlayPlaceholder` | (string) - Custom placeholder text for the year overlay (defaults to "4-digit year"). |
 
 _NOTE: All callback functions are both bound to the Datepicker instance and passed the instance as its 1st argument. So you can simply access the instance via the_ `this` _keyword or the 1st argument._
 
@@ -116,9 +116,9 @@ To make a date-***range*** picker, simply provide these two options.
 
 | Method | Description |
 | ------ | ----------- |
-| `.setDate(date)` | Allows you to programmatically select a date on the calendar. It takes a JavaScript date object as it's only argument. E.x.: `picker.setDate(new Date(2099, 0, 5))` |
 | `.reset()` | Resets the calendar to the original date provided or today. |
-| `.remove()` | Performs cleanup. Will remove various event listeners _only_ for the instance it's called on. So if there are multiple Datepickers on the page, the others will be unaffected.
+| `.remove()` | Performs cleanup. Will remove various event listeners _only_ for the instance it's called on. So if there are multiple Datepickers on the page, the others will be unaffected. If you're calling this on a date-range instance, be sure to call it on *both* pickers. |
+| `.setDate(date)` | Allows you to programmatically select a date on the calendar. It takes a JavaScript date object as it's only argument. E.x.: `picker.setDate(new Date(2099, 0, 5))` |
 
 
 ## Properties & Values
@@ -126,7 +126,7 @@ To make a date-***range*** picker, simply provide these two options.
 If you take a look at the datepicker instance, you'll notice plenty of values that you can grab and use however you'd like. Let's say you instantiated datepicker as such:
 
 ```javascript
-const picker = datepicker('.some-class', {dateSelected: new Date(2099, 0, 5)});
+const picker = datepicker('.some-class', { dateSelected: new Date(2099, 0, 5) });
 ```
 
 Below will detail some helpful properties and values that are available on the `picker` example above.
@@ -157,7 +157,22 @@ Simplest usage:
 const picker = datepicker('#some-id');
 ```
 
-With all options declared:
+Setting up a date-range picker:
+```javascript
+const start = datepicker('#start', {
+  id: 'my-first-rangepicker',
+  range: 1
+});
+
+const end = datepicker('#end', {
+  id: 'my-first-rangepicker',
+  range: 2
+});
+
+// NOTE: Any of the other options, as shown below, are valid for range pickers as well.
+```
+
+With all other options declared:
 ```javascript
 const picker = datepicker(document.querySelector('#some-id'), {
   position: 'tr', // Top right.

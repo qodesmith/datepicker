@@ -48,17 +48,17 @@
    *
    */
   function datepicker(selector, options) {
-    // Determine whether a string was passed or not.
+    // Determine whether the selector is a string or element.
     const el = selector.split ? document.querySelector(selector) : selector;
 
     options = sanitizeOptions(options || defaults(), el, selector);
 
-    const parent = el.parentElement;
+    const noPosition = el === document.body;
+    const parent = noPosition ? document.body : el.parentElement;
     const calendar = document.createElement('div');
     const { startDate, dateSelected } = options;
-    const noPosition = el === document.body || el === document.querySelector('html');
     const instance = {
-      // The calendar will be positioned relative to this element (except when 'body' or 'html').
+      // The calendar will be positioned relative to this element (except when 'body').
       el: el,
 
       // The element that datepicker will be attached to.
@@ -67,7 +67,7 @@
       // Indicates whether to use an <input> element or not as the calendar's anchor.
       nonInput: el.nodeName !== 'INPUT',
 
-      // Flag indicating if `el` is 'body' or 'html' for `calculatePosition`.
+      // Flag indicating if `el` is 'body' for `calculatePosition`.
       noPosition: noPosition,
 
       // Calendar position relative to `el`.
@@ -156,30 +156,8 @@
       isMobile: 'ontouchstart' in window,
 
       // Prevents the calendar from hiding.
-      alwaysShow: !!options.alwaysShow,
-
-
-      ////////////////////////////////////////////////////////
-      // The options below are for date range pickers only. //
-      ////////////////////////////////////////////////////////
-
-      // Used to connect two calendar instances for a date range picker.
-      id: options.id,
-
-      // Valid values are `1` or `2`.
-      range: options.range,
-
-      // Tells us which picker this one is connected to.
-      sibling: options.sibling
+      alwaysShow: !!options.alwaysShow
     };
-
-    /*
-      A sibling would have previously been set in `sanitizeOptions` only after
-      two matching range pickers were identified. Since we don't have access to
-      the current `instance` within `sanitizeOptions` since `instance` hasn't
-      been created yet, we must set the previous range picker's sibling here.
-    */
-    if (instance.sibling) instance.sibling.sibling = instance;
 
     // Initially populate the <input> field / set attributes on the `el`.
     if (dateSelected) setElValues(el, instance);
@@ -188,7 +166,7 @@
     datepickers.push(instance);
     calendarHtml(startDate || dateSelected, instance);
 
-    if (getComputedStyle(parent).position === 'static') {
+    if (!noPosition && getComputedStyle(parent).position === 'static') {
       instance.parentCssText = parent.style.cssText;
       parent.style.cssText += 'position: relative;';
     }
@@ -220,45 +198,8 @@
       overlayPlaceholder,
       overlayButton,
       startDay,
-      disabledDates,
-      id,
-      range
+      disabledDates
     } = options;
-
-    // Checks around id and range.
-    if (range && id == null) throw 'Both range & id must be supplied.';
-    if (id != null) { // `id` can be anything but undefined or null.
-      const pickers = datepickers.filter(picker => picker.id === id);
-      const validRange = range === 1 || range === 2;
-
-      /*
-        NOTE: We don't hold a strict adherence to the 1st picker
-        encountered having a range of 1 because pickers might be
-        established after a fetch request or something async.
-      */
-
-      // Check for a valid range.
-      if (!validRange) {
-        throw '`range` must be 1 or 2.';
-
-      // This is the 2nd range picker encountered.
-      } else if (pickers.length === 1) {
-
-        // Ensure the ranges aren't the same.
-        if (range === pickers[0].range) throw 'Two pickers cannot have the same range.';
-
-        /*
-          Set the sibling property on this picker.
-          We will set the sibling property on pickers[0] further
-          down the chain of events once this instance is created.
-        */
-        options.sibling = pickers[0];
-
-      // More than 2 pickers with the same id.
-      } else if (pickers.length > 1) {
-        throw 'A max of two datepickers can share an id.';
-      }
-    }
 
     // Checks around disabled dates.
     const dateSelectedStripped = +stripTime(dateSelected)
@@ -342,7 +283,7 @@
       let daysCopy = (options.customDays || days).slice();
 
       // Example with startDay of 3 (Wednesday)
-      // daysCopy => [wed, thurs, fri, sat]                 (2) - the 1st hald of the new array
+      // daysCopy => [wed, thurs, fri, sat]                 (2) - the 1st half of the new array
       // chunk    => [sun, mon, tues]                       (3) - the 2nd half of the new array
       const chunk = daysCopy.splice(0, startDay);
 
@@ -360,15 +301,8 @@
     }
 
     // Custom text for overlay placeholder & button.
-    [overlayPlaceholder, overlayButton].forEach((thing, i) => {
-      if (thing && thing.split) {
-        if (i) { // Button.
-          options.overlayButton = thing;
-        } else { // Placeholder.
-          options.overlayPlaceholder = thing;
-        }
-      }
-    });
+    if (typeof overlayPlaceholder === 'string') options.overlayPlaceholder = overlayPlaceholder;
+    if (typeof overlayButton === 'string') options.overlayButton = overlayButton;
 
     return options;
   }
@@ -455,18 +389,30 @@
     const today = new Date();
     const isThisMonth = currentYear === today.getFullYear() && currentMonth === today.getMonth();
 
-    // Calculations for the squares on the calendar.
-    const copy = new Date(new Date(date).setDate(1));
+    // 1st of the month for whatever date we've been provided.
+    const copy = stripTime(new Date(date).setDate(1)); // 1st of the month.
+
+    // copy.getDay() - day of the week, 0-indexed.
+    // startDay      - day of the week the calendar starts on, 0-indexed.
     const offset = copy.getDay() - startDay; // Preceding empty squares.
-    const precedingRow = offset < 0 ? 7 : 0; // Offsetting the start day may move back to a new 1st row.
+
+    // Offsetting the start day may move back to a new 1st row.
+    const precedingRow = offset < 0 ? 7 : 0;
+
+    // Bump the provided date to the 1st of the next month.
     copy.setMonth(copy.getMonth() + 1);
-    copy.setDate(0); // Last day in the current month.
+
+    // Move the provided date back a single day, resulting in the last day of the provided month.
+    copy.setDate(0);
+
+    // Last day of the month = how many quares get a number on the calendar.
     const daysInMonth = copy.getDate(); // Squares with a number.
 
-    // Will contain string representations of HTML for the squares.
+    // This array will contain string representations of HTML for all the calendar squares.
     const calendarSquares = [];
 
     // Fancy calculations for the total # of squares.
+    // The pipe operator truncates any decimals.
     let totalSquares = precedingRow + (((offset + daysInMonth) / 7 | 0) * 7);
     totalSquares += (offset + daysInMonth) % 7 ? 7 : 0;
 
@@ -667,10 +613,11 @@
   }
 
   /*
-   *  Takes a date and returns a date stripped of its time (hh:mm:ss:ms).
+   *  Takes a date or number and returns a date stripped of its time (hh:mm:ss:ms).
    */
-  function stripTime(date) {
-    return date ? new Date(date.getFullYear(), date.getMonth(), date.getDate()) : date;
+  function stripTime(dateOrNum) {
+    const date = new Date(+dateOrNum);
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 
   /*
@@ -679,19 +626,13 @@
    */
   function remove() {
     // NOTE: `this` is the datepicker instance.
-    const { parentCssText, parent, calendar, sibling, el } = this
+    const { parentCssText, parent, calendar, el } = this
 
     // Remove styling done to the parent element and reset it back to its original.
     if (parentCssText !== undefined) parent.style.cssText = parentCssText;
 
     // Remove the calendar from the DOM.
     calendar.remove();
-
-    // If this instance had a sibling, call its remove method as well.
-    if (sibling) {
-      sibling.sibling = null;
-      sibling.remove();
-    }
 
     // Remove this instance from the list.
     datepickers = datepickers.filter(picker => picker.el !== el);
@@ -800,7 +741,7 @@
       const overlayClosed = !!calendar.querySelector('.qs-hidden');
       const monthYearClicked = calendar.querySelector('.qs-month-year').contains(target);
 
-      // Calendar's el is 'html' or 'body'.
+      // Calendar's el is 'body'.
       // Anything but the calendar was clicked.
       if (instance.noPosition && !onCal) {
         // Show / hide a calendar whose el is html or body.

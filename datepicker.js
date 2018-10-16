@@ -202,11 +202,10 @@
     } = options;
 
     // Checks around disabled dates.
-    const dateSelectedStripped = +stripTime(dateSelected)
     options.disabledDates = (disabledDates || []).map(date => {
       if (!dateCheck(date)) {
         throw 'You supplied an invalid date to "options.disabledDates".';
-      } else if (+stripTime(date) === dateSelectedStripped) {
+      } else if (+stripTime(date) === +stripTime(dateSelected)) {
         throw '"disabledDates" cannot contain the same date as "dateSelected".';
       }
 
@@ -214,13 +213,11 @@
     });
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
-    if (position) {
-      const found = ['tr', 'tl', 'br', 'bl', 'c'].some(dir => position === dir);
-      if (!found) throw '"options.position" must be one of the following: tl, tr, bl, br, or c.';
-      options.position = establishPosition(position);
-    } else {
-      options.position = establishPosition('bl');
+    const positionFound = ['tr', 'tl', 'br', 'bl', 'c'].some(dir => position === dir);
+    if (position && !positionFound) {
+      throw '"options.position" must be one of the following: tl, tr, bl, br, or c.';
     }
+    options.position = establishPosition(position || 'bl');
 
     // Check that various options have been provided a JavaScript Date object.
     // If so, strip the time from those dates (for accurate future comparisons).
@@ -236,7 +233,6 @@
     });
 
     options.startDate = stripTime(options.startDate || options.dateSelected || new Date());
-    options.formatter = typeof formatter === 'function' ? formatter : null;
 
     if (maxDate < minDate) {
       throw '"maxDate" in options is less than "minDate".';
@@ -253,7 +249,7 @@
     }
 
     // Callbacks.
-    ['onSelect', 'onShow', 'onHide', 'onMonthChange'].forEach(fxn => {
+    ['onSelect', 'onShow', 'onHide', 'onMonthChange', 'formatter'].forEach(fxn => {
       options[fxn] = typeof options[fxn] === 'function' && options[fxn];
     });
 
@@ -267,7 +263,7 @@
         '"customDays" must be an array with 7 strings.'
       ];
       const wrong = (
-        ({}).toString.call(custom) !== '[object Array]' || // Must be an array.
+        !Array.isArray(custom) || // Must be an array.
         custom.length !== (i ? 7 : 12) || // Must have the corrent length.
         custom.some(item => typeof item !== 'string') // Must contain only strings.
       );
@@ -278,7 +274,7 @@
     });
 
     // Adjust days of the week for user-provided start day.
-    if (startDay !== undefined && +startDay && +startDay > 0 && +startDay < 7) {
+    if (startDay && +startDay > 0 && +startDay < 7) {
       // [sun, mon, tues, wed, thurs, fri, sat]             (1) - original supplied days of the week
       let daysCopy = (options.customDays || days).slice();
 
@@ -301,8 +297,8 @@
     }
 
     // Custom text for overlay placeholder & button.
-    if (typeof overlayPlaceholder === 'string') options.overlayPlaceholder = overlayPlaceholder;
-    if (typeof overlayButton === 'string') options.overlayButton = overlayButton;
+    if (typeof overlayPlaceholder !== 'string') delete options.overlayPlaceholder;
+    if (typeof overlayButton !== 'string') delete options.overlayButton;
 
     return options;
   }
@@ -374,14 +370,17 @@
    */
   function createMonth(date, instance, overlayOpen) {
     const {
-      minDate,
-      maxDate,
-      dateSelected,
-      currentYear,
+      // Dynamic properties.
       currentMonth,
-      noWeekends,
+      currentYear,
+      dateSelected,
+      maxDate,
+      minDate,
+
+      // Static properties.
       days,
       disabledDates,
+      noWeekends,
       startDay,
       weekendIndices
     } = instance;

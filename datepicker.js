@@ -819,7 +819,6 @@
    */
   function setDate(date, reset) {
     date = stripTime(date); // Remove the time.
-    console.log('DATE:', date);
     if (!date) throw '`setDate` needs a JavaScript Date object.';
 
     // Check if the date is selectable.
@@ -848,7 +847,6 @@
   function setMin(date) {
     return changeMinOrMax(this, date, true);
   }
-
 
   /*
    *  Programatically changes the maximum selectable date.

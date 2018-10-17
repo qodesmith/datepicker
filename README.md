@@ -115,8 +115,10 @@ See the `id` option in the table above.
 | `.remove()` | Performs cleanup. Will remove various event listeners _only_ for the instance it's called on. So if there are multiple Datepickers on the page, the others will be unaffected. If you're calling this on a date-range instance, be sure to call it on *both* pickers. |
 | `.reset()` | Resets the calendar to the original date provided or today. |
 | `.setDate(date)` | Allows you to programmatically select a date on the calendar. It takes a JavaScript date object as it's only argument. E.x.: `picker.setDate(new Date(2099, 0, 5))` |
-| `setMin(date)` | Allows you to programmatically change the minimum selectable date. |
-| `setMax(date)` | Allows you to programmatically change the maximum selectable date. |
+| `.setMax(date)` | Allows you to programmatically change the maximum selectable date. |
+| `.setMin(date)` | Allows you to programmatically change the minimum selectable date. |
+
+_NOTE: If_ `setMin` _or_ `setMax` _are called on an instance that has an id (connecting it with another instance) both instances will be affected. This helps maintain daterange behavior._
 
 
 ## Properties & Values

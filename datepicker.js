@@ -81,6 +81,21 @@
       disabledDates
     } = options;
 
+    // If id was provided, it cannot me null or undefined.
+    if (options.hasOwnProperty('id') && options.id == null) {
+      throw 'Id cannot be `null` or `undefined`';
+    }
+
+    // No more than 2 pickers can have the same id.
+    if (options.id) {
+      const count = datepickers.reduce((acc, picker) => {
+        if (picker.id === options.id) acc++;
+        return acc;
+      }, 0);
+
+      if (count > 1) throw 'Only two datepickers can share an id.';
+    }
+
     // Checks around disabled dates.
     options.disabledDates = (disabledDates || []).map(date => {
       if (!dateCheck(date)) {
@@ -280,6 +295,8 @@
       // Function to customize the date format updated on <input> elements - triggered in `setCalendarInputValue`.
       formatter: options.formatter,
 
+
+
       // Labels for months - custom or default.
       months: options.months || months,
 
@@ -306,7 +323,10 @@
       isMobile: 'ontouchstart' in window,
 
       // Prevents the calendar from hiding.
-      alwaysShow: !!options.alwaysShow
+      alwaysShow: !!options.alwaysShow,
+
+      // Used to connect 2 datepickers together to form a daterange picker.
+      id: options.id
     };
 
     // Initially populate the <input> field / set attributes on the `el`.
@@ -858,10 +878,14 @@
   /*
    *  Called by `setMin` and `setMax`.
    */
-  function changeMinOrMax(instance, date, isMin) {
+  function changeMinOrMax(instance, date, isMin, ignoreSibling) {
+    const sibling = datepickers.find(picker => {
+      return picker !== instance && picker.id !== null && picker.id === instance.id
+    });
     const dateSelected = stripTime(instance.dateSelected);
     date = stripTime(date);
 
+    // Remove the selected date if it falls outside the min/max range.
     if (dateSelected) {
       if ((isMin && dateSelected < date) || (!isMin && dateSelected > date)) {
         instance.dateSelected = null;
@@ -870,6 +894,13 @@
 
     instance[isMin ? 'minDate' : 'maxDate'] = date;
     renderCalendar(instance.dateSelected || instance.startDate, instance);
+
+    // Run this same function on the sibling.
+    // `ignoreSibling` prevents infinite recursion.
+    if (!ignoreSibling && sibling) {
+      changeMinOrMax(sibling, date, isMin, true);
+    }
+
     return instance;
   }
 

@@ -885,10 +885,13 @@
     const dateSelected = stripTime(instance.dateSelected);
     date = stripTime(date);
 
-    // Remove the selected date if it falls outside the min/max range.
+    // Remove the selected date if it falls outside the
+    // min/max range and clear its input if it has one.
     if (dateSelected) {
       if ((isMin && dateSelected < date) || (!isMin && dateSelected > date)) {
         instance.dateSelected = null;
+
+        if (!instance.nonInput) instance.el.value = '';
       }
     }
 

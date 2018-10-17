@@ -72,7 +72,6 @@
       maxDate,
       minDate,
       dateSelected,
-      formatter,
       customMonths,
       customDays,
       overlayPlaceholder,
@@ -735,7 +734,6 @@
       return calendar.contains(target) || el === target;
     });
     const onCal = instance && instance.calendar.contains(target);
-    const { noPosition } = instance || {};
 
     // Ignore event handling for mobile devices when disableMobile is true.
     if (instance && instance.isMobile && instance.disableMobile) return;

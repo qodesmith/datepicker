@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Two Calendars</title>
+  <style>
+    body, html {
+      height: 100%
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+    }
+
+    input {
+      font-size: 1.5em;
+      padding: 15px;
+      width: 25%;
+    }
+  </style>
+  <link rel="stylesheet" href="datepicker.css">
+</head>
+<body>
+  <div class="container">
+    <input type="text" class="start">
+    <input type="text" class="end">
+    <input type="text" class="nope">
+  </div>
+
+  <script src="datepicker.js"></script>
+  <script>
+    const start = datepicker('.start', {
+      alwaysShow: 1,
+      id: 1,
+      onSelect: (instance, date) => {
+        instance.setMin(date)
+        // intance.sibling.setMin(date)
+      }
+    })
+
+    const end = datepicker('.end', {
+      alwaysShow: 1,
+      id: 1,
+      onSelect: instance => {
+        console.log('INSTANCE:', instance.calendar);
+      }
+    })
+
+    const nope = datepicker('.nope', {
+      alwaysShow: 1
+    })
+  </script>
+</body>
+</html>

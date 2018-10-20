@@ -87,12 +87,13 @@
 
     // No more than 2 pickers can have the same id.
     if (options.id) {
-      const count = datepickers.reduce((acc, picker) => {
-        if (picker.id === options.id) acc++;
+      const pickers = datepickers.reduce((acc, picker) => {
+        if (picker.id === options.id) acc.push(picker);
         return acc;
-      }, 0);
+      }, []);
 
-      if (count > 1) throw 'Only two datepickers can share an id.';
+      if (pickers.length > 1) throw 'Only two datepickers can share an id.';
+      if (pickers.length) options.sibling = pickers[0];
     }
 
     // Checks around disabled dates.
@@ -328,6 +329,13 @@
       id: options.id
     };
 
+    // Set a reference to each sibling on each instance.
+    // This will only be true the 2nd time an id is encountered.
+    if (options.sibling) {
+      instance.sibling = options.sibling;
+      options.sibling.sibling = instance;
+    }
+
     // Initially populate the <input> field / set attributes on the `el`.
     if (dateSelected) setCalendarInputValue(el, instance);
 
@@ -339,6 +347,17 @@
       instance.parentCssText = parent.style.cssText;
       parent.style.cssText += 'position: relative;';
     }
+
+    // Ensure any pickers with a common parent that have
+    // `parentCssText` will ALL have `parentCssText`.
+    datepickers
+      .filter(picker => picker.hasOwnProperty('parentCssText'))
+      .forEach(picker => {
+        datepickers.forEach(dp => {
+          if (dp === picker || dp.hasOwnProperty('parentCssText')) return;
+          if (dp.parent === picker.parent) dp.parentCssText = picker.parentCssText;
+        });
+      });
 
     // Put our instance's calendar in the DOM.
     parent.appendChild(calendar);
@@ -558,7 +577,8 @@
     hideCal(instance);
 
     // Call the user-provided `onSelect` callback.
-    onSelect && onSelect(instance);
+    // Passing in new date so there's no chance of mutating the original object.
+    onSelect && onSelect(instance, new Date(instance.dateSelected));
   }
 
   /*
@@ -863,6 +883,7 @@
    *  Programatically changes the minimum selectable date.
    */
   function setMin(date) {
+    return console.log(this.calendar);
     return changeMinOrMax(this, date, true);
   }
 
@@ -912,10 +933,17 @@
    */
   function remove() {
     // NOTE: `this` is the datepicker instance.
-    const { parentCssText, parent, calendar, el } = this
+    const { parentCssText, parent, calendar, el, sibling } = this
 
-    // Remove styling done to the parent element and reset it back to its original.
-    if (parentCssText !== undefined) parent.style.cssText = parentCssText;
+    // Remove siblings' reference to this instance.
+    if (sibling) delete sibling.sibling;
+
+    // Remove styling done to the parent element and reset it back to its original
+    // only if there are no other instances using the same parent.
+    if (parentCssText !== undefined) {
+      const found = datepickers.some(picker => picker !== this && picker.parent === parent)
+      if (!found) parent.style.cssText = parentCssText;
+    }
 
     // Remove the calendar from the DOM.
     calendar.remove();

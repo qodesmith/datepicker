@@ -554,39 +554,41 @@
   }
 
   /*
-   *  Highlights the selected date.
+   *  Highlights the selected date - or deselects it.
    *  Calls `setCalendarInputValue`.
    */
-  function selectDay(target, instance) {
+  function selectDay(target, instance, deselect) {
     const { currentMonth, currentYear, calendar, el, onSelect } = instance;
     const active = calendar.querySelector('.qs-active');
     const num = target.textContent;
 
     // Keep track of the currently selected date.
-    instance.dateSelected = new Date(currentYear, currentMonth, num);
+    instance.dateSelected = deselect ? null : new Date(currentYear, currentMonth, num);
 
     // Re-establish the active (highlighted) date.
     if (active) active.classList.remove('qs-active');
-    target.classList.add('qs-active');
+    if (!deselect) target.classList.add('qs-active');
 
     // Populate the <input> field (or not) with a readble value
     // and store the individual date values as attributes.
-    setCalendarInputValue(el, instance);
+    setCalendarInputValue(el, instance, deselect);
 
     // Hide the calendar after a day has been selected.
-    hideCal(instance);
+    // Keep it showing if deselecting.
+    !deselect && hideCal(instance);
 
     // Call the user-provided `onSelect` callback.
     // Passing in new date so there's no chance of mutating the original object.
-    onSelect && onSelect(instance, new Date(instance.dateSelected));
+    onSelect && onSelect(instance, deselect ? null : new Date(instance.dateSelected));
   }
 
   /*
    *  Populates the <input> fields with a readble value
    *  and stores the individual date values as attributes.
    */
-  function setCalendarInputValue(el, instance) {
+  function setCalendarInputValue(el, instance, deselect) {
     if (instance.nonInput) return;
+    if (deselect) return el.value = '';
     if (instance.formatter) return instance.formatter(el, instance.dateSelected, instance);
     el.value = instance.dateSelected.toDateString();
   }
@@ -795,9 +797,11 @@
       // Clicking a number square - process whether to select that day or not.
       } else if (classList.contains('qs-num')) {
         const targ = target.nodeName === 'SPAN' ? target.parentNode : target;
-        const doNothing = ['qs-disabled', 'qs-active', 'qs-empty'].some(cls => {
+        const doNothing = ['qs-disabled', 'qs-empty'].some(cls => {
           return targ.classList.contains(cls);
         });
+
+        if (targ.classList.contains('qs-active')) return selectDay(targ, instance, true);
 
         return !doNothing && selectDay(targ, instance);
 

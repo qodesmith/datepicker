@@ -742,6 +742,11 @@
     }
   }
 
+
+  ///////////////////
+  // EVENT HANDLER //
+  ///////////////////
+
   /*
    *  A single function to handle the 4 events we track - click, focusin, keydown, & input.
    *  Only one listener is applied to the window. It is removed once
@@ -883,7 +888,6 @@
    *  Programatically changes the minimum selectable date.
    */
   function setMin(date) {
-    return console.log(this.calendar);
     return changeMinOrMax(this, date, true);
   }
 
@@ -897,7 +901,7 @@
   /*
    *  Called by `setMin` and `setMax`.
    */
-  function changeMinOrMax(instance, date, isMin, ignoreSibling) {
+  function changeMinOrMax(instance, date, isMin) {
     const sibling = datepickers.find(picker => {
       return picker !== instance && picker.id !== null && picker.id === instance.id
     });
@@ -916,12 +920,6 @@
 
     instance[isMin ? 'minDate' : 'maxDate'] = date;
     renderCalendar(instance.dateSelected || instance.startDate, instance);
-
-    // Run this same function on the sibling.
-    // `ignoreSibling` prevents infinite recursion.
-    if (!ignoreSibling && sibling) {
-      changeMinOrMax(sibling, date, isMin, true);
-    }
 
     return instance;
   }

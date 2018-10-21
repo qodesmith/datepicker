@@ -857,6 +857,7 @@
 
   function reset() {
     this.setDate(this.startDate, true);
+    return this;
   }
 
   /*
@@ -906,6 +907,8 @@
    *  Called by `setMin` and `setMax`.
    */
   function changeMinOrMax(instance, date, isMin) {
+    if (date !== undefined && !dateCheck(date)) throw `Invalid date passed to set${isMin ? 'Min' : 'Max'}`;
+
     const sibling = datepickers.find(picker => {
       return picker !== instance && picker.id !== null && picker.id === instance.id
     });

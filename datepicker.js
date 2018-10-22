@@ -174,7 +174,10 @@
    *  Will run checks on the provided options object to ensure correct types.
    *  Returns an options object if everything checks out.
    */
-  function sanitizeOptions(options, el) {
+  function sanitizeOptions(opts, el) {
+    // Ensure we don't mutate the original options object passed in.
+    const options = Object.assign({}, opts);
+
     // Check if the provided element already has a datepicker attached.
     if (datepickers.includes(el)) throw 'A datepicker already exists on that element.';
 

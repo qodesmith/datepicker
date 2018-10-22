@@ -11,24 +11,24 @@
   <div class="container">
     <section>
       <div class="title">Name</div>
-      <input type="text">
+      <input type="text" class="input">
     </section>
 
     <section>
       <div class="title">Email</div>
-      <input type="text">
+      <input type="text" class="input">
     </section>
 
     <section>
       <form action="">
         <div class="title">Date</div>
-        <input id="date" type="text" readonly="true">
+        <input id="date" type="text" readonly="true" class="input">
       </form>
     </section>
 
     <section>
       <div class="title">Password</div>
-      <input type="password">
+      <input type="password" class="input">
     </section>
 
     <section>
@@ -38,20 +38,29 @@
 
   <script src="datepicker.js"></script>
   <script>
-    const picker = datepicker('#date', {
-      minDate:   new Date(),
-      startDate: new Date(),
-      startDay: 3,
-      noWeekends: true,
-      formatter: function (a, b) {
-        var day = (b.getDate().toString().length === 1) ? "0" + b.getDate() : b.getDate();
-        var month = (b.getMonth().toString().length === 1) ? "0" + b.getMonth() : b.getMonth();
+    // const picker = datepicker('#date', {
+    //   minDate:   new Date(),
+    //   startDate: new Date(),
+    //   startDay: 3,
+    //   noWeekends: true,
+    //   formatter: function (a, b) {
+    //     var day = (b.getDate().toString().length === 1) ? "0" + b.getDate() : b.getDate();
+    //     var month = (b.getMonth().toString().length === 1) ? "0" + b.getMonth() : b.getMonth();
 
-        a.value = day + "-" + month + "-" + b.getFullYear();
-      }
-    });
+    //     a.value = day + "-" + month + "-" + b.getFullYear();
+    //   }
+    // });
 
-    document.querySelector('#date').focus();
+    // document.querySelector('#date').focus();
+    function multiPickers(className, options) {
+      const elements = document.querySelectorAll(className)
+
+      return Array
+        .from(elements)
+        .map(element => datepicker(element, options))
+    }
+
+    multiPickers('.input', { alwaysShow: 1 })
   </script>
 </body>
 </html>

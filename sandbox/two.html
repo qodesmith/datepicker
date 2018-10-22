@@ -37,10 +37,10 @@
   <script src="datepicker.js"></script>
   <script>
     const start = datepicker('.start', {
-      alwaysShow: 1,
+      // alwaysShow: 1,
       id: 1,
       onSelect: (instance, date) => {
-        instance.setMin(date)
+        // instance.setMin(date)
         // intance.sibling.setMin(date)
       }
     })
@@ -48,8 +48,8 @@
     const end = datepicker('.end', {
       alwaysShow: 1,
       id: 1,
-      onSelect: instance => {
-        console.log('INSTANCE:', instance.calendar);
+      onSelect: (instance, date) => {
+        console.log('DATE:', date);
       }
     })
 

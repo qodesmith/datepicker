@@ -1,5 +1,5 @@
 # Datepicker.js
-Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **3.6kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **4.5kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 
@@ -41,7 +41,7 @@ Files & locations:
 |       File        |            Location             |                 Description                |
 | ----------------- | ------------------------------- | ------------------------------------------ |
 | datepicker.js     | node_modules/js-datepicker/     | our main file - (ES7)                      |
-| datepicker.min.js | node_modules/js-datepicker/     | minified main file - (ES5, 3.6kb gzipped!) |
+| datepicker.min.js | node_modules/js-datepicker/     | minified main file - (ES5, 4.5kb gzipped!) |
 | datepicker.css    | node_modules/js-datepicker/     | stylesheet                                 |
 | datepicker.less   | node_modules/js-datepicker/less | less: use it for your own builds           |
 

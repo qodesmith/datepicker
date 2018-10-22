@@ -43,11 +43,9 @@
   /*
    *
    */
-  function Datepicker(selector, options) {
+  function Datepicker(selector, opts) {
     const el = selector.split ? document.querySelector(selector) : selector;
-
-    options = sanitizeOptions(options || defaults(), el, selector);
-
+    const options = sanitizeOptions(opts || defaults(), el, selector);
     const parent = el.parentElement;
     const calendar = document.createElement('div');
     const { startDate, dateSelected } = options;

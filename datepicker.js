@@ -202,9 +202,9 @@
    *  Creates a datepicker instance after sanitizing the options.
    *  Calls `setCalendarInputValue` and conditionally `showCal`.
    */
-  function createInstance(selector, options) {
+  function createInstance(selector, opts) {
     const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
-    options = sanitizeOptions(options || defaults(), el);
+    const options = sanitizeOptions(opts || defaults(), el);
 
     const { startDate, dateSelected } = options;
     const noPosition = el === document.body;
@@ -907,7 +907,7 @@
    *  Called by `setMin` and `setMax`.
    */
   function changeMinOrMax(instance, date, isMin) {
-    if (date !== undefined && !dateCheck(date)) throw `Invalid date passed to set${isMin ? 'Min' : 'Max'}`;
+    if (date != undefined && !dateCheck(date)) throw `Invalid date passed to set${isMin ? 'Min' : 'Max'}`;
 
     const dateSelected = stripTime(instance.dateSelected);
     date = stripTime(date);

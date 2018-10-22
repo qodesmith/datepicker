@@ -29,33 +29,44 @@
 </head>
 <body>
   <div class="container">
-    <input type="text" class="start">
-    <input type="text" class="end">
-    <input type="text" class="nope">
+    <input type="text" class="input start">
+    <input type="text" class="input end">
+    <input type="text" class="input nope">
   </div>
 
   <script src="datepicker.js"></script>
   <script>
-    const start = datepicker('.start', {
-      // alwaysShow: 1,
-      id: 1,
-      onSelect: (instance, date) => {
-        // instance.setMin(date)
-        // intance.sibling.setMin(date)
-      }
-    })
+    // const start = datepicker('.start', {
+    //   alwaysShow: 1,
+    //   id: 1,
+    //   onSelect: (instance, date) => {
+    //     instance.setMin(date)
+    //     instance.sibling.setMin(date)
+    //   }
+    // })
 
-    const end = datepicker('.end', {
-      alwaysShow: 1,
-      id: 1,
-      onSelect: (instance, date) => {
-        console.log('DATE:', date);
-      }
-    })
+    // const end = datepicker('.end', {
+    //   alwaysShow: 1,
+    //   id: 1,
+    //   onSelect: (instance, date) => {
+    //     instance.setMax(date)
+    //     instance.sibling.setMax(date)
+    //   }
+    // })
 
-    const nope = datepicker('.nope', {
-      alwaysShow: 1
-    })
+    // const nope = datepicker('.nope', {
+    //   alwaysShow: 1
+    // })
+
+    function multiPickers(className, options) {
+      const elements = document.querySelectorAll(className)
+
+      return Array
+        .from(elements)
+        .map(element => datepicker(element, {...options}))
+    }
+
+    multiPickers('.input', { alwaysShow: 1 })
   </script>
 </body>
 </html>

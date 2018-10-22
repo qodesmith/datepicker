@@ -85,15 +85,15 @@ By clicking on the year or month, an overlay will show revealing an input field 
 | `disabledDates` | (array of JS date objects) - Provide an array of JS date objects that will be disabled on the calendar. This array cannot include the same date as `dateSelected`. |
 | `disableMobile` | (boolean) - Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. |
 | `disableYearOverlay` | (boolean) - Disable the year overlay. Clicking the year will have no effect. |
-| `id` | (any) Links two pickers together to form a date-_range_ picker. This can be anything but `null` or `undefined`. |
+| `id` | (any) Links two pickers together to help form a date-_range_ picker. This can be anything but `null` or `undefined`. See the [examples](#examples) below for how to set up a daterange picker. |
 | `formatter` | (function) - Provide a function that manually sets the provided input's value with your own formatting. This function is passed three arguments. 1st argument is the DOM element `datepicker` is triggered on. 2nd argument is a JavaScript date object for the selected date. 3rd argument is the datepicker instance itself. |
 | `maxDate` | (JS date object) - This will be the maximum threshold of selectable dates. Anything after it will be unselectable. Example: `new Date(2017, 11, 31)` |
 | `minDate` | (JS date object) - This will be the minumum threshold of selectable dates. Anything prior will be unselectable. Example: `new Date(2016, 5, 1)` |
 | `noWeekends` | (boolean) - Provide `true` to disable selecting weekends. |
 | `startDate` | (JS date object) The month that the calendar will open up to. The default value is the current month. Example: `new Date()` |
-| `onHide` | (function) - Callback function when the calendar is hidden. |
-| `onMonthchange` | (function) - Callback function when the month has changed. |
-| `onSelect` | (function) - Callback function after a date has been selected. |
+| `onHide` | (function) - Callback function when the calendar is hidden. This function will be passed the datepicker instance as its only argument. |
+| `onMonthchange` | (function) - Callback function when the month has changed. This function will be passed the datepicker instance as its only argument. |
+| `onSelect` | (function) - Callback function after a date has been selected. This function is passed the datepicker instance as the 1st argument and the newly selected date as the 2nd argument. When unselecting a date, the 2nd argument will be `null`. |
 | `onShow` | (function) - Callback function when the calendar is shown. |
 | `overlayButton` | (string) - Custom text for the year overlay submit button (defaults to "Submit"). |
 | `overlayPlaceholder` | (string) - Custom placeholder text for the year overlay (defaults to "4-digit year"). |
@@ -101,11 +101,6 @@ By clicking on the year or month, an overlay will show revealing an input field 
 | `startDay` | (number, 0 - 6) - Specify the day of the week your calendar starts on. 0 = Sunday, 1 = Monday, etc. Plays nice with the `customDays` option. |
 
 _NOTE: All callback functions are both bound to the Datepicker instance and passed the instance as its 1st argument. So you can simply access the instance via the_ `this` _keyword or the 1st argument._
-
-
-## Daterange Options
-
-See the `id` option in the table above.
 
 
 ## Methods
@@ -126,7 +121,7 @@ _NOTE: If_ `setMin` _or_ `setMax` _are called on an instance that has an id (con
 If you take a look at the datepicker instance, you'll notice plenty of values that you can grab and use however you'd like. Let's say you instantiated datepicker as such:
 
 ```javascript
-const picker = datepicker('.some-class', { dateSelected: new Date(2099, 0, 5) });
+const picker = datepicker('.some-class', { dateSelected: new Date(2099, 0, 5), id: 1 });
 ```
 
 Below will detail some helpful properties and values that are available on the `picker` example above.
@@ -141,6 +136,7 @@ Below will detail some helpful properties and values that are available on the `
 | `el` | The element datepicker is relatively positioned against (unless centered). |
 | `minDate` | The minimum selectable date. |
 | `maxDate` | The maximum selectable date. |
+| `sibling` | If two datepickers have the same `id` option, then this property will be available and refer to the other instance.  |
 
 
 ## Sizing The Calendar
@@ -161,14 +157,18 @@ const picker = datepicker('#some-id');
 
 Setting up a date-range picker:
 ```javascript
-const start = datepicker('#start', {
-  id: 'my-first-rangepicker',
-  range: 1
+const start = datepicker('.start', {
+  id: 1,
+  onSelect: (instance, selectedDate) => {
+    instance.sibling.setMin(selectedDate);
+  }
 });
 
-const end = datepicker('#end', {
-  id: 'my-first-rangepicker',
-  range: 2
+const end = datepicker('.end', {
+  id: 1,
+  onSelect: (instance, selectedDate) => {
+    instance.sibling.setMax(selectedDate);
+  }
 });
 
 // NOTE: Any of the other options, as shown below, are valid for range pickers as well.

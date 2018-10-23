@@ -144,7 +144,7 @@
     }
 
     // Callbacks.
-    ['onSelect', 'onShow', 'onHide', 'onMonthChange', 'formatter'].forEach(fxn => {
+    ['onSelect', 'onShow', 'onHide', 'onMonthChange', 'formatter', 'disabler'].forEach(fxn => {
       options[fxn] = typeof options[fxn] === 'function' && options[fxn];
     });
 
@@ -294,6 +294,9 @@
 
       // Function to customize the date format updated on <input> elements - triggered in `setCalendarInputValue`.
       formatter: options.formatter,
+
+      // Function with custom logic that determines wether a given date is disabled or not.
+      disabler: options.disabler,
 
 
 
@@ -449,6 +452,7 @@
       // Static properties.
       days,
       disabledDates,
+      disabler,
       noWeekends,
       startDay,
       weekendIndices
@@ -507,6 +511,7 @@
       } else {
         let disabled = (minDate && thisDay < minDate) ||
           (maxDate && thisDay > maxDate) ||
+          (disabler && disabler(thisDay)) ||
           disabledDates.includes(+stripTime(thisDay));
         const isWeekend = weekendIndices.includes(weekdayIndex);
         const currentValidDay = isThisMonth && !disabled && num === today.getDate();

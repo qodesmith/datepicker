@@ -333,6 +333,7 @@
     // This will only be true the 2nd time an id is encountered.
     if (options.sibling) {
       instance.sibling = options.sibling;
+      instance.sibling.first = true; // Flag the first instance in a sibling pair.
       options.sibling.sibling = instance;
     }
 
@@ -893,6 +894,13 @@
     renderCalendar(date, this);
 
     if (reset) this.el.value = '';
+
+    // Ensure min / max values are correct with siblings.
+    if (this.sibling) {
+      const method = this.first ? 'setMin' : 'setMax';
+      this[method](date);
+      this.sibling[method](date);
+    }
 
     return this;
   }

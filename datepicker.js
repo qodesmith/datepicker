@@ -671,8 +671,16 @@
    *  Takes a date or number and returns a date stripped of its time (hh:mm:ss:ms).
    */
   function stripTime(dateOrNum) {
+    /*
+      JavaScript gotcha:
+      +(undefined) => NaN
+      +(null) => 0
+
+      We need to do `dateOrNum == null` because relying on `+dateOrNum`
+      may actually result in `0`, thereby rendering an actual date!
+    */
     const date = new Date(+dateOrNum);
-    if (!dateCheck(date)) return null;
+    if (dateOrNum == null || !dateCheck(date)) return null;
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 

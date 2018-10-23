@@ -563,7 +563,7 @@
     const num = target.textContent;
 
     // Keep track of the currently selected date.
-    instance.dateSelected = deselect ? null : new Date(currentYear, currentMonth, num);
+    instance.dateSelected = deselect ? undefined : new Date(currentYear, currentMonth, num);
 
     // Re-establish the active (highlighted) date.
     if (active) active.classList.remove('qs-active');
@@ -579,7 +579,7 @@
 
     // Call the user-provided `onSelect` callback.
     // Passing in new date so there's no chance of mutating the original object.
-    onSelect && onSelect(instance, deselect ? null : new Date(instance.dateSelected));
+    onSelect && onSelect(instance, deselect ? undefined : new Date(instance.dateSelected));
   }
 
   /*
@@ -680,7 +680,7 @@
       may actually result in `0`, thereby rendering an actual date!
     */
     const date = new Date(+dateOrNum);
-    if (dateOrNum == null || !dateCheck(date)) return null;
+    if (dateOrNum == null || !dateCheck(date)) return undefined;
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 
@@ -924,7 +924,8 @@
     // min/max range and clear its input if it has one.
     if (dateSelected) {
       if ((isMin && dateSelected < date) || (!isMin && dateSelected > date)) {
-        instance.dateSelected = null;
+        instance.dateSelected = undefined;
+
 
         if (!instance.nonInput) instance.el.value = '';
       }

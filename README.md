@@ -480,41 +480,57 @@ Performs cleanup. This will remove the current instance from the DOM, leaving al
 ### setDate(date, changeCalendar)
 
 ```javascript
+// Select a date on the calendar.
 const picker = datepicker('.some-input')
-picker.setDate(new Date(2099, 0 , 1), true)
+picker.setDate(new Date(2099, 0 , 1), true) // Selects January 1st 2099 on the calendar.
+
+// Remove the selection simply by omitting any arguments.
+picker.setDate()
 ```
 
 arguments:
 1. `date` - JavaScript date object.
 2. `changeCalendar` - boolean (default is `false`)
 
-Allows you to programmatically select a date on the calendar. If you pass `true` for the 2nd argument, the calendar will change to the month of the date you passed for argument 1 - otherwise, it will not change. This will This will _not_ trigger the [`onSelect`]('#onSelect') callback.
+Allows you to programmatically select or unselect a date on the calendar. To select a date on the calendar, pass in a JS date object for the 1st argument. If you selected a date on a month other than what's currently displaying _and_ you want the calendar to automatically change to it, pass in `true` as the 2nd argument.
+
+Want to unselect a date? Simply run the function with no arguments.
+
+_Note: This will not trigger the_ [`onSelect`]('#onSelect') _callback._
 
 
 ### setMin(date)
 
 ```javaScript
+// Set a minimum selectable date.
 const picker = datepicker('.some-input')
 picker.setMin(new Date(2018, 0, 1))
+
+// Remove the minimum selectable date.
+picker.setMin()
 ```
 
 arguments:
 1. `date` - JavaScript date object.
 
-Allows you to programmatically change the minimum selectable date. If this instance has an [`id`](#id) set (effectively treating it like a date-range picker), the other instance will be changed as well.
+Allows you to programmatically set the minimum selectable date or unset it. If this instance has an [`id`](#id) set (effectively treating it like a date-range picker), the other instance will be changed as well. To unset a minimum date, simply run the function with no arguments.
 
 
 ### setMax(date)
 
 ```javaScript
+// Set a maximum selectable date.
 const picker = datepicker('.some-input')
 picker.setMax(new Date(2099, 0, 1))
+
+// Remove the maximum selectable date.
+picker.setMax()
 ```
 
 arguments:
 1. `date` - JavaScript date object.
 
-Allows you to programmatically change the maximum selectable date. If this instance has an [`id`](#id) set (effectively treating it like a date-range picker), the other instance will be changed as well.
+Allows you to programmatically set the maximum selectable date or unset it. If this instance has an [`id`](#id) set (effectively treating it like a date-range picker), the other instance will be changed as well. To unset a maximum date, simply run the function with no arguments.
 
 
 ## Properties & Values
@@ -537,7 +553,7 @@ Below will detail some helpful properties and values that are available on the `
 | `el` | The element datepicker is relatively positioned against (unless centered). |
 | `minDate` | The minimum selectable date. |
 | `maxDate` | The maximum selectable date. |
-| `sibling` | If two datepickers have the same `id` option, then this property will be available and refer to the other instance.  |
+| `sibling` | If two datepickers have the same `id` option then this property will be available and refer to the other instance. |
 
 
 ## Sizing The Calendar

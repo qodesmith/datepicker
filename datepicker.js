@@ -952,13 +952,23 @@
     // Remove the selected date if it falls outside the
     // min/max range and clear its input if it has one.
     if (dateSelected) {
+      /*
+        Is a daterange instance:
+        1. setting the min prior to the selected date - on the first instance.
+        2. setting the max after the selected date
+      */
       if (instance.sibling) {
-        /*
-          1. setting the min prior to the selected date
-          2. setting the max after the selected date
-        */
-        // if ((isMin && date < dateSelected) || (!isMin && date > dateSelected)) {}
-        // instance.dateSelected = date
+        if (instance.first && isMin && dateSelected > date) {
+          instance.dateSelected = stripTime(date);
+        } else if (!instance.first && !isMin && dateSelected < date) {
+          instance.dateSelected = stripTime(date);
+        }
+
+      /*
+        Not a daterange instance:
+        1. Min is set after the selected date.
+        2. Max is set before the selected date.
+      */
       } else if ((isMin && dateSelected < date) || (!isMin && dateSelected > date)) {
         instance.dateSelected = undefined;
 

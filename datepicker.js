@@ -108,6 +108,8 @@
     });
 
     // Ensure the accuracy of `options.position` & call `establishPosition`.
+    // The 'c' option positions the calendar smack in the middle of the screen,
+    // *not* relative to the input. This can be desirable for mobile devices.
     const positionFound = ['tr', 'tl', 'br', 'bl', 'c'].some(dir => position === dir);
     if (position && !positionFound) {
       throw '"options.position" must be one of the following: tl, tr, bl, br, or c.';
@@ -265,9 +267,6 @@
 
       // Method to programatically set the calendar's date.
       setDate: setDate,
-
-      // Method to programatically reset the calendar.
-      reset: reset,
 
       // Method that removes the calendar from the DOM along with associated events.
       remove: remove,
@@ -509,10 +508,12 @@
 
       // Disabled & current squares.
       } else {
-        let disabled = (minDate && thisDay < minDate) ||
+        let disabled = (
+          (minDate && thisDay < minDate) ||
           (maxDate && thisDay > maxDate) ||
           (disabler && disabler(thisDay)) ||
-          disabledDates.includes(+stripTime(thisDay));
+          disabledDates.includes(+stripTime(thisDay))
+        );
         const isWeekend = weekendIndices.includes(weekdayIndex);
         const currentValidDay = isThisMonth && !disabled && num === today.getDate();
 
@@ -869,36 +870,51 @@
   // INSTANCE METHODS //
   //////////////////////
 
-  function reset() {
-    this.setDate(this.startDate, true);
-    return this;
-  }
-
   /*
    *  Programatically sets the date on an instance
    *  and updates all associated properties.
    *  Will re-render the calendar if it is showing.
    */
-  function setDate(date, reset) {
-    date = stripTime(date); // Remove the time.
-    if (!date) throw '`setDate` needs a JavaScript Date object.';
+  function setDate(newDate, changeCalendar) {
+    const date = stripTime(newDate); // Remove the time.
+    const { currentYear, currentMonth } = this;
+
+    if (date !== undefined && !date) throw '`setDate` needs a JavaScript Date object.';
+
+    // Removing the selected date.
+    if (date === undefined) {
+      // Remove the date.
+      this.dateSelected = undefined;
+
+      // Remove the min or max depending on if this is a daterange pair.
+      if (this.sibling) this.first ? this.setMin() : this.setMax();
+
+      // Clear the associated input field.
+      setCalendarInputValue(this.el, this, true);
+
+      // Re-render the calendar to clear the selected date.
+      renderCalendar(new Date(this.currentYear, this.currentMonth), this);
+
+      // Return the instance to enable chaining methods.
+      return this;
+    }
 
     // Check if the date is selectable.
-    let noGood = (this.disabledDates || []).some(d => {
-      return +d === +stripTime(date);
-    }) || date < this.minDate || date > this.maxDate;
-
-    if (noGood) throw "You tried to manually set a date that's disabled.";
+    if (
+      this.disabledDates.some(d => +d === +date) ||
+      date < this.minDate ||
+      date > this.maxDate
+    ) throw "You can't manually set a date that's disabled.";
 
     this.currentYear = date.getFullYear();
     this.currentMonth = date.getMonth();
     this.currentMonthName = this.months[date.getMonth()];
-    this.dateSelected = reset ? undefined : date;
+    this.dateSelected = date;
 
-    !reset && setCalendarInputValue(this.el, this);
-    renderCalendar(date, this);
+    setCalendarInputValue(this.el, this);
 
-    if (reset) this.el.value = '';
+    const isSameMonth = currentYear === date.getFullYear() && currentMonth === date.getMonth();
+    (isSameMonth || changeCalendar) && renderCalendar(date, this);
 
     // Ensure min / max values are correct with siblings.
     if (this.sibling) {
@@ -927,7 +943,7 @@
   /*
    *  Called by `setMin` and `setMax`.
    */
-  function changeMinOrMax(instance, date, isMin) {
+  function changeMinOrMax(instance, date, isMin, processingSibling) {
     if (date != undefined && !dateCheck(date)) throw `Invalid date passed to set${isMin ? 'Min' : 'Max'}`;
 
     const dateSelected = stripTime(instance.dateSelected);
@@ -936,9 +952,15 @@
     // Remove the selected date if it falls outside the
     // min/max range and clear its input if it has one.
     if (dateSelected) {
-      if ((isMin && dateSelected < date) || (!isMin && dateSelected > date)) {
+      if (instance.sibling) {
+        /*
+          1. setting the min prior to the selected date
+          2. setting the max after the selected date
+        */
+        // if ((isMin && date < dateSelected) || (!isMin && date > dateSelected)) {}
+        // instance.dateSelected = date
+      } else if ((isMin && dateSelected < date) || (!isMin && dateSelected > date)) {
         instance.dateSelected = undefined;
-
 
         if (!instance.nonInput) instance.el.value = '';
       }
@@ -946,6 +968,10 @@
 
     instance[isMin ? 'minDate' : 'maxDate'] = date;
     renderCalendar(instance.dateSelected || instance.startDate, instance);
+
+    if (!processingSibling && instance.sibling) {
+      changeMinOrMax(instance.sibling, date, isMin, true);
+    }
 
     return instance;
   }

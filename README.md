@@ -11,7 +11,7 @@
 ```
 
 # Datepicker.js
-Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **4.5kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Datepicker has **no dependencies** and is _stupid lightweight_ weighing in at **4.6kb gzipped**! I mean, do you even bandwidth bro? Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 
@@ -82,7 +82,7 @@ Files & locations:
 |       File        |            Location             |                 Description                |
 | ----------------- | ------------------------------- | ------------------------------------------ |
 | datepicker.js     | node_modules/js-datepicker/     | our main file - (ES7)                      |
-| datepicker.min.js | node_modules/js-datepicker/     | minified main file - (ES5, 4.5kb gzipped!) |
+| datepicker.min.js | node_modules/js-datepicker/     | minified main file - (ES5, 4.6kb gzipped!) |
 | datepicker.css    | node_modules/js-datepicker/     | stylesheet                                 |
 | datepicker.less   | node_modules/js-datepicker/less | less: use it for your own builds           |
 
@@ -122,6 +122,8 @@ Use these options if you want to fire off your own functions after something hap
 
 ### onSelect
 
+Callback function after a date has been selected. The 2nd argument is the selected date when a date is being selected and `undefined` when a date is being unselected. You unselect a date by clicking it again.
+
 ```javascript
 const picker = datepicker('.some-input', {
   onSelect: (instance, date) => {
@@ -130,20 +132,20 @@ const picker = datepicker('.some-input', {
   }
 })
 ```
-type - function
-default - none
-arguments:
-1. `instance` - the current datepicker instance.
-2. `date`:
-    * JavaScript date object when a date is being selected.
-    * `undefined` when a date is being unselected.
+* Arguments:
+    1. `instance` - the current datepicker instance.
+    2. `date`:
+        * JavaScript date object when a date is being selected.
+        * `undefined` when a date is being unselected.
 
-Callback function after a date has been selected. The 2nd argument is the selected date when a date is being selected and `undefined` when a date is being unselected. You unselect a date by clicking it again.
+_NOTE: If you want to set something up like a daterange picker, use this option combined with the_ [`id`](#id) _option to ensure both calendars stay in sync. See this [example](#id)._
 
-_NOTE: IF you want to set something up like a daterange picker, use this option combined with the_ [`id`](#id) _option to ensure both calendars stay in sync. See this [example](#id)._
+_NOTE: This will not fire when using the instance [methods](#methods) to manually change the calendar._
 
 
 ### onShow
+
+Callback function when the calendar is shown.
 
 ```javascript
 const picker = datepicker('.some-input', {
@@ -153,13 +155,13 @@ const picker = datepicker('.some-input', {
   }
 })
 ```
-type - function
-default - none
-arguments:
-1. `instance` - the current datepicker instance.
+* Arguments:
+    1. `instance` - the current datepicker instance.
 
 
 ### onHide
+
+Callback function when the calendar is hidden.
 
 ```javascript
 const picker = datepicker('.some-input', {
@@ -169,15 +171,13 @@ const picker = datepicker('.some-input', {
   }
 })
 ```
-type - function
-default - none
-arguments:
-1. `instance` - the current datepicker instance.
-
-Callback function when the calendar is hidden.
+* Arguments:
+    1. `instance` - the current datepicker instance.
 
 
 ### onMonthChange
+
+Callback function when the month has changed.
 
 ```javascript
 const picker = datepicker('.some-input', {
@@ -187,12 +187,8 @@ const picker = datepicker('.some-input', {
   }
 })
 ```
-type - function
-default - none
-arguments:
-1. `instance` - the current datepicker instance.
-
-Callback function when the month has changed.
+* Arguments:
+    1. `instance` - the current datepicker instance.
 
 
 ## Options - Customizations
@@ -202,6 +198,8 @@ These options help you customize the calendar to your suit your needs. Some of t
 
 ### formatter
 
+Using an input field with your datepicker? Want to customize it's value anytime a date is selected? Provide a function that manually sets the provided input's value with your own formatting.
+
 ```javascript
 const picker = datepicker('.some-input', {
   formatter: (input, date, instance) => {
@@ -210,91 +208,87 @@ const picker = datepicker('.some-input', {
   }
 })
 ```
-type - function
-default - none (default format is `date.toDateString()`)
-arguments:
-1. `input` - the input field that the datepicker is associated with.
-2. `date` - a JavaScript date object of the currently selected date.
-3. `instance` - the current datepicker instance.
-
-Using an input field with your datepicker? Want to customize it's value anytime a date is selected? Provide a function that manually sets the provided input's value with your own formatting.
+* Default - default format is `date.toDateString()`
+* Arguments:
+    1. `input` - the input field that the datepicker is associated with.
+    2. `date` - a JavaScript date object of the currently selected date.
+    3. `instance` - the current datepicker instance.
 
 
 ### position
+
+This option positions the calendar relative to the input field it's associated with. This can be 1 of 5 values: `'tr'`, `'tl'`, `'br'`, `'bl'`, `'c'` representing top-right, top-left, bottom-right, bottom-left, and centered respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument. For a value of `'c'`, Datepicker will position itself fixed, smack in the middle of the screen. This can be desirable for mobile devices.
 
 ```javascript
 // The calendar will be positioned to the top-left of the input field.
 const picker = datepicker('.some-input', { position: 'tl' })
 ```
-type - string
-default - 'bl'
-
-This option positions the calendar relative to the input field it's associated with. This can be 1 of 5 values: `'tr'`, `'tl'`, `'br'`, `'bl'`, `'c'` representing top-right, top-left, bottom-right, bottom-left, and centered respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument. For a value of `'c'`, Datepicker will position itself fixed, smack in the middle of the screen. This can be desirable for mobile devices.
+* Type - string
+* Default - 'bl'
 
 
 ### startDay
+
+Specify the day of the week your calendar starts on. 0 = Sunday, 1 = Monday, etc. Plays nice with the [`customDays`](#customDays) option.
 
 ```javascript
 // The first day of the week on this calendar is Monday.
 const picker = datepicker('.some-input', { startDay: 1 })
 ```
-type - number (0 - 6)
-default - 0 (Sunday starts the week)
-
-Specify the day of the week your calendar starts on. 0 = Sunday, 1 = Monday, etc. Plays nice with the [`customDays`](#customDays) option.
+* Type - number (`0` - `6`)
+* Default - `0` (Sunday starts the week)
 
 
 ### customDays
+
+You can customize the display of days on the calendar by providing an array of 7 values. This can be used with the [`startDay`](#startDay) option if your week starts on a day other than Sunday.
 
 ```javascript
 const picker = datepicker('.some-input', {
   customDays: ['S', 'M', 'T', 'W', 'Th', 'F', 'S']
 })
 ```
-* type - array
-* default - `['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']`
-
-You can customize the display of days on the calendar by providing an array of 7 values. This can be used with the [`startDay`](#startDay) option if your week starts on a day other than Sunday.
+* Type - array
+* Default - `['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']`
 
 
 ### customMonths
+
+You can customize the display of the month name at the top of the calendar by providing an array of 12 values.
 
 ```javascript
 const picker = datepicker('.some-input', {
   customMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 })
 ```
-
-type - array
-default - `['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];`
-
-You can customize the display of the month name at the top of the calendar by providing an array of 12 values.
+* Type - array
+* Default - `['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];`
 
 
 ### overlayButton
+
+Custom text for the year overlay submit button.
 
 ```javascript
 const picker = datepicker('.some-input', {
   overlayButton: "¡Vamanos!"
 })
 ```
-type - string
-default - 'Submit'
-
-Custom text for the year overlay submit button.
+* Type - string
+* Default - 'Submit'
 
 
 ### overlayPlaceholder
+
+Custom placeholder text for the year overlay.
 
 ```javascript
 const picker = datepicker('.some-input', {
   overlayPlaceholder: 'Enter a year...'
 })
 ```
-type - string
-default - '4-digit year'
-
-Custom placeholder text for the year overlay.
+* Type - string
+* Default - '4-digit year'
 
 
 ## Options - Settings
@@ -304,57 +298,54 @@ Use these options to set the calendar the way you want.
 
 ### alwaysShow
 
+By default, the datepicker will hide & show itself automatically depending on where you click or focus on the page. If you want the calendar to always be on the screen, use this option.
+
 ```javascript
 const picker = datepicker('.some-input', { alwaysShow: true })
 ```
-* type - boolean
-* default - `false`
-
-By default, the datepicker will hide & show itself automatically depending on where you click or focus on the page. If you want the calendar to always be on the screen, use this option.
+* Type - boolean
+* Default - `false`
 
 
 ### dateSelected
 
+This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well.
+
 ```javascript
 const picker = datepicker('.some-input', { dateSelected: new Date(2099, 0, 5) })
 ```
-type - JS date object
-default - none
-
-This will start the calendar with a date already selected. If Datepicker is used with an `<input>` element, that field will be populated with this date as well.
+* Type - JS date object
 
 
 ### maxDate
 
+This will be the maximum threshold of selectable dates. Anything after it will be unselectable.
+
 ```javascript
 const picker = datepicker('.some-input', { maxDate: new Date(2099, 0, 1) })
 ```
-type - JavaScript date object.
-default - none
-
-This will be the maximum threshold of selectable dates. Anything after it will be unselectable.
+* Type - JavaScript date object.
 
 
 ### minDate
 
+This will be the minumum threshold of selectable dates. Anything prior will be unselectable.
+
 ```javascript
 const picker = datepicker('.some-input', { minDate: new Date(2018, 0, 1) })
 ```
-type - JavaScript date object.
-default - none
-
-This will be the minumum threshold of selectable dates. Anything prior will be unselectable.
+* Type - JavaScript date object.
 
 
 ### startDate
 
+The date you provide will be the month that the calendar start off at.
+
 ```javascript
 const picker = datepicker('.some-input', { startDate: new Date(2099, 0 ,1) })
 ```
-type - JavaScript date object.
-default - today's month
-
-The date you provide will be the month that the calendar start off at.
+* Type - JavaScript date object.
+* Default - today's month
 
 
 ## Options - Disabling Things
@@ -364,16 +355,18 @@ These options are associated with disabled various things.
 
 ### noWeekends
 
+Provide `true` to disable selecting weekends. Weekends are Saturday & Sunday. If your weekends are a set of different days or you need more control over disabled dates, check out the [`disabler`](#disabler) option.
+
 ```javascript
 const picker = datepicker('.some-input', { noWeekends: true })
 ```
-type - boolean
-default - false
-
-Provide `true` to disable selecting weekends. Weekends are Saturday & Sunday. If your weekends are a set of different days or you need more control over disabled dates, check out the [`disabler`](#disabler) option.
+* Type - boolean
+* Default - `false`
 
 
 ### disabler
+
+Sometimes you need more control over which dates to customize. The [`disabledDates`](#disabledDates) option limits you to an explicit array of dates and the [`noWeekends`](#noWeekends) option limits you to Saturdays & Sundays. Provide a function that takes a JavaScript date as it's only argument and returns `true` if the date should be disabled. Each day on the calendar is run through this function prior to the calendar being created.
 
 ```javascript
 const picker1 = datepicker('.some-input1', {
@@ -386,15 +379,13 @@ const picker2 = datepicker('.some-input2', {
   disabler: date => date.getMonth() === 9
 })
 ```
-type - function
-default - none
-arguments:
-1. `date` - JavaScript date object representing a given day on a calendar.
-
-Sometimes you need more control over which dates to customize. The [`disabledDates`](#disabledDates) option limits you to an explicit array of dates and the [`noWeekends`](#noWeekends) option limits you to Saturdays & Sundays. Provide a function that takes a JavaScript date as it's only argument and returns `true` if the date should be disabled. Each day on the calendar is run through this function prior to the calendar being created.
+* Arguments:
+    1. `date` - JavaScript date object representing a given day on a calendar.
 
 
 ### disabledDates
+
+Provide an array of JS date objects that will be disabled on the calendar. This array cannot include the same date as [`dateSelected`](#dateSelected). If you need more control over which dates are disabled, see the [`disabler`](#disabler) option.
 
 ```javascript
 const picker = datepicker('.some-input', {
@@ -405,37 +396,37 @@ const picker = datepicker('.some-input', {
   ]
 })
 ```
-type - array of JS date objects
-default - none
-
-Provide an array of JS date objects that will be disabled on the calendar. This array cannot include the same date as [`dateSelected`](#dateSelected). If you need more control over which dates are disabled, see the [`disabler`](#disabler) option.
+* Type - array of JS date objects
 
 
 ### disableMobile
 
+Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. If that's the case, make sure to use an input with a type of "date" - `<input type="date" />`
+
 ```javascript
 const picker = datepicker('.some-input', { disableMobile: true })
 ```
-type - boolean
-default - `false`
-
-Optionally disable Datepicker on mobile devices. This is handy if you'd like to trigger the mobile device's native date picker instead. If that's the case, make sure to use an input with a type of "date" - `<input type="date" />`
+* Type - boolean
+* Default - `false`
 
 
 ### disableYearOverlay
 
+Clicking the year or month name on the calendar triggers an overlay to show, allowing you to enter a year manually. If you want to disable this feature, set this option to `true`.
+
 ```javascript
 const picker = datepicker('.some-input', { disableYearOverlay: true })
 ```
-type - boolean
-default - `false`
-
-Clicking the year or month name on the calendar triggers an overlay to show, allowing you to enter a year manually. If you want to disable this feature, set this option to `true`.
+* Type - boolean
+* Default - `false`
 
 
 ## Options - Other
 
 ### id
+
+Now we're getting _fancy!_ If you want to link two instances together to help form a date-_range_ picker, this is your option. You still have manual work to do, but it's easy (see the example above). Only two picker instances can share an `id`.
+
 ```javascript
 const start = datepicker('.start', {
   id: 1,
@@ -453,10 +444,7 @@ const end = datepicker('.end', {
   }
 })
 ```
-type - anything but `null` or `undefined`
-default - none
-
-Now we're getting _fancy!_ If you want to link two instances together to help form a date-_range_ picker, this is your option. You still have manual work to do, but it's easy (see the example above). Only two picker instances can share an `id`.
+* Type - anything but `null` or `undefined`
 
 
 ## Methods
@@ -466,6 +454,8 @@ Each instance of Datepicker has methods to allow you to programmatically manipul
 
 ### remove()
 
+Performs cleanup. This will remove the current instance from the DOM, leaving all others in tact. If this is the only instance left, it will also remove the event listeners that Datepicker previously set up.
+
 ```javascript
 const picker = datepicker('.some-input')
 
@@ -474,10 +464,12 @@ const picker = datepicker('.some-input')
 picker.remove() // So fresh & so clean clean.
 ```
 
-Performs cleanup. This will remove the current instance from the DOM, leaving all others in tact. If this is the only instance left, it will also remove the event listeners that Datepicker previously set up.
-
 
 ### setDate(date, changeCalendar)
+
+Allows you to programmatically select or unselect a date on the calendar. To select a date on the calendar, pass in a JS date object for the 1st argument. If you selected a date on a month other than what's currently displaying _and_ you want the calendar to automatically change to it, pass in `true` as the 2nd argument.
+
+Want to unselect a date? Simply run the function with no arguments.
 
 ```javascript
 // Select a date on the calendar.
@@ -487,19 +479,16 @@ picker.setDate(new Date(2099, 0 , 1), true) // Selects January 1st 2099 on the c
 // Remove the selection simply by omitting any arguments.
 picker.setDate()
 ```
-
-arguments:
-1. `date` - JavaScript date object.
-2. `changeCalendar` - boolean (default is `false`)
-
-Allows you to programmatically select or unselect a date on the calendar. To select a date on the calendar, pass in a JS date object for the 1st argument. If you selected a date on a month other than what's currently displaying _and_ you want the calendar to automatically change to it, pass in `true` as the 2nd argument.
-
-Want to unselect a date? Simply run the function with no arguments.
+* Arguments:
+    1. `date` - JavaScript date object.
+    2. `changeCalendar` - boolean (default is `false`)
 
 _Note: This will not trigger the_ [`onSelect`]('#onSelect') _callback._
 
 
 ### setMin(date)
+
+Allows you to programmatically set the minimum selectable date or unset it. If this instance has an [`id`](#id) set (effectively treating it like a date-range picker), the other instance will be changed as well. To unset a minimum date, simply run the function with no arguments.
 
 ```javaScript
 // Set a minimum selectable date.
@@ -509,14 +498,13 @@ picker.setMin(new Date(2018, 0, 1))
 // Remove the minimum selectable date.
 picker.setMin()
 ```
-
-arguments:
-1. `date` - JavaScript date object.
-
-Allows you to programmatically set the minimum selectable date or unset it. If this instance has an [`id`](#id) set (effectively treating it like a date-range picker), the other instance will be changed as well. To unset a minimum date, simply run the function with no arguments.
+* Arguments:
+    1. `date` - JavaScript date object.
 
 
 ### setMax(date)
+
+Allows you to programmatically set the maximum selectable date or unset it. If this instance has an [`id`](#id) set (effectively treating it like a date-range picker), the other instance will be changed as well. To unset a maximum date, simply run the function with no arguments.
 
 ```javaScript
 // Set a maximum selectable date.
@@ -526,11 +514,8 @@ picker.setMax(new Date(2099, 0, 1))
 // Remove the maximum selectable date.
 picker.setMax()
 ```
-
-arguments:
-1. `date` - JavaScript date object.
-
-Allows you to programmatically set the maximum selectable date or unset it. If this instance has an [`id`](#id) set (effectively treating it like a date-range picker), the other instance will be changed as well. To unset a maximum date, simply run the function with no arguments.
+* Arguments:
+    1. `date` - JavaScript date object.
 
 
 ## Properties & Values

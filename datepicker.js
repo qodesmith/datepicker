@@ -1,6 +1,6 @@
 (function(root, returnDatepicker) {
   if (typeof exports === 'object') return module.exports = returnDatepicker();
-  if (typeof define === 'function' && define.amd) return define(function() {return returnDatepicker()});
+  if (typeof define === 'function' && define.amd) return define(() => returnDatepicker());
   return root.datepicker = returnDatepicker();
 })(this, function() {
   'use strict';
@@ -41,8 +41,11 @@
 
   // Add a single function as the handler for a few events for ALL datepickers.
   // Storing events in an array to access later in the `remove` fxn below.
+  // Using `focusin` because it bubbles, `focus` does not.
   const events = ['click', 'focusin', 'keydown', 'input'];
-  events.forEach(event => window.addEventListener(event, oneHandler));
+
+  // Using document instead of window because #iphone :/
+  events.forEach(event => document.addEventListener(event, oneHandler));
 
   /*
    *
@@ -773,6 +776,7 @@
     const { type, target } = e;
     const { classList } = target;
     const instance = datepickers.find(({ calendar, el }) => {
+      console.log(type, target);
       return calendar.contains(target) || el === target;
     });
     const onCal = instance && instance.calendar.contains(target);
@@ -828,7 +832,7 @@
 
     /*
       Only pay attention to `focusin` events if the calendar's el is an <input>.
-      `focusin` bubbles, `focus` does not.
+      We use the `focusin` event because it bubbles - `focus` does not bubble.
     */
     } else if (type === 'focusin' && instance) {
       // Show this intance.

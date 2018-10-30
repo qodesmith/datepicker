@@ -4,7 +4,7 @@
   "description": "Get a date with JavaScript! A datepicker with no dependencies.",
   "main": "datepicker.min.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node sandbox/server.js"
   },
   "keywords": [
@@ -25,11 +25,13 @@
   "license": "MIT",
   "devDependencies": {
     "babel-preset-latest": "^6.22.0",
+    "dom-testing-library": "^3.12.0",
     "gulp": "github:gulpjs/gulp#4.0",
     "gulp-autoprefixer": "^3.1.1",
     "gulp-babel": "^6.1.2",
     "gulp-concat-util": "^0.5.5",
     "gulp-less": "^4.0.1",
+    "jest": "^23.6.0",
     "uglify-js": "^2.7.5"
   }
 }

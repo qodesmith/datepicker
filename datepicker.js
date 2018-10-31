@@ -44,13 +44,13 @@
   // Using `focusin` because it bubbles, `focus` does not.
   const events = ['click', 'focusin', 'keydown', 'input'];
 
-  // Using document instead of window because #iphone :/
-  events.forEach(event => document.addEventListener(event, oneHandler));
 
   /*
    *
    */
   function datepicker(selector, options) {
+    if (!datepickers.length) applyListeners();
+
     // Create the datepicker instance!
     const instance = createInstance(selector, options);
     const { startDate, dateSelected } = instance;
@@ -61,146 +61,18 @@
   }
 
   /*
-   *  Will run checks on the provided options object to ensure correct types.
-   *  Returns an options object if everything checks out.
+   *  Applies the event listeners.
+   *  This will be called the first time datepicker is run.
+   *  It will also be called on the first run *after* having removed
+   *  all previous instances from the DOM. In other words, it only
+   *  runs the first time for each "batch" of datepicker instances.
+   *
+   *  The goal is to ever only have one set of listeners regardless
+   *  of how many datepicker instances have been initialized.
    */
-  function sanitizeOptions(options, el) {
-    // Check if the provided element already has a datepicker attached.
-    if (datepickers.find(picker => picker.el === el)) {
-      throw 'A datepicker already exists on that element.';
-    }
-
-    let {
-      position,
-      maxDate,
-      minDate,
-      dateSelected,
-      customMonths,
-      customDays,
-      overlayPlaceholder,
-      overlayButton,
-      startDay,
-      disabledDates
-    } = options;
-
-    // If id was provided, it cannot me null or undefined.
-    if (options.hasOwnProperty('id') && options.id == null) {
-      throw 'Id cannot be `null` or `undefined`';
-    }
-
-    // No more than 2 pickers can have the same id.
-    if (options.id) {
-      const pickers = datepickers.reduce((acc, picker) => {
-        if (picker.id === options.id) acc.push(picker);
-        return acc;
-      }, []);
-
-      if (pickers.length > 1) throw 'Only two datepickers can share an id.';
-      if (pickers.length) options.sibling = pickers[0];
-    }
-
-    // Checks around disabled dates.
-    options.disabledDates = (disabledDates || []).map(date => {
-      if (!dateCheck(date)) {
-        throw 'You supplied an invalid date to "options.disabledDates".';
-      } else if (+stripTime(date) === +stripTime(dateSelected)) {
-        throw '"disabledDates" cannot contain the same date as "dateSelected".';
-      }
-
-      return +stripTime(date);
-    });
-
-    // Ensure the accuracy of `options.position` & call `establishPosition`.
-    // The 'c' option positions the calendar smack in the middle of the screen,
-    // *not* relative to the input. This can be desirable for mobile devices.
-    const positionFound = ['tr', 'tl', 'br', 'bl', 'c'].some(dir => position === dir);
-    if (position && !positionFound) {
-      throw '"options.position" must be one of the following: tl, tr, bl, br, or c.';
-    }
-    options.position = establishPosition(position || 'bl');
-
-    // Check that various options have been provided a JavaScript Date object.
-    // If so, strip the time from those dates (for accurate future comparisons).
-    ['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(date => {
-      if (options[date]) {
-        if (!dateCheck(options[date]) || isNaN(+options[date])) {
-          throw `"options.${date}" needs to be a valid JavaScript Date object.`;
-        }
-
-        // Strip the time from the date.
-        options[date] = stripTime(options[date]);
-      }
-    });
-
-    options.startDate = stripTime(options.startDate || options.dateSelected || new Date());
-
-    if (maxDate < minDate) {
-      throw '"maxDate" in options is less than "minDate".';
-    }
-
-    if (dateSelected) {
-      if (minDate > dateSelected) {
-        throw '"dateSelected" in options is less than "minDate".';
-      }
-
-      if (maxDate < dateSelected) {
-        throw '"dateSelected" in options is greater than "maxDate".';
-      }
-    }
-
-    // Callbacks.
-    ['onSelect', 'onShow', 'onHide', 'onMonthChange', 'formatter', 'disabler'].forEach(fxn => {
-      options[fxn] = typeof options[fxn] === 'function' && options[fxn];
-    });
-
-
-    // Custom labels for months & days.
-    [customMonths, customDays].forEach((custom, i) => {
-      if (!custom) return;
-
-      const errorMsgs = [
-        '"customMonths" must be an array with 12 strings.',
-        '"customDays" must be an array with 7 strings.'
-      ];
-      const wrong = (
-        !Array.isArray(custom) || // Must be an array.
-        custom.length !== (i ? 7 : 12) || // Must have the corrent length.
-        custom.some(item => typeof item !== 'string') // Must contain only strings.
-      );
-
-      if (wrong) throw errorMsgs[i];
-
-      options[i ? 'days' : 'months'] = custom;
-    });
-
-    // Adjust days of the week for user-provided start day.
-    if (startDay && +startDay > 0 && +startDay < 7) {
-      // [sun, mon, tues, wed, thurs, fri, sat]             (1) - original supplied days of the week
-      let daysCopy = (options.customDays || days).slice();
-
-      // Example with startDay of 3 (Wednesday)
-      // daysCopy => [wed, thurs, fri, sat]                 (2) - the 1st half of the new array
-      // chunk    => [sun, mon, tues]                       (3) - the 2nd half of the new array
-      const chunk = daysCopy.splice(0, startDay);
-
-      // [wed, thurs, fri, sat, sun, mon, tues]             (4) - the new days of the week
-      options.customDays = daysCopy.concat(chunk);
-
-      options.startDay = +startDay;
-      options.weekendIndices = [
-        daysCopy.length - 1, // Last item in the 1st half of the edited array.
-        daysCopy.length // Next item in the array, 1st item in the 2nd half of the edited array.
-      ];
-    } else {
-      options.startDay = 0;
-      options.weekendIndices = [6, 0]; // Indices of "Saturday" and "Sunday".
-    }
-
-    // Custom text for overlay placeholder & button.
-    if (typeof overlayPlaceholder !== 'string') delete options.overlayPlaceholder;
-    if (typeof overlayButton !== 'string') delete options.overlayButton;
-
-    return options;
+  function applyListeners() {
+    // Using document instead of window because #iphone :/
+    events.forEach(event => document.addEventListener(event, oneHandler));
   }
 
   /*
@@ -356,6 +228,7 @@
 
     // Ensure any pickers with a common parent that have
     // `parentCssText` will ALL have `parentCssText`.
+    const TODO_REVISIT_PARENT_CSS_TEXT_DETECTION = true;
     datepickers
       .filter(picker => picker.hasOwnProperty('parentCssText'))
       .forEach(picker => {
@@ -372,6 +245,149 @@
     instance.alwaysShow && showCal(instance);
 
     return instance;
+  }
+
+  /*
+   *  Will run checks on the provided options object to ensure correct types.
+   *  Returns an options object if everything checks out.
+   */
+  function sanitizeOptions(options, el) {
+    // Check if the provided element already has a datepicker attached.
+    if (datepickers.find(picker => picker.el === el)) {
+      throw 'A datepicker already exists on that element.';
+    }
+
+    let {
+      position,
+      maxDate,
+      minDate,
+      dateSelected,
+      customMonths,
+      customDays,
+      overlayPlaceholder,
+      overlayButton,
+      startDay,
+      disabledDates
+    } = options;
+
+    // If id was provided, it cannot me null or undefined.
+    if (options.hasOwnProperty('id') && options.id == null) {
+      throw 'Id cannot be `null` or `undefined`';
+    }
+
+    // No more than 2 pickers can have the same id.
+    if (options.id) {
+      const pickers = datepickers.reduce((acc, picker) => {
+        if (picker.id === options.id) acc.push(picker);
+        return acc;
+      }, []);
+
+      if (pickers.length > 1) throw 'Only two datepickers can share an id.';
+      if (pickers.length) options.sibling = pickers[0];
+    }
+
+    // Checks around disabled dates.
+    options.disabledDates = (disabledDates || []).map(date => {
+      if (!dateCheck(date)) {
+        throw 'You supplied an invalid date to "options.disabledDates".';
+      } else if (+stripTime(date) === +stripTime(dateSelected)) {
+        throw '"disabledDates" cannot contain the same date as "dateSelected".';
+      }
+
+      return +stripTime(date);
+    });
+
+    // Ensure the accuracy of `options.position` & call `establishPosition`.
+    // The 'c' option positions the calendar smack in the middle of the screen,
+    // *not* relative to the input. This can be desirable for mobile devices.
+    const positionFound = ['tr', 'tl', 'br', 'bl', 'c'].some(dir => position === dir);
+    if (position && !positionFound) {
+      throw '"options.position" must be one of the following: tl, tr, bl, br, or c.';
+    }
+    options.position = establishPosition(position || 'bl');
+
+    // Check that various options have been provided a JavaScript Date object.
+    // If so, strip the time from those dates (for accurate future comparisons).
+    ['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(date => {
+      if (options[date]) {
+        if (!dateCheck(options[date]) || isNaN(+options[date])) {
+          throw `"options.${date}" needs to be a valid JavaScript Date object.`;
+        }
+
+        // Strip the time from the date.
+        options[date] = stripTime(options[date]);
+      }
+    });
+
+    options.startDate = stripTime(options.startDate || options.dateSelected || new Date());
+
+    if (maxDate < minDate) {
+      throw '"maxDate" in options is less than "minDate".';
+    }
+
+    if (dateSelected) {
+      if (minDate > dateSelected) {
+        throw '"dateSelected" in options is less than "minDate".';
+      }
+
+      if (maxDate < dateSelected) {
+        throw '"dateSelected" in options is greater than "maxDate".';
+      }
+    }
+
+    // Callbacks.
+    ['onSelect', 'onShow', 'onHide', 'onMonthChange', 'formatter', 'disabler'].forEach(fxn => {
+      options[fxn] = typeof options[fxn] === 'function' && options[fxn];
+    });
+
+
+    // Custom labels for months & days.
+    [customMonths, customDays].forEach((custom, i) => {
+      if (!custom) return;
+
+      const errorMsgs = [
+        '"customMonths" must be an array with 12 strings.',
+        '"customDays" must be an array with 7 strings.'
+      ];
+      const wrong = (
+        !Array.isArray(custom) || // Must be an array.
+        custom.length !== (i ? 7 : 12) || // Must have the corrent length.
+        custom.some(item => typeof item !== 'string') // Must contain only strings.
+      );
+
+      if (wrong) throw errorMsgs[i];
+
+      options[i ? 'days' : 'months'] = custom;
+    });
+
+    // Adjust days of the week for user-provided start day.
+    if (startDay && +startDay > 0 && +startDay < 7) {
+      // [sun, mon, tues, wed, thurs, fri, sat]             (1) - original supplied days of the week
+      let daysCopy = (options.customDays || days).slice();
+
+      // Example with startDay of 3 (Wednesday)
+      // daysCopy => [wed, thurs, fri, sat]                 (2) - the 1st half of the new array
+      // chunk    => [sun, mon, tues]                       (3) - the 2nd half of the new array
+      const chunk = daysCopy.splice(0, startDay);
+
+      // [wed, thurs, fri, sat, sun, mon, tues]             (4) - the new days of the week
+      options.customDays = daysCopy.concat(chunk);
+
+      options.startDay = +startDay;
+      options.weekendIndices = [
+        daysCopy.length - 1, // Last item in the 1st half of the edited array.
+        daysCopy.length // Next item in the array, 1st item in the 2nd half of the edited array.
+      ];
+    } else {
+      options.startDay = 0;
+      options.weekendIndices = [6, 0]; // Indices of "Saturday" and "Sunday".
+    }
+
+    // Custom text for overlay placeholder & button.
+    if (typeof overlayPlaceholder !== 'string') delete options.overlayPlaceholder;
+    if (typeof overlayButton !== 'string') delete options.overlayButton;
+
+    return options;
   }
 
   /*
@@ -769,14 +785,13 @@
 
   /*
    *  A single function to handle the 4 events we track - click, focusin, keydown, & input.
-   *  Only one listener is applied to the window. It is removed once
+   *  Only one listener is applied to the document (not window). It is removed once
    *  all datepicker instances have had their `remove` method called.
    */
   function oneHandler(e) {
     const { type, target } = e;
     const { classList } = target;
     const instance = datepickers.find(({ calendar, el }) => {
-      console.log(type, target);
       return calendar.contains(target) || el === target;
     });
     const onCal = instance && instance.calendar.contains(target);
@@ -1017,7 +1032,7 @@
 
     // If this was the last datepicker in the list, remove the event handlers.
     if (!datepickers.length) {
-      events.forEach(event => window.removeEventListener(event, oneHandler));
+      events.forEach(event => document.removeEventListener(event, oneHandler));
     }
   }
 

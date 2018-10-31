@@ -79,6 +79,8 @@ gulp.task('watch', function(done) {
   return done(); // Async completion.
 });
 
+gulp.task('build', gulp.series('es2015', 'uglify-js'));
+
 gulp.task('default', gulp.series(/*'es2015', 'uglify-js', */'less', 'watch'));
 
 // http://goo.gl/SboRZI

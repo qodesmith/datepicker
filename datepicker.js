@@ -46,7 +46,7 @@
 
 
   /*
-   *
+   *  Datepicker! Get a date with JavaScript...
    */
   function datepicker(selector, options) {
     if (!datepickers.length) applyListeners();
@@ -93,7 +93,7 @@
       // The calendar will be positioned relative to this element (except when 'body').
       el: el,
 
-      // The element that datepicker will be attached to.
+      // The element that datepicker will be child of in the DOM.
       parent: parent,
 
       // Indicates whether to use an <input> element or not as the calendar's anchor.
@@ -217,26 +217,29 @@
     // Initially populate the <input> field / set attributes on the `el`.
     if (dateSelected) setCalendarInputValue(el, instance);
 
-    // Keep track of all our instances in an array.
-    datepickers.push(instance);
-
     // Add any needed styles to the parent element.
-    if (!noPosition && getComputedStyle(parent).position === 'static') {
-      instance.parentCssText = parent.style.cssText;
-      parent.style.cssText += 'position: relative;';
+    const computedPosition = getComputedStyle(parent).position;
+
+    if (!noPosition && (!computedPosition || computedPosition === 'static')) {
+      // Indicate that the parent inline styles for position have been set.
+      instance.inlinePosition = true;
+
+      // Add inline position styles.
+      // I've seen that `element.style.position = '...'` isn't reliable.
+      // https://goo.gl/vWYcpH
+      parent.style.setProperty('position', 'relative');
     }
 
     // Ensure any pickers with a common parent that have
-    // `parentCssText` will ALL have `parentCssText`.
-    const TODO_REVISIT_PARENT_CSS_TEXT_DETECTION = true;
-    datepickers
-      .filter(picker => picker.hasOwnProperty('parentCssText'))
-      .forEach(picker => {
-        datepickers.forEach(dp => {
-          if (dp === picker || dp.hasOwnProperty('parentCssText')) return;
-          if (dp.parent === picker.parent) dp.parentCssText = picker.parentCssText;
-        });
-      });
+    // will ALL have the `inlinePosition` property.
+    if (instance.inlinePosition) {
+      datepickers
+        .filter(picker => picker.parent === instance.parent)
+        .forEach(picker => picker.inlinePosition = true);
+    }
+
+    // Keep track of all our instances in an array.
+    datepickers.push(instance);
 
     // Put our instance's calendar in the DOM.
     parent.appendChild(calendar);
@@ -1012,16 +1015,13 @@
    */
   function remove() {
     // NOTE: `this` is the datepicker instance.
-    const { parentCssText, parent, calendar, el, sibling } = this
-
-    // Remove siblings' reference to this instance.
-    if (sibling) delete sibling.sibling;
+    const { inlinePosition, parent, calendar, el, sibling } = this
 
     // Remove styling done to the parent element and reset it back to its original
     // only if there are no other instances using the same parent.
-    if (parentCssText !== undefined) {
+    if (inlinePosition) {
       const found = datepickers.some(picker => picker !== this && picker.parent === parent)
-      if (!found) parent.style.cssText = parentCssText;
+      if (!found) parent.style.setProperty('position', null);
     }
 
     // Remove the calendar from the DOM.
@@ -1030,12 +1030,17 @@
     // Remove this instance from the list.
     datepickers = datepickers.filter(picker => picker.el !== el);
 
+    // Remove siblings references.
+    if (sibling) delete sibling.sibling;
+
+    // Empty this instance of all properties.
+    for (let prop in this) delete this[prop];
+
     // If this was the last datepicker in the list, remove the event handlers.
     if (!datepickers.length) {
       events.forEach(event => document.removeEventListener(event, oneHandler));
     }
   }
-
 
   return datepicker;
 });

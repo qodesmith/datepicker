@@ -158,7 +158,7 @@
     calendarHtml(startDate || dateSelected, instance);
 
     listeners.forEach(e => { // Declared at the top.
-      window.addEventListener(e, oneHandler.bind(instance));
+      document.addEventListener(e, oneHandler.bind(instance));
     });
 
     if (getComputedStyle(parent).position === 'static') {
@@ -607,7 +607,7 @@
 
     // Remove event listeners (declared at the top).
     listeners.forEach(e => {
-      window.removeEventListener(e, oneHandler);
+      document.removeEventListener(e, oneHandler);
     });
 
     calendar.remove();

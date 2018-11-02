@@ -159,7 +159,7 @@ const picker = datepicker('.some-input', {
         * JavaScript date object when a date is being selected.
         * `undefined` when a date is being unselected.
 
-_NOTE: If you want to set something up like a daterange picker, use this option combined with the_ [`id`](#id) _option to ensure both calendars stay in sync. See this [example](#id)._
+_NOTE: If you want to set something up like a daterange picker, use this option combined with the_ [`id`](#id) _option to ensure both calendars stay in sync. See [this example](#id)._
 
 _NOTE: This will not fire when using the [instance methods](#methods) to manually change the calendar._
 
@@ -219,7 +219,7 @@ These options help you customize the calendar to your suit your needs. Some of t
 
 ### formatter
 
-Using an input field with your datepicker? Want to customize it's value anytime a date is selected? Provide a function that manually sets the provided input's value with your own formatting.
+Using an input field with your datepicker? Want to customize its value anytime a date is selected? Provide a function that manually sets the provided input's value with your own formatting.
 
 ```javascript
 const picker = datepicker('.some-input', {
@@ -266,11 +266,15 @@ const picker = datepicker('.some-input', { startDay: 1 })
 
 You can customize the display of days on the calendar by providing an array of 7 values. This can be used with the [`startDay`](#startday) option if your week starts on a day other than Sunday.
 
+<!-- Chinese days taken from https://goo.gl/vVrqRJ -->
 ```javascript
 const picker = datepicker('.some-input', {
-  customDays: ['S', 'M', 'T', 'W', 'Th', 'F', 'S']
+  customDays: ['天', '一', '二', '三', '四', '五', '六']
 })
 ```
+
+![Custom days screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/chinese-days.png "Example with Chinese custom days")
+
 * Type - array
 * Default - `['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']`
 
@@ -281,9 +285,12 @@ You can customize the display of the month name at the top of the calendar by pr
 
 ```javascript
 const picker = datepicker('.some-input', {
-  customMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  customMonths: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 })
 ```
+
+![Custom months screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/spanish-months.png "Example with Spanish custom months")
+
 * Type - array
 * Default - `['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];`
 
@@ -297,6 +304,9 @@ const picker = datepicker('.some-input', {
   overlayButton: "¡Vamanos!"
 })
 ```
+
+![Custom overlay text screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/overlay-button.png "Example with custom overlay text")
+
 * Type - string
 * Default - `'Submit'`
 
@@ -310,6 +320,9 @@ const picker = datepicker('.some-input', {
   overlayPlaceholder: 'Enter a year...'
 })
 ```
+
+![Custom overlay placeholder screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/overlay-placeholder.png "Example with custom overlay placeholder text")
+
 * Type - string
 * Default - `'4-digit year'`
 
@@ -365,7 +378,7 @@ const picker = datepicker('.some-input', { minDate: new Date(2018, 0, 1) })
 The date you provide will determine the month that the calendar starts off at.
 
 ```javascript
-const picker = datepicker('.some-input', { startDate: new Date(2099, 0 ,1) })
+const picker = datepicker('.some-input', { startDate: new Date(2099, 0, 1) })
 ```
 * Type - JavaScript date object.
 * Default - today's month
@@ -448,7 +461,7 @@ const picker = datepicker('.some-input', { disableYearOverlay: true })
 
 ### id
 
-Now we're getting _fancy!_ If you want to link two instances together to help form a date-_range_ picker, this is your option. You still have manual work to do, but it's easy (see the example above). Only two picker instances can share an `id`. The datepicker instance declared first will be considered the "start" picker in the range.
+Now we're getting _fancy!_ If you want to link two instances together to help form a date-_range_ picker, this is your option. You still have manual work to do, but it's easy (see the example below). Only two picker instances can share an `id`. The datepicker instance declared first will be considered the "start" picker in the range.
 
 ```javascript
 const start = datepicker('.start', {
@@ -490,14 +503,20 @@ picker.remove() // So fresh & so clean clean.
 
 ### setDate
 
-Allows you to programmatically select or unselect a date on the calendar. To select a date on the calendar, pass in a JS date object for the 1st argument. If you selected a date on a month other than what's currently displaying _and_ you want the calendar to automatically change to it, pass in `true` as the 2nd argument.
+Allows you to programmatically select or unselect a date on the calendar. To select a date on the calendar, pass in a JS date object for the 1st argument. If you set a date on a month other than what's currently displaying _and_ you want the calendar to automatically change to it, pass in `true` as the 2nd argument.
 
 Want to unselect a date? Simply run the function with no arguments.
 
 ```javascript
 // Select a date on the calendar.
 const picker = datepicker('.some-input')
-picker.setDate(new Date(2099, 0 , 1), true) // Selects January 1st 2099 on the calendar.
+
+// Selects January 1st 2099 on the calendar
+// *and* changes the calendar to that date.
+picker.setDate(new Date(2099, 0, 1), true)
+
+// Selects November 1st 2099 but does *not* change the calendar.
+picker.setDate(new Date(2099, 10, 1), true)
 
 // Remove the selection simply by omitting any arguments.
 picker.setDate()
@@ -511,7 +530,7 @@ _Note: This will not trigger the_ [`onSelect`]('#onselect') _callback._
 
 ### setMin
 
-Allows you to programmatically set the minimum selectable date or unset it. If this instance has an [`id`](#id) set (effectively treating it like a date-range picker), the other instance will be changed as well. To unset a minimum date, simply run the function with no arguments.
+Allows you to programmatically set the minimum selectable date or unset it. If this instance is part of a date-_range_ instance (see the [`id`](#id) option) then the other instance will be changed as well. To unset a minimum date, simply run the function with no arguments.
 
 ```javaScript
 // Set a minimum selectable date.
@@ -527,7 +546,7 @@ picker.setMin()
 
 ### setMax
 
-Allows you to programmatically set the maximum selectable date or unset it. If this instance has an [`id`](#id) set (effectively treating it like a date-range picker), the other instance will be changed as well. To unset a maximum date, simply run the function with no arguments.
+Allows you to programmatically set the maximum selectable date or unset it. If this instance is part of a date-_range_ instance (see the [`id`](#id) option) then the other instance will be changed as well. To unset a maximum date, simply run the function with no arguments.
 
 ```javaScript
 // Set a maximum selectable date.
@@ -543,13 +562,7 @@ picker.setMax()
 
 ## Properties & Values
 
-If you take a look at the datepicker instance, you'll notice plenty of values that you can grab and use however you'd like. Let's say you instantiated datepicker as such:
-
-```javascript
-const picker = datepicker('.some-class', { dateSelected: new Date(2099, 0, 5), id: 1 });
-```
-
-Below will detail some helpful properties and values that are available on the `picker` example above.
+If you take a look at the datepicker instance, you'll notice plenty of values that you can grab and use however you'd like. Below details some helpful properties and values that are available on the picker instance.
 
 | Property | Value |
 | -------- | ----- |
@@ -602,18 +615,7 @@ const end = datepicker('.end', {
 With all other options declared:
 ```javascript
 const picker = datepicker(document.querySelector('#some-id'), {
-  position: 'tr', // Top right.
-  startDate: new Date(), // This month.
-  startDay: 1, // Calendar week starts on a Monday.
-  dateSelected: new Date(), // Today is selected.
-  disabledDates: [new Date('1/1/2050'), new Date('1/3/2050')], // Disabled dates.
-  minDate: new Date(2016, 5, 1), // June 1st, 2016.
-  maxDate: new Date(2099, 0, 1), // Jan 1st, 2099.
-  noWeekends: true, // Weekends will be unselectable.
-  formatter: function(el, date, instance) {
-    // This will display the date as `1/1/2017`.
-    el.value = date.toDateString();
-  },
+  // Event callbacks.
   onSelect: function(instance) {
     // Show which date was selected.
     console.log(instance.dateSelected);
@@ -628,11 +630,35 @@ const picker = datepicker(document.querySelector('#some-id'), {
     // Show the month of the selected date.
     console.log(instance.currentMonthName);
   },
-  customMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+
+  // Customizations.
+  formatter: function(el, date, instance) {
+    // This will display the date as `1/1/2019`.
+    el.value = date.toDateString();
+  },
+  position: 'tr', // Top right.
+  startDay: 1, // Calendar week starts on a Monday.
   customDays: ['S', 'M', 'T', 'W', 'Th', 'F', 'S'],
-  overlayPlaceholder: 'Enter a 4-digit year',
+  customMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   overlayButton: 'Go!',
-  disableMobile: true // Conditionally disabled on mobile devices.
+  overlayPlaceholder: 'Enter a 4-digit year',
+
+  // Settings.
+  alwaysShow: true, // Never hide the calendar.
+  dateSelected: new Date(), // Today is selected.
+  maxDate: new Date(2099, 0, 1), // Jan 1st, 2099.
+  minDate: new Date(2016, 5, 1), // June 1st, 2016.
+  startDate: new Date(), // This month.
+
+  // Disabling things.
+  noWeekends: true, // Saturday's and Sunday's will be unselectable.
+  disabler: date => (date.getDay() === 2 && date.getMonth() === 9), // Disabled every Tuesday in October
+  disabledDates: [new Date(2050, 0, 1), new Date(2050, 0, 3)], // Specific disabled dates.
+  disableMobile: true, // Conditionally disabled on mobile devices.
+  disableYearOverlay: true, // Clicking the year or month will *not* bring up the year overlay.
+
+  // Id - be sure to provide a 2nd picker with the same id to create a daterange pair.
+  id: 1
 });
 ```
 

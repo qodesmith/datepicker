@@ -18,7 +18,7 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 ![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/calendar.png "Get a date with JavaScript!")
 
 
-### Quick Links
+### Table of Contents
 
 **Event Callbacks**
 
@@ -53,7 +53,7 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [disableMobile](#disablemobile)
 * [disableYearOverlay](#disableyearoverlay)
 
-**Other**
+**ID - Daterange**
 * [id](#id)
 
 **Instance Methods**

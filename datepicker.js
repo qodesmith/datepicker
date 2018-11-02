@@ -176,7 +176,8 @@
    */
   function sanitizeOptions(opts, el) {
     // Ensure we don't mutate the original options object passed in.
-    const options = Object.assign({}, opts);
+    const options = {};
+    for (let prop in opts) options[prop] = opts[prop];
 
     // Check if the provided element already has a datepicker attached.
     if (datepickers.includes(el)) throw 'A datepicker already exists on that element.';

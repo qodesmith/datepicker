@@ -6,12 +6,13 @@
   <title>Two Calendars</title>
   <style>
     body, html {
-      height: 100%
+      height: 100%;
     }
 
     body {
       display: flex;
       align-items: center;
+      position: absolute;
     }
 
     .container {
@@ -30,9 +31,9 @@
 </head>
 <body>
   <div class="container">
+    <input type="text" class="input nope">
     <!-- <input type="text" class="input start"> -->
     <!-- <input type="text" class="input end"> -->
-    <input type="text" class="input nope">
   </div>
 
   <script src="datepicker.js"></script>
@@ -62,7 +63,7 @@
     //   }
     // })
 
-    const nope = datepicker('.nope')
+    const nope = datepicker('.nope', { noWeekends: true })
   </script>
 </body>
 </html>

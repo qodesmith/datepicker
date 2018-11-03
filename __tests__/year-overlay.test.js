@@ -1,4 +1,4 @@
-const datepicker = require('../datepicker')
+const datepicker = require('../datepicker.min')
 
 describe('Year Overlay', () => {
   let picker = undefined

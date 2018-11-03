@@ -1,4 +1,4 @@
-const datepicker = require('../datepicker')
+const datepicker = require('../datepicker.min')
 
 describe('Setting Inline Position', () => {
   beforeEach(() => document.body.innerHTML = '<input type="text" />')

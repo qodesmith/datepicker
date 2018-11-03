@@ -1,4 +1,4 @@
-const datepicker = require('../datepicker')
+const datepicker = require('../datepicker.min')
 
 describe('Initialization' ,() => {
   let picker = undefined

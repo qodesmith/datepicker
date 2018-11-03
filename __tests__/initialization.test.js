@@ -121,7 +121,7 @@ describe('Initialization' ,() => {
 
     expect(dp.className).toBe('qs-datepicker qs-hidden')
 
-    document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
     expect(dp.className).toBe('qs-datepicker')
 
     document.body.click()
@@ -134,7 +134,7 @@ describe('Initialization' ,() => {
 
     expect(dp.className).toBe('qs-datepicker qs-hidden')
 
-    document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
     expect(dp.className).toBe('qs-datepicker qs-hidden')
 
     document.body.click()

@@ -19,7 +19,7 @@ describe('General Usage' ,() => {
     expect(!!dp).toBe(true)
     expect(dp.className).toBe('qs-datepicker qs-hidden')
 
-    document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
     expect(dp.className).toBe('qs-datepicker')
 
     document.body.click()
@@ -32,7 +32,7 @@ describe('General Usage' ,() => {
 
     expect(dp.className).toBe('qs-datepicker qs-hidden')
 
-    document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
     expect(dp.className).toBe('qs-datepicker')
 
     dayOne.click()
@@ -50,13 +50,13 @@ describe('General Usage' ,() => {
     expect(dayOne.classList.contains('qs-active')).toBe(false)
     expect(dayOne.textContent).toBe('1')
 
-    document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
     expect(dp.className).toBe('qs-datepicker')
 
     dayOne.click()
     expect(dp.className).toBe('qs-datepicker qs-hidden')
 
-    document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
     expect(dayOne.classList.contains('qs-square')).toBe(true)
     expect(dayOne.classList.contains('qs-num')).toBe(true)
     expect(dayOne.classList.contains('qs-active')).toBe(true)
@@ -68,7 +68,7 @@ describe('General Usage' ,() => {
     const startMonthText = month.textContent
 
     // Show the calendar.
-    document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
 
     // Left arrow click.
     document.querySelector('.qs-arrow.qs-left').click()

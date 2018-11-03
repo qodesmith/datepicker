@@ -55,7 +55,7 @@ describe('Instance Methods', () => {
       const input = document.querySelector('input')
       const picker = datepicker(input)
 
-      document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
 
       expect(picker.dateSelected).toBe(undefined)
       expect(input.value).toBe('')
@@ -72,7 +72,7 @@ describe('Instance Methods', () => {
       const picker = datepicker('input')
       const startCurrentMonthYear = document.querySelector('.qs-month-year').textContent
 
-      document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
       expect(picker.dateSelected).toBe(undefined)
 
       picker.setDate(new Date(2099, 0, 1), true)
@@ -87,13 +87,13 @@ describe('Instance Methods', () => {
 
     it('should unset a date on the calendar', () => {
       const picker = datepicker('input')
-      document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
 
       const allDays = Array.from(document.querySelectorAll('.qs-square.qs-num'))
       const day1 = allDays.find(node => node.textContent === '1')
 
       day1.click()
-      document.querySelector('input').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
       expect(!!document.querySelector('.qs-active')).toBe(true)
 
       picker.setDate()

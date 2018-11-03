@@ -861,7 +861,8 @@ function oneHandler(e) {
     const submitButton = target.parentElement.querySelector('.qs-submit')
     const newValue = target.value
       .split('')
-      .filter(char => char.match(/[0-9]/))
+      // Prevent leading 0's.
+      .filter((char, i) => char.match(/[0-9]/) && (!i ? char !== '0' : true))
       .join('')
       .slice(0, 4)
 

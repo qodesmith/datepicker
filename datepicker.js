@@ -862,8 +862,10 @@ function oneHandler(e) {
     const newValue = target.value
       .split('')
       // Prevent leading 0's.
-      .filter((char, i) => char.match(/[0-9]/) && (!i ? char !== '0' : true))
-      .join('')
+      .reduce((acc, char) => {
+        if (!acc && char === '0') return ''
+        return char.match(/[0-9]/) ? (acc + char) : acc
+      }, '')
       .slice(0, 4)
 
     // Set the new value of the input and conditionally enable / disable the submit button.

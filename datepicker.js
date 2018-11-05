@@ -126,17 +126,23 @@ function createInstance(selector, opts) {
 
 
 
-    // Method to programatically set the calendar's date.
+    // Method to programmatically set the calendar's date.
     setDate,
 
     // Method that removes the calendar from the DOM along with associated events.
     remove,
 
-    // Method to programatically change the minimum selectable date.
+    // Method to programmatically change the minimum selectable date.
     setMin,
 
-    // Method to programatically change the maximum selectable date.
+    // Method to programmatically change the maximum selectable date.
     setMax,
+
+    // Method to programmatically show the calendar.
+    show,
+
+    // Method to programmatically hide the calendar.
+    hide,
 
 
 
@@ -701,19 +707,19 @@ function stripTime(dateOrNum) {
 /*
  *  Hides the calendar and calls the `onHide` callback.
  */
-function hideCal(instance) {
+function hideCal(instance, api) {
   toggleOverlay(true, instance)
   !instance.alwaysShow && instance.calendar.classList.add('qs-hidden')
-  instance.onHide && instance.onHide(instance)
+  !api && instance.onHide && instance.onHide(instance)
 }
 
 /*
  *  Shows the calendar and calls the `onShow` callback.
  */
-function showCal(instance) {
+function showCal(instance, api) {
   instance.calendar.classList.remove('qs-hidden')
   calculatePosition(instance)
-  instance.onShow && instance.onShow(instance)
+  !api && instance.onShow && instance.onShow(instance)
 }
 
 /*
@@ -879,7 +885,21 @@ function oneHandler(e) {
 //////////////////////
 
 /*
- *  Programatically sets the date on an instance
+ *  Programmatically show the calendar.
+ */
+function show() {
+  showCal(this, true)
+}
+
+/*
+ *  Programmatically hide the calendar.
+ */
+function hide() {
+  hideCal(this, true)
+}
+
+/*
+ *  Programmatically sets the date on an instance
  *  and updates all associated properties.
  *  Will re-render the calendar if it is showing.
  */
@@ -935,14 +955,14 @@ function setDate(newDate, changeCalendar) {
 }
 
 /*
- *  Programatically changes the minimum selectable date.
+ *  Programmatically changes the minimum selectable date.
  */
 function setMin(date) {
   return changeMinOrMax(this, date, true)
 }
 
 /*
- *  Programatically changes the maximum selectable date.
+ *  Programmatically changes the maximum selectable date.
  */
 function setMax(date) {
   return changeMinOrMax(this, date)

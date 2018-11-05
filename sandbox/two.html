@@ -42,10 +42,8 @@
       id: 1,
       onSelect: (instance, date) => {
         instance.setMin(date)
-        // instance.sibling.setMin(date)
       },
       formatter: (input, date, instance) => {
-        console.log('START FORMATTER')
         input.value = date.toLocaleDateString()
       }
     })
@@ -55,7 +53,6 @@
       id: 1,
       onSelect: (instance, date) => {
         instance.setMax(date)
-        // instance.sibling.setMax(date)
       },
       formatter: (input, date, instance) => {
         input.value = date.toLocaleDateString()

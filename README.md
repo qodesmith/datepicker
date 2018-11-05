@@ -598,14 +598,14 @@ Setting up a date-range picker:
 const start = datepicker('.start', {
   id: 1,
   onSelect: (instance, selectedDate) => {
-    instance.sibling.setMin(selectedDate);
+    instance.setMin(selectedDate);
   }
 });
 
 const end = datepicker('.end', {
   id: 1,
   onSelect: (instance, selectedDate) => {
-    instance.sibling.setMax(selectedDate);
+    instance.setMax(selectedDate);
   }
 });
 

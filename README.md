@@ -467,16 +467,16 @@ Now we're getting _fancy!_ If you want to link two instances together to help fo
 const start = datepicker('.start', {
   id: 1,
   onSelect: (instance, date) => {
-    instance.setMin(date) // Set this calendar's minimum date - start of the range.
-    instance.sibling.setMin(date) // Set the sibling calendar as well.
+    // Both instances will be set because they are linked by `id`.
+    instance.setMin(date)
   }
 })
 
 const end = datepicker('.end', {
   id: 1,
   onSelect: (instance, date) => {
-    instance.setMax(date) // Set this calendar's maximum date - end of the range.
-    instance.sibling.setMax(date) // Set the sibling calendar as well.
+    // Both instances will be set because they are linked by `id`.
+    instance.setMax(date)
   }
 })
 ```

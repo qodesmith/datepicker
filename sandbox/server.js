@@ -7,9 +7,9 @@ http.createServer((req, res) => {
     res.end(data);
   }
 
-  if (req.url === '/datepicker.js') {
+  if (req.url === '/datepicker.min.js' || req.url === '/datepicker.js') {
     res.writeHead(200, {'Content-Type': 'application/javascript; charset=UTF-8'});
-    fs.readFile(path.resolve(__dirname, '../datepicker.js'), 'utf-8', sendData);
+    fs.readFile(path.resolve(__dirname, '../datepicker.min.js'), 'utf-8', sendData);
 
   } else if (req.url === '/styles.css') {
     res.writeHead(200, {'Content-Type': 'text/css; charset=UTF-8'});
@@ -21,6 +21,6 @@ http.createServer((req, res) => {
 
   } else {
     res.writeHead(200, {'Content-Type': 'text/html; charset=UTF-8'});
-    fs.readFile(path.resolve(__dirname, 'sandbox.html'), 'utf-8', sendData);
+    fs.readFile(path.resolve(__dirname, 'two.html'), 'utf-8', sendData);
   }
 }).listen(9001, () => console.log('Listening on 9001...'));

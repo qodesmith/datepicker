@@ -623,7 +623,6 @@ function setCalendarInputValue(el, instance, deselect) {
  *  Calls `renderCalendar` with the updated date.
  */
 function changeMonthYear(classList, instance, year) {
-
   // Overlay.
   if (year) {
     instance.currentYear = year
@@ -756,7 +755,7 @@ function overlayYearEntry(e, input, instance) {
   const badDate = isNaN(+new Date().setFullYear(input.value || undefined))
 
   // Enter has been pressed OR submit was clicked.
-  if (e.which === 13 || e.type === 'click') {
+  if ((e.which || e.keyCode) === 13 || e.type === 'click') {
     if (badDate || input.classList.contains('qs-disabled')) return
     changeMonthYear(null, instance, input.value, true)
 
@@ -847,11 +846,11 @@ function oneHandler(e) {
     const overlayShowing = !overlay.classList.contains('qs-hidden')
 
     // Pressing enter while the overlay is open.
-    if (e.which === 13 && overlayShowing && onCal) {
+    if ((e.which || e.keyCode) === 13 && overlayShowing && onCal) {
       overlayYearEntry(e, target, instance)
 
     // ESC key pressed.
-    } else if (e.which === 27 && overlayShowing && onCal) {
+    } else if ((e.which || e.keyCode) === 27 && overlayShowing && onCal) {
       toggleOverlay(true, instance)
     }
   } else if (type === 'input') {

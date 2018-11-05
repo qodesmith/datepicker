@@ -49,59 +49,347 @@ describe('Instance Methods', () => {
   })
 
   describe('setDate()', () => {
-    beforeEach(() => document.body.innerHTML = '<input type="text" />')
+    describe('on a single calendar', () => {
+      beforeEach(() => document.body.innerHTML = '<input type="text" />')
 
-    it('should set a date on the calendar and populate the input field', () => {
-      const input = document.querySelector('input')
-      const picker = datepicker(input)
+      it('should set a date on the calendar and populate the input field', () => {
+        const input = document.querySelector('input')
+        const picker = datepicker(input)
 
-      document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
+        document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
 
-      expect(picker.dateSelected).toBe(undefined)
-      expect(input.value).toBe('')
+        expect(picker.dateSelected).toBe(undefined)
+        expect(input.value).toBe('')
 
-      picker.setDate(new Date(2099, 0, 1))
-      expect(!!picker.dateSelected).toBe(true)
-      expect(+picker.dateSelected).toBe(+new Date(2099, 0, 1))
-      expect(!!input.value).toBe(true)
+        picker.setDate(new Date(2099, 0, 1))
+        expect(!!picker.dateSelected).toBe(true)
+        expect(+picker.dateSelected).toBe(+new Date(2099, 0, 1))
+        expect(!!input.value).toBe(true)
 
-      picker.remove()
+        picker.remove()
+      })
+
+      it('should change the calendar month to that date', () => {
+        const picker = datepicker('input')
+        const startCurrentMonthYear = document.querySelector('.qs-month-year').textContent
+
+        document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
+        expect(picker.dateSelected).toBe(undefined)
+
+        picker.setDate(new Date(2099, 0, 1), true)
+        expect(!!picker.dateSelected).toBe(true)
+        expect(+picker.dateSelected).toBe(+new Date(2099, 0, 1))
+
+        const endCurrentMonthYear = document.querySelector('.qs-month-year').textContent
+        expect(startCurrentMonthYear).not.toBe(endCurrentMonthYear)
+
+        picker.remove()
+      })
+
+      it('should unset a date on the calendar', () => {
+        const picker = datepicker('input')
+        document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
+
+        const allDays = Array.from(document.querySelectorAll('.qs-square.qs-num'))
+        const day1 = allDays.find(node => node.textContent === '1')
+
+        day1.click()
+        document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
+        expect(!!document.querySelector('.qs-active')).toBe(true)
+
+        picker.setDate()
+        expect(!!document.querySelector('.qs-active')).toBe(false)
+      })
+
+      it('should throw if setting a date outside the selectable range', () => {
+        const today = new Date()
+        const year = today.getFullYear()
+        const month = today.getMonth()
+        const picker = datepicker('input', {
+          minDate: new Date(year, month, 10),
+          maxDate: new Date(year, month, 20)
+        })
+
+        const allDays = document.querySelectorAll('.qs-square.qs-num:not(.qs-empty)')
+        allDays.forEach(node => {
+          const num = +node.textContent
+          expect(node.classList.contains('qs-disabled')).toBe(num < 10 || num > 20)
+        })
+
+        expect(() => picker.setDate(new Date(year, month, 1))).toThrow()
+        expect(() => picker.setDate(new Date(year, month, 21))).toThrow()
+      })
     })
 
-    it('should change the calendar month to that date', () => {
-      const picker = datepicker('input')
-      const startCurrentMonthYear = document.querySelector('.qs-month-year').textContent
+    describe('with a daterange pair', () => {
+      let start = undefined
+      let end = undefined
 
-      document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
-      expect(picker.dateSelected).toBe(undefined)
+      beforeEach(() => {
+        document.body.innerHTML = `
+          <input type="text" class="start" />
+          <input type="text" class="end" />
+        `
+        start = datepicker('.start', { id: 1 })
+        end = datepicker('.end', { id: 1 })
+      })
 
-      picker.setDate(new Date(2099, 0, 1), true)
-      expect(!!picker.dateSelected).toBe(true)
-      expect(+picker.dateSelected).toBe(+new Date(2099, 0, 1))
+      afterEach(() => {
+        start.remove()
+        end.remove()
+      })
 
-      const endCurrentMonthYear = document.querySelector('.qs-month-year').textContent
-      expect(startCurrentMonthYear).not.toBe(endCurrentMonthYear)
+      it('should set the min date on both calendars when called on the 1st', () => {
+        const allStartDays1 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays1 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
 
-      picker.remove()
-    })
+        ;[allStartDays1, allEndDays1].forEach(arr => {
+          arr.forEach(node => {
+            expect(node.classList.contains('qs-disabled')).toBe(false)
+            expect(node.classList.contains('active')).toBe(false)
+          })
+        })
 
-    it('should unset a date on the calendar', () => {
-      const picker = datepicker('input')
-      document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
+        const today = new Date()
+        start.setDate(new Date(today.getFullYear(), today.getMonth(), 15))
 
-      const allDays = Array.from(document.querySelectorAll('.qs-square.qs-num'))
-      const day1 = allDays.find(node => node.textContent === '1')
+        const allStartDays2 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays2 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
 
-      day1.click()
-      document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
-      expect(!!document.querySelector('.qs-active')).toBe(true)
+        ;[allStartDays2, allEndDays2].forEach(arr => {
+          arr.forEach(node => {
+            const num = +node.textContent
+            expect(node.classList.contains('qs-disabled')).toBe(num < 15)
+            expect(node.classList.contains('active')).toBe(false)
+          })
+        })
+      })
 
-      picker.setDate()
-      expect(!!document.querySelector('.qs-active')).toBe(false)
+      it('should set the max date on both calendars when called on the 2nd', () => {
+        const allStartDays1 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays1 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+
+        ;[allStartDays1, allEndDays1].forEach(arr => {
+          arr.forEach(node => {
+            expect(node.classList.contains('qs-disabled')).toBe(false)
+            expect(node.classList.contains('active')).toBe(false)
+          })
+        })
+
+        const today = new Date()
+        end.setDate(new Date(today.getFullYear(), today.getMonth(), 15))
+
+        const allStartDays2 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays2 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+
+        ;[allStartDays2, allEndDays2].forEach(arr => {
+          arr.forEach(node => {
+            const num = +node.textContent
+            expect(node.classList.contains('qs-disabled')).toBe(num > 15)
+            expect(node.classList.contains('active')).toBe(false)
+          })
+        })
+      })
     })
   })
 
-  describe('setMin()', () => {})
+  describe('setMin()', () => {
+    describe('on a single caledar', () => {
+      let picker = undefined
 
-  describe('setMax()', () => {})
+      beforeEach(() => {
+        document.body.innerHTML = '<input type="text" />'
+        picker = datepicker('input')
+      })
+
+      afterEach(() => picker.remove())
+
+      it('should set the minimum selectable date', () => {
+        const allNums1 = Array.from(document.querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        allNums1.forEach(node => expect(node.classList.contains('qs-disabled')).toBe(false))
+
+        const today = new Date()
+        const minDate = new Date(today.getFullYear(), today.getMonth(), 15)
+        picker.setMin(minDate)
+
+        const allNums2 = Array.from(document.querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        allNums2.forEach(node => {
+          const num = +node.textContent
+          expect(node.classList.contains('qs-disabled')).toBe(num < 15)
+        })
+      })
+
+      it('should unset the minimum selectable date', () => {
+        const allNums1 = Array.from(document.querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        allNums1.forEach(node => expect(node.classList.contains('qs-disabled')).toBe(false))
+
+        const today = new Date()
+        const minDate = new Date(today.getFullYear(), today.getMonth(), 15)
+        picker.setMin(minDate)
+
+        const allNums2 = Array.from(document.querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        allNums2.forEach(node => {
+          const num = +node.textContent
+          expect(node.classList.contains('qs-disabled')).toBe(num < 15 ? true : false)
+        })
+
+        picker.setMin()
+        const allNums3 = Array.from(document.querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        allNums3.forEach(node => expect(node.classList.contains('qs-disabled')).toBe(false))
+      })
+    })
+
+    describe('with a daterange pair', () => {
+      let start = undefined
+      let end = undefined
+
+      beforeEach(() => {
+        document.body.innerHTML = `
+          <input type="text" class="start" />
+          <input type="text" class="end" />
+        `
+        start = datepicker('.start', { id: 1 })
+        end = datepicker('.end', { id: 1 })
+      })
+
+      afterEach(() => {
+        start.remove()
+        end.remove()
+      })
+
+      it('should set / unset the minimum selectable date on both instances when called on the 1st one', () => {
+        const allStartDays1 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays1 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+
+        // Assert that no days on either calendar are disabled.
+        ;[allStartDays1, allEndDays1].forEach(arr => {
+          arr.forEach(node => expect(node.classList.contains('qs-disabled')).toBe(false))
+        })
+
+        const today = new Date()
+        const minDate = new Date(today.getFullYear(), today.getMonth(), 15)
+        start.setMin(minDate)
+
+        const allStartDays2 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays2 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+
+        ;[allStartDays2, allEndDays2].forEach(arr => {
+          arr.forEach((node, i) => {
+            const num = +node.textContent
+            expect(node.classList.contains('qs-disabled')).toBe(num < 15)
+          })
+        })
+
+        start.setMin()
+
+        const allStartDays3 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays3 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+
+        ;[allStartDays1, allEndDays1].forEach(arr => {
+          arr.forEach(node => expect(node.classList.contains('qs-disabled')).toBe(false))
+        })
+      })
+
+      it('should set / unset the minimum selectable date on both instances when called on the 2nd one', () => {
+        const allStartDays1 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays1 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+
+        // Assert that no days on either calendar are disabled.
+        ;[allStartDays1, allEndDays1].forEach(arr => {
+          arr.forEach(node => expect(node.classList.contains('qs-disabled')).toBe(false))
+        })
+
+        const today = new Date()
+        const minDate = new Date(today.getFullYear(), today.getMonth(), 15)
+        end.setMin(minDate)
+
+        const allStartDays2 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays2 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+
+        ;[allStartDays2, allEndDays2].forEach(arr => {
+          arr.forEach((node, i) => {
+            const num = +node.textContent
+            expect(node.classList.contains('qs-disabled')).toBe(num < 15)
+          })
+        })
+
+        end.setMin()
+
+        const allStartDays3 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays3 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+
+        ;[allStartDays1, allEndDays1].forEach(arr => {
+          arr.forEach(node => expect(node.classList.contains('qs-disabled')).toBe(false))
+        })
+      })
+
+      it('should change the selected date if setting minimum prior to that date', () => {
+        const today = new Date()
+        start.setDate(new Date(today.getFullYear(), today.getMonth(), 20))
+        const allStartDays1 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[0]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+        const allEndDays1 = Array.from(document
+          .querySelectorAll('.qs-datepicker')[1]
+          .querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
+
+        ;[allStartDays1, allEndDays1].forEach(arr => {
+          arr.forEach(node => {
+            const num = +node.textContent
+            expect()
+          })
+        })
+        expect()
+
+        const minDate = new Date(today.getFullYear(), today.getMonth(), 15)
+
+      })
+    })
+  })
+
+  describe('setMax()', () => {
+    describe('on a single caledar', () => {})
+
+    describe('with a daterange pair', () => {})
+  })
 })

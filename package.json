@@ -45,10 +45,6 @@
     "type": "git",
     "url": "https://github.com/qodesmith/datepicker"
   },
-  "files": [
-    "dist/*",
-    "./*"
-  ],
   "browserslist": [
     "last 2 versions"
   ],

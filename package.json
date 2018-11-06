@@ -46,8 +46,8 @@
     "url": "https://github.com/qodesmith/datepicker"
   },
   "files": [
-    "dist/datepicker.min.js",
-    "dist/datepicker.min.css"
+    "dist/*",
+    "./*"
   ],
   "browserslist": [
     "last 2 versions"

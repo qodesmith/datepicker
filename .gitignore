@@ -1,7 +1,7 @@
 # Files
 .DS_Store
 .idea
-datepicker-es5.js
 
 # Folders
 node_modules
+dist

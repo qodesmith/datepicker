@@ -1,4 +1,9 @@
-const datepicker = require('../datepicker.min')
+const datepicker = require('../src/datepicker')
+
+function todaysDate() {
+  const today = new Date()
+  return [today.getFullYear(), today.getMonth()]
+}
 
 describe('Instance Methods', () => {
   describe('remove()', () => {
@@ -52,19 +57,22 @@ describe('Instance Methods', () => {
     describe('on a single calendar', () => {
       beforeEach(() => document.body.innerHTML = '<input type="text" />')
 
-      it('should set a date on the calendar and populate the input field', () => {
+      it('should highlight a date on the calendar and populate the input field', () => {
         const input = document.querySelector('input')
         const picker = datepicker(input)
+        const [year, month] = todaysDate()
 
         document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
 
         expect(picker.dateSelected).toBe(undefined)
         expect(input.value).toBe('')
+        expect(document.querySelectorAll('.qs-active').length).toBe(0)
 
-        picker.setDate(new Date(2099, 0, 1))
+        picker.setDate(new Date(year, month, 1))
         expect(!!picker.dateSelected).toBe(true)
-        expect(+picker.dateSelected).toBe(+new Date(2099, 0, 1))
+        expect(+picker.dateSelected).toBe(+new Date(year, month, 1))
         expect(!!input.value).toBe(true)
+        expect(document.querySelectorAll('.qs-active').length).toBe(1)
 
         picker.remove()
       })
@@ -72,13 +80,14 @@ describe('Instance Methods', () => {
       it('should change the calendar month to that date', () => {
         const picker = datepicker('input')
         const startCurrentMonthYear = document.querySelector('.qs-month-year').textContent
+        const [year, month] = todaysDate()
 
         document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
         expect(picker.dateSelected).toBe(undefined)
 
-        picker.setDate(new Date(2099, 0, 1), true)
+        picker.setDate(new Date(year, month + 1, 1), true)
         expect(!!picker.dateSelected).toBe(true)
-        expect(+picker.dateSelected).toBe(+new Date(2099, 0, 1))
+        expect(+picker.dateSelected).toBe(+new Date(year, month + 1, 1))
 
         const endCurrentMonthYear = document.querySelector('.qs-month-year').textContent
         expect(startCurrentMonthYear).not.toBe(endCurrentMonthYear)
@@ -92,6 +101,7 @@ describe('Instance Methods', () => {
 
         const allDays = Array.from(document.querySelectorAll('.qs-square.qs-num'))
         const day1 = allDays.find(node => node.textContent === '1')
+        expect(document.querySelectorAll('.qs-active').length).toBe(0)
 
         day1.click()
         document.querySelector('input').dispatchEvent(new Event('focusin', { bubbles: true }))
@@ -102,9 +112,7 @@ describe('Instance Methods', () => {
       })
 
       it('should throw if setting a date outside the selectable range', () => {
-        const today = new Date()
-        const year = today.getFullYear()
-        const month = today.getMonth()
+        const [year, month] = todaysDate()
         const picker = datepicker('input', {
           minDate: new Date(year, month, 10),
           maxDate: new Date(year, month, 20)
@@ -154,8 +162,8 @@ describe('Instance Methods', () => {
           })
         })
 
-        const today = new Date()
-        start.setDate(new Date(today.getFullYear(), today.getMonth(), 15))
+        const [year, month] = todaysDate()
+        start.setDate(new Date(year, month, 15))
 
         const allStartDays2 = Array.from(document
           .querySelectorAll('.qs-datepicker')[0]
@@ -188,8 +196,8 @@ describe('Instance Methods', () => {
           })
         })
 
-        const today = new Date()
-        end.setDate(new Date(today.getFullYear(), today.getMonth(), 15))
+        const [year, month] = todaysDate()
+        end.setDate(new Date(year, month, 15))
 
         const allStartDays2 = Array.from(document
           .querySelectorAll('.qs-datepicker')[0]
@@ -205,6 +213,28 @@ describe('Instance Methods', () => {
             expect(node.classList.contains('active')).toBe(false)
           })
         })
+      })
+
+      it('should throw if setting a date outside the selectable range (either calendar)', () => {
+        start.remove()
+        end.remove()
+
+        const [year, month] = todaysDate()
+        start = datepicker('.start', {
+          id: 1,
+          minDate: new Date(year, month, 10),
+          maxDate: new Date(year, month, 20)
+        })
+        end = datepicker('.end', {
+          id: 1,
+          minDate: new Date(year, month, 10),
+          maxDate: new Date(year, month, 20)
+        })
+
+        expect(() => start.setDate(new Date(year, month, 1))).toThrow()
+        expect(() => start.setDate(new Date(year, month, 21))).toThrow()
+        expect(() => end.setDate(new Date(year, month, 1))).toThrow()
+        expect(() => end.setDate(new Date(year, month, 21))).toThrow()
       })
     })
   })
@@ -252,6 +282,30 @@ describe('Instance Methods', () => {
         picker.setMin()
         const allNums3 = Array.from(document.querySelectorAll('.qs-square.qs-num:not(.qs-empty)'))
         allNums3.forEach(node => expect(node.classList.contains('qs-disabled')).toBe(false))
+      })
+
+      it('should remove a selected date when setting the minimum after that date', () => {
+        const [year, month] = todaysDate()
+        expect(document.querySelectorAll('.qs-active').length).toBe(0)
+        picker.setDate(new Date(year, month, 1))
+        expect(document.querySelectorAll('.qs-active').length).toBe(1)
+
+        picker.setMin(new Date(year, month, 10))
+        expect(document.querySelectorAll('.qs-active').length).toBe(0)
+      })
+
+      it('should throw when setting the minimum past the maximum', () => {
+        const [year, month] = todaysDate()
+        picker.setMax(new Date(year, month, 10))
+
+        expect(() => picker.setMin(new Date(year, month, 11))).toThrow()
+      })
+
+      it('should throw when setting the maximum below the minimum', () => {
+        const [year, month] = todaysDate()
+        picker.setMin(new Date(year, month, 11))
+
+        expect(() => picker.setMax(new Date(year, month, 10))).toThrow()
       })
     })
 

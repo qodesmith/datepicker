@@ -76,9 +76,9 @@ Simply include `datepicker.css` in the `<head>`...
 ```html
 <head>
   ...
-  <link rel="stylesheet" href="datepicker.css">
+  <link rel="stylesheet" href="datepicker.min.css">
   <!-- Via Unpkg CDN -->
-  <!-- <link rel="stylesheet" href="https://unpkg.com/js-datepicker/datepicker.css"> -->
+  <!-- <link rel="stylesheet" href="https://unpkg.com/js-datepicker/dist/datepicker.min.css"> -->
 </head>
 ```
 
@@ -100,12 +100,12 @@ npm install --save js-datepicker
 
 Files & locations:
 
-|       File        |            Location             |                 Description                |
-| ----------------- | ------------------------------- | ------------------------------------------ |
-| datepicker.js     | node_modules/js-datepicker/     | our main file - (ES7)                      |
-| datepicker.min.js | node_modules/js-datepicker/     | minified main file - (ES5, 5kb gzipped!) |
-| datepicker.css    | node_modules/js-datepicker/     | stylesheet                                 |
-| datepicker.less   | node_modules/js-datepicker/less | less: use it for your own builds           |
+|        File        |            Location             |               Description              |
+| ------------------ | ------------------------------- | -------------------------------------- |
+| datepicker.js      | node_modules/js-datepicker/src  | our main file - (ES7)                  |
+| datepicker.less    | node_modules/js-datepicker/src  | less: use it for your own builds       |
+| datepicker.min.js  | node_modules/js-datepicker/dist | production build - (ES5, 5kb gzipped!) |
+| datepicker.min.css | node_modules/js-datepicker/dist | production stylesheet                  |
 
 
 ## Usage

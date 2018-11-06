@@ -1,4 +1,4 @@
-require('./less/datepicker.less')
+require('./datepicker.less')
 
 let datepickers = [] // Get's reassigned in `remove()` below.
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -1002,10 +1002,14 @@ function changeMinOrMax(instance, date, isMin, processingSibling) {
 
       if (!instance.nonInput) instance.el.value = ''
     }
+  } else if (isMin && date > instance.maxDate) {
+    throw `You can't set the minimum date past the maximum.`
+  } else if (!isMin && date < instance.minDate) {
+    throw `You can't set the maximum date below the minimum.`
   }
 
   instance[isMin ? 'minDate' : 'maxDate'] = date
-  renderCalendar(instance.dateSelected || instance.startDate, instance)
+  renderCalendar(dateSelected || instance.startDate, instance)
 
   if (!processingSibling && instance.sibling) {
     changeMinOrMax(instance.sibling, date, isMin, true)

@@ -977,18 +977,19 @@ function changeMinOrMax(instance, date, isMin, processingSibling) {
   const dateSelected = stripTime(instance.dateSelected)
   date = stripTime(date)
 
+  if (isMin && date > instance.maxDate) throw `You can't set the minimum date past the maximum.`
+  if (!isMin && date < instance.minDate) throw `You can't set the maximum date below the minimum.`
+
   // Remove the selected date if it falls outside the
   // min/max range and clear its input if it has one.
   if (dateSelected) {
     /*
       Is a daterange instance:
-      1. setting the min prior to the selected date - on the first instance.
-      2. setting the max after the selected date
+        1. isMin changes selected date on first instance
+        2. !isMin changes selected date on second instance
     */
     if (instance.sibling) {
-      if (instance.first && isMin && dateSelected > date) {
-        instance.dateSelected = stripTime(date)
-      } else if (!instance.first && !isMin && dateSelected < date) {
+      if ((isMin && instance.first) || (!isMin && !instance.first)) {
         instance.dateSelected = stripTime(date)
       }
 
@@ -1002,10 +1003,6 @@ function changeMinOrMax(instance, date, isMin, processingSibling) {
 
       if (!instance.nonInput) instance.el.value = ''
     }
-  } else if (isMin && date > instance.maxDate) {
-    throw `You can't set the minimum date past the maximum.`
-  } else if (!isMin && date < instance.minDate) {
-    throw `You can't set the maximum date below the minimum.`
   }
 
   instance[isMin ? 'minDate' : 'maxDate'] = date

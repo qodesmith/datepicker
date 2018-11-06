@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
   start = datepicker('.start', {
     id: 1,
     alwaysShow: 1,
+    minDate: new Date(),
+    dateSelected: new Date(),
     onSelect: (instance, date) => {
       instance.setMin(date)
     }

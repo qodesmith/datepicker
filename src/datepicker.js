@@ -529,7 +529,7 @@ function createMonth(date, instance, overlayOpen) {
         (minDate && thisDay < minDate) ||
         (maxDate && thisDay > maxDate) ||
         (disabler && disabler(thisDay)) ||
-        disabledDates.includes(+stripTime(thisDay))
+        disabledDates.includes(+thisDay)
       )
       const isWeekend = weekendIndices.includes(weekdayIndex)
       const currentValidDay = isThisMonth && !disabled && num === today.getDate()
@@ -971,11 +971,11 @@ function setMax(date) {
 /*
  *  Called by `setMin` and `setMax`.
  */
-function changeMinOrMax(instance, date, isMin, processingSibling) {
-  if (date != undefined && !dateCheck(date)) throw `Invalid date passed to set${isMin ? 'Min' : 'Max'}`
+function changeMinOrMax(instance, newDate, isMin, processingSibling) {
+  if (newDate != undefined && !dateCheck(newDate)) throw `Invalid date passed to set${isMin ? 'Min' : 'Max'}`
 
-  const dateSelected = stripTime(instance.dateSelected)
-  date = stripTime(date)
+  const { dateSelected } = instance
+  const date = stripTime(newDate)
 
   if (isMin && date > instance.maxDate) throw `You can't set the minimum date past the maximum.`
   if (!isMin && date < instance.minDate) throw `You can't set the maximum date below the minimum.`
@@ -990,7 +990,7 @@ function changeMinOrMax(instance, date, isMin, processingSibling) {
     */
     if (instance.sibling) {
       if ((isMin && instance.first) || (!isMin && !instance.first)) {
-        instance.dateSelected = stripTime(date)
+        instance.dateSelected = date
       }
 
     /*

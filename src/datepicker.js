@@ -417,19 +417,14 @@ function establishPosition([p1, p2]) {
  *  of the calendar controls, month, and overlay.
  */
 function renderCalendar(date, instance) {
-  const overlay = (instance.disableYearOverlay) ? false : instance.calendar.querySelector('.qs-overlay');
-  const overlayOpen = overlay && !overlay.classList.contains('qs-hidden');
-  
-  const calenderInnerHTML = [
+  const overlay = instance.calendar.querySelector('.qs-overlay')
+  const overlayOpen = overlay && !overlay.classList.contains('qs-hidden')
+
+  instance.calendar.innerHTML = [
     createControls(date, instance, overlayOpen),
-    createMonth(date, instance, overlayOpen)
-  ];
-
-  if (!instance.disableYearOverlay) {
-    calenderInnerHTML.push(createOverlay(instance, overlayOpen));
-  }
-
-  instance.calendar.innerHTML = calenderInnerHTML.join('');
+    createMonth(date, instance, overlayOpen),
+    createOverlay(instance, overlayOpen)
+  ].join('')
 
   /*
     When the overlay is open and we submit a year, the calendar's html

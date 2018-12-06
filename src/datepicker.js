@@ -568,6 +568,8 @@ function createMonth(date, instance, overlayOpen) {
 function createOverlay(instance, overlayOpen) {
   const { overlayPlaceholder, overlayButton } = instance
 
+  if (instance.disableYearOverlay) return;
+
   return `
     <div class="qs-overlay ${overlayOpen ? '' : 'qs-hidden'}">
       <div class="qs-close">&#10005;</div>

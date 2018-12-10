@@ -6,8 +6,7 @@
   "scripts": {
     "build": "webpack --mode production --env.prod",
     "test": "jest",
-    "start": "webpack-dev-server --mode development --env.dev --progress",
-    "prepublish": "npm run test && npm run build"
+    "start": "webpack-dev-server --mode development --env.dev --progress"
   },
   "_jest_explanation": {
     "moduleNameMapper": {

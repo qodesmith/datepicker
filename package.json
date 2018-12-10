@@ -1,6 +1,6 @@
 {
   "name": "js-datepicker",
-  "version": "4.0.6",
+  "version": "4.0.7",
   "description": "Get a date with JavaScript! A datepicker with no dependencies.",
   "main": "dist/datepicker.min.js",
   "scripts": {
@@ -17,6 +17,10 @@
     "transform": {
       "url": "https://jestjs.io/docs/en/webpack#mocking-css-modules",
       "notes": "I'm not using CSS modules. Rather, in the example show in the url above, it shows this is the way to have babel transpile the things. You DON'T need to install jest-babel, it's part of the Jest core now."
+    },
+    "testRegex": {
+      "url": "https://jest-bot.github.io/jest/docs/configuration.html#testregex-string",
+      "notes": "Just the `*.test.js` files in the `__tests__` directory."
     }
   },
   "jest": {
@@ -25,7 +29,8 @@
     },
     "transform": {
       "^.+\\.js$": "babel-jest"
-    }
+    },
+    "testRegex": "(/__tests__/)*.test.js"
   },
   "keywords": [
     "datepicker",

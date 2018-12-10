@@ -182,11 +182,11 @@ function createInstance(selector, opts) {
     overlayButton: options.overlayButton || 'Submit',
 
     // Disable the overlay for changing the year.
-    disableYearOverlay: options.disableYearOverlay,
+    disableYearOverlay: !!options.disableYearOverlay,
 
     // Disable the datepicker on mobile devices.
     // Allows the use of native datepicker if the input type is 'date'.
-    disableMobile: options.disableMobile,
+    disableMobile: !!options.disableMobile,
 
     // Used in conjuntion with `disableMobile` above within `oneHandler`.
     isMobile: 'ontouchstart' in window,
@@ -860,7 +860,8 @@ function oneHandler(e) {
       toggleOverlay(true, instance)
     }
   } else if (type === 'input') {
-    if (!instance) return
+    // Avoid applying these restrictions to other inputs on the page.
+    if (!instance || !instance.calendar.contains(target)) return
 
     // Only allow numbers & a max length of 4 characters.
     const submitButton = target.parentElement.querySelector('.qs-submit')

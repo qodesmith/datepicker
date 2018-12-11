@@ -1,5 +1,6 @@
 require('./datepicker.less')
 
+
 let datepickers = [] // Get's reassigned in `remove()` below.
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const months = [
@@ -24,9 +25,11 @@ const sides = {
   c: 'centered' // This fixes the calendar smack in the middle of the screen.
 }
 
-// Add a single function as the handler for a few events for ALL datepickers.
-// Storing events in an array to access later in the `remove` fxn below.
-// Using `focusin` because it bubbles, `focus` does not.
+/*
+  Add a single function as the handler for a few events for ALL datepickers.
+  Storing events in an array to access later in the `remove` fxn below.
+  Using `focusin` because it bubbles, `focus` does not.
+*/
 const events = ['click', 'focusin', 'keydown', 'input']
 
 
@@ -248,7 +251,7 @@ function createInstance(selector, opts) {
  */
 function sanitizeOptions(opts, el) {
   // Check if the provided element already has a datepicker attached.
-  if (datepickers.find(picker => picker.el === el)) {
+  if (datepickers.some(picker => picker.el === el)) {
     throw 'A datepicker already exists on that element.'
   }
 
@@ -785,9 +788,9 @@ function overlayYearEntry(e, input, instance) {
 function oneHandler(e) {
   const { type, target } = e
   const { classList } = target
-  const instance = datepickers.find(({ calendar, el }) => (
+  const instance = datepickers.filter(({ calendar, el }) => (
     calendar.contains(target) || el === target
-  ))
+  ))[0]
   const onCal = instance && instance.calendar.contains(target)
 
   // Ignore event handling for mobile devices when disableMobile is true.

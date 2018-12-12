@@ -246,6 +246,23 @@ function createInstance(selector, opts) {
 }
 
 /*
+ *  Helper function to duplicate copy an object or array.
+ *  Should help Babel avoid adding syntax that isn't IE compatible.
+ */
+function freshCopy(item) {
+  if (Array.isArray(item)) return item.map(freshCopy)
+
+  if (({}).toString.call(item) === '[object Object]') {
+    return Object.keys(item).reduce((newObj, key) => {
+      newObj[key] = freshCopy(item[key])
+      return newObj
+    }, {})
+  }
+
+  return item
+}
+
+/*
  *  Will run checks on the provided options object to ensure correct types.
  *  Returns an options object if everything checks out.
  */
@@ -256,7 +273,7 @@ function sanitizeOptions(opts, el) {
   }
 
   // Avoid mutating the original object that was supplied by the user.
-  const options = { ...opts }
+  const options = freshCopy(opts)
 
   let {
     position,

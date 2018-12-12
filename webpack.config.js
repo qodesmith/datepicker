@@ -22,12 +22,7 @@ module.exports = (env, argv) => ({
         test: /\.js$/,
         include: path.resolve(__dirname, 'src'),
         use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              '@babel/preset-env'
-            ]
-          }
+          loader: 'babel-loader'
         }
       },
       {

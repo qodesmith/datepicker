@@ -5,13 +5,41 @@ const TerserPlugin = require('terser-webpack-plugin')
 
 
 module.exports = (env, argv) => ({
+  // http://bit.ly/2w4ndaR - new in Webpack 4.
   mode: env.prod ? 'production' : 'development',
-  context: path.resolve(__dirname, './'),
+
+  /*
+    http://bit.ly/2vZm5Ft
+    The base directory, an absolute path, for resolving
+    entry points and loaders from configuration.
+  */
+  context: path.resolve(__dirname, 'src'),
+
+  /*
+    http://bit.ly/2w3Ahxa
+    The point(s) to enter the application.
+  */
   entry: [
+    // Only during development.
     !env.prod && path.resolve(__dirname, 'sandbox/sandbox.js'),
+
+    // Development & production.
     path.resolve(__dirname, 'src/datepicker.js')
   ].filter(Boolean),
-  target: 'web', // Default.
+
+  /*
+    http://bit.ly/2w55YpG
+    Instructs Webpack to target a specific environment.
+    This is the default value.
+  */
+  target: 'web',
+
+  /*
+    http://bit.ly/2JojX2u
+    The top-level output key contains set of options instructing webpack
+    on how and where it should output your bundles, assets and anything else
+    you bundle or load with webpack.
+  */
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'datepicker.min.js',
@@ -23,9 +51,27 @@ module.exports = (env, argv) => ({
       {
         test: /\.js$/,
         include: path.resolve(__dirname, 'src'),
-        use: {
-          loader: 'babel-loader'
-        }
+        use: [
+          // https://goo.gl/EXjzoG
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                [
+                  '@babel/preset-env', // https://goo.gl/aAxYAq
+                  {
+                    modules: false, // Needed for tree shaking to work.
+                    useBuiltIns: 'entry', // https://goo.gl/x16mAq
+                    corejs: { // https://goo.gl/9Vfu6X
+                      version: 3,
+                      proposals: true
+                    }
+                  }
+                ]
+              ]
+            }
+          }
+        ]
       },
       {
         test: /\.less$/,

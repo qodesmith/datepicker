@@ -3,7 +3,7 @@ window.end = undefined
 window.nope = undefined
 
 document.addEventListener('DOMContentLoaded', () => {
-  start = datepicker('.start', {
+  window.start = datepicker('.start', {
     id: 1,
     alwaysShow: 1,
     minDate: new Date(),
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  end = datepicker('.end', {
+  window.end = datepicker('.end', {
     id: 1,
     alwaysShow: 1,
     onSelect: (instance, date) => {
@@ -21,8 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  nope = datepicker('.nope', {
+  window.nope = datepicker('.nope', {
     alwaysShow: 1
   })
-
 })

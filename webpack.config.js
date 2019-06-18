@@ -116,6 +116,23 @@ module.exports = (env, argv) => ({
     */
     public: 'http://localhost:9001'
   },
+  // https://goo.gl/bxPV7L
+  optimization: {
+    minimize: !!env.prod,
+    minimizer: [
+      // https://goo.gl/yWD5vm - List of reasons we're using Terser instead (Webpack is too!).
+      new TerserPlugin({ // https://goo.gl/YgdtKb
+        cache: true, // https://goo.gl/QVWRtq
+        parallel: true, //https://goo.gl/hUkvnK
+        terserOptions: { // https://goo.gl/y3psR1
+          ecma: 5,
+          output: {
+            comments: false
+          }
+        }
+      })
+    ]
+  },
   plugins: [
     new MiniCssExtractPlugin({
       filename: 'datepicker.min.css'

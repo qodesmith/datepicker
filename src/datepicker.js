@@ -228,9 +228,9 @@ function createInstance(selector, opts) {
   // Ensure any pickers with a common parent that have
   // will ALL have the `inlinePosition` property.
   if (instance.inlinePosition) {
-    datepickers
-      .filter(picker => picker.parent === instance.parent)
-      .forEach(picker => picker.inlinePosition = true)
+    datepickers.forEach(picker => {
+      if (picker.parent === instance.parent) picker.inlinePosition = true
+    })
   }
 
   // Keep track of all our instances in an array.

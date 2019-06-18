@@ -20,14 +20,14 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 
 ### Table of Contents
 
-**Event Callbacks**
+#### Event Callbacks
 
 * [onSelect](#onselect)
 * [onShow](#onshow)
 * [onHide](#onhide)
 * [onMonthChange](#onmonthchange)
 
-**Customizations**
+#### Customizations
 
 * [formatter](#formatter)
 * [position](#position)
@@ -37,7 +37,7 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [overlayButton](#overlaybutton)
 * [overlayPlaceholder](#overlayplaceholder)
 
-**Settings**
+#### Settings
 
 * [alwaysShow](#alwaysshow)
 * [dateSelected](#dateselected)
@@ -45,7 +45,7 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [minDate](#mindate)
 * [startDate](#startdate)
 
-**Disabling Things**
+#### Disabling Things
 
 * [noWeekends](#noweekends)
 * [disabler](#disabler)
@@ -53,10 +53,10 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [disableMobile](#disablemobile)
 * [disableYearOverlay](#disableyearoverlay)
 
-**ID - Daterange**
+#### ID - Daterange
 * [id](#id)
 
-**Instance Methods**
+#### Instance Methods
 
 * [remove](#remove)
 * [setDate](#setdate)

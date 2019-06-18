@@ -62,6 +62,9 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [setDate](#setdate)
 * [setMin](#setmin)
 * [setMax](#setmax)
+* [show](#show)
+* [hide](#hide)
+
 
 See the [examples](#examples) below.
 
@@ -558,6 +561,29 @@ picker.setMax()
 ```
 * Arguments:
     1. `date` - JavaScript date object.
+
+
+### show
+
+Allows you to programmatically show the calendar. Using this method will trigger the `onShow` callback if your instance has one.
+
+```javascript
+const picker = datepicker('.some-input')
+picker.show()
+```
+
+
+### hide
+
+Allows you to programmatically hide the calendar. If the `alwaysShow` property was set on the instance then this method will have no effect. Using this method will trigger the `onHide` callback if your instance has one.
+
+```javascript
+const picker1 = datepicker('.some-input')
+const picker2 = datepicker('.some-other-input', { alwaysShow: true })
+
+picker1.hide() // This works.
+picker2.hide() // This does not work because of `alwaysShow`.
+```
 
 
 ## Properties & Values

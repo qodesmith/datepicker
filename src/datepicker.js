@@ -909,14 +909,14 @@ function oneHandler(e) {
  *  Programmatically show the calendar.
  */
 function show() {
-  showCal(this, true)
+  showCal(this)
 }
 
 /*
  *  Programmatically hide the calendar.
  */
 function hide() {
-  hideCal(this, true)
+  hideCal(this)
 }
 
 /*

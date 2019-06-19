@@ -5,9 +5,10 @@ window.nope = undefined
 document.addEventListener('DOMContentLoaded', () => {
   window.start = datepicker('.start', {
     id: 1,
-    // alwaysShow: 1,
+    alwaysShow: 1,
     minDate: new Date(),
     dateSelected: new Date(),
+    showAllDates: 1,
     onSelect: (instance, date) => {
       instance.setMin(date)
     },
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   window.nope = datepicker('.nope', {
-    alwaysShow: 1
+    alwaysShow: 1,
+    showAllDates: 1
   })
 })

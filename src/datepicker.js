@@ -198,7 +198,10 @@ function createInstance(selector, opts) {
     alwaysShow: !!options.alwaysShow,
 
     // Used to connect 2 datepickers together to form a daterange picker.
-    id: options.id
+    id: options.id,
+
+    // Shows a date in every square rendered on the calendar (preceding and trailing month days).
+    showAllDates: !!options.showAllDates
   }
 
   // Set a reference to each sibling on each instance.
@@ -246,7 +249,7 @@ function createInstance(selector, opts) {
 }
 
 /*
- *  Helper function to duplicate copy an object or array.
+ *  Helper function to duplicate an object or array.
  *  Should help Babel avoid adding syntax that isn't IE compatible.
  */
 function freshCopy(item) {
@@ -484,6 +487,7 @@ function createMonth(date, instance, overlayOpen) {
     dateSelected,
     maxDate,
     minDate,
+    showAllDates,
 
     // Static properties.
     days,
@@ -534,14 +538,23 @@ function createMonth(date, instance, overlayOpen) {
     const weekday = days[weekdayIndex]
     const num = i - (offset >= 0 ? offset : (7 + offset))
     const thisDay = new Date(currentYear, currentMonth, num)
-    const isEmpty = num < 1 || num > daysInMonth
+    const thisDayNum = thisDay.getDate()
+    const outsideOfCurrentMonth = num < 1 || num > daysInMonth
     let otherClass = ''
-    let span = `<span class="qs-num">${num}</span>`
+    let span = `<span class="qs-num">${thisDayNum}</span>`
 
-    // Empty squares.
-    if (isEmpty) {
+    // Squares outside the current month.
+    if (outsideOfCurrentMonth) {
       otherClass = 'qs-empty'
-      span = ''
+
+      // Show dim dates for dates in preceding and trailing months.
+      if (showAllDates) {
+        otherClass += ' qs-disabled'
+
+      // Show empty squares for dates in preceding and trailing months.
+      } else {
+        span = ''
+      }
 
     // Disabled & current squares.
     } else {
@@ -559,7 +572,7 @@ function createMonth(date, instance, overlayOpen) {
     }
 
     // Currently selected day.
-    if (+thisDay === +dateSelected && !isEmpty) otherClass += ' qs-active'
+    if (+thisDay === +dateSelected && !outsideOfCurrentMonth) otherClass += ' qs-active'
 
     calendarSquares.push(`<div class="qs-square qs-num ${weekday} ${otherClass}">${span}</div>`)
   }

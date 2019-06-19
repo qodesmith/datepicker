@@ -44,6 +44,7 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [maxDate](#maxdate)
 * [minDate](#mindate)
 * [startDate](#startdate)
+* [showAllDates](#showalldates)
 
 #### Disabling Things
 
@@ -385,6 +386,20 @@ const picker = datepicker('.some-input', { startDate: new Date(2099, 0, 1) })
 ```
 * Type - JavaScript date object.
 * Default - today's month
+
+
+### showAllDates
+
+By default, the datepicker will not put date numbers on calendar days that fall outside the current month. They will be empty squares. Sometimes you want to see those preceding and trailing days. This is the option for you.
+
+```javascript
+const picker = datepicker('.some-input', { showAllDates: true })
+```
+
+![Show all dates on screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/show-all-dates-on.png "Example with show all dates option on")
+
+* Type - boolean
+* Default - `false`
 
 
 ## Options - Disabling Things

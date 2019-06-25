@@ -750,19 +750,19 @@ function stripTime(dateOrNum) {
 /*
  *  Hides the calendar and calls the `onHide` callback.
  */
-function hideCal(instance, api) {
+function hideCal(instance) {
   toggleOverlay(true, instance)
   !instance.alwaysShow && instance.calendar.classList.add('qs-hidden')
-  !api && instance.onHide && instance.onHide(instance)
+  instance.onHide && instance.onHide(instance)
 }
 
 /*
  *  Shows the calendar and calls the `onShow` callback.
  */
-function showCal(instance, api) {
+function showCal(instance) {
   instance.calendar.classList.remove('qs-hidden')
   calculatePosition(instance)
-  !api && instance.onShow && instance.onShow(instance)
+  instance.onShow && instance.onShow(instance)
 }
 
 /*

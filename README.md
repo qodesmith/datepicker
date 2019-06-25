@@ -659,7 +659,7 @@ Styles for the calendar are compiled down to CSS from the `datepicker.less` file
 
 Simplest usage:
 ```javascript
-const picker = datepicker('#some-id');
+const picker = datepicker('#some-id')
 ```
 
 Setting up a date-range picker:
@@ -667,16 +667,16 @@ Setting up a date-range picker:
 const start = datepicker('.start', {
   id: 1,
   onSelect: (instance, selectedDate) => {
-    instance.setMin(selectedDate);
+    instance.setMin(selectedDate)
   }
-});
+})
 
 const end = datepicker('.end', {
   id: 1,
   onSelect: (instance, selectedDate) => {
-    instance.setMax(selectedDate);
+    instance.setMax(selectedDate)
   }
-});
+})
 
 // NOTE: Any of the other options, as shown below, are valid for range pickers as well.
 ```
@@ -685,30 +685,31 @@ With all other options declared:
 ```javascript
 const picker = datepicker(document.querySelector('#some-id'), {
   // Event callbacks.
-  onSelect: function(instance) {
+  onSelect: instance => {
     // Show which date was selected.
-    console.log(instance.dateSelected);
+    console.log(instance.dateSelected)
   },
-  onShow: function(instance) {
-    console.log('Calendar showing.');
+  onShow: instance => {
+    console.log('Calendar showing.')
   },
-  onHide: function(instance) {
-    console.log('Calendar hidden.');
+  onHide: instance => {
+    console.log('Calendar hidden.')
   },
-  onMonthChange: function(instance) {
+  onMonthChange: instance => {
     // Show the month of the selected date.
-    console.log(instance.currentMonthName);
+    console.log(instance.currentMonthName)
   },
 
   // Customizations.
-  formatter: function(el, date, instance) {
+  formatter: (input, date, instance) => {
     // This will display the date as `1/1/2019`.
-    el.value = date.toDateString();
+    input.value = date.toDateString()
   },
   position: 'tr', // Top right.
   startDay: 1, // Calendar week starts on a Monday.
   customDays: ['S', 'M', 'T', 'W', 'Th', 'F', 'S'],
   customMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  customOverlayMonths: ['😀', '😂', '😎', '😍', '🤩', '😜', '😬', '😳', '🤪', '🤓 ', '😝', '😮'],
   overlayButton: 'Go!',
   overlayPlaceholder: 'Enter a 4-digit year',
 
@@ -728,7 +729,7 @@ const picker = datepicker(document.querySelector('#some-id'), {
 
   // Id - be sure to provide a 2nd picker with the same id to create a daterange pair.
   id: 1
-});
+})
 ```
 
 

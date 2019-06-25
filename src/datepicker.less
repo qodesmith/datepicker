@@ -49,24 +49,13 @@
     transition: opacity @transition;
     display: flex;
     flex-direction: column;
-    align-items: center;
 
     &.qs-hidden {
       opacity: 0;
       z-index: -1;
     }
 
-    .qs-close {
-      align-self: flex-end;
-      display: inline-table;
-      padding: .5em;
-      line-height: .77;
-      cursor: pointer;
-      position: absolute;
-    }
-
     .qs-overlay-year {
-      display: block;
       border: none;
       background: transparent;
       border-bottom: 1px solid white;
@@ -74,13 +63,23 @@
       color: white;
       font-size: @font-size;
       padding: .25em 0;
-      margin: auto 0 .5em;
-      width: calc(~'100% - 1em');
+      width: 80%;
+      text-align: center;
+      margin: 0 auto;
+      display: block;
 
       // https://goo.gl/oUuGkG
       &::-webkit-inner-spin-button {
         -webkit-appearance: none;
       }
+    }
+
+    .qs-close {
+      padding: .5em;
+      cursor: pointer;
+      position: absolute;
+      top: 0;
+      right: 0;
     }
 
     .qs-submit {
@@ -95,6 +94,26 @@
         color: gray;
         border-color: gray;
         cursor: not-allowed;
+      }
+    }
+
+    .qs-overlay-month-container {
+      display: flex;
+      flex-wrap: wrap;
+      flex-grow: 1;
+    }
+
+    .qs-overlay-month {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: calc(100% / 3);
+      cursor: pointer;
+      opacity: .5;
+      transition: opacity @transition / 2;
+
+      &.active, &:hover {
+        opacity: 1;
       }
     }
   }

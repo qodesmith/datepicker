@@ -37,6 +37,7 @@ const events = ['click', 'focusin', 'keydown', 'input']
  *  Datepicker! Get a date with JavaScript...
  */
 function datepicker(selector, options) {
+  // Apply the event listeners only once.
   if (!datepickers.length) applyListeners()
 
   // Create the datepicker instance!
@@ -178,6 +179,9 @@ function createInstance(selector, opts) {
     // Start day of the week - indexed from `days` above.
     startDay: options.startDay,
 
+    // Custom overlay months.
+    overlayMonths: options.overlayMonths || (options.months || months).map(m => m.slice(0, 3)),
+
     // Custom overlay placeholder.
     overlayPlaceholder: options.overlayPlaceholder || '4-digit year',
 
@@ -283,8 +287,6 @@ function sanitizeOptions(opts, el) {
     maxDate,
     minDate,
     dateSelected,
-    customMonths,
-    customDays,
     overlayPlaceholder,
     overlayButton,
     startDay,
@@ -363,22 +365,21 @@ function sanitizeOptions(opts, el) {
 
 
   // Custom labels for months & days.
-  ;[customMonths, customDays].forEach((custom, i) => {
+  const createLabelErrMsg = (label, num) => `"${label}" must be an array with ${num} strings.`
+  ;['customDays', 'customMonths', 'customOverlayMonths'].forEach((label, i) => {
+    const custom = options[label]
+
+    // Do nothing if the user hasn't provided this custom option.
     if (!custom) return
 
-    const errorMsgs = [
-      '"customMonths" must be an array with 12 strings.',
-      '"customDays" must be an array with 7 strings.'
-    ]
-    const wrong = (
+    const isWrong = (
       !Array.isArray(custom) || // Must be an array.
-      custom.length !== (i ? 7 : 12) || // Must have the corrent length.
-      custom.some(item => typeof item !== 'string') // Must contain only strings.
+      custom.length !== (i ? 12 : 7) || // Must have the correct length.
+      custom.some(item => typeof item !== 'string') // Must be an array of strings only.
     )
 
-    if (wrong) throw errorMsgs[i]
-
-    options[i ? 'days' : 'months'] = custom
+    if (isWrong) throw createLabelErrMsg(label, i ? 12 : 7)
+    options[!i ? 'days' : i < 2 ? 'months' : 'overlayMonths'] = custom
   })
 
   // Adjust days of the week for user-provided start day.
@@ -599,12 +600,20 @@ function createMonth(date, instance, overlayOpen) {
  *  manually navigate to a month & year.
  */
 function createOverlay(instance, overlayOpen) {
-  const { overlayPlaceholder, overlayButton } = instance
+  const { overlayPlaceholder, overlayButton, overlayMonths } = instance
+  const shortMonths = overlayMonths.map((m, i) => (`
+      <div class="qs-overlay-month" data-month-num="${i}">
+        <span data-month-num="${i}">${m}</span>
+      </div>
+  `)).join('')
 
   return `
     <div class="qs-overlay ${overlayOpen ? '' : 'qs-hidden'}">
-      <div class="qs-close">&#10005;</div>
-      <input class="qs-overlay-year" placeholder="${overlayPlaceholder}" />
+      <div>
+        <input class="qs-overlay-year" placeholder="${overlayPlaceholder}" />
+        <div class="qs-close">&#10005;</div>
+      </div>
+      <div class="qs-overlay-month-container">${shortMonths}</div>
       <div class="qs-submit qs-disabled">${overlayButton}</div>
     </div>
   `
@@ -661,10 +670,11 @@ function setCalendarInputValue(el, instance, deselect) {
  *  from a users manual input on the overlay.
  *  Calls `renderCalendar` with the updated date.
  */
-function changeMonthYear(classList, instance, year) {
+function changeMonthYear(classList, instance, year, overlayMonthIndex) {
   // Overlay.
-  if (year) {
-    instance.currentYear = year
+  if (year || overlayMonthIndex) {
+    if (year) instance.currentYear = year
+    if (overlayMonthIndex) instance.currentMonth = +overlayMonthIndex
 
   // Month change.
   } else {
@@ -788,15 +798,19 @@ function toggleOverlay(closing, instance) {
  *  Calls `changeMonthYear` when a year is submitted and
  *  conditionally enables / disables the submit button.
  */
-function overlayYearEntry(e, input, instance) {
+function overlayYearEntry(e, input, instance, overlayMonthIndex) {
   // Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
 
   const badDate = isNaN(+new Date().setFullYear(input.value || undefined))
+  const value = badDate ? null : input.value
 
   // Enter has been pressed OR submit was clicked.
   if ((e.which || e.keyCode) === 13 || e.type === 'click') {
-    if (badDate || input.classList.contains('qs-disabled')) return
-    changeMonthYear(null, instance, input.value, true)
+    if (overlayMonthIndex) {
+      changeMonthYear(null, instance, value, overlayMonthIndex)
+    } else if (!badDate && !input.classList.contains('qs-disabled')) {
+      changeMonthYear(null, instance, value, overlayMonthIndex)
+    }
 
   // Enable / disabled the submit button.
   } else if (instance.calendar.contains(input)) { // Scope to one calendar instance.
@@ -818,10 +832,11 @@ function overlayYearEntry(e, input, instance) {
 function oneHandler(e) {
   const { type, target } = e
   const { classList } = target
-  const instance = datepickers.filter(({ calendar, el }) => (
+  const [instance] = datepickers.filter(({ calendar, el }) => (
     calendar.contains(target) || el === target
-  ))[0]
+  ))
   const onCal = instance && instance.calendar.contains(target)
+
 
   // Ignore event handling for mobile devices when disableMobile is true.
   if (instance && instance.isMobile && instance.disableMobile) return
@@ -836,8 +851,10 @@ function oneHandler(e) {
     if (!instance) return datepickers.forEach(hideCal)
 
     const { calendar, disableYearOverlay } = instance
+    const input = calendar.querySelector('.qs-overlay-year')
     const overlayClosed = !!calendar.querySelector('.qs-hidden')
     const monthYearClicked = calendar.querySelector('.qs-month-year').contains(target)
+    const newMonthIndex = target.dataset.monthNum
 
     // Calendar's el is 'body'.
     // Anything but the calendar was clicked.
@@ -855,6 +872,10 @@ function oneHandler(e) {
     } else if (monthYearClicked || classList.contains('qs-close')) {
       !disableYearOverlay && toggleOverlay(!overlayClosed, instance)
 
+    // Clicking a month in the overlay - the <span> inside might have been clicked.
+    } else if (newMonthIndex) {
+      overlayYearEntry(e, input, instance, newMonthIndex)
+
     // Clicking a number square - process whether to select that day or not.
     } else if (classList.contains('qs-num')) {
       const targ = target.nodeName === 'SPAN' ? target.parentNode : target
@@ -866,7 +887,6 @@ function oneHandler(e) {
 
     // Clicking the submit button in the overlay.
     } else if (classList.contains('qs-submit') && !classList.contains('qs-disabled')) {
-      const input = calendar.querySelector('.qs-overlay-year')
       overlayYearEntry(e, input, instance)
     }
 
@@ -897,7 +917,7 @@ function oneHandler(e) {
     if (!instance || !instance.calendar.contains(target)) return
 
     // Only allow numbers & a max length of 4 characters.
-    const submitButton = target.parentElement.querySelector('.qs-submit')
+    const submitButton = instance.calendar.querySelector('.qs-submit')
     const newValue = target.value
       .split('')
       // Prevent leading 0's.

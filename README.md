@@ -15,10 +15,13 @@ Get a date with JavaScript! Datepicker has **no dependencies** and weighs in at 
 
 _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 
-![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/calendar.png "Get a date with JavaScript!")
+![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/calendar.png "Get a date with JavaScript!")
 
 
 ### Table of Contents
+
+* [Installation](#installation)
+* [Manual Year & Month Navigation](#manual-year--month-navigation)
 
 #### Event Callbacks
 
@@ -34,6 +37,7 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [startDay](#startday)
 * [customDays](#customdays)
 * [customMonths](#custommonths)
+* [customOverlayMonths](#customoverlaymonths)
 * [overlayButton](#overlaybutton)
 * [overlayPlaceholder](#overlayplaceholder)
 
@@ -132,10 +136,11 @@ You can use Datepicker with any type of element you want. If used with an `<inpu
 _NOTE: Using_ `<input type="date">` _will cause issues as those inputs already have a built in calendar._ `datepicker` _will not change the value of those inputs. Use_ `<input type="text">` _instead._
 
 
-### Manual Year Navigation
+### Manual Year & Month Navigation
 
-By clicking on the year or month, an overlay will show revealing an input field where you can enter a year:
-![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/overlay.png "Get a date with JavaScript!")
+By clicking on the year or month an overlay will show revealing an input field and a list of months. You can either enter a year in the input, click a month, or both:
+
+![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/overlay-default.png "Get a date with JavaScript!")
 
 <hr>
 
@@ -277,7 +282,7 @@ const picker = datepicker('.some-input', {
 })
 ```
 
-![Custom days screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/chinese-days.png "Example with Chinese custom days")
+![Custom days screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/chinese-days.png "Example with Chinese custom days")
 
 * Type - array
 * Default - `['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']`
@@ -285,7 +290,7 @@ const picker = datepicker('.some-input', {
 
 ### customMonths
 
-You can customize the display of the month name at the top of the calendar by providing an array of 12 values.
+You can customize the display of the month name at the top of the calendar by providing an array of 12 strings.
 
 ```javascript
 const picker = datepicker('.some-input', {
@@ -293,10 +298,33 @@ const picker = datepicker('.some-input', {
 })
 ```
 
-![Custom months screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/spanish-months.png "Example with Spanish custom months")
+![Custom months screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/spanish-months.png "Example with Spanish custom months")
 
 * Type - array
-* Default - `['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];`
+* Default - `['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']`
+
+
+### customOverlayMonths
+
+You can customize the display of the month names in the overlay view by providing an array of 12 strings. Keep in mind that if the values are too long, it could produce undesired results in the UI.
+
+Here's what the default looks like:
+
+![Custom overlay months default screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/overlay-default.png "Example with default custom overlay months")
+
+Here's an example with an array of custom values:
+
+```javascript
+const picker = datepicker('.some-input', {
+  customOverlayMonths: ['😀', '😂', '😎', '😍', '🤩', '😜', '😬', '😳', '🤪', '🤓 ', '😝', '😮']
+})
+```
+
+![Custom overlay months screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/overlay-custom-months.png "Example with custom overlay months")
+
+* Type - array
+* Default - The first 3 characters of each item in `customMonths`.
+
 
 
 ### overlayButton
@@ -309,7 +337,7 @@ const picker = datepicker('.some-input', {
 })
 ```
 
-![Custom overlay text screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/overlay-button.png "Example with custom overlay text")
+![Custom overlay text screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/overlay-button.png "Example with custom overlay text")
 
 * Type - string
 * Default - `'Submit'`
@@ -321,11 +349,11 @@ Custom placeholder text for the year overlay.
 
 ```javascript
 const picker = datepicker('.some-input', {
-  overlayPlaceholder: 'Enter a year...'
+  overlayPlaceholder: 'Entrar un año'
 })
 ```
 
-![Custom overlay placeholder screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/overlay-placeholder.png "Example with custom overlay placeholder text")
+![Custom overlay placeholder screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/overlay-placeholder.png "Example with custom overlay placeholder text")
 
 * Type - string
 * Default - `'4-digit year'`
@@ -396,7 +424,7 @@ By default, the datepicker will not put date numbers on calendar days that fall 
 const picker = datepicker('.some-input', { showAllDates: true })
 ```
 
-![Show all dates on screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/show-all-dates-on.png "Example with show all dates option on")
+![Show all dates on screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/show-all-dates-on.png "Example with show all dates option on")
 
 * Type - boolean
 * Default - `false`
@@ -708,7 +736,7 @@ const picker = datepicker(document.querySelector('#some-id'), {
 
 ### MIT
 
-Copyright 2018 Aaron Cordova
+Copyright 2017 - present, Aaron Cordova
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

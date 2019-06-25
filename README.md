@@ -49,6 +49,7 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [minDate](#mindate)
 * [startDate](#startdate)
 * [showAllDates](#showalldates)
+* [respectDisabledReadOnly](#respectdisabledreadonly)
 
 #### Disabling Things
 
@@ -425,6 +426,18 @@ const picker = datepicker('.some-input', { showAllDates: true })
 ```
 
 ![Show all dates on screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/show-all-dates-on.png "Example with show all dates option on")
+
+* Type - boolean
+* Default - `false`
+
+
+### respectDisabledReadOnly
+
+`<input />`'s can have a `disabled` or `readonly` attribute applied to them. In those cases, you might want to prevent Datepicker from selecting a date and changing the input's value. Set this option to `true` if that's the case. The calendar will still be functional in that you can change months and enter a year, but dates will not be selectable (or deselectable).
+
+```javascript
+const picker = datepicker('.some-input', { respectDisabledReadOnly: true })
+```
 
 * Type - boolean
 * Default - `false`

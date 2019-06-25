@@ -205,7 +205,10 @@ function createInstance(selector, opts) {
     id: options.id,
 
     // Shows a date in every square rendered on the calendar (preceding and trailing month days).
-    showAllDates: !!options.showAllDates
+    showAllDates: !!options.showAllDates,
+
+    // Prevents Datepicker from selecting dates when attached to inputs that are `disabled` or `readonly`.
+    respectDisabledReadOnly: !!options.respectDisabledReadOnly
   }
 
   // Set a reference to each sibling on each instance.
@@ -624,9 +627,12 @@ function createOverlay(instance, overlayOpen) {
  *  Calls `setCalendarInputValue`.
  */
 function selectDay(target, instance, deselect) {
-  const { currentMonth, currentYear, calendar, el, onSelect } = instance
+  const { currentMonth, currentYear, calendar, el, onSelect, respectDisabledReadOnly } = instance
   const active = calendar.querySelector('.qs-active')
   const num = target.textContent
+
+  // Prevent Datepicker from selecting (or deselecting) dates.
+  if ((el.disabled || el.readOnly) && respectDisabledReadOnly) return
 
   // Keep track of the currently selected date.
   instance.dateSelected = deselect ? undefined : new Date(currentYear, currentMonth, num)

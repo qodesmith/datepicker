@@ -516,6 +516,28 @@ const picker = datepicker('.some-input', { disableYearOverlay: true })
 * Default - `false`
 
 
+### disabled
+
+Want to completely disable the calendar? Simply set the `disabled` property on the datepicker instance to `true` to render it impotent. Maybe you don't want the calendar to show in a given situation. Maybe the calendar is showing but you don't want it to do anything until some other field is filled out in a form. Either way, have fun.
+
+Example:
+```javascript
+const picker = datepicker('.some-input')
+
+function disablePicker() {
+  picker.disabled = true
+}
+
+function enablePicker() {
+  picker.disabled = false
+}
+
+function togglePicker() {
+  picker.disabled = !picker.disabled
+}
+```
+
+
 ## Options - Other
 
 ### id

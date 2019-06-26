@@ -757,6 +757,8 @@ function stripTime(dateOrNum) {
  *  Hides the calendar and calls the `onHide` callback.
  */
 function hideCal(instance) {
+  if (instance.disabled) return
+
   toggleOverlay(true, instance)
   !instance.alwaysShow && instance.calendar.classList.add('qs-hidden')
   instance.onHide && instance.onHide(instance)
@@ -766,6 +768,8 @@ function hideCal(instance) {
  *  Shows the calendar and calls the `onShow` callback.
  */
 function showCal(instance) {
+  if (instance.disabled) return
+
   instance.calendar.classList.remove('qs-hidden')
   calculatePosition(instance)
   instance.onShow && instance.onShow(instance)
@@ -856,6 +860,9 @@ function oneHandler(e) {
     // Anywhere other than the calendar - close the calendar.
     if (!instance) return datepickers.forEach(hideCal)
 
+    // Do nothing for disabled calendars.
+    if (instance.disabled) return
+
     const { calendar, disableYearOverlay } = instance
     const input = calendar.querySelector('.qs-overlay-year')
     const overlayClosed = !!calendar.querySelector('.qs-hidden')
@@ -906,7 +913,7 @@ function oneHandler(e) {
 
     // Hide all other instances.
     datepickers.forEach(picker => picker !== instance && hideCal(picker))
-  } else if (type === 'keydown' && instance) {
+  } else if (type === 'keydown' && instance && !instance.disabled) {
     const overlay = instance.calendar.querySelector('.qs-overlay')
     const overlayShowing = !overlay.classList.contains('qs-hidden')
 

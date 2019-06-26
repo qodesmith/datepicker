@@ -58,6 +58,7 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [disabledDates](#disableddates)
 * [disableMobile](#disablemobile)
 * [disableYearOverlay](#disableyearoverlay)
+* [disabled](#disabled)
 
 #### ID - Daterange
 * [id](#id)

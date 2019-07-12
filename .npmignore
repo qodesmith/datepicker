@@ -5,7 +5,3 @@
 # Folders
 node_modules
 *.png
-
-# Un-ignore things from `.gitignore`
-!dist
-!dist/**/*

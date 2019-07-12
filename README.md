@@ -82,7 +82,7 @@ See the [examples](#examples) below.
 
 #### Manually
 
-Simply include `datepicker.css` in the `<head>`...
+Simply include `datepicker.min.css` in the `<head>`...
 ```html
 <head>
   ...
@@ -102,6 +102,8 @@ and include `datepicker.min.js` just above your closing `</body>` tag...
 </body>
 ```
 
+If you downloaded the package via zip file from Github, these files are located in the `dist` folder. Otherwise, you can use the Unpkg CDN as shown in the examples above.
+
 
 #### Via NPM
 ```
@@ -112,7 +114,6 @@ Files & locations:
 
 |        File        |            Location             |               Description              |
 | ------------------ | ------------------------------- | -------------------------------------- |
-| datepicker.js      | node_modules/js-datepicker/src  | our main file - (ES7)                  |
 | datepicker.less    | node_modules/js-datepicker/src  | less: use it for your own builds       |
 | datepicker.min.js  | node_modules/js-datepicker/dist | production build - (ES5, 5kb gzipped!) |
 | datepicker.min.css | node_modules/js-datepicker/dist | production stylesheet                  |

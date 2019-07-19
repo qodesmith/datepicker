@@ -77,7 +77,7 @@ function createInstance(selector, opts) {
   */
   let el = selector
   if (typeof el === 'string') {
-    el = el[0] === '#' ? document.getElementById(el) : document.querySelector(el)
+    el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
   }
 
   const options = sanitizeOptions(opts || defaults(), el)

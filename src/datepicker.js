@@ -70,9 +70,17 @@ function applyListeners() {
  *  Calls `setCalendarInputValue` and conditionally `showCal`.
  */
 function createInstance(selector, opts) {
-  const el = typeof selector === 'string' ? document.querySelector(selector) : selector
-  const options = sanitizeOptions(opts || defaults(), el)
+  /*
+    In the case that the selector is an id beginning with a number,
+    querySelector will fail. That's why we need to check and
+    conditionally use `getElementById`.
+  */
+  let el = selector
+  if (typeof el === 'string') {
+    el = el[0] === '#' ? document.getElementById(el) : document.querySelector(el)
+  }
 
+  const options = sanitizeOptions(opts || defaults(), el)
   const { startDate, dateSelected } = options
   const noPosition = el === document.body
   const parent = noPosition ? document.body : el.parentElement

@@ -121,8 +121,25 @@ Files & locations:
 
 ## Usage
 
+Importing the library if you're using it in Node:
+```javascript
+import datepicker from 'js-datepicker'
+// or
+const datepicker = require('js-datepicker')
+```
+
+Actually instantiating an instance:
 ```javascript
 const picker = datepicker(selector, options)
+```
+
+Importing the CSS file into your project using Node:
+```
+// Sass
+@import '~js-datepicker/dist/datepicker.min.css';
+
+// Less
+@import (inline) '~js-datepicker/dist/datepicker.min.css';
 ```
 
 Datepicker takes 2 arguments:

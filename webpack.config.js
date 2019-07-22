@@ -74,15 +74,13 @@ module.exports = (env, argv) => ({
         ]
       },
       {
-        test: /\.less$/,
+        test: /\.(scss|css)$/,
         include: path.resolve(__dirname, 'src'),
         use: [
-          {
-            loader: MiniCssExtractPlugin.loader
-          },
+          MiniCssExtractPlugin.loader, // https://goo.gl/uUBr8G
           'css-loader',
-          'postcss-loader',
-          'less-loader'
+          'postcss-loader', // https://goo.gl/BCwCzg - needs to be *after* `css-loader`.
+          'sass-loader'
         ]
       }
     ]
@@ -141,7 +139,7 @@ module.exports = (env, argv) => ({
     // Used only in development.
     // Prevents `npm run build` from creating an html asset in the dist folder.
     !env.prod && new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'src/index.ejs'),
+      template: path.resolve(__dirname, 'sandbox/index.ejs'),
       title: 'Datepicker Sandbox'
     })
   ].filter(Boolean)

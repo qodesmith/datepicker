@@ -1,24 +1,28 @@
-@width: 250px; // Regular: 250px
-@border-width: 1px;
-@radius: @width * .016891; // 296px / 5px ratio.
-@transition: .3s;
-@font-size: @width * .056;
+$width: 15.625em;
+$radius: $width * .016891;
+$transition: .3s;
+$font-size: $width * .056;
 
-.qs-datepicker {
+/*
+  All a user has to do to change the calendar size is
+  change the font-size on the container and everything
+  magically resizes accordingly. Relative units ftw!
+*/
+.qs-datepicker-container {
+  font-size: 1rem;
   color: black;
   position: absolute;
-  width: @width;
+  width: $width;
   display: flex;
   flex-direction: column;
   font-family: sans-serif;
-  font-size: @font-size;
   z-index: 9001;
   user-select: none;
-  border: @border-width solid gray;
-  border-radius: @radius;
+  border: 1px solid gray;
+  border-radius: $radius;
   overflow: hidden;
   background: white;
-  box-shadow: 0 (@width * .08) (@width * .08) -(@width * .06) rgba(0,0,0,.3);
+  box-shadow: 0 ($width * .08) ($width * .08) ($width * -.06) rgba(0,0,0,.3);
 
   * {
     box-sizing: border-box;
@@ -34,7 +38,9 @@
   &.qs-hidden {
     display: none;
   }
+}
 
+.qs-datepicker {
   .qs-overlay {
     position: absolute;
     top: 0;
@@ -46,7 +52,7 @@
     padding: .5em;
     z-index: 1;
     opacity: 1;
-    transition: opacity @transition;
+    transition: opacity $transition;
     display: flex;
     flex-direction: column;
 
@@ -55,13 +61,13 @@
       z-index: -1;
     }
 
-    .qs-overlay-year {
+    .qs-overlay-year { // Overlay year input element.
       border: none;
       background: transparent;
       border-bottom: 1px solid white;
       border-radius: 0;
       color: white;
-      font-size: @font-size;
+      font-size: $font-size;
       padding: .25em 0;
       width: 80%;
       text-align: center;
@@ -84,7 +90,7 @@
 
     .qs-submit {
       border: 1px solid white;
-      border-radius: @radius;
+      border-radius: $radius;
       padding: .5em;
       margin: 0 auto auto;
       cursor: pointer;
@@ -110,7 +116,7 @@
       width: calc(100% / 3);
       cursor: pointer;
       opacity: .5;
-      transition: opacity @transition / 2;
+      transition: opacity $transition / 2;
 
       &.active, &:hover {
         opacity: 1;
@@ -127,7 +133,7 @@
     flex-shrink: 0;
     background: lightgray;
     filter: blur(0px);
-    transition: filter @transition;
+    transition: filter $transition;
 
     &.qs-blur {
       filter: blur(5px);
@@ -135,13 +141,11 @@
   }
 
   .qs-arrow {
-    @arrow: @width / 10;
-    @offset: (@arrow / 4) - ((@arrow / 4) / 4);
-    height: @arrow;
-    width: @arrow;
+    height: $width / 10;
+    width: $width / 10;
     position: relative;
     cursor: pointer;
-    border-radius: @arrow / 5;
+    border-radius: $radius;
     transition: background .15s;
 
     &:hover {
@@ -158,7 +162,7 @@
 
     &:after {
       content: '';
-      border: (@arrow / 4) solid transparent;
+      border: ($width / 40) solid transparent;
       position: absolute;
       top: 50%;
       transition: border .2s;
@@ -204,9 +208,9 @@
   .qs-squares {
     display: flex;
     flex-wrap: wrap;
-    padding: @width * .02;
+    padding: $width * .02;
     filter: blur(0px);
-    transition: filter @transition;
+    transition: filter $transition;
 
     &.qs-blur {
       filter: blur(5px);
@@ -214,14 +218,14 @@
   }
 
   .qs-square {
-    width: 100% / 7;
-    height: @width / 10;
+    width: calc(100% / 7);
+    height: $width / 10;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: background .1s;
-    border-radius: @radius;
+    border-radius: $radius;
 
     &.qs-current {
       font-weight: bold;

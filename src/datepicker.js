@@ -1,4 +1,8 @@
-require('./datepicker.less')
+/*
+  Importing this scss file so as to declare it's a dependency of the library.
+  Webpack will then separate it out into its own css file and include it in the dist folder.
+*/
+require('./datepicker.scss')
 
 
 let datepickers = [] // Get's reassigned in `remove()` below.
@@ -18,12 +22,23 @@ const months = [
   'December'
 ]
 const sides = {
+  // `t`, `r`, `b`, and `l` are all positioned relatively to the input the calendar is attached to.
   t: 'top',
   r: 'right',
   b: 'bottom',
   l: 'left',
-  c: 'centered' // This fixes the calendar smack in the middle of the screen.
+
+  // `centered` fixes the calendar smack in the middle of the screen. Useful for mobile devices.
+  c: 'centered'
 }
+
+/*
+  The default callback functions (onSelect, etc.) will be a noop function.
+  Using this variable so we can simply reference the same function.
+  Also, this allows us to check if the callback is a noop function
+  by doing a `=== noop` anywhere we like.
+*/
+const noop = () => {}
 
 /*
   Add a single function as the handler for a few events for ALL datepickers.
@@ -44,7 +59,24 @@ function datepicker(selector, options) {
   const instance = createInstance(selector, options)
   const { startDate, dateSelected } = instance
 
-  renderCalendar(startDate || dateSelected, instance)
+  /*
+    Daterange processing!
+    When we encounted the 2nd in a pair, we need run both through `adjustDateranges`
+    to handle the min & max settings, and we need to re-render the 1st.
+  */
+  if (instance.second) {
+    const first = instance.sibling
+
+    // Adjust both dateranges.
+    adjustDateranges({ instance, deselect: !dateSelected })
+    adjustDateranges({ instance: first, deselect: !first.dateSelected })
+
+    // Re-render the first daterange instance - the 2nd will be rendered below.
+    renderCalendar(first)
+  }
+
+  renderCalendar(instance, startDate || dateSelected)
+  calculatePosition(instance)
 
   return instance
 }
@@ -71,7 +103,7 @@ function applyListeners() {
  */
 function createInstance(selector, opts) {
   /*
-    In the case that the selector is an id beginning with a number,
+    In the case that the selector is an id beginning with a number (#123),
     querySelector will fail. That's why we need to check and
     conditionally use `getElementById`.
   */
@@ -81,11 +113,18 @@ function createInstance(selector, opts) {
   }
 
   const options = sanitizeOptions(opts || defaults(), el)
-  const { startDate, dateSelected } = options
+  const { startDate, dateSelected, sibling } = options
   const noPosition = el === document.body
   const parent = noPosition ? document.body : el.parentElement
+  const calendarContainer = document.createElement('div')
   const calendar = document.createElement('div')
-  calendar.className = 'qs-datepicker qs-hidden'
+
+  // The calendar scales relative to the font-size of the container.
+  // The user can provide a class name that sets font-size, or a theme perhaps.
+  // thereby controlling the overall size and look of the calendar.
+  calendarContainer.className = 'qs-datepicker-container'
+  calendar.className = 'qs-datepicker'
+
 
   const instance = {
     // The calendar will be positioned relative to this element (except when 'body').
@@ -109,13 +148,13 @@ function createInstance(selector, opts) {
     // Starts the calendar with a date selected.
     dateSelected,
 
-    // An array of dates to disable.
+    // An array of dates to disable - these are unix timestamps and not date objects (converted in `sanitizeOptions`).
     disabledDates: options.disabledDates,
 
-    // Low end of selectable dates.
+    // Low end of selectable dates - overriden for daterange pairs below.
     minDate: options.minDate,
 
-    // High end of selectable dates.
+    // High end of selectable dates - overriden for daterange pairs below.
     maxDate: options.maxDate,
 
     // Disabled the ability to select days on the weekend.
@@ -123,6 +162,9 @@ function createInstance(selector, opts) {
 
     // Indices for "Saturday" and "Sunday" repsectively.
     weekendIndices: options.weekendIndices,
+
+    // The containing element to our calendar.
+    calendarContainer,
 
     // The element our calendar is constructed in.
     calendar,
@@ -216,15 +258,53 @@ function createInstance(selector, opts) {
     showAllDates: !!options.showAllDates,
 
     // Prevents Datepicker from selecting dates when attached to inputs that are `disabled` or `readonly`.
-    respectDisabledReadOnly: !!options.respectDisabledReadOnly
+    respectDisabledReadOnly: !!options.respectDisabledReadOnly,
+
+
+
+    // Indicates this is the 1st instance in a daterange pair.
+    first: options.first,
+
+    // Indicates this is the 2nd instance in a daterange pair.
+    second: options.second
   }
 
-  // Set a reference to each sibling on each instance.
-  // This will only be true the 2nd time an id is encountered.
-  if (options.sibling) {
-    instance.sibling = options.sibling
-    instance.sibling.first = true // Flag the first instance in a sibling pair.
-    options.sibling.sibling = instance
+  /*
+    Daterange processing!
+    Ensure both instances have a reference to one another.
+    Set min/max and original min/max dates on each instance.
+  */
+  if (sibling) {
+    /* If we're here, we're encountering the 2nd instance in a daterange pair. */
+    const first = sibling
+    const second = instance
+    const minDate = first.minDate || second.minDate
+    const maxDate = first.maxDate || second.maxDate
+
+    // Store the 1st instance as a sibling on the 2nd.
+    second.sibling = first
+
+    // Store the 2nd instance as a sibling on the 1st.
+    first.sibling = second
+
+    /*
+      Daterange pairs share a min & max date.
+      The 1st instance overrides the 2nd.
+    */
+    first.minDate = minDate
+    first.maxDate = maxDate
+    second.minDate = minDate
+    second.maxDate = maxDate
+
+    // Used to restore the min / max dates when a date is deselected.
+    first.originalMinDate = minDate
+    first.originalMaxDate = maxDate
+    second.originalMinDate = minDate
+    second.originalMaxDate = maxDate
+
+    // Add a method that returns an object with start & end date selections for the pair.
+    first.getRange = getRange
+    second.getRange = getRange
   }
 
   // Initially populate the <input> field / set attributes on the `el`.
@@ -239,7 +319,7 @@ function createInstance(selector, opts) {
 
     // Add inline position styles.
     // I've seen that `element.style.position = '...'` isn't reliable.
-    // https://goo.gl/vWYcpH
+    // https://mzl.la/2Yi6hNG
     parent.style.setProperty('position', 'relative')
   }
 
@@ -255,7 +335,8 @@ function createInstance(selector, opts) {
   datepickers.push(instance)
 
   // Put our instance's calendar in the DOM.
-  parent.appendChild(calendar)
+  calendarContainer.appendChild(calendar)
+  parent.appendChild(calendarContainer)
 
   // Conditionally show the calendar.
   instance.alwaysShow && showCal(instance)
@@ -267,6 +348,7 @@ function createInstance(selector, opts) {
  *  Helper function to duplicate an object or array.
  *  Should help Babel avoid adding syntax that isn't IE compatible.
  */
+
 function freshCopy(item) {
   if (Array.isArray(item)) return item.map(freshCopy)
 
@@ -286,12 +368,25 @@ function freshCopy(item) {
  */
 function sanitizeOptions(opts, el) {
   // Check if the provided element already has a datepicker attached.
-  if (datepickers.some(picker => picker.el === el)) {
-    throw 'A datepicker already exists on that element.'
-  }
+  if (datepickers.some(picker => picker.el === el)) throw 'A datepicker already exists on that element.'
 
   // Avoid mutating the original object that was supplied by the user.
   const options = freshCopy(opts)
+
+  /*
+    Check that various options have been provided a JavaScript Date object.
+    If so, strip the time from those dates (for accurate future comparisons).
+  */
+  ;['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(value => {
+    const date = options[value]
+    if (date && !dateCheck(date)) throw `"options.${value}" needs to be a valid JavaScript Date object.`
+
+    /*
+      Strip the time from the date.
+      For dates not supplied, stripTime will return undefined.
+    */
+    options[value] = stripTime(date)
+  })
 
   let {
     position,
@@ -301,100 +396,100 @@ function sanitizeOptions(opts, el) {
     overlayPlaceholder,
     overlayButton,
     startDay,
-    disabledDates
+    id
   } = options
 
+  options.startDate = stripTime(options.startDate || dateSelected || new Date())
+
+
+  // Checks around disabled dates.
+  options.disabledDates = (options.disabledDates || []).map(date => {
+    const newDateNum = +stripTime(date)
+
+    if (!dateCheck(date)) throw 'You supplied an invalid date to "options.disabledDates".'
+    if (newDateNum === +stripTime(dateSelected)) throw '"disabledDates" cannot contain the same date as "dateSelected".'
+
+    // Return a number because `createMonth` checks this array for a number match.
+    return newDateNum
+  })
+
   // If id was provided, it cannot me null or undefined.
-  if (options.hasOwnProperty('id') && options.id == null) {
+  if (options.hasOwnProperty('id') && id == null) {
     throw 'Id cannot be `null` or `undefined`'
   }
 
-  // No more than 2 pickers can have the same id.
-  if (options.id) {
-    const pickers = datepickers.reduce((acc, picker) => {
-      if (picker.id === options.id) acc.push(picker)
-      return acc
-    }, [])
+  /*
+    Daterange processing!
+    No more than 2 pickers can have the same id.
+    Later on in `createInstance` we'll process the daterange pair further.
+    Store values for `originalMinDate` & `originalMaxDate`.
+    Store a reference to the 1st instance on the 2nd in the options -
+      the 1st will get its reference to the 2nd in `createInstance`.
+  */
+  if (id || id === 0) {
+    // Search through pickers already created and see if there's an id match for this one.
+    const pickers = datepickers.filter(picker => picker.id === id)
 
+    // No more than 2 pickers can have the same id.
     if (pickers.length > 1) throw 'Only two datepickers can share an id.'
-    if (pickers.length) options.sibling = pickers[0]
+
+    // 2nd - If we found a picker, THIS will be the 2nd in the pair. Set the sibling property on the options.
+    if (pickers.length) {
+      options.second = true
+      options.sibling = pickers[0]
+
+    // 1st - If no pickers were found, this is the 1st in the pair.
+    } else {
+      options.first = true
+    }
   }
 
-  // Checks around disabled dates.
-  options.disabledDates = (disabledDates || []).map(date => {
-    if (!dateCheck(date)) {
-      throw 'You supplied an invalid date to "options.disabledDates".'
-    } else if (+stripTime(date) === +stripTime(dateSelected)) {
-      throw '"disabledDates" cannot contain the same date as "dateSelected".'
-    }
-
-    return +stripTime(date)
-  })
-
-  // Ensure the accuracy of `options.position` & call `establishPosition`.
-  // The 'c' option positions the calendar smack in the middle of the screen,
-  // *not* relative to the input. This can be desirable for mobile devices.
+  /*
+    Ensure the accuracy of `options.position` & call `establishPosition`.
+    The 'c' option positions the calendar smack in the middle of the screen,
+    *not* relative to the input. This can be desirable for mobile devices.
+  */
   const positionFound = ['tr', 'tl', 'br', 'bl', 'c'].some(dir => position === dir)
   if (position && !positionFound) {
     throw '"options.position" must be one of the following: tl, tr, bl, br, or c.'
   }
   options.position = establishPosition(position || 'bl')
 
-  // Check that various options have been provided a JavaScript Date object.
-  // If so, strip the time from those dates (for accurate future comparisons).
-  ;['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(date => {
-    if (options[date]) {
-      if (!dateCheck(options[date]) || isNaN(+options[date])) {
-        throw `"options.${date}" needs to be a valid JavaScript Date object.`
-      }
-
-      // Strip the time from the date.
-      options[date] = stripTime(options[date])
-    }
-  })
-
-  options.startDate = stripTime(options.startDate || options.dateSelected || new Date())
-
-  if (maxDate < minDate) {
-    throw '"maxDate" in options is less than "minDate".'
-  }
-
+  // Check proper relationship between `minDate`, `maxDate`, & `dateSelected`.
+  if (maxDate < minDate) throw '"maxDate" in options is less than "minDate".'
   if (dateSelected) {
-    if (minDate > dateSelected) {
-      throw '"dateSelected" in options is less than "minDate".'
-    }
-
-    if (maxDate < dateSelected) {
-      throw '"dateSelected" in options is greater than "maxDate".'
-    }
+    const dsErr = min => { throw `"dateSelected" in options is ${min ? 'less' : 'greater'} than "${min || 'mac'}Date".` }
+    if (minDate > dateSelected) dsErr('min')
+    if (maxDate < dateSelected) dsErr()
   }
 
-  // Callbacks.
+  // Callbacks - default to a noop function.
   ['onSelect', 'onShow', 'onHide', 'onMonthChange', 'formatter', 'disabler'].forEach(fxn => {
-    options[fxn] = typeof options[fxn] === 'function' && options[fxn]
+    if (typeof options[fxn] !== 'function') options[fxn] = noop // `noop` defined at the top.
   })
-
 
   // Custom labels for months & days.
-  const createLabelErrMsg = (label, num) => `"${label}" must be an array with ${num} strings.`
   ;['customDays', 'customMonths', 'customOverlayMonths'].forEach((label, i) => {
     const custom = options[label]
+    const num = i ? 12 : 7
 
     // Do nothing if the user hasn't provided this custom option.
     if (!custom) return
 
-    const isWrong = (
+    if (
       !Array.isArray(custom) || // Must be an array.
-      custom.length !== (i ? 12 : 7) || // Must have the correct length.
+      custom.length !== num || // Must have the correct length.
       custom.some(item => typeof item !== 'string') // Must be an array of strings only.
-    )
+    ) throw `"${label}" must be an array with ${num} strings.`
 
-    if (isWrong) throw createLabelErrMsg(label, i ? 12 : 7)
     options[!i ? 'days' : i < 2 ? 'months' : 'overlayMonths'] = custom
   })
 
-  // Adjust days of the week for user-provided start day.
-  if (startDay && +startDay > 0 && +startDay < 7) {
+  /*
+    Adjust days of the week for user-provided start day.
+    If `startDay` is a bad value, it will simply be ignored.
+  */
+  if (startDay && startDay > 0 && startDay < 7) {
     // [sun, mon, tues, wed, thurs, fri, sat]             (1) - original supplied days of the week
     let daysCopy = (options.customDays || days).slice()
 
@@ -447,13 +542,16 @@ function establishPosition([p1, p2]) {
 }
 
 /*
- *  Renders a calendar.
+ *  Renders a calendar, defaulting to the current year & month of that calendar.
  *  Populates `calendar.innerHTML` with the contents
  *  of the calendar controls, month, and overlay.
  */
-function renderCalendar(date, instance) {
+function renderCalendar(instance, date) {
   const overlay = instance.calendar.querySelector('.qs-overlay')
   const overlayOpen = overlay && !overlay.classList.contains('qs-hidden')
+
+  // Default to rendering the current month. This is helpful for re-renders.
+  date = date || new Date(instance.currentYear, instance.currentMonth)
 
   instance.calendar.innerHTML = [
     createControls(date, instance, overlayOpen),
@@ -462,8 +560,8 @@ function renderCalendar(date, instance) {
   ].join('')
 
   /*
-    When the overlay is open and we submit a year, the calendar's html
-    is recreated here. To make the overlay fade out the same way it faded in,
+    When the overlay is open and we submit a year (or click a month), the calendar's
+    html is recreated here. To make the overlay fade out the same way it faded in,
     we need to create it with the appropriate classes (triggered by `overlayOpen`),
     and then wait 10ms to take those classes back off, triggering a fade out.
   */
@@ -549,7 +647,7 @@ function createMonth(date, instance, overlayOpen) {
     const weekdayIndex = (i - 1) % 7
     const weekday = days[weekdayIndex]
     const num = i - (offset >= 0 ? offset : (7 + offset))
-    const thisDay = new Date(currentYear, currentMonth, num)
+    const thisDay = new Date(currentYear, currentMonth, num) // No time so we can compare accurately :)
     const thisDayNum = thisDay.getDate()
     const outsideOfCurrentMonth = num < 1 || num > daysInMonth
     let otherClass = ''
@@ -570,17 +668,18 @@ function createMonth(date, instance, overlayOpen) {
 
     // Disabled & current squares.
     } else {
-      let disabled = (
+
+      // Disabled dates.
+      if (
         (minDate && thisDay < minDate) ||
         (maxDate && thisDay > maxDate) ||
-        (disabler && disabler(thisDay)) ||
-        disabledDates.includes(+thisDay)
-      )
-      const isWeekend = weekendIndices.includes(weekdayIndex)
-      const currentValidDay = isThisMonth && !disabled && num === today.getDate()
+        disabler(thisDay) ||
+        disabledDates.includes(+thisDay) ||
+        (noWeekends && weekendIndices.includes(weekdayIndex))
+      ) otherClass = 'qs-disabled'
 
-      disabled = disabled || (noWeekends && isWeekend)
-      otherClass = disabled ? 'qs-disabled' : currentValidDay ? 'qs-current' : ''
+      // Current date, i.e. today's date.
+      if (isThisMonth && num === today.getDate()) otherClass += ' qs-current'
     }
 
     // Currently selected day.
@@ -635,7 +734,15 @@ function createOverlay(instance, overlayOpen) {
  *  Calls `setCalendarInputValue`.
  */
 function selectDay(target, instance, deselect) {
-  const { currentMonth, currentYear, calendar, el, onSelect, respectDisabledReadOnly } = instance
+  const {
+    currentMonth,
+    currentYear,
+    calendar,
+    el,
+    onSelect,
+    respectDisabledReadOnly,
+    sibling
+  } = instance
   const active = calendar.querySelector('.qs-active')
   const num = target.textContent
 
@@ -657,19 +764,54 @@ function selectDay(target, instance, deselect) {
   // Keep it showing if deselecting.
   !deselect && hideCal(instance)
 
+  if (sibling) {
+    adjustDateranges({ instance, deselect })
+    renderCalendar(instance)
+    renderCalendar(sibling)
+  }
+
+
   // Call the user-provided `onSelect` callback.
   // Passing in new date so there's no chance of mutating the original object.
-  onSelect && onSelect(instance, deselect ? undefined : new Date(instance.dateSelected))
+  // In the case of a daterange, min & max dates are automatically set.
+  onSelect(instance, deselect ? undefined : new Date(instance.dateSelected))
 }
 
 /*
- *  Populates the <input> fields with a readble value
+  When selecting / deselecting a date, this resets `minDate` or `maxDate` on
+  both pairs of a daterange based upon `originalMinDate` or `originalMaxDate`.
+*/
+function adjustDateranges({ instance, deselect }) {
+  const first = instance.first ? instance : instance.sibling
+  const second = first.sibling
+
+  if (first === instance) {
+    if (deselect) {
+      first.minDate = first.originalMinDate
+      second.minDate = second.originalMinDate
+    } else {
+      first.minDate = first.dateSelected
+      second.minDate = first.dateSelected
+    }
+  } else {
+    if (deselect) {
+      second.maxDate = second.originalMaxDate
+      first.maxDate = first.originalMaxDate
+    } else {
+      second.maxDate = second.dateSelected
+      first.maxDate = second.dateSelected
+    }
+  }
+}
+
+/*
+ *  Populates the <input> fields with a readable value
  *  and stores the individual date values as attributes.
  */
 function setCalendarInputValue(el, instance, deselect) {
   if (instance.nonInput) return
   if (deselect) return el.value = ''
-  if (instance.formatter) return instance.formatter(el, instance.dateSelected, instance)
+  if (instance.formatter !== noop) return instance.formatter(el, instance.dateSelected, instance)
   el.value = instance.dateSelected.toDateString()
 }
 
@@ -706,32 +848,29 @@ function changeMonthYear(classList, instance, year, overlayMonthIndex) {
 
   instance.currentMonthName = instance.months[instance.currentMonth]
 
-  const newDate = new Date(instance.currentYear, instance.currentMonth, 1)
-  renderCalendar(newDate, instance)
-
-  instance.onMonthChange && instance.onMonthChange(instance)
+  renderCalendar(instance)
+  instance.onMonthChange(instance)
 }
 
 /*
- *  Sets the `style` attribute on the calendar after doing calculations.
+ *  Sets the `top` & `left` inline styles on the container after doing calculations.
  */
 function calculatePosition(instance) {
   // Don't position the calendar in reference to the <body> or <html> elements.
   if (instance.noPosition) return
 
-  const { el, calendar, position, parent } = instance
+  const { el, calendarContainer, position, parent } = instance
   const { top, right, centered } = position
 
-  if (centered) return calendar.classList.add('qs-centered')
+  if (centered) return calendarContainer.classList.add('qs-centered')
 
-  const [parentRect, elRect, calRect] = [parent, el, calendar].map(x => x.getBoundingClientRect())
+  const [parentRect, elRect, calRect] = [parent, el, calendarContainer].map(x => x.getBoundingClientRect())
   const offset = elRect.top - parentRect.top + parent.scrollTop
-  const style = `
-    top:${offset - (top ? calRect.height : (elRect.height * -1))}px;
-    left:${elRect.left - parentRect.left + (right ? elRect.width - calRect.width : 0)}px;
-  `
+  const topStyle = `${offset - (top ? calRect.height : (elRect.height * -1))}px`
+  const leftStyle = `${elRect.left - parentRect.left + (right ? elRect.width - calRect.width : 0)}px`
 
-  calendar.setAttribute('style', style)
+  calendarContainer.style.setProperty('top', topStyle)
+  calendarContainer.style.setProperty('left', leftStyle)
 }
 
 /*
@@ -746,18 +885,21 @@ function dateCheck(date) {
 
 /*
  *  Takes a date or number and returns a date stripped of its time (hh:mm:ss:ms).
+ *  Returns a new date object.
+ *  Returns undefined for invalid date objects.
  */
 function stripTime(dateOrNum) {
+  // NOTE: in `createMonth`, `stripTime` is passed a number.
   /*
     JavaScript gotcha:
-    +(undefined) => NaN
-    +(null) => 0
-
-    We need to do `dateOrNum == null` because relying on `+dateOrNum`
-    may actually result in `0`, thereby rendering an actual date!
+      +(undefined) => NaN
+      +(null) => 0
   */
+
+  // Implicit `undefined` here, later checked elsewhere.
+  if (!dateCheck(dateOrNum) && (typeof dateOrNum !== 'number' || isNaN(dateOrNum))) return
+
   const date = new Date(+dateOrNum)
-  if (dateOrNum == null || !dateCheck(date)) return undefined
   return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
 
@@ -768,8 +910,8 @@ function hideCal(instance) {
   if (instance.disabled) return
 
   toggleOverlay(true, instance)
-  !instance.alwaysShow && instance.calendar.classList.add('qs-hidden')
-  instance.onHide && instance.onHide(instance)
+  !instance.alwaysShow && instance.calendarContainer.classList.add('qs-hidden')
+  instance.onHide(instance)
 }
 
 /*
@@ -778,9 +920,9 @@ function hideCal(instance) {
 function showCal(instance) {
   if (instance.disabled) return
 
-  instance.calendar.classList.remove('qs-hidden')
+  instance.calendarContainer.classList.remove('qs-hidden')
   calculatePosition(instance)
-  instance.onShow && instance.onShow(instance)
+  instance.onShow(instance)
 }
 
 /*
@@ -793,7 +935,17 @@ function toggleOverlay(closing, instance) {
     .qs-squares  - The container for all the squares making up the grid of the calendar.
   */
 
+
+  /*
+    This function is called within a `setTimeout` inside `renderCalendar`.
+    What if `.remove()` was called within that time span? There would be no properties on
+    instance anymore since `.remove()` removes them all. Return here to avoid errors.
+    This is highly unlikely to happen, but in case the instances are tied to other functions
+    in the users program, and perhaps those functions remove the calendar, avoid errors here.
+  */
   const { calendar } = instance
+  if (!calendar) return
+
   const overlay = calendar.querySelector('.qs-overlay')
   const yearInput = overlay.querySelector('.qs-overlay-year')
   const controls = calendar.querySelector('.qs-controls')
@@ -871,7 +1023,7 @@ function oneHandler(e) {
     // Do nothing for disabled calendars.
     if (instance.disabled) return
 
-    const { calendar, disableYearOverlay } = instance
+    const { calendar, calendarContainer, disableYearOverlay } = instance
     const input = calendar.querySelector('.qs-overlay-year')
     const overlayClosed = !!calendar.querySelector('.qs-hidden')
     const monthYearClicked = calendar.querySelector('.qs-month-year').contains(target)
@@ -881,7 +1033,7 @@ function oneHandler(e) {
     // Anything but the calendar was clicked.
     if (instance.noPosition && !onCal) {
       // Show / hide a calendar whose el is html or body.
-      const calendarClosed = calendar.classList.contains('qs-hidden')
+      const calendarClosed = calendarContainer.classList.contains('qs-hidden')
       ;(calendarClosed ? showCal : hideCal)(instance)
 
     // Clicking the arrow buttons - change the calendar month.
@@ -944,7 +1096,7 @@ function oneHandler(e) {
       // Prevent leading 0's.
       .reduce((acc, char) => {
         if (!acc && char === '0') return ''
-        return char.match(/[0-9]/) ? (acc + char) : acc
+        return acc + (char.match(/[0-9]/) ? char : '')
       }, '')
       .slice(0, 4)
 
@@ -979,28 +1131,39 @@ function hide() {
  *  Will re-render the calendar if it is showing.
  */
 function setDate(newDate, changeCalendar) {
-  const date = stripTime(newDate) // Remove the time.
-  const { currentYear, currentMonth } = this
-
-  if (date !== undefined && !date) throw '`setDate` needs a JavaScript Date object.'
+  const date = stripTime(newDate) // Remove the time, creating a fresh date object.
+  const { currentYear, currentMonth, sibling } = this
 
   // Removing the selected date.
-  if (date === undefined) {
+  if (newDate == null) {
     // Remove the date.
     this.dateSelected = undefined
-
-    // Remove the min or max depending on if this is a daterange pair.
-    if (this.sibling) this.first ? this.setMin() : this.setMax()
 
     // Clear the associated input field.
     setCalendarInputValue(this.el, this, true)
 
+    // Daterange processing!
+    if (sibling) {
+      adjustDateranges({ instance: this, deselect: true })
+      renderCalendar(sibling)
+    }
+
     // Re-render the calendar to clear the selected date.
-    renderCalendar(new Date(this.currentYear, this.currentMonth), this)
+    renderCalendar(this)
 
     // Return the instance to enable chaining methods.
     return this
+
+  // Date isn't undefined or null but still falsey.
+  } else if (!dateCheck(newDate)) {
+    throw '`setDate` needs a JavaScript Date object.'
   }
+
+
+  /*
+   * Anything below this line is for setting a new date.
+   */
+
 
   // Check if the date is selectable.
   if (
@@ -1016,15 +1179,13 @@ function setDate(newDate, changeCalendar) {
 
   setCalendarInputValue(this.el, this)
 
-  const isSameMonth = currentYear === date.getFullYear() && currentMonth === date.getMonth()
-  ;(isSameMonth || changeCalendar) && renderCalendar(date, this)
-
-  // Ensure min / max values are correct with siblings.
-  if (this.sibling) {
-    const method = this.first ? 'setMin' : 'setMax'
-    this[method](date)
-    this.sibling[method](date)
+  if (sibling) {
+    adjustDateranges({ instance: this })
+    renderCalendar(sibling, date)
   }
+
+  const isSameMonth = currentYear === date.getFullYear() && currentMonth === date.getMonth()
+  ;(isSameMonth || changeCalendar || sibling) && renderCalendar(this, date)
 
   return this
 }
@@ -1046,48 +1207,128 @@ function setMax(date) {
 /*
  *  Called by `setMin` and `setMax`.
  */
-function changeMinOrMax(instance, newDate, isMin, processingSibling) {
-  if (newDate != undefined && !dateCheck(newDate)) throw `Invalid date passed to set${isMin ? 'Min' : 'Max'}`
+function changeMinOrMax(instance, date, isMin) {
+  const { dateSelected, first, sibling, minDate, maxDate } = instance
+  const newDate = stripTime(date)
+  const type = isMin ? 'Min' : 'Max'
 
-  const { dateSelected } = instance
-  const date = stripTime(newDate)
+  const origProp = () => `original${type}Date`
+  const prop = () => `${type.toLowerCase()}Date`
+  const method = () => `set${type}`
+  const throwOutOfRangeError = () => { throw `Out-of-range date passed to ${method()}` }
 
-  if (isMin && date > instance.maxDate) throw `You can't set the minimum date past the maximum.`
-  if (!isMin && date < instance.minDate) throw `You can't set the maximum date below the minimum.`
-
-  // Remove the selected date if it falls outside the
-  // min/max range and clear its input if it has one.
-  if (dateSelected) {
+  // Removing min / max.
+  if (date == null) {
     /*
-      Is a daterange instance:
-        1. isMin changes selected date on first instance
-        2. !isMin changes selected date on second instance
+      Scenarios:
+        * minDate
+          * 1st && 1st selected
+          * 2nd && 1st selected
+        * maxDate
+          * 2nd && 2nd selected
+          * 1st && 2nd selected
     */
-    if (instance.sibling) {
-      if ((isMin && instance.first) || (!isMin && !instance.first)) {
-        instance.dateSelected = date
+
+    // When removing a date, always remove the original min/max date.
+    instance[origProp()] = undefined
+
+    // Daterange processing!
+    if (sibling) {
+      sibling[origProp()] = undefined // Remove the original min/max date.
+
+      // Removing the min.
+      if (isMin) {
+        if ((first && !dateSelected) || (!first && !sibling.dateSelected)) {
+          instance.minDate = undefined
+          sibling.minDate = undefined
+        }
+
+      // Removing the max.
+      } else if ((first && !sibling.dateSelected) || (!first && !dateSelected)) {
+        instance.maxDate = undefined
+        sibling.maxDate = undefined
       }
 
-    /*
-      Not a daterange instance:
-      1. Min is set after the selected date.
-      2. Max is set before the selected date.
-    */
-    } else if ((isMin && dateSelected < date) || (!isMin && dateSelected > date)) {
-      instance.dateSelected = undefined
-
-      if (!instance.nonInput) instance.el.value = ''
+    // Regular instances.
+    } else {
+      instance[prop()] = undefined
     }
+
+  // Throw an error for invalid dates.
+  } else if (!dateCheck(date)) {
+    throw `Invalid date passed to ${method()}`
+
+  // Setting min / max.
+  } else if (sibling) {
+    /*
+      Acceptable ranges for setting minDate or maxDate:
+        * Daterange
+          * minDate
+            * -∞ -> (dateSelected || maxDate)
+          * maxDate
+            * (dateSelected || minDate) -> ∞
+        * Regular
+          * minDate
+            * -∞ -> (dateSeleted || maxDate)
+          * maxDate
+            * (dateSelected || minDate) -> ∞
+    */
+
+    // Check for dates out of range for daterange pairs.
+    if (
+      // 1st instance checks.
+      (first && isMin && newDate > (dateSelected || maxDate)) || // setMin
+      (first && !isMin && newDate < (sibling.dateSelected || minDate)) || // setMax
+
+      // 2nd instance checks.
+      (!first && isMin && newDate > (sibling.dateSelected || maxDate)) || // setMin
+      (!first && !isMin && newDate < (dateSelected || minDate)) // setMax
+    ) throwOutOfRangeError()
+
+    instance[origProp()] = newDate
+    sibling[origProp()] = newDate
+
+    if (
+      //setMin
+      (isMin && ((first && !dateSelected) || (!first && !sibling.dateSelected))) ||
+
+      //setMax
+      (!isMin && ((first && !sibling.dateSelected) || (!first && !dateSelected)))
+    ) {
+      instance[prop()] = newDate
+      sibling[prop()] = newDate
+    }
+
+  // Individual instance.
+  } else {
+    // Check for dates our of range for single instances.
+    if (
+      (isMin && newDate > (dateSelected || maxDate)) || // minDate
+      (!isMin && newDate < (dateSelected || minDate)) // maxDate
+    ) throwOutOfRangeError()
+
+    instance[prop()] = newDate
   }
 
-  instance[isMin ? 'minDate' : 'maxDate'] = date
-  renderCalendar(dateSelected || instance.startDate, instance)
-
-  if (!processingSibling && instance.sibling) {
-    changeMinOrMax(instance.sibling, date, isMin, true)
-  }
+  sibling && renderCalendar(sibling)
+  renderCalendar(instance)
 
   return instance
+}
+
+/**
+ *
+ *  Returns an object with start & end date selections.
+ *  Available onCal daterange pairs only.
+ */
+function getRange() {
+  const first = this.first ? this : this.sibling
+  const second = first.sibling
+
+  return {
+    start: first.dateSelected,
+    end: second.dateSelected
+  }
 }
 
 /*
@@ -1097,7 +1338,7 @@ function changeMinOrMax(instance, newDate, isMin, processingSibling) {
  */
 function remove() {
   // NOTE: `this` is the datepicker instance.
-  const { inlinePosition, parent, calendar, el, sibling } = this
+  const { inlinePosition, parent, calendarContainer, el, sibling } = this
 
   // Remove styling done to the parent element and reset it back to its original
   // only if there are no other instances using the same parent.
@@ -1107,7 +1348,7 @@ function remove() {
   }
 
   // Remove the calendar from the DOM.
-  calendar.remove()
+  calendarContainer.remove()
 
   // Remove this instance from the list.
   datepickers = datepickers.filter(picker => picker.el !== el)

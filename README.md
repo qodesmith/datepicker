@@ -742,28 +742,17 @@ Simplest usage:
 const picker = datepicker('#some-id')
 ```
 
-Setting up a date-range picker:
+Setting up a daterange picker:
 ```javascript
-const start = datepicker('.start', {
-  id: 1,
-  onSelect: (instance, selectedDate) => {
-    instance.setMin(selectedDate)
-  }
-})
-
-const end = datepicker('.end', {
-  id: 1,
-  onSelect: (instance, selectedDate) => {
-    instance.setMax(selectedDate)
-  }
-})
+const start = datepicker('.start', { id: 1 })
+const end = datepicker('.end', { id: 1 })
 
 // NOTE: Any of the other options, as shown below, are valid for range pickers as well.
 ```
 
 With all other options declared:
 ```javascript
-const picker = datepicker(document.querySelector('#some-id'), {
+const picker = datepicker('#some-id', {
   // Event callbacks.
   onSelect: instance => {
     // Show which date was selected.

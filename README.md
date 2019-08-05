@@ -636,7 +636,7 @@ const picker = datepicker('.some-input')
 picker.setDate(new Date(2099, 0, 1), true)
 
 // Selects November 1st 2099 but does *not* change the calendar.
-picker.setDate(new Date(2099, 10, 1), true)
+picker.setDate(new Date(2099, 10, 1))
 
 // Remove the selection simply by omitting any arguments.
 picker.setDate()
@@ -650,7 +650,7 @@ _Note: This will not trigger the_ [`onSelect`]('#onselect') _callback._
 
 ### setMin
 
-Allows you to programmatically set the minimum selectable date or unset it. If this instance is part of a date-_range_ instance (see the [`id`](#id) option) then the other instance will be changed as well. To unset a minimum date, simply run the function with no arguments.
+Allows you to programmatically set the minimum selectable date or unset it. If this instance is part of a [daterange](#using-as-a-daterange-picker) instance (see the [`id`](#id) option) then the other instance will be changed as well. To unset a minimum date, simply run the function with no arguments.
 
 ```javaScript
 // Set a minimum selectable date.
@@ -666,7 +666,7 @@ picker.setMin()
 
 ### setMax
 
-Allows you to programmatically set the maximum selectable date or unset it. If this instance is part of a date-_range_ instance (see the [`id`](#id) option) then the other instance will be changed as well. To unset a maximum date, simply run the function with no arguments.
+Allows you to programmatically set the maximum selectable date or unset it. If this instance is part of a [daterange](#using-as-a-daterange-picker) instance (see the [`id`](#id) option) then the other instance will be changed as well. To unset a maximum date, simply run the function with no arguments.
 
 ```javaScript
 // Set a maximum selectable date.
@@ -706,6 +706,16 @@ picker2.hide() // This does not work because of `alwaysShow`.
 ### getRange
 
 This method is only available on [daterange](#using-as-a-daterange-picker) pickers. It will return an object with `start` and `end` properties whose values are JavaScript date objects representing what the user selected on both calendars.
+
+```javascript
+const start = datepicker('.start', { id: 1 })
+const end = datepicker('.end', { id: 1 })
+
+// ...
+
+start.getRange() // { start: <JS date object>, end: <JS date object> }
+end.getRange() // Gives you the same as above!
+```
 
 
 ## Properties & Values

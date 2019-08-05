@@ -6,14 +6,15 @@ html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  height: 200%;
   font-family: sans-serif;
 }
 
-body {
+.container {
   display: flex;
   align-items: center;
   justify-content: space-around;
+  margin-top: 25vh;
 }
 
 input {
@@ -22,4 +23,9 @@ input {
   width: 25%;
   border: 1px solid #ccc;
   border-radius: 3px;
+}
+
+.range-container {
+  text-align: center;
+  padding-top: 5em;
 }

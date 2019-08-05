@@ -1,7 +1,5 @@
 # Files
 .DS_Store
 .idea
-
-# Folders
-node_modules
 *.png
+*.gif

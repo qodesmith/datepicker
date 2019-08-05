@@ -10,12 +10,12 @@ $font-size: $width * .056;
 */
 .qs-datepicker-container {
   font-size: 1rem;
+  font-family: sans-serif;
   color: black;
   position: absolute;
   width: $width;
   display: flex;
   flex-direction: column;
-  font-family: sans-serif;
   z-index: 9001;
   user-select: none;
   border: 1px solid gray;
@@ -229,6 +229,10 @@ $font-size: $width * .056;
 
     &.qs-current {
       font-weight: bold;
+
+      span {
+        text-decoration: underline;
+      }
     }
 
     &.qs-active {

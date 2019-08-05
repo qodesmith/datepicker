@@ -11,7 +11,7 @@
 ```
 
 # Datepicker.js
-Get a date with JavaScript! Datepicker has **no dependencies** and weighs in at **5kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Or a date<span style="font-style: italic;">range</span>, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.6kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 
@@ -22,6 +22,11 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 
 * [Installation](#installation)
 * [Manual Year & Month Navigation](#manual-year--month-navigation)
+* [Using As A Daterange Picker](#using-as-a-daterange-picker)
+* [Calendar Examples](#examples)
+* [Sizing The Calendar](#sizing-the-calendar)
+* [Properties & Values](#properties--values)
+
 
 #### Event Callbacks
 
@@ -61,6 +66,7 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [disabled](#disabled)
 
 #### ID - Daterange
+
 * [id](#id)
 
 #### Instance Methods
@@ -71,6 +77,7 @@ _Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
 * [setMax](#setmax)
 * [show](#show)
 * [hide](#hide)
+* [getRange](#getrange) _(daterange only)_
 
 
 See the [examples](#examples) below.
@@ -87,7 +94,7 @@ Simply include `datepicker.min.css` in the `<head>`...
 <head>
   ...
   <link rel="stylesheet" href="datepicker.min.css">
-  <!-- Via Unpkg CDN -->
+  <!-- Or remotely via Unpkg CDN -->
   <!-- <link rel="stylesheet" href="https://unpkg.com/js-datepicker/dist/datepicker.min.css"> -->
 </head>
 ```
@@ -97,7 +104,7 @@ and include `datepicker.min.js` just above your closing `</body>` tag...
 <body>
   ...
   <script src="datepicker.min.js"></script>
-  <!-- Via Unpkg CDN -->
+  <!-- Or remotely via Unpkg CDN -->
   <!-- <script src="https://unpkg.com/js-datepicker"></script> -->
 </body>
 ```
@@ -107,16 +114,16 @@ If you downloaded the package via zip file from Github, these files are located 
 
 #### Via NPM
 ```
-npm install --save js-datepicker
+npm install js-datepicker
 ```
 
 Files & locations:
 
-|        File        |            Location             |               Description              |
+|        File        |             Folder              |              Description               |
 | ------------------ | ------------------------------- | -------------------------------------- |
-| datepicker.less    | node_modules/js-datepicker/src  | less: use it for your own builds       |
 | datepicker.min.js  | node_modules/js-datepicker/dist | production build - (ES5, 5kb gzipped!) |
 | datepicker.min.css | node_modules/js-datepicker/dist | production stylesheet                  |
+| datepicker.scss    | node_modules/js-datepicker/src  | Scss file. Use it in your own builds.  |
 
 
 ## Usage
@@ -128,18 +135,19 @@ import datepicker from 'js-datepicker'
 const datepicker = require('js-datepicker')
 ```
 
-Actually instantiating an instance:
+Using it in your code:
 ```javascript
 const picker = datepicker(selector, options)
 ```
 
-Importing the CSS file into your project using Node:
+Importing the styles into your project using Node:
 ```
-// Sass
-@import '~js-datepicker/dist/datepicker.min.css';
+// From within a scss file,
+// import datepickers scss file...
+@import '~js-datepicker/src/datepicker';
 
-// Less
-@import (inline) '~js-datepicker/dist/datepicker.min.css';
+// or import datepickers css file.
+@import '~js-datepicker/dist/datepicker.min.css';
 ```
 
 Datepicker takes 2 arguments:
@@ -153,7 +161,7 @@ The return value of the `datepicker` function is the datepicker instance. See th
 
 You can use Datepicker with any type of element you want. If used with an `<input>` element (the common use case), then the `<input>`'s value will automatically be set when selecting a date.
 
-_NOTE: Using_ `<input type="date">` _will cause issues as those inputs already have a built in calendar._ `datepicker` _will not change the value of those inputs. Use_ `<input type="text">` _instead._
+_NOTE: Datepicker will not change the value of input fields with a type of_ `date` - `<input type="date">`. _This is because those input's already have a built in calendar and can cause problems. Use_ `<input type="text">` _instead._
 
 
 ### Manual Year & Month Navigation
@@ -161,6 +169,21 @@ _NOTE: Using_ `<input type="date">` _will cause issues as those inputs already h
 By clicking on the year or month an overlay will show revealing an input field and a list of months. You can either enter a year in the input, click a month, or both:
 
 ![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/overlay-default.png "Get a date with JavaScript!")
+
+
+### Using As A Daterange Picker
+
+Want 2 calendars linked together to form ~~Voltron~~ a date<span style="font-style: italic;">range</span> picker? It's as simple as giving them both the same [id](#id)! By using the [id](#id) option, Datepicker handles all the logic to keep both calendars in sync.
+
+![Datepicker daterange screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/daterange.gif "Animated GIF opf a daterange pair")
+
+The 1st calendar will serve as the minimum date and the 2nd calendar as the maximum. Dates will be enabled / disabled on each calendar automatically when the user selects a date on either. The [getRange](#getrange) method will conveniently give you an object with the `start` and `end` date selections. It's as simple as creating 2 instances with the same `id` to foerm a daterange picker:
+
+```javascript
+const start = datepicker('.start', { id: 1 })
+const end = datepicker('.end', { id: 1 })
+```
+
 
 <hr>
 
@@ -346,7 +369,6 @@ const picker = datepicker('.some-input', {
 * Default - The first 3 characters of each item in `customMonths`.
 
 
-
 ### overlayButton
 
 Custom text for the year overlay submit button.
@@ -414,6 +436,8 @@ const picker = datepicker('.some-input', { maxDate: new Date(2099, 0, 1) })
 ```
 * Type - JavaScript date object.
 
+_NOTE: When using a [daterange](#using-as-a-daterange-picker) pair, if you set_ `maxDate` _on the first instance it will be ignored on the 2nd instance._
+
 
 ### minDate
 
@@ -423,6 +447,8 @@ This will be the minumum threshold of selectable dates. Anything prior will be u
 const picker = datepicker('.some-input', { minDate: new Date(2018, 0, 1) })
 ```
 * Type - JavaScript date object.
+
+_NOTE: When using a [daterange](#using-as-a-daterange-picker) pair, if you set_ `minDate` _on the first instance it will be ignored on the 2nd instance._
 
 
 ### startDate
@@ -561,25 +587,13 @@ function togglePicker() {
 
 ### id
 
-Now we're getting _fancy!_ If you want to link two instances together to help form a date-_range_ picker, this is your option. You still have manual work to do, but it's easy (see the example below). Only two picker instances can share an `id`. The datepicker instance declared first will be considered the "start" picker in the range.
+Now we're getting _fancy!_ If you want to link two instances together to help form a date<span style="font-style: italic;">range</span> picker, this is your option. Only two picker instances can share an `id`. The datepicker instance declared first will be considered the "start" picker in the range. There's a fancy [getRange](#getrange) method for you to use as well.
 
 ```javascript
-const start = datepicker('.start', {
-  id: 1,
-  onSelect: (instance, date) => {
-    // Both instances will be set because they are linked by `id`.
-    instance.setMin(date)
-  }
-})
-
-const end = datepicker('.end', {
-  id: 1,
-  onSelect: (instance, date) => {
-    // Both instances will be set because they are linked by `id`.
-    instance.setMax(date)
-  }
-})
+const start = datepicker('.start', { id: 1 })
+const end = datepicker('.end', { id: 1 })
 ```
+
 * Type - anything but `null` or `undefined`
 
 
@@ -683,6 +697,11 @@ picker2.hide() // This does not work because of `alwaysShow`.
 ```
 
 
+### getRange
+
+This method is only available on [daterange](#using-as-a-daterange-picker) pickers. It will return an object with `start` and `end` properties whose values are JavaScript date objects representing what the user selected on both calendars.
+
+
 ## Properties & Values
 
 If you take a look at the datepicker instance, you'll notice plenty of values that you can grab and use however you'd like. Below details some helpful properties and values that are available on the picker instance.
@@ -690,6 +709,7 @@ If you take a look at the datepicker instance, you'll notice plenty of values th
 | Property | Value |
 | -------- | ----- |
 | `calendar` | The calendar element. |
+| `calendarContainer` | The container element that houses the calendar. Use it to [size](#sizing-the-calendar) the calendar. |
 | `currentMonth` | A 0-index number representing the current month. For example, `0` represents January. |
 | `currentMonthName` | Calendar month in plain english. E.x. `January` |
 | `currentYear` | The current year. E.x. `2099` |
@@ -702,11 +722,17 @@ If you take a look at the datepicker instance, you'll notice plenty of values th
 
 ## Sizing The Calendar
 
-Styles for the calendar are compiled down to CSS from the `datepicker.less` file with `gulp`. All the sizes for the various portions of the calendar are relative to a single value at the top of that file: `@width: 250px;`. To resize the calendar, simply rebuild `datepicker.css` by doing the following:
+You can control the size of the calendar dynamically with the `font-size` property!
 
-1. Open `datepicker.less`
-2. Change the `@width` variable to whatever value you want (try `350px`) and save.
-3. From the command line run `gulp less`.
+Every element you see on the calendar is relatively sized in `em`'s. The calendar has a container `<div>` with a class name of `qs-datepicker-container` and a `font-size: 1rem` style on it in the CSS. Simply override that property with inline styles set via JavaScript and watch the calendar resize! For ease, you can access the containing div via the `calendarContainer` property on each instance. For example:
+
+```javascript
+// Instantiate a datepicker instance.
+const picker = datepicker('.some-class')
+
+// Use JavaScript to change the calendar size.
+picker.calendarContainer.style.setProperty('font-size', '1.5rem')
+```
 
 
 ## Examples
@@ -773,6 +799,7 @@ const picker = datepicker(document.querySelector('#some-id'), {
   maxDate: new Date(2099, 0, 1), // Jan 1st, 2099.
   minDate: new Date(2016, 5, 1), // June 1st, 2016.
   startDate: new Date(), // This month.
+  showAllDates: true, // Numbers for leading & trailing days outside the current month will show.
 
   // Disabling things.
   noWeekends: true, // Saturday's and Sunday's will be unselectable.
@@ -781,7 +808,7 @@ const picker = datepicker(document.querySelector('#some-id'), {
   disableMobile: true, // Conditionally disabled on mobile devices.
   disableYearOverlay: true, // Clicking the year or month will *not* bring up the year overlay.
 
-  // Id - be sure to provide a 2nd picker with the same id to create a daterange pair.
+  // ID - be sure to provide a 2nd picker with the same id to create a daterange pair.
   id: 1
 })
 ```

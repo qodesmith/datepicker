@@ -11,7 +11,7 @@
 ```
 
 # Datepicker.js
-Get a date with JavaScript! Or a date<span style="font-style: italic;">range</span>, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.6kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.6kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 _Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
 
@@ -173,7 +173,7 @@ By clicking on the year or month an overlay will show revealing an input field a
 
 ### Using As A Daterange Picker
 
-Want 2 calendars linked together to form ~~Voltron~~ a date<span style="font-style: italic;">range</span> picker? It's as simple as giving them both the same [id](#id)! By using the [id](#id) option, Datepicker handles all the logic to keep both calendars in sync.
+Want 2 calendars linked together to form ~~Voltron~~ a daterange picker? It's as simple as giving them both the same [id](#id)! By using the [id](#id) option, Datepicker handles all the logic to keep both calendars in sync.
 
 ![Datepicker daterange screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/daterange.gif "Animated GIF opf a daterange pair")
 
@@ -442,7 +442,7 @@ const picker = datepicker('.some-input', { maxDate: new Date(2099, 0, 1) })
 ```
 * Type - JavaScript date object.
 
-_NOTE: When using a [daterange](#using-as-a-daterange-picker) pair, if you set_ `maxDate` _on the first instance it will be ignored on the 2nd instance._
+_NOTE: When using a [daterange](#using-as-a-daterange-picker) pair, if you set_ `maxDate` _on the first instance options it will be ignored on the 2nd instance options._
 
 
 ### minDate
@@ -454,7 +454,7 @@ const picker = datepicker('.some-input', { minDate: new Date(2018, 0, 1) })
 ```
 * Type - JavaScript date object.
 
-_NOTE: When using a [daterange](#using-as-a-daterange-picker) pair, if you set_ `minDate` _on the first instance it will be ignored on the 2nd instance._
+_NOTE: When using a [daterange](#using-as-a-daterange-picker) pair, if you set_ `minDate` _on the first instance options it will be ignored on the 2nd instance options._
 
 
 ### startDate
@@ -593,7 +593,7 @@ function togglePicker() {
 
 ### id
 
-Now we're getting _fancy!_ If you want to link two instances together to help form a date<span style="font-style: italic;">range</span> picker, this is your option. Only two picker instances can share an `id`. The datepicker instance declared first will be considered the "start" picker in the range. There's a fancy [getRange](#getrange) method for you to use as well.
+Now we're getting _fancy!_ If you want to link two instances together to help form a daterange picker, this is your option. Only two picker instances can share an `id`. The datepicker instance declared first will be considered the "start" picker in the range. There's a fancy [getRange](#getrange) method for you to use as well.
 
 ```javascript
 const start = datepicker('.start', { id: 1 })

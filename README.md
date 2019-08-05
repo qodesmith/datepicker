@@ -177,11 +177,17 @@ Want 2 calendars linked together to form ~~Voltron~~ a date<span style="font-sty
 
 ![Datepicker daterange screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/daterange.gif "Animated GIF opf a daterange pair")
 
-The 1st calendar will serve as the minimum date and the 2nd calendar as the maximum. Dates will be enabled / disabled on each calendar automatically when the user selects a date on either. The [getRange](#getrange) method will conveniently give you an object with the `start` and `end` date selections. It's as simple as creating 2 instances with the same `id` to foerm a daterange picker:
+The 1st calendar will serve as the minimum date and the 2nd calendar as the maximum. Dates will be enabled / disabled on each calendar automatically when the user selects a date on either. The [getRange](#getrange) method will conveniently give you an object with the `start` and `end` date selections. It's as simple as creating 2 instances with the same `id` to form a daterange picker:
 
 ```javascript
 const start = datepicker('.start', { id: 1 })
 const end = datepicker('.end', { id: 1 })
+```
+
+And when you want to get your start and end values, simply call [getRange](#getrange) on _either_ instance:
+```javascript
+start.getRange() // { start: <JS date object>, end: <JS date object> }
+end.getRange() // Gives you the same as above!
 ```
 
 

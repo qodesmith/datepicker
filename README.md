@@ -13,7 +13,7 @@
 # Datepicker.js
 Get a date with JavaScript! Or a date<span style="font-style: italic;">range</span>, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.6kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
-_Note: Use_ `datepicker.min.js` _to ensure ES5 compatibility._
+_Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
 
 ![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/calendar.png "Get a date with JavaScript!")
 

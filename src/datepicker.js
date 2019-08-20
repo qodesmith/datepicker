@@ -57,7 +57,7 @@ function datepicker(selector, options) {
 
   // Create the datepicker instance!
   const instance = createInstance(selector, options)
-  const { startDate, dateSelected } = instance
+  const { startDate, dateSelected, alwaysShow } = instance
 
   /*
     Daterange processing!
@@ -76,7 +76,7 @@ function datepicker(selector, options) {
   }
 
   renderCalendar(instance, startDate || dateSelected)
-  calculatePosition(instance)
+  alwaysShow && calculatePosition(instance)
 
   return instance
 }
@@ -122,7 +122,7 @@ function createInstance(selector, opts) {
   // The calendar scales relative to the font-size of the container.
   // The user can provide a class name that sets font-size, or a theme perhaps.
   // thereby controlling the overall size and look of the calendar.
-  calendarContainer.className = 'qs-datepicker-container'
+  calendarContainer.className = 'qs-datepicker-container qs-hidden'
   calendar.className = 'qs-datepicker'
 
 
@@ -348,7 +348,6 @@ function createInstance(selector, opts) {
  *  Helper function to duplicate an object or array.
  *  Should help Babel avoid adding syntax that isn't IE compatible.
  */
-
 function freshCopy(item) {
   if (Array.isArray(item)) return item.map(freshCopy)
 
@@ -543,8 +542,8 @@ function establishPosition([p1, p2]) {
 
 /*
  *  Renders a calendar, defaulting to the current year & month of that calendar.
- *  Populates `calendar.innerHTML` with the contents
- *  of the calendar controls, month, and overlay.
+ *  Populates `calendar.innerHTML` with the contents of the calendar controls, month, and overlay.
+ *  This method does NOT *show* the calendar on the screen. It only affects the html structure.
  */
 function renderCalendar(instance, date) {
   const overlay = instance.calendar.querySelector('.qs-overlay')

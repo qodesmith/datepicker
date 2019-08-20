@@ -3,6 +3,7 @@
   "version": "5.0.1",
   "description": "Get a date with JavaScript! A datepicker with no dependencies.",
   "main": "dist/datepicker.min.js",
+  "style": "./src/datepicker.scss",
   "scripts": {
     "build": "webpack --mode production --env.prod",
     "test": "jest",

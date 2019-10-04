@@ -18,4 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
   //----------------------------------------
 
   window.nope = datepicker('.nope', { position: 'tr' })
+
+  window.dp = datepicker('#dp')
 })

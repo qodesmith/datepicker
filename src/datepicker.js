@@ -1022,7 +1022,7 @@ function oneHandler(e) {
     // Do nothing for disabled calendars.
     if (instance.disabled) return
 
-    const { calendar, calendarContainer, disableYearOverlay } = instance
+    const { calendar, calendarContainer, disableYearOverlay, nonInput } = instance
     const input = calendar.querySelector('.qs-overlay-year')
     const overlayClosed = !!calendar.querySelector('.qs-hidden')
     const monthYearClicked = calendar.querySelector('.qs-month-year').contains(target)
@@ -1060,6 +1060,9 @@ function oneHandler(e) {
     // Clicking the submit button in the overlay.
     } else if (classList.contains('qs-submit') && !classList.contains('qs-disabled')) {
       overlayYearEntry(e, input, instance)
+    // Clicking the calendar's el for non-input's should show it.
+    } else if (nonInput && target === instance.el) {
+      showCal(instance)
     }
 
   /*

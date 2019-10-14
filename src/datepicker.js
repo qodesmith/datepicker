@@ -53,7 +53,7 @@ const events = ['click', 'focusin', 'keydown', 'input']
  */
 function datepicker(selector, options) {
   // Apply event listeners on its parent, if in shadow DOM
-  if (options.isInShadowDom) applyInstanceSpecificShadowDomListeners(selector)
+  if (options && options.isInShadowDom) applyInstanceSpecificShadowDomListeners(selector)
 
   // Apply the global event listeners only once.
   if (!datepickers.length) applyListeners()

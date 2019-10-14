@@ -467,7 +467,7 @@ function sanitizeOptions(opts, el) {
       options.second = true
       options.sibling = pickers[0]
 
-      // 1st - If no pickers were found, this is the 1st in the pair.
+    // 1st - If no pickers were found, this is the 1st in the pair.
     } else {
       options.first = true
     }
@@ -497,22 +497,22 @@ function sanitizeOptions(opts, el) {
     if (typeof options[fxn] !== 'function') options[fxn] = noop // `noop` defined at the top.
   })
 
-    // Custom labels for months & days.
-    ;['customDays', 'customMonths', 'customOverlayMonths'].forEach((label, i) => {
-      const custom = options[label]
-      const num = i ? 12 : 7
+  // Custom labels for months & days.
+  ;['customDays', 'customMonths', 'customOverlayMonths'].forEach((label, i) => {
+    const custom = options[label]
+    const num = i ? 12 : 7
 
-      // Do nothing if the user hasn't provided this custom option.
-      if (!custom) return
+    // Do nothing if the user hasn't provided this custom option.
+    if (!custom) return
 
-      if (
-        !Array.isArray(custom) || // Must be an array.
-        custom.length !== num || // Must have the correct length.
-        custom.some(item => typeof item !== 'string') // Must be an array of strings only.
-      ) throw `"${label}" must be an array with ${num} strings.`
+    if (
+      !Array.isArray(custom) || // Must be an array.
+      custom.length !== num || // Must have the correct length.
+      custom.some(item => typeof item !== 'string') // Must be an array of strings only.
+    ) throw `"${label}" must be an array with ${num} strings.`
 
-      options[!i ? 'days' : i < 2 ? 'months' : 'overlayMonths'] = custom
-    })
+    options[!i ? 'days' : i < 2 ? 'months' : 'overlayMonths'] = custom
+  })
 
   /*
     Adjust days of the week for user-provided start day.
@@ -690,12 +690,12 @@ function createMonth(date, instance, overlayOpen) {
       if (showAllDates) {
         otherClass += ' qs-disabled'
 
-        // Show empty squares for dates in preceding and trailing months.
+      // Show empty squares for dates in preceding and trailing months.
       } else {
         span = ''
       }
 
-      // Disabled & current squares.
+    // Disabled & current squares.
     } else {
 
       // Disabled dates.
@@ -861,7 +861,7 @@ function changeMonthYear(classList, instance, year, overlayMonthIndex) {
     if (year) instance.currentYear = year
     if (overlayMonthIndex) instance.currentMonth = +overlayMonthIndex
 
-    // Month change.
+  // Month change.
   } else {
     instance.currentMonth += classList.contains('qs-right') ? 1 : -1
 
@@ -1011,7 +1011,7 @@ function overlayYearEntry(e, input, instance, overlayMonthIndex) {
       changeMonthYear(null, instance, value, overlayMonthIndex)
     }
 
-    // Enable / disabled the submit button.
+  // Enable / disabled the submit button.
   } else if (instance.calendar.contains(input)) { // Scope to one calendar instance.
     const submit = instance.calendar.querySelector('.qs-submit')
     submit.classList[badDate ? 'add' : 'remove']('qs-disabled')
@@ -1064,22 +1064,22 @@ function oneHandler(e) {
     if (instance.noPosition && !onCal) {
       // Show / hide a calendar whose el is html or body.
       const calendarClosed = calendarContainer.classList.contains('qs-hidden')
-        ;(calendarClosed ? showCal : hideCal)(instance)
+      ;(calendarClosed ? showCal : hideCal)(instance)
 
-      // Clicking the arrow buttons - change the calendar month.
+    // Clicking the arrow buttons - change the calendar month.
     } else if (classList.contains('qs-arrow')) {
       changeMonthYear(classList, instance)
 
-      // Clicking the month/year - open the overlay.
-      // Clicking the X on the overlay - close the overlay.
+    // Clicking the month/year - open the overlay.
+    // Clicking the X on the overlay - close the overlay.
     } else if (monthYearClicked || classList.contains('qs-close')) {
       !disableYearOverlay && toggleOverlay(!overlayClosed, instance)
 
-      // Clicking a month in the overlay - the <span> inside might have been clicked.
+    // Clicking a month in the overlay - the <span> inside might have been clicked.
     } else if (newMonthIndex) {
       overlayYearEntry(e, input, instance, newMonthIndex)
 
-      // Clicking a number square - process whether to select that day or not.
+    // Clicking a number square - process whether to select that day or not.
     } else if (classList.contains('qs-num')) {
       const targ = target.nodeName === 'SPAN' ? target.parentNode : target
       const doNothing = ['qs-disabled', 'qs-empty'].some(cls => targ.classList.contains(cls))
@@ -1088,18 +1088,18 @@ function oneHandler(e) {
 
       return !doNothing && selectDay(targ, instance)
 
-      // Clicking the submit button in the overlay.
+    // Clicking the submit button in the overlay.
     } else if (classList.contains('qs-submit') && !classList.contains('qs-disabled')) {
       overlayYearEntry(e, input, instance)
-      // Clicking the calendar's el for non-input's should show it.
+    // Clicking the calendar's el for non-input's should show it.
     } else if (nonInput && target === instance.el) {
       showCal(instance)
     }
 
-    /*
-      Only pay attention to `focusin` events if the calendar's el is an <input>.
-      We use the `focusin` event because it bubbles - `focus` does not bubble.
-    */
+/*
+  Only pay attention to `focusin` events if the calendar's el is an <input>.
+  We use the `focusin` event because it bubbles - `focus` does not bubble.
+*/
   } else if (type === 'focusin' && instance) {
     // Show this intance.
     showCal(instance)
@@ -1114,7 +1114,7 @@ function oneHandler(e) {
     if ((e.which || e.keyCode) === 13 && overlayShowing && onCal) {
       overlayYearEntry(e, target, instance)
 
-      // ESC key pressed.
+    // ESC key pressed.
     } else if ((e.which || e.keyCode) === 27 && overlayShowing && onCal) {
       toggleOverlay(true, instance)
     }
@@ -1197,7 +1197,7 @@ function setDate(newDate, changeCalendar) {
     // Return the instance to enable chaining methods.
     return this
 
-    // Date isn't undefined or null but still falsey.
+  // Date isn't undefined or null but still falsey.
   } else if (!dateCheck(newDate)) {
     throw '`setDate` needs a JavaScript Date object.'
   }
@@ -1228,7 +1228,7 @@ function setDate(newDate, changeCalendar) {
   }
 
   const isSameMonth = currentYear === date.getFullYear() && currentMonth === date.getMonth()
-    ;(isSameMonth || changeCalendar || sibling) && renderCalendar(this, date)
+  ;(isSameMonth || changeCalendar || sibling) && renderCalendar(this, date)
 
   return this
 }
@@ -1286,22 +1286,22 @@ function changeMinOrMax(instance, date, isMin) {
           sibling.minDate = undefined
         }
 
-        // Removing the max.
+      // Removing the max.
       } else if ((first && !sibling.dateSelected) || (!first && !dateSelected)) {
         instance.maxDate = undefined
         sibling.maxDate = undefined
       }
 
-      // Regular instances.
+    // Regular instances.
     } else {
       instance[prop()] = undefined
     }
 
-    // Throw an error for invalid dates.
+  // Throw an error for invalid dates.
   } else if (!dateCheck(date)) {
     throw `Invalid date passed to ${method()}`
 
-    // Setting min / max.
+  // Setting min / max.
   } else if (sibling) {
     /*
       Acceptable ranges for setting minDate or maxDate:
@@ -1342,7 +1342,7 @@ function changeMinOrMax(instance, date, isMin) {
       sibling[prop()] = newDate
     }
 
-    // Individual instance.
+  // Individual instance.
   } else {
     // Check for dates our of range for single instances.
     if (

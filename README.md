@@ -55,6 +55,7 @@ _Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
 * [startDate](#startdate)
 * [showAllDates](#showalldates)
 * [respectDisabledReadOnly](#respectdisabledreadonly)
+* [isInShadowDom](#isinshadowdom)
 
 #### Disabling Things
 
@@ -492,6 +493,25 @@ const picker = datepicker('.some-input', { respectDisabledReadOnly: true })
 
 * Type - boolean
 * Default - `false`
+
+
+### isInShadowDom
+
+By default the Datepicker listens for events on document. But if the `<input />` is within a shadow DOM, the event's target will be set to the shadow host.
+
+Provide `true` to make the Datepicker listen for events on the `<input />`'s immediate parent instead.
+
+
+
+```javascript
+// Provide a DOM node as first parameter, since it wont be found in shadow DOM when using a selector (via document)
+const picker = datepicker(inputElement, { isInShadowDom: true })
+```
+
+* Type - boolean
+* Default - `false`
+
+_Note: The `<input />` must have a parent element within the shadow DOM._
 
 
 ## Options - Disabling Things

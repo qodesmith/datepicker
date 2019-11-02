@@ -265,4 +265,26 @@ $font-size: $width * .056;
       }
     }
   }
+
+  .qs-event {
+    position: relative;
+
+    &:after {
+      content: '';
+      position: absolute;
+      width: $width * .03;
+      height: $width * .03;
+      border-radius: 50%;
+      background: #07f;
+      bottom: 0;
+      right: 0;
+    }
+
+    &.qs-disabled,
+    &.qs-empty {
+      &:after {
+        background: lighten(#07f, 40);
+      }
+    }
+  }
 }

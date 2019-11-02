@@ -11,13 +11,30 @@ document.addEventListener('DOMContentLoaded', () => {
     el.style.setProperty('font-size', `${num}em`)
   })
 
-  window.start = datepicker('.start', { id: 1 })
+  window.start = datepicker('.start', {
+    id: 1,
+    alwaysShow: 1,
+    showAllDates: 1,
+    events: [
+      new Date(),
+      new Date('11/20/2019'),
+      new Date('11/22/2019')
+    ]
+  })
 
   window.end = datepicker('.end', { id: 1 })
 
   //----------------------------------------
 
-  window.nope = datepicker('.nope', { position: 'tr' })
+  window.nope = datepicker('.nope', {
+    position: 'tr',
+    alwaysShow: 1,
+    events: [
+      new Date(),
+      new Date('11/20/2019'),
+      new Date('11/22/2019')
+    ]
+  })
 
   window.dp = datepicker('#dp')
 })

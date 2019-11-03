@@ -16,9 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     alwaysShow: 1,
     showAllDates: 1,
     events: [
-      new Date(),
-      new Date('11/20/2019'),
-      new Date('11/22/2019')
+      new Date(2019, 10, 1),
+      new Date(2019, 10, 10),
+      new Date(2019, 10, 20),
     ]
   })
 
@@ -30,9 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
     position: 'tr',
     alwaysShow: 1,
     events: [
-      new Date(),
-      new Date('11/20/2019'),
-      new Date('11/22/2019')
+      new Date(2019, 10, 1),
+      new Date(2019, 10, 10),
+      new Date(2019, 10, 20),
     ]
   })
 

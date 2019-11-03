@@ -11,7 +11,7 @@
 ```
 
 # Datepicker.js
-Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.6kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.7kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 _Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
 
@@ -45,6 +45,7 @@ _Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
 * [customOverlayMonths](#customoverlaymonths)
 * [overlayButton](#overlaybutton)
 * [overlayPlaceholder](#overlayplaceholder)
+* [events](#events)
 
 #### Settings
 
@@ -405,6 +406,24 @@ const picker = datepicker('.some-input', {
 
 * Type - string
 * Default - `'4-digit year'`
+
+
+### events
+
+An array of dates which indicate something is happening - a meeting, birthday, etc. I.e. an _event_.
+```javascript
+const picker = datepicker('.some-input', {
+  events: [
+    new Date(2019, 10, 1),
+    new Date(2019, 10, 10),
+    new Date(2019, 10, 20),
+  ]
+})
+```
+
+![Events on calendar screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/events.png "Example with events on calendar")
+
+* Type - array of JS date objects
 
 
 ## Options - Settings

@@ -178,6 +178,8 @@ function createInstance(selector, opts) {
     // Year of `startDate` or `dateSelected`.
     currentYear: (startDate || dateSelected).getFullYear(),
 
+    // Events will show a small circle on calendar days.
+    events: options.events || {},
 
 
     // Method to programmatically set the calendar's date.
@@ -371,6 +373,18 @@ function sanitizeOptions(opts, el) {
 
   // Avoid mutating the original object that was supplied by the user.
   const options = freshCopy(opts)
+
+  /*
+    Check and ensure all events in the provided array are JS dates.
+    Store these on the instance as an object with JS datetimes as keys for fast lookup.
+  */
+  if (options.events) {
+    options.events = options.events.reduce((acc, date) => {
+      if (!dateCheck(date)) throw '"options.events" must only contain valid JavaScript Date objects.'
+      acc[+stripTime(date)] = true
+      return acc
+    }, {})
+  }
 
   /*
     Check that various options have been provided a JavaScript Date object.
@@ -604,7 +618,8 @@ function createMonth(date, instance, overlayOpen) {
     disabler,
     noWeekends,
     startDay,
-    weekendIndices
+    weekendIndices,
+    events
   } = instance
 
   // Same year, same month?
@@ -647,6 +662,8 @@ function createMonth(date, instance, overlayOpen) {
     const weekday = days[weekdayIndex]
     const num = i - (offset >= 0 ? offset : (7 + offset))
     const thisDay = new Date(currentYear, currentMonth, num) // No time so we can compare accurately :)
+    const eventClass = ' qs-event'
+    const hasEvent = events[+thisDay]
     const thisDayNum = thisDay.getDate()
     const outsideOfCurrentMonth = num < 1 || num > daysInMonth
     let otherClass = ''
@@ -658,6 +675,7 @@ function createMonth(date, instance, overlayOpen) {
 
       // Show dim dates for dates in preceding and trailing months.
       if (showAllDates) {
+        if (hasEvent) otherClass += eventClass
         otherClass += ' qs-disabled'
 
       // Show empty squares for dates in preceding and trailing months.
@@ -676,6 +694,9 @@ function createMonth(date, instance, overlayOpen) {
         disabledDates.includes(+thisDay) ||
         (noWeekends && weekendIndices.includes(weekdayIndex))
       ) otherClass = 'qs-disabled'
+
+      // Show events for squares with a number even if they are disabled.
+      if (hasEvent) otherClass += eventClass
 
       // Current date, i.e. today's date.
       if (isThisMonth && num === today.getDate()) otherClass += ' qs-current'

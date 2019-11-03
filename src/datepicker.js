@@ -378,9 +378,9 @@ function sanitizeOptions(opts, el) {
     Check and ensure all events in the provided array are JS dates.
     Store these on the instance as an object with JS datetimes as keys for fast lookup.
   */
-  if (options.events && options.events.length) {
+  if (options.events) {
     options.events = options.events.reduce((acc, date) => {
-      if (!dateCheck(date)) throw `"options.events" must only contain valid JavaScript Date objects.`
+      if (!dateCheck(date)) throw '"options.events" must only contain valid JavaScript Date objects.'
       acc[+stripTime(date)] = true
       return acc
     }, {})

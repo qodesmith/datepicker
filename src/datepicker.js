@@ -810,7 +810,6 @@ function adjustDateranges({ instance, deselect }) {
       first.minDate = first.originalMinDate
       second.minDate = second.originalMinDate
     } else {
-      first.minDate = first.dateSelected
       second.minDate = first.dateSelected
     }
   } else {
@@ -818,7 +817,6 @@ function adjustDateranges({ instance, deselect }) {
       second.maxDate = second.originalMaxDate
       first.maxDate = first.originalMaxDate
     } else {
-      second.maxDate = second.dateSelected
       first.maxDate = second.dateSelected
     }
   }

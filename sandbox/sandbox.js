@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.nope = datepicker('.nope', {
     position: 'tr',
-    alwaysShow: 1,
     events: [
       new Date(2019, 10, 1),
       new Date(2019, 10, 10),
@@ -37,4 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   window.dp = datepicker('#dp')
+
+  document.querySelector('button').addEventListener('click', e => {
+    e.stopPropagation() // Without this, the `oneHandler` event listener that Datepicker uses will kick in and hide the calendar.
+    const isHidden = nope.calendarContainer.classList.contains('qs-hidden')
+    nope[isHidden ? 'show' : 'hide']()
+  })
 })

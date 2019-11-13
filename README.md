@@ -78,6 +78,7 @@ _Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
 * [setMax](#setmax)
 * [show](#show)
 * [hide](#hide)
+  * [Show / Hide "Gotcha"](#show--hide-gotcha)
 * [getRange](#getrange) _(daterange only)_
 
 
@@ -708,6 +709,8 @@ const picker = datepicker('.some-input')
 picker.show()
 ```
 
+_Note: see the "[gotcha](#show--hide-gotcha)" below for implementing this method in an event handler._
+
 
 ### hide
 
@@ -719,6 +722,28 @@ const picker2 = datepicker('.some-other-input', { alwaysShow: true })
 
 picker1.hide() // This works.
 picker2.hide() // This does not work because of `alwaysShow`.
+```
+
+_Note: see the "[gotcha](#show--hide-gotcha)" below for implementing this method in an event handler._
+
+
+#### Show / Hide "Gotcha"
+
+Want to show / hide the calendar programmatically with a button or by clicking some element? Make [sure](https://github.com/qodesmith/datepicker/issues/71#issuecomment-553363045) to use `stopPropagation` in your event callback! If you don't, any click event in the DOM will bubble up to Datepicker's internal `oneHandler` event listener, triggering logic to close the calendar since it "sees" the click event _outside_ the calendar. Here's an example on how to use the `show` and `hide` methods in a click event handler:
+
+```javascript
+// Attach the picker to an input element.
+const picker = datepicker(inputElement, options)
+
+// Toggle the calendar when a button is clicked.
+button.addEventListener('click', e => {
+  // THIS!!! Prevent Datepicker's event handler from hiding the calendar.
+  e.stopPropagation()
+
+  // Toggle the calendar.
+  const isHidden = picker.calendarContainer.classList.contains('qs-hidden')
+  picker[isHidden ? 'show' : 'hide']()
+})
 ```
 
 
@@ -744,7 +769,7 @@ If you take a look at the datepicker instance, you'll notice plenty of values th
 | Property | Value |
 | -------- | ----- |
 | `calendar` | The calendar element. |
-| `calendarContainer` | The container element that houses the calendar. Use it to [size](#sizing-the-calendar) the calendar. |
+| `calendarContainer` | The container element that houses the calendar. Use it to [size](#sizing-the-calendar) the calendar or programmatically [check if the calendar is showing](#show--hide-gotcha). |
 | `currentMonth` | A 0-index number representing the current month. For example, `0` represents January. |
 | `currentMonthName` | Calendar month in plain english. E.x. `January` |
 | `currentYear` | The current year. E.x. `2099` |

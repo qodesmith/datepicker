@@ -622,6 +622,11 @@ function createMonth(date, instance, overlayOpen) {
     events
   } = instance
 
+  // If we have a daterange picker, get the current range.
+  const range = (instance.getRange && instance.getRange() || {})
+  const start = +range.start
+  const end = +range.end
+
   // Same year, same month?
   const today = new Date()
   const isThisMonth = currentYear === today.getFullYear() && currentMonth === today.getMonth()
@@ -668,10 +673,11 @@ function createMonth(date, instance, overlayOpen) {
     const outsideOfCurrentMonth = num < 1 || num > daysInMonth
     let otherClass = ''
     let span = `<span class="qs-num">${thisDayNum}</span>`
+    const dateInSelectedRange = start && end && +thisDay >= start && +thisDay <= end
 
     // Squares outside the current month.
     if (outsideOfCurrentMonth) {
-      otherClass = 'qs-empty'
+      otherClass = 'qs-empty qs-outside-current-month'
 
       // Show dim dates for dates in preceding and trailing months.
       if (showAllDates) {
@@ -702,8 +708,17 @@ function createMonth(date, instance, overlayOpen) {
       if (isThisMonth && num === today.getDate()) otherClass += ' qs-current'
     }
 
-    // Currently selected day.
-    if (+thisDay === +dateSelected && !outsideOfCurrentMonth) otherClass += ' qs-active'
+    // Currently selected day && daterange selected dates.
+    if (!outsideOfCurrentMonth) {
+      // Current day, start, or end.
+      if (+thisDay === +dateSelected || ((+thisDay === start || +thisDay === end) && start && end)) {
+        otherClass += ' qs-active'
+
+      // Days in the range - not start & end.
+      } else if (dateInSelectedRange) {
+        otherClass += ' qs-range-date'
+      }
+    }
 
     calendarSquares.push(`<div class="qs-square qs-num ${weekday} ${otherClass}">${span}</div>`)
   }

@@ -689,7 +689,7 @@ function createMonth(date, instance, overlayOpen) {
         span = ''
       }
 
-    // Disabled & current squares.
+    // Disabled, current, & date-range squares.
     } else {
 
       // Disabled dates.
@@ -706,17 +706,25 @@ function createMonth(date, instance, overlayOpen) {
 
       // Current date, i.e. today's date.
       if (isThisMonth && num === today.getDate()) otherClass += ' qs-current'
-    }
 
-    // Currently selected day && daterange selected dates.
-    if (!outsideOfCurrentMonth) {
-      // Current day, start, or end.
-      if (+thisDay === +dateSelected || ((+thisDay === start || +thisDay === end) && start && end)) {
-        otherClass += ' qs-active'
+      // Selected day.
+      if (+thisDay === +dateSelected) otherClass += ' qs-active'
 
-      // Days in the range - not start & end.
-      } else if (dateInSelectedRange) {
-        otherClass += ' qs-range-date'
+      // Date-range classes.
+      if (dateInSelectedRange) {
+        // Indicate what index day of the week this is - from first to last. Affects styles.
+        otherClass += ` qs-range-date-${weekdayIndex}`
+
+        // Differentiate start & end range days.
+        if (start !== end) {
+          if (+thisDay === start) {
+            otherClass += ' qs-range-date-start qs-active'
+          } else if (+thisDay === end) {
+            otherClass += ' qs-range-date-end qs-active'
+          } else {
+            otherClass += ' qs-range-date-middle'
+          }
+        }
       }
     }
 

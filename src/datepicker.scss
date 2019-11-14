@@ -239,8 +239,36 @@ $font-size: $width * .056;
       background: lightblue;
     }
 
-    &.qs-range-date {
+    &.qs-range-date-start {
+      &:not(.qs-range-date-6) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
+
+    &.qs-range-date-middle {
       background: lighten(lightblue, 10%);
+
+      &:not(.qs-range-date-0):not(.qs-range-date-6) {
+        border-radius: 0;
+      }
+
+      &.qs-range-date-0 {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      &.qs-range-date-6 {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+
+    &.qs-range-date-end {
+      &:not(.qs-range-date-0) {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
     }
 
     &.qs-disabled {

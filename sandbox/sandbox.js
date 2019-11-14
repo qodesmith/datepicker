@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.nope = datepicker('.nope', {
     position: 'tr',
+    alwaysShow: 1,
     events: [
       new Date(2019, 10, 1),
       new Date(2019, 10, 10),

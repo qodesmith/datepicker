@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.start = datepicker('.start', {
     id: 1,
     alwaysShow: 1,
-    showAllDates: 1,
     events: [
       new Date(2019, 10, 1),
       new Date(2019, 10, 10),
@@ -22,16 +21,18 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
   })
 
-  window.end = datepicker('.end', { id: 1 })
+  window.end = datepicker('.end', { id: 1, alwaysShow: 1 })
 
   //----------------------------------------
 
   window.nope = datepicker('.nope', {
     position: 'tr',
+    alwaysShow: 1,
     events: [
       new Date(2019, 10, 1),
       new Date(2019, 10, 10),
       new Date(2019, 10, 20),
+      new Date(2019, 9, 31)
     ]
   })
 

@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
       new Date(2019, 10, 1),
       new Date(2019, 10, 10),
       new Date(2019, 10, 20),
+      new Date(2019, 9, 31)
     ]
   })
 

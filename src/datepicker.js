@@ -622,6 +622,11 @@ function createMonth(date, instance, overlayOpen) {
     events
   } = instance
 
+  // If we have a daterange picker, get the current range.
+  const range = (instance.getRange && instance.getRange() || {})
+  const start = +range.start
+  const end = +range.end
+
   // Same year, same month?
   const today = new Date()
   const isThisMonth = currentYear === today.getFullYear() && currentMonth === today.getMonth()
@@ -668,10 +673,11 @@ function createMonth(date, instance, overlayOpen) {
     const outsideOfCurrentMonth = num < 1 || num > daysInMonth
     let otherClass = ''
     let span = `<span class="qs-num">${thisDayNum}</span>`
+    const dateInSelectedRange = start && end && +thisDay >= start && +thisDay <= end
 
     // Squares outside the current month.
     if (outsideOfCurrentMonth) {
-      otherClass = 'qs-empty'
+      otherClass = 'qs-empty qs-outside-current-month'
 
       // Show dim dates for dates in preceding and trailing months.
       if (showAllDates) {
@@ -683,7 +689,7 @@ function createMonth(date, instance, overlayOpen) {
         span = ''
       }
 
-    // Disabled & current squares.
+    // Disabled, current, & date-range squares.
     } else {
 
       // Disabled dates.
@@ -700,10 +706,27 @@ function createMonth(date, instance, overlayOpen) {
 
       // Current date, i.e. today's date.
       if (isThisMonth && num === today.getDate()) otherClass += ' qs-current'
-    }
 
-    // Currently selected day.
-    if (+thisDay === +dateSelected && !outsideOfCurrentMonth) otherClass += ' qs-active'
+      // Selected day.
+      if (+thisDay === +dateSelected) otherClass += ' qs-active'
+
+      // Date-range classes.
+      if (dateInSelectedRange) {
+        // Indicate what index day of the week this is - from first to last. Affects styles.
+        otherClass += ` qs-range-date-${weekdayIndex}`
+
+        // Differentiate start & end range days.
+        if (start !== end) {
+          if (+thisDay === start) {
+            otherClass += ' qs-range-date-start qs-active'
+          } else if (+thisDay === end) {
+            otherClass += ' qs-range-date-end qs-active'
+          } else {
+            otherClass += ' qs-range-date-middle'
+          }
+        }
+      }
+    }
 
     calendarSquares.push(`<div class="qs-square qs-num ${weekday} ${otherClass}">${span}</div>`)
   }

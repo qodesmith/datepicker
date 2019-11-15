@@ -13,27 +13,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.start = datepicker('.start', {
     id: 1,
-    alwaysShow: 1,
     events: [
       new Date(2019, 10, 1),
       new Date(2019, 10, 10),
       new Date(2019, 10, 20),
-    ]
+    ],
+    onHide: () => console.log('START HIDDEN')
   })
 
-  window.end = datepicker('.end', { id: 1, alwaysShow: 1 })
+  window.end = datepicker('.end', {
+    id: 1,
+    onHide: () => console.log('END HIDDEN')
+  })
 
   //----------------------------------------
 
   window.nope = datepicker('.nope', {
     position: 'tr',
-    alwaysShow: 1,
     events: [
       new Date(2019, 10, 1),
       new Date(2019, 10, 10),
       new Date(2019, 10, 20),
       new Date(2019, 9, 31)
-    ]
+    ],
+    onHide: () => console.log('NOPE HIDDEN')
   })
 
   window.dp = datepicker('#dp')

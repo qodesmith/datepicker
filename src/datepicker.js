@@ -950,9 +950,14 @@ function stripTime(dateOrNum) {
 function hideCal(instance) {
   if (instance.disabled) return
 
-  toggleOverlay(true, instance)
-  !instance.alwaysShow && instance.calendarContainer.classList.add('qs-hidden')
-  instance.onHide(instance)
+  // Only trigger `onHide` for instances that are currently showing.
+  const isShowing = !instance.calendarContainer.classList.contains('qs-hidden')
+
+  if (isShowing && !instance.alwaysShow) {
+    toggleOverlay(true, instance)
+    instance.calendarContainer.classList.add('qs-hidden')
+    instance.onHide(instance)
+  }
 }
 
 /*

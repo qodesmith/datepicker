@@ -19,13 +19,18 @@ module.exports = (env, argv) => ({
     http://bit.ly/2w3Ahxa
     The point(s) to enter the application.
   */
-  entry: [
-    // Only during development.
-    !env.prod && path.resolve(__dirname, 'sandbox/sandbox.js'),
+  entry: (() => {
+    const entry = {
+      datepicker: path.resolve(__dirname, 'src/datepicker.js'),
+      sandbox: env.dev && path.resolve(__dirname, 'sandbox/test-app.js'),
+      'test-app': env.test && path.resolve(__dirname, 'sandbox/test-app.js')
+    }
 
-    // Development & production.
-    path.resolve(__dirname, 'src/datepicker.js')
-  ].filter(Boolean),
+    return Object.keys(entry).reduce((acc, key) => {
+      if (entry[key]) acc[key] = entry[key]
+      return acc
+    }, {})
+  })(),
 
   /*
     http://bit.ly/2w55YpG
@@ -42,7 +47,7 @@ module.exports = (env, argv) => ({
   */
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'datepicker.min.js',
+    filename: env.prod ? 'datepicker.min.js' : '[name].js',
     library: 'datepicker',
     libraryTarget: 'umd' // "Universal" export - Node, browser, amd, etc.
   },
@@ -114,6 +119,7 @@ module.exports = (env, argv) => ({
     */
     public: 'http://localhost:9001'
   },
+
   // https://goo.gl/bxPV7L
   optimization: {
     minimize: !!env.prod,
@@ -139,8 +145,13 @@ module.exports = (env, argv) => ({
     // Used only in development.
     // Prevents `npm run build` from creating an html asset in the dist folder.
     !env.prod && new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'sandbox/index.ejs'),
-      title: 'Datepicker Sandbox'
+      template: path.resolve(__dirname, env.dev ? 'sandbox/index.ejs' : 'sandbox/test.ejs'),
+      title: env.dev ? 'Datepicker Sandbox' : 'Cypress E2E Testing',
+      chunks: [
+        'datepicker',
+        env.dev && 'sandbox',
+        env.test && 'test-app'
+      ].filter(Boolean)
     })
   ].filter(Boolean)
 })

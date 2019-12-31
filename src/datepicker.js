@@ -112,6 +112,8 @@ function createInstance(selector, opts) {
     el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
   }
 
+  if (!el) throw (`No selector / element found.`)
+
   const options = sanitizeOptions(opts || defaults(), el)
   const { startDate, dateSelected, sibling } = options
   const noPosition = el === document.body

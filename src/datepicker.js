@@ -872,7 +872,7 @@ function setCalendarInputValue(el, instance, deselect) {
 function changeMonthYear(classList, instance, year, overlayMonthIndex) {
   // Overlay.
   if (year || overlayMonthIndex) {
-    if (year) instance.currentYear = year
+    if (year) instance.currentYear = +year
     if (overlayMonthIndex) instance.currentMonth = +overlayMonthIndex
 
   // Month change.

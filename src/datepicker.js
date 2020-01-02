@@ -693,6 +693,7 @@ function createMonth(date, instance, overlayOpen) {
 
     // Disabled, current, & date-range squares.
     } else {
+      otherClass += 'qs-num'
 
       // Disabled dates.
       if (
@@ -730,7 +731,7 @@ function createMonth(date, instance, overlayOpen) {
       }
     }
 
-    calendarSquares.push(`<div class="qs-square qs-num ${weekday} ${otherClass}">${span}</div>`)
+    calendarSquares.push(`<div class="qs-square ${otherClass} ${weekday}">${span}</div>`)
   }
 
   // Add the header row of days of the week.
@@ -1100,11 +1101,9 @@ function oneHandler(e) {
     // Clicking a number square - process whether to select that day or not.
     } else if (classList.contains('qs-num')) {
       const targ = target.nodeName === 'SPAN' ? target.parentNode : target
-      const doNothing = ['qs-disabled', 'qs-empty'].some(cls => targ.classList.contains(cls))
 
       if (targ.classList.contains('qs-active')) return selectDay(targ, instance, true)
-
-      return !doNothing && selectDay(targ, instance)
+      return !targ.classList.contains('qs-disabled') && selectDay(targ, instance)
 
     // Clicking the submit button in the overlay.
     } else if (classList.contains('qs-submit') && !classList.contains('qs-disabled')) {

@@ -673,7 +673,7 @@ function createMonth(date, instance, overlayOpen) {
     const hasEvent = events[+thisDay]
     const thisDayNum = thisDay.getDate()
     const outsideOfCurrentMonth = num < 1 || num > daysInMonth
-    let otherClass = ''
+    let otherClass = 'qs-num'
     let span = `<span class="qs-num">${thisDayNum}</span>`
     const dateInSelectedRange = start && end && +thisDay >= start && +thisDay <= end
 
@@ -693,8 +693,6 @@ function createMonth(date, instance, overlayOpen) {
 
     // Disabled, current, & date-range squares.
     } else {
-      otherClass += 'qs-num'
-
       // Disabled dates.
       if (
         (minDate && thisDay < minDate) ||

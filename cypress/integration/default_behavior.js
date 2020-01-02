@@ -140,6 +140,7 @@ describe('Initial calendar load with default settings', () => {
     it('inlinePosition', () => expect(picker.inlinePosition).to.be.true)
   })
 
+  // TODO
   describe('Datepicker HTML structure and element types', () => {})
 
   describe('Datepicker UI (& corresponding changes to instance object properties)', () => {
@@ -153,6 +154,46 @@ describe('Initial calendar load with default settings', () => {
       cy.get('[data-cy="input-1"]').click()
       cy.get('.qs-datepicker-container')
         .should('be.visible')
+    })
+
+    it('shows the calendar days of the week (top of calendar)', () => {
+      cy.get('.qs-squares .qs-day')
+        .should('have.length', 7)
+    })
+
+    it('shows the calendar days of the month', () => {
+      cy.get('.qs-squares .qs-num')
+        .should('have.length.of.at.least', 28)
+    })
+
+    it('has the correct number of days on the calendar', () => {
+      const numOfDays = howManyDays(picker)
+
+      days.forEach(day => {
+        cy.get(`.qs-squares .qs-num.${day}`)
+          .should('have.length.of.at.least', 4)
+
+        cy.get(`.qs-squares .qs-num.${day}`)
+          .should('have.length.of.at.most', 5)
+      })
+
+      cy.get('.qs-square.qs-num:not(.qs-empty)')
+        .should('have.length', numOfDays)
+    })
+
+    it(`should show today's date in bold and underlined`, () => {
+      cy.get('.qs-current')
+        .should('have.text', `${today.getDate()}`)
+        .should('have.css', 'font-weight', '700')
+
+      cy.get('.qs-current .qs-num')
+        .should('have.css', 'text-decoration', 'underline solid rgb(0, 0, 0)')
+    })
+
+    it('should not have bold & underline on other dates', () => {
+      cy.get('div.qs-num:not(.qs-empty):not(.qs-current) span')
+        .eq(0)
+        .should('have.css', 'text-decoration', 'none solid rgb(0, 0, 0)')
     })
 
     it('should not be showing the overlay', () => {
@@ -211,6 +252,28 @@ describe('Initial calendar load with default settings', () => {
             .then(() => {
               cy.get('.qs-month-year .qs-year')
                 .should('have.text', `${nextYear}`)
+
+              // http://bit.ly/2r5CJo4 - This is a current workaround for `.should('be.visible')` on elements with 0 opacity.
+              cy.get('.qs-overlay')
+                .should('have.css', 'opacity', '0')
+              expect(picker.currentYear).to.equal(nextYear)
+            })
+        })
+      })
+
+      it('should change the year via the submit button and hide the overlay', () => {
+        cy.get('.qs-month-year .qs-year').click().then($year => {
+          const currentYear = +$year.text()
+          const nextYear = currentYear + 1
+
+          expect(picker.currentYear).to.equal(currentYear)
+          cy.get('.qs-overlay-year')
+            .type(`${nextYear}`)
+          cy.get('.qs-overlay .qs-submit')
+            .click()
+            .then(() => {
+              cy.get('.qs-month-year .qs-year')
+                .should('have.text', `${nextYear}`)
               cy.get('.qs-overlay')
                 .should('have.css', 'opacity', '0')
               expect(picker.currentYear).to.equal(nextYear)
@@ -225,14 +288,79 @@ describe('Initial calendar load with default settings', () => {
           const monthIndexToClick = currentMonthIndex === 11 ? 0 : currentMonthIndex + 1
           const nextMonthName = months[monthIndexToClick]
 
+          expect(picker.currentMonthName).to.equal(currentMonthName)
           cy.get('.qs-month-year').click()
           cy.get('.qs-overlay-month-container .qs-overlay-month')
             .eq(monthIndexToClick)
             .click()
-          cy.get('.qs-month-year .qs-month')
-            .should('have.text', nextMonthName)
-          cy.get('.qs-overlay')
-            .should('have.css', 'opacity', '0')
+            .then(() => {
+              cy.get('.qs-month-year .qs-month')
+                .should('have.text', nextMonthName)
+              cy.get('.qs-overlay')
+                .should('have.css', 'opacity', '0')
+              expect(picker.currentMonthName).to.equal(nextMonthName)
+            })
+        })
+      })
+    })
+
+    describe('Date changes', () => {
+      const dayToSelect = 15
+
+      describe('Selecting a date', () => {
+        it('should have a value of undefined for `dateSelected` on the instance object prior to selecting a date', () => {
+          expect(picker.dateSelected).to.be.undefined
+        })
+
+        it('should populate `dateSelected` on the instance object with the correct date', () => {
+          const correctDate = +new Date(picker.currentYear, picker.currentMonth, dayToSelect)
+
+          cy.get(`span.qs-num:contains('${dayToSelect}')`).click().then(() => {
+            expect(+picker.dateSelected).to.equal(correctDate)
+          })
+        })
+
+        it('should populate the input field using the `toDateString` method (default)', () => {
+          const dateString = picker.dateSelected.toDateString()
+
+          cy.get('[data-cy="input-1"]')
+            .should('have.value', dateString)
+        })
+
+        it('should hide the calendar', () => {
+          cy.get('.qs-datepicker-container')
+            .should('be.hidden')
+        })
+
+        it('should show the date selected highlighted when re-opening the calendar', () => {
+          cy.get('[data-cy="input-1"]').click()
+          cy.get('.qs-active')
+            .should('have.length.of', 1)
+            .should('have.text', `${dayToSelect}`)
+        })
+      })
+
+      describe('De-selecting a date', () => {
+        it('should have a value of undefined for `dateSelected` on the instance object', () => {
+          expect(picker.dateSelected).not.to.be.undefined
+          cy.get(`span.qs-num:contains('${dayToSelect}')`).click().then(() => {
+            expect(picker.dateSelected).to.be.undefined
+          })
+        })
+
+        it('should not hide the caledar', () => {
+          cy.get('.qs-datepicker-container')
+            .should('be.visible')
+        })
+
+        it('it should un-highlight the date on the calendar', () => {
+          cy.get('.qs-active')
+            .should('have.length.of', 0)
+        })
+
+        it('should clear the input value', () => {
+          cy.get('[data-cy="input-1"]')
+            .should('have.value', '')
         })
       })
     })
@@ -247,85 +375,8 @@ describe('Initial calendar load with default settings', () => {
 
 
 
-
-  // describe('Top-level containers', () => {
-  //   it('has two main containers', () => {
-  //     // Outer container.
-  //     cy.get('div.qs-datepicker-container')
-  //       .should('be.visible')
-
-  //     // Inner container
-  //     cy.get('div.qs-datepicker')
-  //       .should('be.visible')
-  //   })
-  // })
-
-  // describe('Controls', () => {
-  //   it('has a top-level container', () => {
-  //     cy.get('div.qs-controls')
-  //       .should('be.visible')
-  //   })
-
-  //   it('has a container for the month & year', () => {
-  //     cy.get('div.qs-controls div.qs-month-year')
-  //       .should('be.visible')
-  //   })
-
-  //   it('has a month and year', () => {
-  //     // Month.
-  //     cy.get('div.qs-controls div.qs-month-year span.qs-month')
-  //       .should('be.visible')
-
-  //     // Year.
-  //     cy.get('div.qs-controls div.qs-month-year span.qs-year')
-  //       .should('be.visible')
-  //   })
-
-  //   it('has two arrows for navigating months', () => {
-  //     cy.get('div.qs-controls div.qs-arrow')
-  //       .should('have.length', 2)
-
-  //     // Left arrow.
-  //     cy.get('div.qs-controls div.qs-arrow.qs-left')
-  //       .should('be.visible')
-
-  //     // Right arrow.
-  //     cy.get('div.qs-controls div.qs-arrow.qs-right')
-  //       .should('be.visible')
-  //   })
-  // })
-
-  // describe('Calendar days', () => {
-  //   it('shows the calendar days of the week', () => {
-  //     cy.get('div.qs-squares div.qs-day')
-  //       .should('have.length', 7)
-  //   })
-
-  //   it('shows the calendar days', () => {
-  //     cy.get('div.qs-squares div.qs-num')
-  //       .should('have.length.of.at.least', 28)
-  //   })
-
-  //   it('has the correct number of days on the calendar', () => {
-  //     cy.window().then(win => {
-  //       const numOfDays = howManyDays(win.testDatepicker)
-
-  //       ;['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
-  //         cy.get(`div.qs-squares div.qs-num.${day}`)
-  //           .should('have.length.of.at.least', 4)
-
-  //         cy.get(`div.qs-squares div.qs-num.${day}`)
-  //           .should('have.length.of.at.most', 5)
-  //       })
-
-  //       cy.get('div.qs-square.qs-num:not(.qs-empty)')
-  //         .should('have.length', numOfDays)
-  //     })
-  //   })
-  // })
-
   // it(`doesn't show the overlay`, () => {
-  //   // http://bit.ly/2r5CJo4 - This is a current workaround for `.should('be.visible')` on elements with 0 opacity.
+  //
   //   cy.get('.qs-overlay')
   //     .should('have.css', 'opacity', '0')
   // })

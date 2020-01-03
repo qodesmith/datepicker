@@ -672,7 +672,7 @@ _Note: This will not trigger the_ [`onSelect`]('#onselect') _callback._
 
 Allows you to programmatically set the minimum selectable date or unset it. If this instance is part of a [daterange](#using-as-a-daterange-picker) instance (see the [`id`](#id) option) then the other instance will be changed as well. To unset a minimum date, simply run the function with no arguments.
 
-```javaScript
+```javascript
 // Set a minimum selectable date.
 const picker = datepicker('.some-input')
 picker.setMin(new Date(2018, 0, 1))
@@ -688,7 +688,7 @@ picker.setMin()
 
 Allows you to programmatically set the maximum selectable date or unset it. If this instance is part of a [daterange](#using-as-a-daterange-picker) instance (see the [`id`](#id) option) then the other instance will be changed as well. To unset a maximum date, simply run the function with no arguments.
 
-```javaScript
+```javascript
 // Set a maximum selectable date.
 const picker = datepicker('.some-input')
 picker.setMax(new Date(2099, 0, 1))

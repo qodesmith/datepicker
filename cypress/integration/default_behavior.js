@@ -520,4 +520,132 @@ describe('Initial calendar load with default settings', () => {
       })
     })
   })
+
+  describe.only('Instance methods', () => {
+    const dayToSelect = 23
+
+    describe('setDate', () => {
+      before(() => {
+        cy.get('body').click()
+        cy.wait(100)
+        cy.get('[data-cy="input-1"]').click()
+        cy.wait(100)
+
+        expect(picker.dateSelected).to.be.undefined
+        cy.get('.qs-active')
+          .should('have.length', 0)
+          .then(() => {
+            picker.setDate(new Date(picker.currentYear, picker.currentMonth, dayToSelect))
+          })
+      })
+
+      it('should programmatically set a date', () => {
+        cy.get('.qs-active')
+          .should('have.length', 1)
+          .should('have.text', `${dayToSelect}`)
+      })
+
+      it('should populate the input with that date', () => {
+        const expectedInputText = new Date(picker.currentYear, picker.currentMonth, dayToSelect).toDateString()
+        cy.get('[data-cy="input-1"]')
+          .should('have.value', expectedInputText)
+      })
+
+      it('should populate `dateSelected` on the instance object', () => {
+        expect(+picker.dateSelected).to.equal(+new Date(picker.currentYear, picker.currentMonth, dayToSelect))
+      })
+
+      it('should navigate the calendar to that date via the second argument', () => {
+        cy.get('.qs-active').click().then(() => {
+          const { currentMonthName, currentYear, currentMonth } = picker
+          const nextMonthIndex = currentMonth === 0 ? 1 : 0
+          const nextMonthName = months[nextMonthIndex]
+          const nextYear = currentYear + 1
+          const nextDate = 20
+
+          expect(picker.dateSelected).to.be.undefined
+
+          cy.get('.qs-active')
+            .should('have.length', 0)
+          cy.get('.qs-month')
+            .should('have.text', currentMonthName)
+          cy.get('.qs-year')
+            .should('have.text', `${currentYear}`)
+            .then(() => {
+              picker.setDate(new Date(nextYear, nextMonthIndex, nextDate), true)
+
+              cy.get('.qs-month')
+                .should('have.text', nextMonthName)
+              cy.get('.qs-year')
+                .should('have.text', `${nextYear}`)
+              cy.get('[data-cy="input-1"]')
+                .should('have.value', new Date(nextYear, nextMonthIndex, 20).toDateString())
+              cy.get('.qs-active')
+                .should('have.text', `${nextDate}`)
+            })
+        })
+      })
+
+      it('should remove the selected date when no argument is provided', () => {
+        picker.setDate()
+
+        expect(picker.dateSelected).to.be.undefined
+        cy.get('.qs-active')
+          .should('have.length', 0)
+
+      })
+    })
+
+    describe('setMin', () => {
+      before(() => {
+        cy.get('.qs-square.qs-disabled')
+          .should('have.length', 0)
+        cy.get('.qs-active')
+          .should('have.length', 0)
+        expect(picker.minDate).to.be.undefined
+      })
+
+      it('should set the `minDate` property on the instance', () => {
+        const minDate = new Date(picker.currentYear, picker.currentMonth, dayToSelect)
+
+        picker.setMin(minDate)
+        expect(+picker.minDate).to.equal(+minDate)
+      })
+
+      it('should disable dates prior to the provided value (including prev months)', () => {
+        cy.get('.qs-square.qs-disabled')
+          .should('have.length', dayToSelect - 1)
+
+        cy.get('.qs-arrow.qs-left').click().then(() => {
+          const numOfDaysInMonth = new Date(picker.currentYear, picker.currentMonth + 1, 0).getDate()
+
+          cy.get('.qs-square.qs-disabled')
+            .should('have.length', numOfDaysInMonth)
+        })
+      })
+
+      it('should prevent disabled dates from being selected', () => {
+        expect(picker.dateSelected).to.be.undefined
+
+        cy.get('.qs-square.qs-disabled')
+          .first()
+          .should('have.text', '1')
+          .click()
+          .then(() => {
+            expect(picker.dateSelected).to.be.undefined
+
+            cy.get('.qs-active')
+              .should('have.length', 0)
+          })
+      })
+
+      it('should remove the min selectable date when called with no argument', () => {
+        picker.setMin()
+
+        expect(picker.minDate).to.be.undefined
+        cy.get('.qs-square.qs-disabled')
+          .should('have.length', 0)
+      })
+    })
+  })
 })

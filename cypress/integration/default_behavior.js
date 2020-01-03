@@ -1,19 +1,6 @@
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-/*
-  Helper function to determine how many days the calendar should have.
-  The calendar constantly changes since tests will run on a different date each time.
-*/
-function howManyDays(datepickerInstance) {
-  const numOfDays = new Date(
-    datepickerInstance.currentYear, // Year.
-    datepickerInstance.currentMonth + 1, // Month + 1.
-    0 // 0 sets it back to the last day of the previous month.
-  ).getDate()
-
-  return numOfDays
-}
 
 describe('Initial calendar load with default settings', () => {
   const today = new Date()

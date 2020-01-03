@@ -157,6 +157,9 @@ describe('Initial calendar load with default settings', () => {
       it('shows the calendar days of the week (top of calendar)', () => {
         cy.get('.qs-squares .qs-day')
           .should('have.length', 7)
+          .each(($day, i) => {
+            expect($day.text()).to.equal(days[i])
+          })
       })
 
       it('shows the calendar days of the month', () => {
@@ -232,6 +235,16 @@ describe('Initial calendar load with default settings', () => {
           .should('have.css', 'opacity', '1')
       })
 
+      it('should have the correct default placeholder for the overlay input', () => {
+        cy.get('.qs-overlay-year')
+          .should('have.attr', 'placeholder', '4-digit year')
+      })
+
+      it('should have the correct default submit button text', () => {
+        cy.get('.qs-submit')
+          .should('have.text', 'Submit')
+      })
+
       it('should change the year when the user inputs one and hide the overlay', () => {
         cy.get('.qs-month-year .qs-year').then($year => {
           const currentYear = +$year.text()
@@ -291,6 +304,17 @@ describe('Initial calendar load with default settings', () => {
                 .should('have.css', 'opacity', '0')
               expect(picker.currentMonthName).to.equal(nextMonthName)
             })
+        })
+      })
+
+      it('should close the overlay when clicking the close button', () => {
+        cy.get('.qs-month-year').click().then(() => {
+          cy.get('.qs-overlay')
+            .should('have.css', 'opacity', '1')
+          cy.get('.qs-close').click().then(() => {
+            cy.get('.qs-overlay')
+            .should('have.css', 'opacity', '0')
+          })
         })
       })
     })
@@ -469,6 +493,44 @@ describe('Initial calendar load with default settings', () => {
       })
     })
 
-    describe('Overlay', () => {})
+    describe('Overlay', () => {
+      it('should have a div for the overlay container', () => {
+        cy.get('div.qs-overlay')
+          .should('have.length', 1)
+      })
+
+      it('should have a div container for the year input and close button', () => {
+        cy.get('div.qs-overlay div')
+          .first()
+          .children()
+          .should('have.length', 2)
+      })
+
+      it('should have a div for the close button', () => {
+        cy.get('div.qs-close')
+          .should('have.length', 1)
+      })
+
+      it('should have a div for the months container', () => {
+        cy.get('div.qs-overlay-month-container')
+          .should('have.length', 1)
+      })
+
+      it('should have 12 divs for the months with a span in each', () => {
+        cy.get('.qs-overlay-month')
+          .should('have.length', 12)
+          .each($month => {
+            expect($month.find('span').length).to.equal(1)
+          })
+
+        cy.get('span[data-month-num]')
+          .should('have.length', 12)
+      })
+
+      it('should have a div for the submit button', () => {
+        cy.get('div.qs-submit')
+          .should('have.length', 1)
+      })
+    })
   })
 })

@@ -521,7 +521,7 @@ describe('Initial calendar load with default settings', () => {
     })
   })
 
-  describe.only('Instance methods', () => {
+  describe('Instance methods', () => {
     const dayToSelect = 23
 
     describe('setDate', () => {
@@ -586,7 +586,7 @@ describe('Initial calendar load with default settings', () => {
         })
       })
 
-      it('should remove the selected date when no argument is provided', () => {
+      it('should remove the selected date when called with no argument', () => {
         picker.setDate()
 
         expect(picker.dateSelected).to.be.undefined
@@ -644,6 +644,100 @@ describe('Initial calendar load with default settings', () => {
 
         expect(picker.minDate).to.be.undefined
         cy.get('.qs-square.qs-disabled')
+          .should('have.length', 0)
+      })
+    })
+
+    describe('setMax', () => {
+      before(() => {
+        cy.get('.qs-square.qs-disabled')
+          .should('have.length', 0)
+          .then(() => {
+            expect(picker.maxDate).to.be.undefined
+            picker.setMax(new Date(picker.currentYear, picker.currentMonth, 1))
+          })
+      })
+
+      it('should set the `maxDate` property on the instnace', () => {
+        expect(+picker.maxDate).to.equal(+new Date(picker.currentYear, picker.currentMonth, 1))
+      })
+
+      it('should disabled dates after the provided value (including future months)', () => {
+        const numOfDaysInMonth = new Date(picker.currentYear, picker.currentMonth + 1, 0).getDate()
+        const numOfDaysNextMonth = new Date(picker.currentYear, picker.currentMonth + 2, 0).getDate()
+
+        cy.get('.qs-square.qs-disabled')
+          .should('have.length', numOfDaysInMonth - 1)
+        cy.get('.qs-arrow.qs-right').click().then(() => {
+          cy.get('.qs-square.qs-disabled')
+            .should('have.length', numOfDaysNextMonth)
+        })
+      })
+
+      it('should prevent disabled dates from being selected', () => {
+        expect(picker.dateSelected).to.be.undefined
+        cy.get('.qs-square.qs-disabled')
+          .first()
+          .should('have.text', '1')
+          .click()
+          .then(() => {
+            expect(picker.dateSelected).to.be.undefined
+          })
+      })
+
+      it('should remove the max selectable date when called with no argument', () => {
+        const numOfDaysInMonth = new Date(picker.currentYear, picker.currentMonth + 1, 0).getDate()
+
+        cy.get('.qs-square.qs-disabled')
+          .should('have.length', numOfDaysInMonth)
+          .then(() => {
+            expect(picker.maxDate).not.to.be.undefined
+            picker.setMax()
+            expect(picker.maxDate).to.be.undefined
+            cy.get('.qs-square.qs-disabled')
+              .should('have.length', 0)
+          })
+      })
+    })
+
+    describe('show', () => {
+      before(() => {
+        cy.get('body').click()
+        cy.get('.qs-datepicker-container')
+          .should('not.be.visible')
+      })
+
+      it('should show the calendar when called', () => {
+        picker.show()
+        cy.get('.qs-datepicker-container')
+          .should('be.visible')
+      })
+    })
+
+    describe('hide', () => {
+      it('should hide the calendar when called', () => {
+        picker.hide()
+        cy.get('.qs-datepicker-container')
+          .should('not.be.visible')
+      })
+    })
+
+    describe('remove', () => {
+      before(() => {
+        cy.get('.qs-datepicker-container')
+          .should('have.length', 1)
+      })
+
+      it('should completely nuke the instance object', () => {
+        const numOfProps = Object.keys(picker).length
+
+        expect(numOfProps).to.be.gt(0)
+        picker.remove()
+        expect(Object.keys(picker).length).to.equal(0)
+      })
+
+      it('should remove the calendar from the DOM', () => {
+        cy.get('.qs-datepicker-container')
           .should('have.length', 0)
       })
     })

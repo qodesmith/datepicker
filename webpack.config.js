@@ -145,13 +145,16 @@ module.exports = (env, argv) => ({
     // Used only in development.
     // Prevents `npm run build` from creating an html asset in the dist folder.
     !env.prod && new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, env.dev ? 'sandbox/index.ejs' : 'sandbox/test.ejs'),
+      template: path.resolve(__dirname, `sanbox/${env.dev ? 'index' : 'test'}.ejs`),
       title: env.dev ? 'Datepicker Sandbox' : 'Cypress E2E Testing',
+
+      // http://bit.ly/2SSVJlc - Order Webpack assets manually. Requires `entry` above to be an object.
       chunks: [
         'datepicker',
         env.dev && 'sandbox',
         env.test && 'test-app'
-      ].filter(Boolean)
+      ].filter(Boolean),
+      chunksSortMode: 'manual'
     })
   ].filter(Boolean)
 })

@@ -41,12 +41,12 @@ describe('Callback functions', () => {
         })
       })
 
-      it('should be called with the instance and undefined when un-selecting a date', () => {
+      it('should be called with the instance and undefined when de-selecting a date', () => {
         expect(onSelect).to.be.calledTwice
         expect(onSelect).to.be.calledWith(picker, undefined)
       })
 
-      it('should not be called when using instance methods to manually select / un-select a date', () => {
+      it('should not be called when using instance methods to manually select / de-select a date', () => {
         picker.setDate(new Date(picker.currentYear, picker.currentMonth, 15))
         expect(onSelect).to.be.calledTwice
 
@@ -159,7 +159,66 @@ describe('Callback functions', () => {
   })
 
   describe('Daterange callbacks', () => {
-    describe('onSelect', () => {})
+    describe('onSelect', () => {
+      let picker1
+      let picker2
+      let onSelect1
+      let onSelect2
+
+      after(() => {
+        picker1.remove()
+        picker2.remove()
+      })
+
+      it('should run the provided callback function from the correct calendar after selecting a date', () => {
+        onSelect1 = cy.stub()
+        onSelect2 = cy.stub()
+
+        picker1 = dp('[data-cy="input-1"]', { id: 1, alwaysShow: 1, onSelect: onSelect1 })
+        picker2 = dp('[data-cy="input-2"]', { id: 1, alwaysShow: 1, onSelect: onSelect2 })
+
+        cy.get('[data-cy="section-1"] div.qs-num:contains("15")').click().then(() => {
+          expect(onSelect1).to.have.callCount(1)
+          expect(onSelect2).to.have.callCount(0)
+
+          cy.get('[data-cy="section-2"] div.qs-num:contains("20")').click().then(() => {
+            expect(onSelect1).to.have.callCount(1)
+            expect(onSelect2).to.have.callCount(1)
+          })
+        })
+      })
+
+      it('should be called with the instance and date when being selected', () => {
+        expect(onSelect1).to.be.calledWith(picker1, new Date(picker1.currentYear, picker1.currentMonth, 15))
+        expect(onSelect2).to.be.calledWith(picker2, new Date(picker2.currentYear, picker2.currentMonth, 20))
+      })
+
+      it('should run the provided callback function from the correct calendar after de-selecting a date', () => {
+        cy.get('[data-cy="section-1"] div.qs-num:contains("15")').click().then(() => {
+          expect(onSelect1).to.have.callCount(2)
+          expect(onSelect2).to.have.callCount(1)
+
+          cy.get('[data-cy="section-2"] div.qs-num:contains("20")').click().then(() => {
+            expect(onSelect1).to.have.callCount(2)
+            expect(onSelect2).to.have.callCount(2)
+          })
+        })
+      })
+
+      it('should be called with the instance and undefined when de-selecting a date', () => {
+        expect(onSelect1).to.be.calledWith(picker1, undefined)
+        expect(onSelect2).to.be.calledWith(picker2, undefined)
+      })
+
+      it('should not be called when using instance methods to manually select / de-select a date', () => {
+        picker1.setDate(new Date(picker1.currentYear, picker1.currentMonth, 11))
+        picker2.setDate(new Date(picker2.currentYear, picker1.currentMonth, 18))
+        picker1.setDate()
+        picker2.setDate()
+        expect(onSelect1).to.have.callCount(2)
+        expect(onSelect2).to.have.callCount(2)
+      })
+    })
 
     describe('onShow', () => {})
 

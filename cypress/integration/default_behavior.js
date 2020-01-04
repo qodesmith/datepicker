@@ -46,19 +46,15 @@ describe('Initial calendar load with default settings', () => {
     it('weekendIndices', () => expect(picker.weekendIndices).to.deep.equal([6, 0]))
 
     it('calendarContainer', () => {
-      cy.get('[data-cy="input-1"]')
-        .then($input => {
-          const container = $input.parent().find('.qs-datepicker-container')[0]
-          expect(picker.calendarContainer).to.equal(container)
-        })
+      cy.get('.qs-datepicker-container').then($calendarContainer => {
+        expect(picker.calendarContainer).to.equal($calendarContainer[0])
+      })
     })
 
     it('calendar', () => {
-      cy.get('[data-cy="input-1"]')
-        .then($input => {
-          const calendar = $input.parent().find('.qs-datepicker-container .qs-datepicker')[0]
-          expect(picker.calendar).to.equal(calendar)
-        })
+      cy.get('.qs-datepicker').then($calendar => {
+        expect(picker.calendar).to.equal($calendar[0])
+      })
     })
 
     it('currentMonth', () => expect(picker.currentMonth).to.equal(today.getMonth()))
@@ -139,6 +135,20 @@ describe('Initial calendar load with default settings', () => {
         cy.get('[data-cy="input-1"]').click()
         cy.get('.qs-datepicker-container')
           .should('be.visible')
+      })
+
+      it('defaults to showing the current month and year', () => {
+        cy.get('.qs-month').then($month => {
+          const month = $month.text()
+          const monthIndex = months.findIndex(m => m === month)
+
+          expect(today.getMonth()).to.equal(monthIndex)
+
+          cy.get('.qs-year').then($year => {
+            const year = $year.text()
+            expect(today.getFullYear()).to.equal(+year)
+          })
+        })
       })
 
       it('shows the calendar days of the week (top of calendar)', () => {

@@ -239,6 +239,8 @@ const picker = datepicker('.some-input', {
 * Arguments:
     1. `instance` - the current datepicker instance.
 
+_NOTE: This **will** fire when using the [show](#show) instance method._
+
 
 ### onHide
 
@@ -254,6 +256,8 @@ const picker = datepicker('.some-input', {
 ```
 * Arguments:
     1. `instance` - the current datepicker instance.
+
+_NOTE: This **will** fire when using the [hide](#hide) instance method._
 
 
 ### onMonthChange

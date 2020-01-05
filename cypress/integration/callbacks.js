@@ -220,10 +220,154 @@ describe('Callback functions', () => {
       })
     })
 
-    describe('onShow', () => {})
+    describe('onShow', () => {
+      let picker1
+      let picker2
+      let onShow1
+      let onShow2
 
-    describe('onHide', () => {})
+      after(() => {
+        picker1.remove()
+        picker2.remove()
+      })
 
-    describe('onMonthChange', () => {})
+      it('should run the provided callback function from the correct calendar after showing the calendar', () => {
+        onShow1 = cy.stub()
+        onShow2 = cy.stub()
+
+        picker1 = dp('[data-cy="input-1"]', { id: 1, onShow: onShow1 })
+        picker2 = dp('[data-cy="input-2"]', { id: 1, onShow: onShow2 })
+
+        expect(onShow1).to.have.callCount(0)
+        expect(onShow2).to.have.callCount(0)
+
+        cy.get('[data-cy="input-1"]').click().then(() => {
+          expect(onShow1).to.have.callCount(1)
+          expect(onShow2).to.have.callCount(0)
+
+          cy.get('[data-cy="input-2"]').click().then(() => {
+            expect(onShow1).to.have.callCount(1)
+            expect(onShow2).to.have.callCount(1)
+          })
+        })
+      })
+
+      it('should be called with the instance', () => {
+        expect(onShow1).to.be.calledWith(picker1)
+        expect(onShow2).to.be.calledWith(picker2)
+      })
+
+      it('should be called when using the `show` instance method', () => {
+        cy.get('body').click().then(() => {
+          picker1.show()
+          picker2.show()
+
+          expect(onShow1).to.be.calledWith(picker1)
+          expect(onShow2).to.be.calledWith(picker2)
+          expect(onShow1).to.have.callCount(2)
+          expect(onShow2).to.have.callCount(2)
+        })
+      })
+    })
+
+    describe('onHide', () => {
+      let picker1
+      let picker2
+      let onHide1
+      let onHide2
+
+      after(() => {
+        picker1.remove()
+        picker2.remove()
+      })
+
+      it('should run the provided callback function from the correct calendar after hiding the calendar', () => {
+        onHide1 = cy.stub()
+        onHide2 = cy.stub()
+
+        picker1 = dp('[data-cy="input-1"]', { id: 1, onHide: onHide1 })
+        picker2 = dp('[data-cy="input-2"]', { id: 1, onHide: onHide2 })
+
+        cy.get('[data-cy="input-1"]').click().then(() => {
+          expect(onHide1).to.have.callCount(0)
+          expect(onHide2).to.have.callCount(0)
+
+          cy.get('[data-cy="input-2"]').click().then(() => {
+            expect(onHide1).to.have.callCount(1)
+            expect(onHide2).to.have.callCount(0)
+
+            cy.get('body').click().then(() => {
+              expect(onHide1).to.have.callCount(1)
+              expect(onHide2).to.have.callCount(1)
+            })
+          })
+        })
+      })
+
+      it('should be called with the instance', () => {
+        expect(onHide1).to.be.calledWith(picker1)
+        expect(onHide2).to.be.calledWith(picker2)
+      })
+
+      it('should be called when using the `hide` instance method', () => {
+        cy.get('[data-cy="input-1"]').click().then(() => {
+          expect(onHide1).to.have.callCount(1)
+          picker1.hide()
+          expect(onHide1).to.have.callCount(2)
+          expect(onHide1).to.be.calledWith(picker1)
+
+          cy.get('[data-cy="input-2"]').click().then(() => {
+            expect(onHide2).to.have.callCount(1)
+            picker2.hide()
+            expect(onHide2).to.have.callCount(2)
+            expect(onHide2).to.be.calledWith(picker2)
+          })
+        })
+      })
+    })
+
+    describe('onMonthChange', () => {
+      let picker1
+      let picker2
+      let onMonthChange1
+      let onMonthChange2
+
+      after(() => {
+        // picker1.remove()
+        // picker2.remove()
+      })
+
+      it('should run the provided callback function from the correct calendar after changing the nmonth', () => {
+        onMonthChange1 = cy.stub()
+        onMonthChange2 = cy.stub()
+
+        picker1 = dp('[data-cy="input-1"]', { id: 1, alwaysShow: 1, onMonthChange: onMonthChange1 })
+        picker2 = dp('[data-cy="input-2"]', { id: 1, alwaysShow: 1, onMonthChange: onMonthChange2 })
+
+        expect(onMonthChange1).to.have.callCount(0)
+        expect(onMonthChange2).to.have.callCount(0)
+
+        cy.get('[data-cy="section-1"] .qs-arrow.qs-left').click().then(() => {
+          expect(onMonthChange1).to.have.callCount(1)
+          expect(onMonthChange2).to.have.callCount(0)
+
+          cy.get('[data-cy="section-2"] .qs-arrow.qs-left').click().then(() => {
+            expect(onMonthChange1).to.have.callCount(1)
+            expect(onMonthChange2).to.have.callCount(1)
+          })
+        })
+      })
+
+      it('should be called with the instance', () => {
+        expect(onMonthChange1).to.be.calledWith(picker1)
+        expect(onMonthChange2).to.be.calledWith(picker2)
+      })
+
+      it('should not be called when using the `setDate` instance method', () => {
+        picker1.setDate(new Date(picker1.currentYear, picker1.currentMonth - 1, 5))
+        expect(onMonthChange1).to.have.callCount(1)
+
+      })
+    })
   })
 })

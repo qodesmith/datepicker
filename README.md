@@ -219,8 +219,6 @@ const picker = datepicker('.some-input', {
         * JavaScript date object when a date is being selected.
         * `undefined` when a date is being unselected.
 
-_NOTE: If you want to set something up like a daterange picker, use this option combined with the_ [`id`](#id) _option to ensure both calendars stay in sync. See [this example](#id)._
-
 _NOTE: This will not fire when using the [instance methods](#methods) to manually change the calendar._
 
 

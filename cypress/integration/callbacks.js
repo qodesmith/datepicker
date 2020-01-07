@@ -333,11 +333,11 @@ describe('Callback functions', () => {
       let onMonthChange2
 
       after(() => {
-        // picker1.remove()
-        // picker2.remove()
+        picker1.remove()
+        picker2.remove()
       })
 
-      it('should run the provided callback function from the correct calendar after changing the nmonth', () => {
+      it('should run the provided callback function from the correct calendar after changing the month', () => {
         onMonthChange1 = cy.stub()
         onMonthChange2 = cy.stub()
 
@@ -365,8 +365,12 @@ describe('Callback functions', () => {
 
       it('should not be called when using the `setDate` instance method', () => {
         picker1.setDate(new Date(picker1.currentYear, picker1.currentMonth - 1, 5))
+        picker1.setDate(new Date(picker1.currentYear, picker1.currentMonth - 1, 5, true))
         expect(onMonthChange1).to.have.callCount(1)
 
+        picker2.setDate(new Date(picker2.currentYear, picker2.currentMonth, 15))
+        picker2.setDate(new Date(picker2.currentYear, picker2.currentMonth, 16, true))
+        expect(onMonthChange2).to.have.callCount(1)
       })
     })
   })

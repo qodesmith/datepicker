@@ -1220,22 +1220,19 @@ function setDate(newDate, changeCalendar) {
     date > this.maxDate
   ) throw "You can't manually set a date that's disabled."
 
-  const cy = this.currentYear = date.getFullYear()
-  const cm = this.currentMonth = date.getMonth()
-  const cmn = this.currentMonthName = this.months[date.getMonth()]
+  this.currentYear = date.getFullYear()
+  this.currentMonth = date.getMonth()
+  this.currentMonthName = this.months[date.getMonth()]
   this.dateSelected = date
 
   setCalendarInputValue(this.el, this)
 
   if (sibling) {
-    // Ensure the sibling is internally set to the same month & year as the other.
-    sibling.currentYear = cy
-    sibling.currentMonth = cm
-    sibling.currentMonthName = cmn
-
     // Adjust other date properties and re-render the sibling to show the same month as the other.
     adjustDateranges({ instance: this })
-    renderCalendar(sibling, date)
+
+    // Re-render the sibling to reflect possible disabled dates due to a selection.
+    renderCalendar(sibling)
   }
 
   const isSameMonth = currentYear === date.getFullYear() && currentMonth === date.getMonth()

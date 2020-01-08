@@ -1220,10 +1220,18 @@ function setDate(newDate, changeCalendar) {
     date > this.maxDate
   ) throw "You can't manually set a date that's disabled."
 
-  this.currentYear = date.getFullYear()
-  this.currentMonth = date.getMonth()
-  this.currentMonthName = this.months[date.getMonth()]
+  // Keep track of the new date.
   this.dateSelected = date
+
+  /*
+    These properties indicate to the instance where the calendar is currently at.
+    Only change them if we're also navigating to the new date in the UI.
+  */
+  if (changeCalendar) {
+    this.currentYear = date.getFullYear()
+    this.currentMonth = date.getMonth()
+    this.currentMonthName = this.months[date.getMonth()]
+  }
 
   setCalendarInputValue(this.el, this)
 
@@ -1236,7 +1244,7 @@ function setDate(newDate, changeCalendar) {
   }
 
   const isSameMonth = currentYear === date.getFullYear() && currentMonth === date.getMonth()
-  ;(isSameMonth || changeCalendar || sibling) && renderCalendar(this, date)
+  ;(isSameMonth || changeCalendar) && renderCalendar(this, date)
 
   return this
 }

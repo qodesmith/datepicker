@@ -116,6 +116,8 @@ describe('Initial calendar load with default settings', () => {
 
     it('respectDisabledReadOnly', () => expect(picker.respectDisabledReadOnly).to.be.false)
 
+    it('sibling', () => expect(picker.sibling).to.be.undefined)
+
     it('first', () => expect(picker.first).to.be.undefined)
 
     it('second', () => expect(picker.second).to.be.undefined)

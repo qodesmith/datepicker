@@ -244,7 +244,7 @@ describe('Initial calendar load with default settings', () => {
           .should('have.text', 'Submit')
       })
 
-      it('should change the year when the user inputs one and hide the overlay', () => {
+      it('should change the year & hide the overlay when using the input & pressing enter', () => {
         cy.get('.qs-month-year .qs-year').then($year => {
           const currentYear = +$year.text()
           const nextYear = currentYear + 1
@@ -264,7 +264,7 @@ describe('Initial calendar load with default settings', () => {
         })
       })
 
-      it('should change the year via the submit button and hide the overlay', () => {
+      it('should change the year & hide the overlay via the submit button', () => {
         cy.get('.qs-month-year .qs-year').click().then($year => {
           const currentYear = +$year.text()
           const nextYear = currentYear + 1
@@ -284,7 +284,7 @@ describe('Initial calendar load with default settings', () => {
         })
       })
 
-      it('should change the month when the user clicks one and hide the overlay', () => {
+      it('should change the month & hide the overlay when the user clicks a month', () => {
         cy.get('.qs-month-year .qs-month').then($month => {
           const currentMonthName = $month.text()
           const currentMonthIndex = months.findIndex(month => month === currentMonthName)

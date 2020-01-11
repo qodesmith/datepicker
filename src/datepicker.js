@@ -75,7 +75,7 @@ function datepicker(selector, options) {
   }
 
   renderCalendar(instance, instance.startDate || instance.dateSelected)
-  instance.alwaysShow && calculatePosition(instance)
+  if (instance.alwaysShow) calculatePosition(instance)
 
   return instance
 }
@@ -345,7 +345,7 @@ function createInstance(selector, opts) {
   parent.appendChild(calendarContainer)
 
   // Conditionally show the calendar.
-  instance.alwaysShow && showCal(instance)
+  if (instance.alwaysShow) showCal(instance)
 
   return instance
 }
@@ -810,7 +810,7 @@ function selectDay(target, instance, deselect) {
     Hide the calendar after a day has been selected.
     Keep it showing if deselecting.
   */
-  !deselect && hideCal(instance)
+  if (!deselect) hideCal(instance)
 
   if (instance.sibling) {
     adjustDateranges({ instance: instance, deselect: deselect })
@@ -1102,7 +1102,7 @@ function oneHandler(e) {
     // Clicking the month/year - open the overlay.
     // Clicking the X on the overlay - close the overlay.
     } else if (monthYearClicked || classList.contains('qs-close')) {
-      !disableYearOverlay && toggleOverlay(!overlayClosed, instance)
+      if (!disableYearOverlay) toggleOverlay(!overlayClosed, instance)
 
     // Clicking a month in the overlay - the <span> inside might have been clicked.
     } else if (newMonthIndex) {
@@ -1112,8 +1112,13 @@ function oneHandler(e) {
     } else if (classList.contains('qs-num')) {
       var targ = target.nodeName === 'SPAN' ? target.parentNode : target
 
-      if (targ.classList.contains('qs-active')) return selectDay(targ, instance, true)
-      return !targ.classList.contains('qs-disabled') && selectDay(targ, instance)
+      if (targ.classList.contains('qs-active')) {
+        selectDay(targ, instance, true)
+      } else if (!targ.classList.contains('qs-disabled')) {
+        selectDay(targ, instance)
+      }
+
+      return
 
     // Clicking the submit button in the overlay.
     } else if (classList.contains('qs-submit') && !classList.contains('qs-disabled')) {
@@ -1132,7 +1137,7 @@ function oneHandler(e) {
     showCal(instance)
 
     // Hide all other instances.
-    datepickers.forEach(function(picker) { picker !== instance && hideCal(picker) })
+    datepickers.forEach(function(picker) { if (picker !== instance) hideCal(picker) })
   } else if (type === 'keydown' && instance && !instance.disabled) {
     var overlay = instance.calendar.querySelector('.qs-overlay')
     var overlayShowing = !overlay.classList.contains('qs-hidden')
@@ -1258,7 +1263,7 @@ function setDate(newDate, changeCalendar) {
   }
 
   var isSameMonth = currentYear === date.getFullYear() && currentMonth === date.getMonth()
-  ;(isSameMonth || changeCalendar) && renderCalendar(this, date)
+  if (isSameMonth || changeCalendar) renderCalendar(this, date)
 
   return this
 }
@@ -1387,7 +1392,7 @@ function changeMinOrMax(instance, date, isMin) {
     instance[prop()] = newDate
   }
 
-  sibling && renderCalendar(sibling)
+  if (sibling) renderCalendar(sibling)
   renderCalendar(instance)
 
   return instance

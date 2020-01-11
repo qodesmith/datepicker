@@ -701,8 +701,9 @@ function createMonth(date, instance, overlayOpen) {
         (minDate && thisDay < minDate) ||
         (maxDate && thisDay > maxDate) ||
         disabler(thisDay) ||
-        disabledDates.includes(+thisDay) ||
-        (noWeekends && weekendIndices.includes(weekdayIndex))
+        // disabledDates.includes(+thisDay) || // .includes isn't supported in older browsers.
+        disabledDates.some(function(num) { return num === +thisDay }) ||
+        (noWeekends && weekendIndices.some(function(idx) { return idx === weekdayIndex }))
       ) otherClass = 'qs-disabled'
 
       // Show events for squares with a number even if they are disabled.
@@ -732,7 +733,7 @@ function createMonth(date, instance, overlayOpen) {
       }
     }
 
-    calendarSquares.push('<div class="qs-square ' + otherClass + weekday + '">${span}</div>')
+    calendarSquares.push('<div class="qs-square ' + otherClass + ' ' + weekday + '">' + span + '</div>')
   }
 
   // Add the header row of days of the week.

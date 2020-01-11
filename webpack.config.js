@@ -54,31 +54,6 @@ module.exports = (env, argv) => ({
   module: {
     rules: [
       {
-        test: /\.js$/,
-        include: path.resolve(__dirname, 'src'),
-        use: [
-          // https://goo.gl/EXjzoG
-          {
-            loader: 'babel-loader',
-            options: {
-              presets: [
-                [
-                  '@babel/preset-env', // https://goo.gl/aAxYAq
-                  {
-                    modules: false, // Needed for tree shaking to work.
-                    useBuiltIns: 'entry', // https://goo.gl/x16mAq
-                    corejs: { // https://goo.gl/9Vfu6X
-                      version: 3,
-                      proposals: true
-                    }
-                  }
-                ]
-              ]
-            }
-          }
-        ]
-      },
-      {
         test: /\.(scss|css)$/,
         include: path.resolve(__dirname, 'src'),
         use: [

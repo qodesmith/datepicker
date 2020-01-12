@@ -322,10 +322,6 @@ describe('Initial calendar load with default settings', () => {
       const dayToSelect = 15
 
       describe('Selecting a date', () => {
-        it('should have a value of undefined for `dateSelected` on the instance object prior to selecting a date', () => {
-          expect(picker.dateSelected).to.be.undefined
-        })
-
         it('should populate `dateSelected` on the instance object with the correct date', () => {
           const correctDate = +new Date(picker.currentYear, picker.currentMonth, dayToSelect)
 

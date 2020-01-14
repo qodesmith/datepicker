@@ -189,6 +189,8 @@ function createInstance(selector, opts) {
     // Year of `startDate` or `dateSelected`.
     currentYear: (startDate || dateSelected).getFullYear(),
 
+    // Events will show a small circle on calendar days.
+    events: options.events || {},
 
 
     // Method to programmatically set the calendar's date.
@@ -402,13 +404,25 @@ function sanitizeOptions(opts, el) {
   // Avoid mutating the original object that was supplied by the user.
   const options = freshCopy(opts)
 
-    /*
-      Check that various options have been provided a JavaScript Date object.
-      If so, strip the time from those dates (for accurate future comparisons).
-    */
-    ;['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(value => {
-      const date = options[value]
-      if (date && !dateCheck(date)) throw `"options.${value}" needs to be a valid JavaScript Date object.`
+  /*
+    Check and ensure all events in the provided array are JS dates.
+    Store these on the instance as an object with JS datetimes as keys for fast lookup.
+  */
+  if (options.events) {
+    options.events = options.events.reduce((acc, date) => {
+      if (!dateCheck(date)) throw '"options.events" must only contain valid JavaScript Date objects.'
+      acc[+stripTime(date)] = true
+      return acc
+    }, {})
+  }
+
+  /*
+    Check that various options have been provided a JavaScript Date object.
+    If so, strip the time from those dates (for accurate future comparisons).
+  */
+  ;['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(value => {
+    const date = options[value]
+    if (date && !dateCheck(date)) throw `"options.${value}" needs to be a valid JavaScript Date object.`
 
       /*
         Strip the time from the date.
@@ -634,8 +648,14 @@ function createMonth(date, instance, overlayOpen) {
     disabler,
     noWeekends,
     startDay,
-    weekendIndices
+    weekendIndices,
+    events
   } = instance
+
+  // If we have a daterange picker, get the current range.
+  const range = (instance.getRange && instance.getRange() || {})
+  const start = +range.start
+  const end = +range.end
 
   // Same year, same month?
   const today = new Date()
@@ -677,17 +697,21 @@ function createMonth(date, instance, overlayOpen) {
     const weekday = days[weekdayIndex]
     const num = i - (offset >= 0 ? offset : (7 + offset))
     const thisDay = new Date(currentYear, currentMonth, num) // No time so we can compare accurately :)
+    const eventClass = ' qs-event'
+    const hasEvent = events[+thisDay]
     const thisDayNum = thisDay.getDate()
     const outsideOfCurrentMonth = num < 1 || num > daysInMonth
     let otherClass = ''
     let span = `<span class="qs-num">${thisDayNum}</span>`
+    const dateInSelectedRange = start && end && +thisDay >= start && +thisDay <= end
 
     // Squares outside the current month.
     if (outsideOfCurrentMonth) {
-      otherClass = 'qs-empty'
+      otherClass = 'qs-empty qs-outside-current-month'
 
       // Show dim dates for dates in preceding and trailing months.
       if (showAllDates) {
+        if (hasEvent) otherClass += eventClass
         otherClass += ' qs-disabled'
 
       // Show empty squares for dates in preceding and trailing months.
@@ -695,7 +719,7 @@ function createMonth(date, instance, overlayOpen) {
         span = ''
       }
 
-    // Disabled & current squares.
+    // Disabled, current, & date-range squares.
     } else {
 
       // Disabled dates.
@@ -707,12 +731,32 @@ function createMonth(date, instance, overlayOpen) {
         (noWeekends && weekendIndices.includes(weekdayIndex))
       ) otherClass = 'qs-disabled'
 
+      // Show events for squares with a number even if they are disabled.
+      if (hasEvent) otherClass += eventClass
+
       // Current date, i.e. today's date.
       if (isThisMonth && num === today.getDate()) otherClass += ' qs-current'
-    }
 
-    // Currently selected day.
-    if (+thisDay === +dateSelected && !outsideOfCurrentMonth) otherClass += ' qs-active'
+      // Selected day.
+      if (+thisDay === +dateSelected) otherClass += ' qs-active'
+
+      // Date-range classes.
+      if (dateInSelectedRange) {
+        // Indicate what index day of the week this is - from first to last. Affects styles.
+        otherClass += ` qs-range-date-${weekdayIndex}`
+
+        // Differentiate start & end range days.
+        if (start !== end) {
+          if (+thisDay === start) {
+            otherClass += ' qs-range-date-start qs-active'
+          } else if (+thisDay === end) {
+            otherClass += ' qs-range-date-end qs-active'
+          } else {
+            otherClass += ' qs-range-date-middle'
+          }
+        }
+      }
+    }
 
     calendarSquares.push(`<div class="qs-square qs-num ${weekday} ${otherClass}">${span}</div>`)
   }
@@ -819,7 +863,6 @@ function adjustDateranges({ instance, deselect }) {
       first.minDate = first.originalMinDate
       second.minDate = second.originalMinDate
     } else {
-      first.minDate = first.dateSelected
       second.minDate = first.dateSelected
     }
   } else {
@@ -827,7 +870,6 @@ function adjustDateranges({ instance, deselect }) {
       second.maxDate = second.originalMaxDate
       first.maxDate = first.originalMaxDate
     } else {
-      second.maxDate = second.dateSelected
       first.maxDate = second.dateSelected
     }
   }
@@ -938,9 +980,14 @@ function stripTime(dateOrNum) {
 function hideCal(instance) {
   if (instance.disabled) return
 
-  toggleOverlay(true, instance)
-  !instance.alwaysShow && instance.calendarContainer.classList.add('qs-hidden')
-  instance.onHide(instance)
+  // Only trigger `onHide` for instances that are currently showing.
+  const isShowing = !instance.calendarContainer.classList.contains('qs-hidden')
+
+  if (isShowing && !instance.alwaysShow) {
+    toggleOverlay(true, instance)
+    instance.calendarContainer.classList.add('qs-hidden')
+    instance.onHide(instance)
+  }
 }
 
 /*

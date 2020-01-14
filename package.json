@@ -1,6 +1,6 @@
 {
   "name": "js-datepicker",
-  "version": "5.0.3",
+  "version": "5.2.1",
   "description": "Get a date with JavaScript! A datepicker with no dependencies.",
   "main": "dist/datepicker.min.js",
   "style": "./src/datepicker.scss",
@@ -56,23 +56,23 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "autoprefixer": "^9.6.1",
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "autoprefixer": "^9.7.1",
     "babel-loader": "^8.0.5",
-    "core-js": "^3.1.4",
-    "css-loader": "^3.1.0",
+    "core-js": "^3.3.6",
+    "css-loader": "^3.2.0",
     "cssnano": "^4.1.10",
     "html-webpack-plugin": "^3.2.0",
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "mini-css-extract-plugin": "^0.8.0",
-    "node-sass": "^4.12.0",
+    "node-sass": "^4.13.0",
     "postcss-loader": "^3.0.0",
     "regenerator-runtime": "^0.13.3",
-    "sass-loader": "^7.1.0",
-    "terser-webpack-plugin": "^1.3.0",
-    "webpack": "^4.36.1",
-    "webpack-cli": "^3.3.6",
-    "webpack-dev-server": "^3.7.2"
+    "sass-loader": "^8.0.0",
+    "terser-webpack-plugin": "^2.2.1",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
   }
 }

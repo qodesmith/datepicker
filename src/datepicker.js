@@ -414,7 +414,7 @@ function sanitizeOptions(opts, el) {
   var startDay = options.startDay
   var id = options.id
 
-  options.startDate = stripTime(options.startDate || options.dateSelected || new Date())
+  options.startDate = stripTime(options.startDate || dateSelected || new Date())
 
 
   // Checks around disabled dates.
@@ -422,7 +422,7 @@ function sanitizeOptions(opts, el) {
     var newDateNum = +stripTime(date)
 
     if (!dateCheck(date)) throw 'You supplied an invalid date to "options.disabledDates".'
-    if (newDateNum === +stripTime(options.dateSelected)) throw '"disabledDates" cannot contain the same date as "dateSelected".'
+    if (newDateNum === +stripTime(dateSelected)) throw '"disabledDates" cannot contain the same date as "dateSelected".'
 
     // Return a number because `createMonth` checks this array for a number match.
     return newDateNum

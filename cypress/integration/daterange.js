@@ -1,16 +1,20 @@
 describe('Daterange Pair', () => {
+  let win
   let picker1
   let picker2
 
   before(() => {
     cy.visit('http://localhost:9001')
-    cy.window().then(win => {
+    cy.window().then(global => {
+      win = global
       picker1 = win.dp('[data-cy="input-1"]', { id: 1 })
       picker2 = win.dp('[data-cy="input-2"]', { id: 1 })
     })
   })
 
   describe('Daterange instance object properties', () => {
+    before(() => cy.get('[data-cy="input-1"]').click())
+
     it('id', () => {
       expect(picker1.id).to.equal(1)
       expect(picker2.id).to.equal(1)
@@ -33,15 +37,17 @@ describe('Daterange Pair', () => {
   })
 
   describe('Daterange UI (& corresponding changes to instance object properties)', () => {
-    before(() => cy.get('[data-cy="input-1"]').click())
 
     describe('Basic visuals and behavior', () => {
       it('should only change months on the calendar being navigated', () => {
         cy.get('[data-cy="section-1"] span.qs-month').then($month => {
+          // Get the current month name.
           const currentStartMonthName = $month.text()
 
+          // Change the month on the 1st calendar.
           cy.get('[data-cy="section-1"] .qs-arrow.qs-right').click().then(() => {
             cy.get('[data-cy="section-1"] span.qs-month').then($month => {
+              // Get the new month name.
               const nextStartMonthName = $month.text()
 
               expect(nextStartMonthName).not.to.equal(currentStartMonthName)
@@ -56,27 +62,60 @@ describe('Daterange Pair', () => {
         })
       })
     })
+
+    describe('Date changes', () => {
+      const dayToSelect = 15
+
+      before(() => {
+        picker1.remove()
+        picker2.remove()
+        picker1 = win.dp('[data-cy="input-1"]', { id: 1 })
+        picker2 = win.dp('[data-cy="input-2"]', { id: 1 })
+        cy.get('[data-cy="input-1"]').click()
+      })
+
+      describe('Selecting a date', () => {
+        describe('1st instance', () => {
+          it('should disable any prior dates on the 2nd instance', () => {
+            cy.get(`[data-cy="section-1"] span.qs-num:contains(${dayToSelect})`).click().then(() => {
+              cy.get('[data-cy="input-2"]').click().then(() => {
+                cy.get('[data-cy="section-2"] .qs-square.qs-disabled')
+                  .should('have.length', dayToSelect - 1)
+              })
+            })
+          })
+
+          it('should not have any disabled dates on the first instance', () => {
+            cy.get('[data-cy="input-1"]').click().then(() => {
+              cy.get('[data-cy="section-1"] .qs-square.qs-disabled')
+                .should('have.length', 0)
+            })
+          })
+
+          it('should only set `minDate` on the 2nd instance', () => {
+            expect(picker1.minDate).to.be.undefined
+            expect(picker1.maxDate).to.be.undefined
+            expect(+picker2.minDate).to.equal(+new Date(picker1.currentYear, picker1.currentMonth, dayToSelect))
+            expect(picker2.maxDate).to.be.undefined
+          })
+        })
+      })
+    })
   })
 
-  describe.skip('Instance methods', () => {
-    const startDayToSelect = 15
+  describe('Instance methods', () => {
+    const today = new Date()
+    const thisYear = today.getFullYear()
+    const thisMonth = today.getMonth()
+    const startDayToSelect = 5
     const endDayToSelect = 20
 
     describe('setDate', () => {
-      before(() => {
-        expect(picker1.dateSelected).to.be.undefined
-        expect(picker2.dateSelected).to.be.undefined
-
-        cy.get('[data-cy="input-1"]').click()
-
-        // Neither calendar should have any date selected.
-        cy.get('.qs-active')
-          .should('have.length', 0)
-      })
+      before(() => cy.get('[data-cy="input-1"]').click())
 
       describe('Start instance', () => {
         it('should programmatically set a date on the start calendar', () => {
-          picker1.setDate(new Date(picker1.currentYear, picker1.currentMonth, startDayToSelect))
+          picker1.setDate(new Date(thisYear, thisMonth, startDayToSelect))
 
           cy.get('[data-cy="section-1"] .qs-active')
             .should('have.length', 1)
@@ -96,6 +135,7 @@ describe('Daterange Pair', () => {
 
         it('should populate the start input with that date', () => {
           const expectedInputText = new Date(picker1.currentYear, picker1.currentMonth, startDayToSelect).toDateString()
+
           cy.get('[data-cy="input-1"]')
             .should('have.value', expectedInputText)
           cy.get('[data-cy="input-2"]')
@@ -103,51 +143,44 @@ describe('Daterange Pair', () => {
         })
 
         it('should populate `dateSelected` on the start instance object', () => {
-          expect(+picker.dateSelected).to.equal(+new Date(picker.currentYear, picker.currentMonth, startDayToSelect))
+          expect(+picker1.dateSelected).to.equal(+new Date(picker1.currentYear, picker1.currentMonth, startDayToSelect))
         })
 
         it('should navigate the calendar to that date via the second argument', () => {
-          cy.get('.qs-active').click().then(() => {
-            const { currentMonthName, currentYear, currentMonth } = picker
-            const nextMonthIndex = currentMonth === 0 ? 1 : 0
-            const nextMonthName = months[nextMonthIndex]
-            const nextYear = currentYear + 1
-            const nextDate = 20
+          const previousMonthName = picker1.currentMonthName
+          const previousYear = picker1.currentYear
 
-            expect(picker.dateSelected).to.be.undefined
+          picker1.setDate(new Date(picker1.currentYear - 1, picker1.currentMonth - 1, startDayToSelect), true)
 
-            cy.get('.qs-active')
-              .should('have.length', 0)
-            cy.get('.qs-month')
-              .should('have.text', currentMonthName)
-            cy.get('.qs-year')
-              .should('have.text', `${currentYear}`)
-              .then(() => {
-                picker.setDate(new Date(nextYear, nextMonthIndex, nextDate), true)
-
-                cy.get('.qs-month')
-                  .should('have.text', nextMonthName)
-                cy.get('.qs-year')
-                  .should('have.text', `${nextYear}`)
-                cy.get('[data-cy="input-1"]')
-                  .should('have.value', new Date(nextYear, nextMonthIndex, 20).toDateString())
-                cy.get('.qs-active')
-                  .should('have.text', `${nextDate}`)
-              })
-          })
+          cy.get('[data-cy="section-1"] .qs-month')
+            .should('not.have.text', previousMonthName)
+          cy.get('[data-cy="section-1"] .qs-year')
+            .should('have.text', `${previousYear - 1}`)
+          cy.get('[data-cy="section-1"] .qs-active')
+            .should('have.text', `${startDayToSelect}`)
+          cy.get('.qs-active')
+            .should('have.length', 1)
         })
 
         it('should remove the selected date when called with no argument', () => {
-          picker.setDate()
+          picker1.setDate()
 
-          expect(picker.dateSelected).to.be.undefined
+          expect(picker1.dateSelected).to.be.undefined
           cy.get('.qs-active')
             .should('have.length', 0)
+        })
 
+        it('should clear the input when called with no argument', () => {
+          cy.get('[data-cy="input-1"]')
+            .should('have.text', '')
         })
       })
 
-      describe('End instance', () => {})
+      describe('End instance', () => {
+        it('should', () => {
+          debugger
+        })
+      })
     })
 
     describe('setMin', () => {

@@ -523,12 +523,11 @@ describe('Daterange Pair', () => {
           })
       })
 
-      describe('Start instance', () => {
-        let numOfDaysInMonth
+      let numOfDaysInMonth
 
+      describe('Start instance', () => {
         it('should set the `maxDate` property on both instances', () => {
           numOfDaysInMonth = new Date(picker1.currentYear, picker1.currentMonth + 1, 0).getDate()
-          picker1.setMax(new Date(picker1.currentYear, picker1.currentMonth, 1))
           const maxDate = new Date(picker1.currentYear, picker1.currentMonth, endDayToSelect)
 
           picker1.setMax(maxDate)
@@ -644,48 +643,201 @@ describe('Daterange Pair', () => {
         })
       })
 
-      describe('End instance', () => {})
+      describe('End instance', () => {
+        before(() => {
+          expect(picker1.maxDate).to.be.undefined
+          expect(picker2.maxDate).to.be.undefined
+        })
+
+        it('should set the `maxDate` property on both instances', () => {
+          const maxDate = new Date(picker2.currentYear, picker2.currentMonth, endDayToSelect)
+
+          picker2.setMax(maxDate)
+          expect(+picker1.maxDate).to.equal(+maxDate)
+          expect(+picker2.maxDate).to.equal(+maxDate)
+        })
+
+        it('should disable dates after the provided value (including following months) on the end calendar', () => {
+          // Bring up the end calendar since the start calendar was previously showing.
+          cy.get('[data-cy="input-2"]').click().then(() => {
+            cy.get('[data-cy="section-2"] .qs-square.qs-disabled')
+              .should('have.length', numOfDaysInMonth - endDayToSelect)
+
+            cy.get('[data-cy="section-2"] .qs-arrow.qs-right').click().then(() => {
+              const numOfDaysInNextMonth = new Date(picker2.currentYear, picker2.currentMonth + 1, 0).getDate()
+
+              cy.get('[data-cy="section-2"] .qs-square.qs-disabled')
+                .should('have.length', numOfDaysInNextMonth)
+            })
+          })
+        })
+
+        it('should disable dates after the provided value (including following months) on the start calendar', () => {
+          // Ensure the start calendar is showing.
+          cy.get('[data-cy="input-1"]').click().then(() => {
+            cy.get('[data-cy="section-1"] .qs-square.qs-disabled')
+              .should('have.length', numOfDaysInMonth - endDayToSelect)
+
+            cy.get('[data-cy="section-1"] .qs-arrow.qs-right').click().then(() => {
+              const numOfDaysInNextMonth = new Date(picker1.currentYear, picker1.currentMonth + 1, 0).getDate()
+
+              cy.get('[data-cy="section-1"] .qs-square.qs-disabled')
+                .should('have.length', numOfDaysInNextMonth)
+            })
+          })
+        })
+
+        it('should not disable dates on either calendar in past months', () => {
+          cy.get('[data-cy="section-1"] .qs-arrow.qs-left').click().then(() => {
+            cy.get('[data-cy="section-1"] .qs-arrow.qs-left').click().then(() => {
+
+              // Check previous month on the start calendar.
+              cy.get('[data-cy="section-1"] .qs-square.qs-disabled')
+                .should('have.length', 0)
+
+              // Reset the start calendar.
+              cy.get('[data-cy="section-1"] .qs-arrow.qs-right').click()
+
+              // Bring up the end calendar.
+              cy.get('[data-cy="input-2"]').click().then(() => {
+                cy.get('[data-cy="section-2"] .qs-arrow.qs-left').click().then(() => {
+                  cy.get('[data-cy="section-2"] .qs-arrow.qs-left').click().then(() => {
+
+                    // Check previous month on the end calendar.
+                    cy.get('[data-cy="section-2"] .qs-square.qs-disabled')
+                      .should('have.length', 0)
+
+                    // Reset the end calendar.
+                    cy.get('[data-cy="section-2"] .qs-arrow.qs-right').click()
+                  })
+                })
+              })
+            })
+          })
+        })
+
+        it('should prevent disabled dates from being selected on end calendar', () => {
+          expect(picker1.dateSelected).to.be.undefined
+          expect(picker2.dateSelected).to.be.undefined
+
+          cy.get('[data-cy="section-2"] .qs-square.qs-disabled')
+            .first()
+            .should('have.text', `${endDayToSelect + 1}`)
+            .click()
+            .then(() => {
+              expect(picker2.dateSelected).to.be.undefined
+
+              cy.get('[data-cy="section-2"] .qs-active')
+                .should('have.length', 0)
+            })
+        })
+
+        it('should prevent disabled dates from being selected on start calendar', () => {
+          // The start calendar is open from the previous test.
+          expect(picker1.dateSelected).to.be.undefined
+          expect(picker2.dateSelected).to.be.undefined
+
+          cy.get('[data-cy="input-1"]').click().then(() => {
+            cy.get('[data-cy="section-1"] .qs-square.qs-disabled')
+              .first()
+              .should('have.text', `${endDayToSelect + 1}`)
+              .click()
+              .then(() => {
+                expect(picker1.dateSelected).to.be.undefined
+
+                cy.get('[data-cy="section-1"] .qs-active')
+                  .should('have.length', 0)
+              })
+          })
+        })
+
+        it('should remove the max selectable date from both instances when called with no argument', () => {
+          expect(picker1.maxDate).not.to.be.undefined
+          expect(picker2.maxDate).not.to.be.undefined
+
+          picker2.setMax()
+
+          expect(picker1.maxDate).to.be.undefined
+          expect(picker2.maxDate).to.be.undefined
+          cy.get('.qs-square.qs-disabled')
+            .should('have.length', 0)
+        })
+      })
     })
 
-    describe.skip('show', () => {
+    describe('show', () => {
       before(() => {
-        cy.get('body').click()
-        cy.get('.qs-datepicker-container')
-          .should('not.be.visible')
+        cy.get('body').click().then(() => {
+          cy.get('[data-cy="section-1"] .qs-datepicker-container')
+            .should('not.be.visible')
+          cy.get('[data-cy="section-2"] .qs-datepicker-container')
+            .should('not.be.visible')
+        })
       })
 
-      it('should show the calendar when called', () => {
-        picker.show()
-        cy.get('.qs-datepicker-container')
+      it('Start instance - should show the calendar when called', () => {
+        picker1.show()
+        cy.get('[data-cy="section-1"] .qs-datepicker-container')
+          .should('be.visible')
+      })
+
+      it('End instance - should show the calendar when called', () => {
+        picker2.show()
+        cy.get('[data-cy="section-2"] .qs-datepicker-container')
           .should('be.visible')
       })
     })
 
-    describe.skip('hide', () => {
-      it('should hide the calendar when called', () => {
-        picker.hide()
-        cy.get('.qs-datepicker-container')
+    describe('hide', () => {
+      it('Start instance - should hide the calendar when called', () => {
+        picker1.hide()
+        cy.get('[data-cy="section-1"] .qs-datepicker-container')
+          .should('not.be.visible')
+      })
+
+      it('End instance - should hide the calendar when called', () => {
+        picker2.hide()
+        cy.get('[data-cy="section-2"] .qs-datepicker-container')
           .should('not.be.visible')
       })
     })
 
-    describe.skip('remove', () => {
+    describe('remove', () => {
       before(() => {
         cy.get('.qs-datepicker-container')
-          .should('have.length', 1)
+          .should('have.length', 2)
       })
 
-      it('should completely nuke the instance object', () => {
-        const numOfProps = Object.keys(picker).length
+      describe('Start instance', () => {
+        it('should completely nuke the instance object', () => {
+          const originalNumOfProps = Object.keys(picker1).length
+          picker1.remove()
+          const numOfProps = Object.keys(picker1).length
 
-        expect(numOfProps).to.be.gt(0)
-        picker.remove()
-        expect(Object.keys(picker).length).to.equal(0)
+          expect(originalNumOfProps).to.be.gt(0)
+          expect(numOfProps).to.equal(0)
+        })
+
+        it('should remove the calendar from the DOM', () => {
+          cy.get('[data-cy="section-1"] .qs-datepicker-container')
+            .should('have.length', 0)
+        })
       })
 
-      it('should remove the calendar from the DOM', () => {
-        cy.get('.qs-datepicker-container')
-          .should('have.length', 0)
+      describe('End instance', () => {
+        it('should completely nuke the instance object', () => {
+          const originalNumOfProps = Object.keys(picker2).length
+          picker2.remove()
+          const numOfProps = Object.keys(picker2).length
+
+          expect(originalNumOfProps).to.be.gt(0)
+          expect(numOfProps).to.equal(0)
+        })
+
+        it('should remove the calendar from the DOM', () => {
+          cy.get('[data-cy="section-2"] .qs-datepicker-container')
+            .should('have.length', 0)
+        })
       })
     })
   })

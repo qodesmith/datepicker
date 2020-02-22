@@ -313,7 +313,7 @@ describe('Daterange Pair', () => {
           })
         })
 
-        it('should not disabled dates on either calendar in future months', () => {
+        it('should not disable dates on either calendar in future months', () => {
           cy.get('[data-cy="section-2"] .qs-arrow.qs-right').click().then(() => {
             cy.get('[data-cy="section-2"] .qs-arrow.qs-right').click().then(() => {
 
@@ -434,7 +434,7 @@ describe('Daterange Pair', () => {
           })
         })
 
-        it('should not disabled dates on either calendar in future months', () => {
+        it('should not disable dates on either calendar in future months', () => {
           cy.get('[data-cy="section-1"] .qs-arrow.qs-right').click().then(() => {
             cy.get('[data-cy="section-1"] .qs-arrow.qs-right').click().then(() => {
 
@@ -513,7 +513,7 @@ describe('Daterange Pair', () => {
       })
     })
 
-    describe.skip('setMax', () => {
+    describe('setMax', () => {
       before(() => {
         cy.get('.qs-square.qs-disabled')
           .should('have.length', 0)
@@ -521,50 +521,126 @@ describe('Daterange Pair', () => {
             expect(picker1.maxDate).to.be.undefined
             expect(picker2.maxDate).to.be.undefined
           })
-        })
+      })
 
       describe('Start instance', () => {
-        picker.setMax(new Date(picker1.currentYear, picker1.currentMonth, 1))
+        let numOfDaysInMonth
 
         it('should set the `maxDate` property on both instances', () => {
-          expect(+picker.maxDate).to.equal(+new Date(picker.currentYear, picker.currentMonth, 1))
+          numOfDaysInMonth = new Date(picker1.currentYear, picker1.currentMonth + 1, 0).getDate()
+          picker1.setMax(new Date(picker1.currentYear, picker1.currentMonth, 1))
+          const maxDate = new Date(picker1.currentYear, picker1.currentMonth, endDayToSelect)
+
+          picker1.setMax(maxDate)
+          expect(+picker1.maxDate).to.equal(+maxDate)
+          expect(+picker2.maxDate).to.equal(+maxDate)
         })
 
-        it('should disabled dates after the provided value (including future months)', () => {
-          const numOfDaysInMonth = new Date(picker.currentYear, picker.currentMonth + 1, 0).getDate()
-          const numOfDaysNextMonth = new Date(picker.currentYear, picker.currentMonth + 2, 0).getDate()
+        it('should disable dates after the provided value (including following months) on the start calendar', () => {
+          // Ensure the start calendar is showing.
+          cy.get('[data-cy="input-1"]').click().then(() => {
+            cy.get('[data-cy="section-1"] .qs-square.qs-disabled')
+              .should('have.length', numOfDaysInMonth - endDayToSelect)
 
-          cy.get('.qs-square.qs-disabled')
-            .should('have.length', numOfDaysInMonth - 1)
-          cy.get('.qs-arrow.qs-right').click().then(() => {
-            cy.get('.qs-square.qs-disabled')
-              .should('have.length', numOfDaysNextMonth)
+            cy.get('[data-cy="section-1"] .qs-arrow.qs-right').click().then(() => {
+              const numOfDaysInNextMonth = new Date(picker1.currentYear, picker1.currentMonth + 1, 0).getDate()
+
+              cy.get('[data-cy="section-1"] .qs-square.qs-disabled')
+                .should('have.length', numOfDaysInNextMonth)
+            })
           })
         })
 
-        it('should prevent disabled dates from being selected', () => {
-          expect(picker.dateSelected).to.be.undefined
-          cy.get('.qs-square.qs-disabled')
+        it('should disable dates after the provided value (including following months) on the end calendar', () => {
+          // Bring up the end calendar since the start calendar was previously showing.
+          cy.get('[data-cy="input-2"]').click().then(() => {
+            cy.get('[data-cy="section-2"] .qs-square.qs-disabled')
+              .should('have.length', numOfDaysInMonth - endDayToSelect)
+
+            cy.get('[data-cy="section-2"] .qs-arrow.qs-right').click().then(() => {
+              const numOfDaysInNextMonth = new Date(picker2.currentYear, picker2.currentMonth + 1, 0).getDate()
+
+              cy.get('[data-cy="section-2"] .qs-square.qs-disabled')
+                .should('have.length', numOfDaysInNextMonth)
+            })
+          })
+        })
+
+        it('should not disable dates on either calendar in past months', () => {
+          cy.get('[data-cy="section-2"] .qs-arrow.qs-left').click().then(() => {
+            cy.get('[data-cy="section-2"] .qs-arrow.qs-left').click().then(() => {
+
+              // Check previous month on the end calendar.
+              cy.get('[data-cy="section-2"] .qs-square.qs-disabled')
+                .should('have.length', 0)
+
+              // Reset the end calendar.
+              cy.get('[data-cy="section-2"] .qs-arrow.qs-right').click()
+
+              // Bring up the start calendar.
+              cy.get('[data-cy="input-1"]').click().then(() => {
+                cy.get('[data-cy="section-1"] .qs-arrow.qs-left').click().then(() => {
+                  cy.get('[data-cy="section-1"] .qs-arrow.qs-left').click().then(() => {
+
+                    // Check previous month on the start calendar.
+                    cy.get('[data-cy="section-1"] .qs-square.qs-disabled')
+                      .should('have.length', 0)
+
+                    // Reset the start calendar.
+                    cy.get('[data-cy="section-1"] .qs-arrow.qs-right').click()
+                  })
+                })
+              })
+            })
+          })
+        })
+
+        it('should prevent disabled dates from being selected on start calendar', () => {
+          // The start calendar is open from the previous test.
+          expect(picker1.dateSelected).to.be.undefined
+          expect(picker2.dateSelected).to.be.undefined
+
+          cy.get('[data-cy="section-1"] .qs-square.qs-disabled')
             .first()
-            .should('have.text', '1')
+            .should('have.text', `${endDayToSelect + 1}`)
             .click()
             .then(() => {
-              expect(picker.dateSelected).to.be.undefined
+              expect(picker1.dateSelected).to.be.undefined
+
+              cy.get('[data-cy="section-1"] .qs-active')
+                .should('have.length', 0)
             })
         })
 
-        it('should remove the max selectable date when called with no argument', () => {
-          const numOfDaysInMonth = new Date(picker.currentYear, picker.currentMonth + 1, 0).getDate()
+        it('should prevent disabled dates from being selected on end calendar', () => {
+          expect(picker1.dateSelected).to.be.undefined
+          expect(picker2.dateSelected).to.be.undefined
 
+          // Open the end calendar.
+          cy.get('[data-cy="input-2"]').click().then(() => {
+            cy.get('[data-cy="section-2"] .qs-square.qs-disabled')
+              .first()
+              .should('have.text', `${endDayToSelect + 1}`)
+              .click()
+              .then(() => {
+                expect(picker2.dateSelected).to.be.undefined
+
+                cy.get('[data-cy="section-2"] .qs-active')
+                  .should('have.length', 0)
+              })
+          })
+        })
+
+        it('should remove the max selectable date from both instances when called with no argument', () => {
+          expect(picker1.maxDate).not.to.be.undefined
+          expect(picker2.maxDate).not.to.be.undefined
+
+          picker1.setMax()
+
+          expect(picker1.maxDate).to.be.undefined
+          expect(picker2.maxDate).to.be.undefined
           cy.get('.qs-square.qs-disabled')
-            .should('have.length', numOfDaysInMonth)
-            .then(() => {
-              expect(picker.maxDate).not.to.be.undefined
-              picker.setMax()
-              expect(picker.maxDate).to.be.undefined
-              cy.get('.qs-square.qs-disabled')
-                .should('have.length', 0)
-            })
+            .should('have.length', 0)
         })
       })
 

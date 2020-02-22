@@ -739,7 +739,7 @@ describe('Initial calendar load with default settings', () => {
       it('should completely nuke the instance object', () => {
         const originalNumOfProps = Object.keys(picker).length
         picker.remove()
-        const numOfProps = Object.keys(picker1).length
+        const numOfProps = Object.keys(picker).length
 
         expect(originalNumOfProps).to.be.gt(0)
         expect(numOfProps).to.equal(0)

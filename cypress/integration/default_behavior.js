@@ -737,11 +737,12 @@ describe('Initial calendar load with default settings', () => {
       })
 
       it('should completely nuke the instance object', () => {
-        const numOfProps = Object.keys(picker).length
-
-        expect(numOfProps).to.be.gt(0)
+        const originalNumOfProps = Object.keys(picker).length
         picker.remove()
-        expect(Object.keys(picker).length).to.equal(0)
+        const numOfProps = Object.keys(picker1).length
+
+        expect(originalNumOfProps).to.be.gt(0)
+        expect(numOfProps).to.equal(0)
       })
 
       it('should remove the calendar from the DOM', () => {

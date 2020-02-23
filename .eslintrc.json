@@ -2,9 +2,8 @@
   "parserOptions": {
     "ecmaVersion": 3
   },
-  "overrides": [
-    {
-      "files": ["datepicker.js"]
-    }
+  "ignorePatterns": [
+    "webpack.config.js",
+    "test-app.js"
   ]
 }

@@ -41,14 +41,14 @@ module.exports = (env, argv) => ({
 
   /*
     http://bit.ly/2JojX2u
-    The top-level output key contains set of options instructing webpack
+    The top-level output key contains a set of options instructing webpack
     on how and where it should output your bundles, assets and anything else
     you bundle or load with webpack.
   */
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: env.prod ? 'datepicker.min.js' : '[name].js',
-    library: 'datepicker',
+    library: 'datepicker', // The name of the global variable the library is set to.
     libraryTarget: 'umd' // "Universal" export - Node, browser, amd, etc.
   },
   module: {

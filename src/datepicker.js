@@ -789,6 +789,7 @@ function selectDay(target, instance, deselect) {
   var el = instance.el
   var active = instance.calendar.querySelector('.qs-active')
   var num = target.textContent
+  var sibling = instance.sibling
 
   // Prevent Datepicker from selecting (or deselecting) dates.
   if ((el.disabled || el.readOnly) && instance.respectDisabledReadOnly) return
@@ -801,7 +802,7 @@ function selectDay(target, instance, deselect) {
   if (!deselect) target.classList.add('qs-active')
 
   /*
-    Populate the <input> field (or not) with a readble value
+    Populate the <input> field (or not) with a readable value
     and store the individual date values as attributes.
   */
   setCalendarInputValue(el, instance, deselect)
@@ -812,10 +813,25 @@ function selectDay(target, instance, deselect) {
   */
   if (!deselect) hideCal(instance)
 
-  if (instance.sibling) {
+  if (sibling) {
+    // Update minDate & maxDate of both calendars.
     adjustDateranges({ instance: instance, deselect: deselect })
+
+    /*
+      http://bit.ly/2VdRx0r
+      Daterange - if we're selecting a date on the "start" calendar,
+      navigate the "end" calendar to the same month & year only if
+      no date has already been selected on the "end" calendar.
+    */
+    if (instance.first && !sibling.dateSelected) {
+      sibling.currentYear = instance.currentYear
+      sibling.currentMonth = instance.currentMonth
+      sibling.currentMonthName = instance.currentMonthName
+    }
+
+    // Re-render both calendars.
     renderCalendar(instance)
-    renderCalendar(instance.sibling)
+    renderCalendar(sibling)
   }
 
 

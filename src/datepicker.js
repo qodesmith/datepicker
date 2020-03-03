@@ -1187,6 +1187,19 @@ function oneHandler(e) {
   }
 }
 
+/**
+ *
+ *  In the case of a calendar being placed in a shadow DOM (web components), we need
+ *  to keep the `oneHandler` listener on the document while having another listener
+ *  on the shadow DOM. We set a property on the event object to indicate the event
+ *  originated from a shadow DOM. This will ensure that once the event bubbles up to
+ * `onHandler` on the document, we know to ignore it.
+ */
+function shadowDomHandler(e) {
+  oneHandler(e)
+  e.__qs_shadow_dom = true
+}
+
 
 //////////////////////
 // INSTANCE METHODS //

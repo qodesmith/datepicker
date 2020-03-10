@@ -382,7 +382,7 @@ function getElement(selector) {
   if (typeof el === 'string') {
     el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
   }
-  return el;
+  return el
 }
 
 /*
@@ -1108,7 +1108,7 @@ function overlayYearEntry(e, input, instance, overlayMonthIndex) {
 function oneHandler(e) {
   var type = e.type
   var target = e.target
-  var handledForShadowDom = e.handledForShadowDom;
+  var handledForShadowDom = e.handledForShadowDom
   var classList = target.classList
   var instance = datepickers.filter(function(picker) {
     return picker.calendar.contains(target) || picker.el === target
@@ -1230,8 +1230,8 @@ function oneHandler(e) {
  * Calls the generic handler and sets property handledForShadowDom to true on the event.
  */
 function shadowDomHandler(e) {
-  oneHandler(e);
-  e.handledForShadowDom = true;
+  oneHandler(e)
+  e.handledForShadowDom = true
 }
 
 
@@ -1504,7 +1504,7 @@ function remove() {
   datepickers = datepickers.filter(function(picker) { return picker.el !== el })
 
   // If this was the last datepicker in shadow DOM with this parent, remove the event listeners
-  if (isInShadowDom && !datepickers.some(function (picker) { return picker.isInShadowDom && picker.parent === _this.parent; ))){
+  if (isInShadowDom && !datepickers.some(function (picker) { return picker.isInShadowDom && picker.parent === _this.parent })){
     events.forEach(function (event) { parent.removeEventListener(event, shadowDomHandler) })
   }
 

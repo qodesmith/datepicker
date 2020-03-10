@@ -1,0 +1,29 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height : 100%;
+  margin: 0;
+  font-family: sans-serif;
+}
+
+body {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+input {
+  font-family: inherit;
+  font-size: inherit;
+  padding: .5em;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}

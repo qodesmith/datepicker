@@ -19,13 +19,18 @@ module.exports = (env, argv) => ({
     http://bit.ly/2w3Ahxa
     The point(s) to enter the application.
   */
-  entry: [
-    // Only during development.
-    !env.prod && path.resolve(__dirname, 'sandbox/sandbox.js'),
+  entry: (() => {
+    const entry = {
+      datepicker: path.resolve(__dirname, 'src/datepicker.js'),
+      sandbox: env.dev && path.resolve(__dirname, 'sandbox/test-app.js'),
+      'test-app': env.test && path.resolve(__dirname, 'sandbox/test-app.js')
+    }
 
-    // Development & production.
-    path.resolve(__dirname, 'src/datepicker.js')
-  ].filter(Boolean),
+    return Object.keys(entry).reduce((acc, key) => {
+      if (entry[key]) acc[key] = entry[key]
+      return acc
+    }, {})
+  })(),
 
   /*
     http://bit.ly/2w55YpG
@@ -36,43 +41,18 @@ module.exports = (env, argv) => ({
 
   /*
     http://bit.ly/2JojX2u
-    The top-level output key contains set of options instructing webpack
+    The top-level output key contains a set of options instructing webpack
     on how and where it should output your bundles, assets and anything else
     you bundle or load with webpack.
   */
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'datepicker.min.js',
-    library: 'datepicker',
+    filename: env.prod ? 'datepicker.min.js' : '[name].js',
+    library: 'datepicker', // The name of the global variable the library is set to.
     libraryTarget: 'umd' // "Universal" export - Node, browser, amd, etc.
   },
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        include: path.resolve(__dirname, 'src'),
-        use: [
-          // https://goo.gl/EXjzoG
-          {
-            loader: 'babel-loader',
-            options: {
-              presets: [
-                [
-                  '@babel/preset-env', // https://goo.gl/aAxYAq
-                  {
-                    modules: false, // Needed for tree shaking to work.
-                    useBuiltIns: 'entry', // https://goo.gl/x16mAq
-                    corejs: { // https://goo.gl/9Vfu6X
-                      version: 3,
-                      proposals: true
-                    }
-                  }
-                ]
-              ]
-            }
-          }
-        ]
-      },
       {
         test: /\.(scss|css)$/,
         include: path.resolve(__dirname, 'src'),
@@ -114,6 +94,7 @@ module.exports = (env, argv) => ({
     */
     public: 'http://localhost:9001'
   },
+
   // https://goo.gl/bxPV7L
   optimization: {
     minimize: !!env.prod,
@@ -139,8 +120,16 @@ module.exports = (env, argv) => ({
     // Used only in development.
     // Prevents `npm run build` from creating an html asset in the dist folder.
     !env.prod && new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'sandbox/index.ejs'),
-      title: 'Datepicker Sandbox'
+      template: path.resolve(__dirname, `sandbox/${env.dev ? 'index' : 'test'}.ejs`),
+      title: env.dev ? 'Datepicker Sandbox' : 'Cypress E2E Testing',
+
+      // http://bit.ly/2SSVJlc - Order Webpack assets manually. Requires `entry` above to be an object.
+      chunks: [
+        'datepicker',
+        env.dev && 'sandbox',
+        env.test && 'test-app'
+      ].filter(Boolean),
+      chunksSortMode: 'manual'
     })
   ].filter(Boolean)
 })

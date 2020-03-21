@@ -51,12 +51,21 @@ var events = ['click', 'focusin', 'keydown', 'input']
 /*
  *  Datepicker! Get a date with JavaScript...
  */
-function datepicker(selector, options) {
-  // Apply the event listeners only once.
-  if (!datepickers.length) applyListeners()
+function datepicker(selectorOrElement, options) {
+    // Create the datepicker instance!
+  var instance = createInstance(selectorOrElement, options)
 
-  // Create the datepicker instance!
-  var instance = createInstance(selector, options)
+  // Apply the event listeners to the document only once.
+  if (!datepickers.length) applyListeners(document)
+
+  // Apply the event listeners to a particular shadow DOM only once.
+  if (instance.shadowDom) {
+    var shadowDomAlreadyInUse = datepickers.some(function(picker) { return picker.shadowDom === instance.shadowDom })
+    if (!shadowDomAlreadyInUse) applyListeners(instance.shadowDom, true)
+  }
+
+  // Keep track of all our instances in an array.
+  datepickers.push(instance)
 
   /*
     Daterange processing!
@@ -90,11 +99,13 @@ function datepicker(selector, options) {
  *  The goal is to ever only have one set of listeners regardless
  *  of how many datepicker instances have been initialized.
  */
-function applyListeners() {
-  // Using document instead of window because #iphone :/
-  // Safari won't handle the click event properly if it's on the window.
+function applyListeners(documentOrShadowDom, useShadowDomHandler) {
+  /*
+    Using document instead of window because #iphone :/
+    Safari won't handle the click event properly if it's on the window.
+  */
   events.forEach(function(event) {
-    document.addEventListener(event, oneHandler)
+    documentOrShadowDom.addEventListener(event, useShadowDomHandler ? shadowDomHandler : oneHandler)
   })
 }
 
@@ -102,43 +113,120 @@ function applyListeners() {
  *  Creates a datepicker instance after sanitizing the options.
  *  Calls `setCalendarInputValue` and conditionally `showCal`.
  */
-function createInstance(selector, opts) {
+function createInstance(selectorOrElement, opts) {
+  var options = sanitizeOptions(opts || defaults())
+
   /*
-    In the case that the selector is an id beginning with a number (#123),
-    querySelector will fail. That's why we need to check and
-    conditionally use `getElementById`.
+    This will get assigned the shadow DOM if there is in one.
+    We use this property to trigger an extra event listener on the shadow DOM
+    as well as tell the <body> listener to ignore events from the shadow DOM.
   */
-  var el = selector
+  var shadowDom
+
+  /*
+    This will get assigned the <custom-element> containing the shadow DOM.
+    TODO - EXPLAIN WHAT WE USE THIS PROPERTY FOR.
+  */
+  var customElement
+
+  /*
+    In the case that the selector is an id beginning with a number (e.x. #123),
+    querySelector will fail. That's why we need to check and conditionally use `getElementById`.
+    Also, datepicker doesn't support string selectors when using a shadow DOM, hence why we use `document`.
+  */
+  var el = selectorOrElement
   if (typeof el === 'string') {
     el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
+
+  /*
+    If the selector is not a string, we may have been given an element within a shadow DOM (or a shadow DOM itself).
+    IE doesn't support custom elements at all so that would have to be polyfilled.
+    Warn about this for good dev experience and then throw whatever error the browser gives.
+  */
+  } else {
+    try {
+      var rootNode = el.getRootNode() // Even if `el` IS the shadow DOM, this will still return the shadow DOM.
+      if (type(rootNode) === '[object ShadowRoot]') {
+        shadowDom = rootNode
+        customElement = rootNode.host
+      }
+    } catch(e) {
+      console.warn('You have to polyfill the web components spec - http://bit.ly/3axUZHC')
+      throw e
+    }
   }
 
   if (!el) throw ('No selector / element found.')
 
-  var options = sanitizeOptions(opts || defaults(), el)
+  // Check if the provided element already has a datepicker attached.
+  if (datepickers.some(function(picker) { return picker.el === el })) throw 'A datepicker already exists on that element.'
+
+  /*
+    `noPosition` tells future logic to avoid trying to style the parent element of datepicker.
+    Otherwise, it will conditionally add `position: relative` styling to the parent.
+    For instance, if datepicker's selector was 'body', there is no parent element to do any
+    styling to. And there's nothing to position datepicker relative to. It will just be appended to the body.
+
+    This property also prevents `calculatePosition()` from doing anything.
+    `noPosition` will false when using a shadow DOM.
+  */
   var noPosition = el === document.body
-  var parent = noPosition ? document.body : el.parentElement
+
+  /*
+    `parent` is the element that datepicker will be attached to in the DOM. In the case of `noPosition`,
+    it will be the <body>. If datepicker was passed a top-level element in the shadow DOM (meaning the element's
+    direct parent IS the shadow DOM) or the shadow DOM itself, the parent will be the shadow DOM.
+  */
+  var parent = shadowDom ? (el.parentElement || shadowDom) : noPosition ? document.body : el.parentElement
+
+  /*
+    The calendar needs to be positioned relative to something. That something is `el`.
+    Since we position the calendar absolutely, we need something up the chain to have explicit positioning on it.
+    `positionedEl` will conditionally get that explicit positioning below via inline styles if it doesn't already have it.
+    That positioning, if applied, will be removed (cleaned up) down the line.
+    `calculatePosition` will use the coordinates for `positionedEl` and `el` to correctly position the calendar.
+
+    If `noPosition` is true, this value will be ignored further down the chain.
+    If `parent` is a shadow DOM, this will be the custom element associated with that shadow DOM.
+  */
+  var positionedEl = shadowDom ? (el.parentElement || customElement) : parent
+
+
   var calendarContainer = document.createElement('div')
   var calendar = document.createElement('div')
 
-  // The calendar scales relative to the font-size of the container.
-  // The user can provide a class name that sets font-size, or a theme perhaps.
-  // thereby controlling the overall size and look of the calendar.
+  /*
+    The calendar scales relative to the font-size of the container.
+    The user can provide a class name that sets font-size, or a theme perhaps,
+    thereby controlling the overall size and look of the calendar.
+  */
   calendarContainer.className = 'qs-datepicker-container qs-hidden'
   calendar.className = 'qs-datepicker'
 
 
   var instance = {
-    // The calendar will be positioned relative to this element (except when 'body').
+    // If a datepicker is used within a shadow DOM, this will be populated with it.
+    shadowDom: shadowDom,
+
+    // If a datepicker is used within a shadow DOM, this will be populated with the web component custom element.
+    customElement: customElement,
+
+
+
+    // Used to help calculate the position of the calendar.
+    positionedEl: positionedEl,
+
+    // The calendar will become a sibling to this element in the DOM and be positioned relative to it (except when <body>).
     el: el,
 
-    // The element that datepicker will be child of in the DOM.
+    // The element that datepicker will be child of in the DOM. Used to calculate datepicker's position and might get inline styles.
     parent: parent,
 
+    // TODO - what happens when we use a custom element that eventually renders an input?
     // Indicates whether to use an <input> element or not as the calendar's anchor.
     nonInput: el.nodeName !== 'INPUT',
 
-    // Flag indicating if `el` is 'body' for `calculatePosition`.
+    // Flag indicating if `el` is 'body'. Used below and by `calculatePosition`.
     noPosition: noPosition,
 
     // Calendar position relative to `el`.
@@ -182,6 +270,7 @@ function createInstance(selector, opts) {
 
     // Events will show a small circle on calendar days.
     events: options.events || {},
+
 
 
     // Method to programmatically set the calendar's date.
@@ -314,37 +403,38 @@ function createInstance(selector, opts) {
   // Initially populate the <input> field / set attributes on the `el`.
   if (options.dateSelected) setCalendarInputValue(el, instance)
 
-  // Add any needed styles to the parent element.
-  var computedPosition = getComputedStyle(parent).position
+  // Find out what positioning `positionedEl` has so we can conditionally style it.
+  var computedPosition = getComputedStyle(positionedEl).position
 
+  // Only add inline styles if `positionedEl` doesn't have any explicit positioning.
   if (!noPosition && (!computedPosition || computedPosition === 'static')) {
-    // Indicate that the parent inline styles for position have been set.
+    // Indicate that inline styles have been set.
     instance.inlinePosition = true
 
-    // Add inline position styles.
-    // I've seen that `element.style.position = '...'` isn't reliable.
-    // https://mzl.la/2Yi6hNG
-    parent.style.setProperty('position', 'relative')
+    /*
+      Add inline position styles.
+      I've seen that `element.style.position = '...'` isn't reliable.
+      https://mzl.la/2Yi6hNG
+    */
+    positionedEl.style.setProperty('position', 'relative')
   }
 
   /*
-    Ensure any pickers with a common parent that have
-    will ALL have the `inlinePosition` property.
+    Ensure any pickers with a common `positionedEl` will ALL have the `inlinePosition` property.
+    This will ensure the styling is removed ONLY when the LAST picker inside it is removed.
+    This condition will trigger when subsequent pickers are instantiated inside `postionedEl`.
   */
   if (instance.inlinePosition) {
     datepickers.forEach(function(picker) {
-      if (picker.parent === instance.parent) picker.inlinePosition = true
+      if (picker.positionedEl === instance.positionedEl) picker.inlinePosition = true
     })
   }
-
-  // Keep track of all our instances in an array.
-  datepickers.push(instance)
 
   // Put our instance's calendar in the DOM.
   calendarContainer.appendChild(calendar)
   parent.appendChild(calendarContainer)
 
-  // Conditionally show the calendar.
+  // Conditionally show the calendar from the start.
   if (instance.alwaysShow) showCal(instance)
 
   return instance
@@ -357,7 +447,7 @@ function createInstance(selector, opts) {
 function freshCopy(item) {
   if (Array.isArray(item)) return item.map(freshCopy)
 
-  if (({}).toString.call(item) === '[object Object]') {
+  if (type(item) === '[object Object]') {
     return Object.keys(item).reduce(function(newObj, key) {
       newObj[key] = freshCopy(item[key])
       return newObj
@@ -371,10 +461,7 @@ function freshCopy(item) {
  *  Will run checks on the provided options object to ensure correct types.
  *  Returns an options object if everything checks out.
  */
-function sanitizeOptions(opts, el) {
-  // Check if the provided element already has a datepicker attached.
-  if (datepickers.some(function(picker) { return picker.el === el })) throw 'A datepicker already exists on that element.'
-
+function sanitizeOptions(opts) {
   // Avoid mutating the original object that was supplied by the user.
   var options = freshCopy(opts)
 
@@ -916,25 +1003,40 @@ function changeMonthYear(classList, instance, year, overlayMonthIndex) {
 
 /*
  *  Sets the `top` & `left` inline styles on the container after doing calculations.
+ *  Positions datepicker relative to `instance.parent`.
  */
 function calculatePosition(instance) {
-  // Don't position the calendar in reference to the <body> or <html> elements.
+  // Don't try to position the calendar if its el is <body> or <html>.
   if (instance.noPosition) return
 
   var top = instance.position.top
   var right = instance.position.right
   var centered = instance.position.centered
 
+  /*
+    For reference, here's what's happening with this class name...
+
+    .qs-centered {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    It's positioned smack in the middle of the entire screen.
+  */
   if (centered) return instance.calendarContainer.classList.add('qs-centered')
 
-  var rects = [instance.parent, instance.el, instance.calendarContainer].map(function(x) { return x.getBoundingClientRect() })
-  var parentRect = rects[0]
-  var elRect = rects[1]
-  var calRect = rects[2]
-  var offset = elRect.top - parentRect.top + instance.parent.scrollTop
-  var topStyle = offset - (top ? calRect.height : (elRect.height * -1)) + 'px'
-  var leftStyle = elRect.left - parentRect.left + (right ? elRect.width - calRect.width : 0) + 'px'
+  // Get the measurements.
+  var positionedElRects = instance.positionedEl.getBoundingClientRect()
+  var elRects = instance.el.getBoundingClientRect()
+  var containerRects = instance.calendarContainer.getBoundingClientRect()
 
+  // Calculate the position!
+  var topStyle = elRects.top - positionedElRects.top + (top ? (containerRects.height * -1) : elRects.height) + 'px'
+  var leftStyle = elRects.left - positionedElRects.left + (right ? (elRects.width - containerRects.width) : 0) + 'px'
+
+  // Set the styles.
   instance.calendarContainer.style.setProperty('top', topStyle)
   instance.calendarContainer.style.setProperty('left', leftStyle)
 }
@@ -944,7 +1046,7 @@ function calculatePosition(instance) {
  */
 function dateCheck(date) {
   return (
-    ({}).toString.call(date) === '[object Date]' &&
+    type(date) === '[object Date]' &&
     date.toString() !== 'Invalid Date'
   )
 }
@@ -1060,6 +1162,13 @@ function overlayYearEntry(e, input, instance, overlayMonthIndex) {
   }
 }
 
+/*
+ *  Returns the explicit type of something as a string.
+ */
+function type(thing) {
+  return ({}).toString.call(thing)
+}
+
 
 ///////////////////
 // EVENT HANDLER //
@@ -1071,6 +1180,9 @@ function overlayYearEntry(e, input, instance, overlayMonthIndex) {
  *  all datepicker instances have had their `remove` method called.
  */
 function oneHandler(e) {
+  // Prevent double-firing when events bubble from a shadow DOM.
+  if (e.__qs_shadow_dom) return
+
   var type = e.type
   var target = e.target
   var classList = target.classList
@@ -1187,7 +1299,7 @@ function oneHandler(e) {
   }
 }
 
-/**
+/*
  *
  *  In the case of a calendar being placed in a shadow DOM (web components), we need
  *  to keep the `oneHandler` listener on the document while having another listener
@@ -1198,6 +1310,13 @@ function oneHandler(e) {
 function shadowDomHandler(e) {
   oneHandler(e)
   e.__qs_shadow_dom = true
+}
+
+/*
+ *  Removes the event listeners on either the document or the shadow DOM.
+ */
+function removeEvents(node, listener) {
+  events.forEach(function(event) { node.removeEventListener(event, listener) })
 }
 
 
@@ -1448,36 +1567,37 @@ function getRange() {
  *  Removes the event listeners if this is the last instance.
  */
 function remove() {
-  var inlinePosition = this.inlinePosition
-  var parent = this.parent
+  var shadowDom = this.shadowDom
+  var positionedEl = this.positionedEl
   var calendarContainer = this.calendarContainer
-  var el = this.el
   var sibling = this.sibling
   var _this = this
 
   // Remove styling done to the parent element and reset it back to its original
   // only if there are no other instances using the same parent.
-  if (inlinePosition) {
-    var found = datepickers.some(function(picker) { return picker !== _this && picker.parent === parent })
-    if (!found) parent.style.setProperty('position', null)
+  if (this.inlinePosition) {
+    var relativeElStillInUse = datepickers.some(function(picker) { return picker !== _this && picker.positionedEl === positionedEl })
+    if (!relativeElStillInUse) positionedEl.style.setProperty('position', null)
   }
 
   // Remove the calendar from the DOM.
   calendarContainer.remove()
 
   // Remove this instance from the list.
-  datepickers = datepickers.filter(function(picker) { return picker.el !== el })
+  datepickers = datepickers.filter(function(picker) { return picker !== _this })
 
   // Remove siblings references.
   if (sibling) delete sibling.sibling
 
+  // If this was the last datepicker in the list, remove the event handlers.
+  if (!datepickers.length) removeEvents(document, oneHandler)
+
+  // Remove the shadow DOM listener if this was the last picker in that shadow DOM.
+  var shadowDomStillInUse = datepickers.filter(function(picker) { return picker.shadowDom === shadowDom }).length
+  if (shadowDom && !shadowDomStillInUse) removeEvents(shadowDom, shadowDomHandler)
+
   // Empty this instance of all properties.
   for (prop in this) delete this[prop]
-
-  // If this was the last datepicker in the list, remove the event handlers.
-  if (!datepickers.length) {
-    events.forEach(function(event) { document.removeEventListener(event, oneHandler) })
-  }
 }
 
 module.exports = datepicker

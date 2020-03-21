@@ -1179,7 +1179,10 @@ function hideOtherPickers(instance) {
  *  all datepicker instances have had their `remove` method called.
  */
 function oneHandler(e) {
-  // Prevent double-firing when events bubble from a shadow DOM.
+  /*
+    Prevent double-firing when events bubble from a shadow DOM.
+    This works even if we have shadow DOMs within shadow DOMs within...
+  */
   if (e.__qs_shadow_dom) return
 
   var type = e.type

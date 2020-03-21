@@ -1169,6 +1169,13 @@ function type(thing) {
   return ({}).toString.call(thing)
 }
 
+/*
+ *  Hides all instances aside from the one passed in.
+ */
+function hideOtherPickers(instance) {
+  datepickers.forEach(function(picker) { if (picker !== instance) hideCal(picker) })
+}
+
 
 ///////////////////
 // EVENT HANDLER //
@@ -1254,6 +1261,7 @@ function oneHandler(e) {
     // Clicking the calendar's el for non-input's should show it.
     } else if (nonInput && target === instance.el) {
       showCal(instance)
+      hideOtherPickers(instance)
     }
 
   /*
@@ -1265,7 +1273,7 @@ function oneHandler(e) {
     showCal(instance)
 
     // Hide all other instances.
-    datepickers.forEach(function(picker) { if (picker !== instance) hideCal(picker) })
+    hideOtherPickers(instance)
   } else if (type === 'keydown' && instance && !instance.disabled) {
     var overlay = instance.calendar.querySelector('.qs-overlay')
     var overlayShowing = !overlay.classList.contains('qs-hidden')

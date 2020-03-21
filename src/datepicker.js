@@ -125,7 +125,8 @@ function createInstance(selectorOrElement, opts) {
 
   /*
     This will get assigned the <custom-element> containing the shadow DOM.
-    TODO - EXPLAIN WHAT WE USE THIS PROPERTY FOR.
+    This can potentially eventually become `positionedEl` (stored on the instance object).
+    It is used for positioning purposes. See the explanation below.
   */
   var customElement
 
@@ -222,8 +223,7 @@ function createInstance(selectorOrElement, opts) {
     // The element that datepicker will be child of in the DOM. Used to calculate datepicker's position and might get inline styles.
     parent: parent,
 
-    // TODO - what happens when we use a custom element that eventually renders an input?
-    // Indicates whether to use an <input> element or not as the calendar's anchor.
+    // Indicates whether the calendar is used with an <input> or not. Affects login in the event listener.
     nonInput: el.nodeName !== 'INPUT',
 
     // Flag indicating if `el` is 'body'. Used below and by `calculatePosition`.

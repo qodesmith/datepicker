@@ -1014,16 +1014,8 @@ function calculatePosition(instance) {
   var centered = instance.position.centered
 
   /*
-    For reference, here's what's happening with this class name...
-
-    .qs-centered {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    It's positioned smack in the middle of the entire screen.
+    This positions the calendar `fixed` in the middle of the screen,
+    so we don't need to do any calculations. We just add the class to trigger styles.
   */
   if (centered) return instance.calendarContainer.classList.add('qs-centered')
 

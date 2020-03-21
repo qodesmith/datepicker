@@ -1581,11 +1581,13 @@ function remove() {
   var sibling = this.sibling
   var _this = this
 
-  // Remove styling done to the parent element and reset it back to its original
-  // only if there are no other instances using the same parent.
+  /*
+    Remove styling done to the parent element and reset it back to its original
+    only if there are no other instances using the same parent.
+  */
   if (this.inlinePosition) {
-    var relativeElStillInUse = datepickers.some(function(picker) { return picker !== _this && picker.positionedEl === positionedEl })
-    if (!relativeElStillInUse) positionedEl.style.setProperty('position', null)
+    var positionedElStillInUse = datepickers.some(function(picker) { return picker !== _this && picker.positionedEl === positionedEl })
+    if (!positionedElStillInUse) positionedEl.style.setProperty('position', null)
   }
 
   // Remove the calendar from the DOM.
@@ -1601,7 +1603,7 @@ function remove() {
   if (!datepickers.length) removeEvents(document, oneHandler)
 
   // Remove the shadow DOM listener if this was the last picker in that shadow DOM.
-  var shadowDomStillInUse = datepickers.filter(function(picker) { return picker.shadowDom === shadowDom }).length
+  var shadowDomStillInUse = datepickers.some(function(picker) { return picker.shadowDom === shadowDom })
   if (shadowDom && !shadowDomStillInUse) removeEvents(shadowDom, shadowDomHandler)
 
   // Empty this instance of all properties.

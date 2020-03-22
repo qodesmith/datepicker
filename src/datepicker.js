@@ -146,6 +146,7 @@ function createInstance(selectorOrElement, opts) {
   if (typeof el === 'string') {
     el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
 
+  // Maybe this will be supported one day once I understand the use-case.
   } else if (type(el) === '[object ShadowRoot]') {
     throw 'Using a shadow DOM as your selector is not supported.'
 

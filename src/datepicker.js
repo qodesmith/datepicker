@@ -139,6 +139,9 @@ function createInstance(selectorOrElement, opts) {
   if (typeof el === 'string') {
     el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
 
+  } else if (type(el) === '[object ShadowRoot]') {
+    throw 'Using a shadow DOM as your selector is not supported.'
+
   /*
     If the selector is not a string, we may have been given an element within a shadow DOM (or a shadow DOM itself).
     IE doesn't support custom elements at all so that would have to be polyfilled.
@@ -210,6 +213,7 @@ function createInstance(selectorOrElement, opts) {
     shadowDom: shadowDom,
 
     // If a datepicker is used within a shadow DOM, this will be populated with the web component custom element.
+    // This is not used internally, but provided as a convenience for users who might want a reference.
     customElement: customElement,
 
 
@@ -322,7 +326,7 @@ function createInstance(selectorOrElement, opts) {
     // Start day of the week - indexed from `days` above.
     startDay: options.startDay,
 
-    // Custom overlay months.
+    // Custom overlay months - only the first 3 characters are used.
     overlayMonths: options.overlayMonths || (options.months || months).map(function(m) { return m.slice(0, 3) }),
 
     // Custom overlay placeholder.
@@ -1308,7 +1312,7 @@ function oneHandler(e) {
  *  to keep the `oneHandler` listener on the document while having another listener
  *  on the shadow DOM. We set a property on the event object to indicate the event
  *  originated from a shadow DOM. This will ensure that once the event bubbles up to
- * `onHandler` on the document, we know to ignore it.
+ * `oneHandler` on the document, we know to ignore it.
  */
 function shadowDomHandler(e) {
   oneHandler(e)
@@ -1604,5 +1608,6 @@ function remove() {
   // Empty this instance of all properties.
   for (prop in this) delete this[prop]
 }
+
 
 module.exports = datepicker

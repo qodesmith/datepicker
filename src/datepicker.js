@@ -177,9 +177,12 @@ function createInstance(selectorOrElement, opts) {
   var noPosition = el === document.body
 
   /*
-    `parent` is the element that datepicker will be attached to in the DOM. In the case of `noPosition`,
-    it will be the <body>. If datepicker was passed a top-level element in the shadow DOM (meaning the element's
-    direct parent IS the shadow DOM) or the shadow DOM itself, the parent will be the shadow DOM.
+    `parent` is the element that datepicker will be attached to in the DOM.
+
+    In the case of `noPosition`, it will be the <body>. If datepicker was passed a top-level element
+    in the shadow DOM (meaning the element's direct parent IS the shadow DOM), the parent will be the
+    shadow DOM. Otherwise, `parent` is assigned the parent of the element that was passed to datepicker
+    in the first place (usually an <input>).
   */
   var parent = shadowDom ? (el.parentElement || shadowDom) : noPosition ? document.body : el.parentElement
 
@@ -1007,7 +1010,8 @@ function changeMonthYear(classList, instance, year, overlayMonthIndex) {
 
 /*
  *  Sets the `top` & `left` inline styles on the container after doing calculations.
- *  Positions datepicker relative to `instance.parent`.
+ *  Positions datepicker relative to `instance.el` using `instance.positionedEl` to
+ *  derive calculations.
  */
 function calculatePosition(instance) {
   // Don't try to position the calendar if its el is <body> or <html>.

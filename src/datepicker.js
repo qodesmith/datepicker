@@ -126,7 +126,14 @@ function createInstance(selectorOrElement, opts) {
   /*
     This will get assigned the <custom-element> containing the shadow DOM.
     This can potentially eventually become `positionedEl` (stored on the instance object).
-    It is used for positioning purposes. See the explanation below.
+    It is used for positioning purposes. See the explanation below where `positionedEl` is defined.
+
+    PLEASE NOTE - custom elements have a default display of `inline` which, for whatever reason,
+    can have negative effects on the calendar. This is only an issue if the calendar is attached
+    directly to the shadow DOM and not nested within some other element in the shadow DOM.
+    If this is your case and you notice weirdness (such as the calendar disappearing immediately after showing),
+    try adding an explicit display property to the custom element. This is also mentioned in the
+    "best practices" article by Google here - https://bit.ly/33F7TkJ.
   */
   var customElement
 

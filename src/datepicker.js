@@ -117,7 +117,7 @@ function createInstance(selectorOrElement, opts) {
   var options = sanitizeOptions(opts || defaults())
 
   /*
-    This will get assigned the shadow DOM if there is in one.
+    This will get assigned the shadow DOM if the calendar is in one.
     We use this property to trigger an extra event listener on the shadow DOM
     as well as tell the <body> listener to ignore events from the shadow DOM.
   */

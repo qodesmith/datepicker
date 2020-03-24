@@ -685,9 +685,11 @@ function renderCalendar(instance, date) {
     When the overlay is open and we submit a year (or click a month), the calendar's
     html is recreated here. To make the overlay fade out the same way it faded in,
     we need to create it with the appropriate classes (triggered by `overlayOpen`),
-    and then wait 10ms to take those classes back off, triggering a fade out.
+    then wait for the next repaint, triggering a fade out.
+
+    Good for IE >= 10.
   */
-  if (overlayOpen) setTimeout(function() { toggleOverlay(true, instance) }, 10)
+  if (overlayOpen) window.requestAnimationFrame(function() { toggleOveraly(true, instance) })
 }
 
 /*
@@ -1115,17 +1117,6 @@ function toggleOverlay(closing, instance) {
     .qs-controls - The header of the calendar containing the left / right arrows & month / year.
     .qs-squares  - The container for all the squares making up the grid of the calendar.
   */
-
-
-  /*
-    This function is called within a `setTimeout` inside `renderCalendar`.
-    What if `.remove()` was called within that time span? There would be no properties on
-    instance anymore since `.remove()` removes them all. Return here to avoid errors.
-    This is highly unlikely to happen, but in case the instances are tied to other functions
-    in the users program, and perhaps those functions remove the calendar, avoid errors here.
-  */
-  var calendar = instance.calendar
-  if (!calendar) return
 
   var overlay = calendar.querySelector('.qs-overlay')
   var yearInput = overlay.querySelector('.qs-overlay-year')

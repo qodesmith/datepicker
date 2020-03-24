@@ -1459,7 +1459,7 @@ function remove() {
   if (sibling) delete sibling.sibling
 
   // Empty this instance of all properties.
-  for (prop in this) delete this[prop]
+  for (var prop in this) delete this[prop]
 
   // If this was the last datepicker in the list, remove the event handlers.
   if (!datepickers.length) {

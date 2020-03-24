@@ -195,14 +195,14 @@ function createInstance(selectorOrElement, opts) {
   var parent = shadowDom ? (el.parentElement || shadowDom) : noPosition ? document.body : el.parentElement
 
   /*
-    The calendar needs to be positioned relative to something. That something is `el`.
-    Since we position the calendar absolutely, we need something up the chain to have explicit positioning on it.
-    `positionedEl` will conditionally get that explicit positioning below via inline styles if it doesn't already have it.
-    That positioning, if applied, will be removed (cleaned up) down the line.
-    `calculatePosition` will use the coordinates for `positionedEl` and `el` to correctly position the calendar.
+    The calendar needs to be positioned relative `el`. Since we position the calendar absolutely, we need
+    something up the chain to have explicit positioning on it. `positionedEl` will conditionally get that
+    explicit positioning below via inline styles if it doesn't already have it. That positioning, if applied,
+    will be removed (cleaned up) down the line. `calculatePosition` will use the coordinates for `positionedEl`
+    and `el` to correctly position the calendar.
 
     If `noPosition` is true, this value will be ignored further down the chain.
-    If `parent` is a shadow DOM, this will be the custom element associated with that shadow DOM.
+    If `parent` is a shadow DOM, this could be the custom element associated with that shadow DOM.
   */
   var positionedEl = shadowDom ? (el.parentElement || customElement) : parent
 
@@ -1593,8 +1593,8 @@ function remove() {
   var _this = this
 
   /*
-    Remove styling done to the parent element and reset it back to its original
-    only if there are no other instances using the same parent.
+    Remove styling done to `positionedEl` and reset it back to its original
+    only if there are no other instances with the same `positionedEl`.
   */
   if (this.inlinePosition) {
     var positionedElStillInUse = datepickers.some(function(picker) { return picker !== _this && picker.positionedEl === positionedEl })

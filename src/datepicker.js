@@ -689,7 +689,7 @@ function renderCalendar(instance, date) {
 
     Good for IE >= 10.
   */
-  if (overlayOpen) window.requestAnimationFrame(function() { toggleOveraly(true, instance) })
+  if (overlayOpen) window.requestAnimationFrame(function() { toggleOverlay(true, instance) })
 }
 
 /*
@@ -1118,6 +1118,7 @@ function toggleOverlay(closing, instance) {
     .qs-squares  - The container for all the squares making up the grid of the calendar.
   */
 
+  var calendar = instance.calendar
   var overlay = calendar.querySelector('.qs-overlay')
   var yearInput = overlay.querySelector('.qs-overlay-year')
   var controls = calendar.querySelector('.qs-controls')

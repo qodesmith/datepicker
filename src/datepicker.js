@@ -1091,7 +1091,7 @@ function hideCal(instance) {
   var isShowing = !instance.calendarContainer.classList.contains('qs-hidden')
 
   if (isShowing && !instance.alwaysShow) {
-    toggleOverlay(true, instance)
+    toggleOverlay(true)
     instance.calendarContainer.classList.add('qs-hidden')
     instance.onHide(instance)
   }
@@ -1111,7 +1111,7 @@ function showCal(instance) {
 /*
  *  Show / hide the change-year overlay.
  */
-function toggleOverlay(closing, instance) {
+function toggleOverlay(closing) {
   /*
     .qs-overlay  - The dark overlay element containing the year input & submit button.
     .qs-controls - The header of the calendar containing the left / right arrows & month / year.
@@ -1239,7 +1239,7 @@ function oneHandler(e) {
     // Clicking the month/year - open the overlay.
     // Clicking the X on the overlay - close the overlay.
     } else if (monthYearClicked || classList.contains('qs-close')) {
-      if (!disableYearOverlay) toggleOverlay(!overlayClosed, instance)
+      if (!disableYearOverlay) toggleOverlay(!overlayClosed)
 
     // Clicking a month in the overlay - the <span> inside might have been clicked.
     } else if (newMonthIndex) {
@@ -1286,7 +1286,7 @@ function oneHandler(e) {
 
     // ESC key pressed.
     } else if ((e.which || e.keyCode) === 27 && overlayShowing && onCal) {
-      toggleOverlay(true, instance)
+      toggleOverlay(true)
     }
   } else if (type === 'input') {
     // Avoid applying these restrictions to other inputs on the page.

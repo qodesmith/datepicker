@@ -196,7 +196,7 @@ end.getRange() // Gives you the same as above!
 
 ## Custom Elements / Shadow DOM Usage
 
-You can use Datepicker within a Shadow DOM and custom elements. In order to do so, _you must_ pass a ___node___ as the 1st argument:
+You can use Datepicker within a Shadow DOM and custom elements. In order to do so, <span style="text-decoration: underline; font-style: italic; font-weight: bold;">must</span> pass a ___node___ as the 1st argument:
 
 ```javascript
 class MyElement extends HTMLElement {
@@ -209,6 +209,8 @@ class MyElement extends HTMLElement {
         <input />
       </div>
     `
+
+    // Create the node we'll pass to datepicker.
     this.input = shadowRoot.querySelector('input')
   }
 

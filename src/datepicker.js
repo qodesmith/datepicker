@@ -61,7 +61,7 @@ function datepicker(selectorOrElement, options) {
   // Apply the event listeners to a particular shadow DOM only once.
   if (instance.shadowDom) {
     var shadowDomAlreadyInUse = datepickers.some(function(picker) { return picker.shadowDom === instance.shadowDom })
-    if (!shadowDomAlreadyInUse) applyListeners(instance.shadowDom, true)
+    if (!shadowDomAlreadyInUse) applyListeners(instance.shadowDom)
   }
 
   // Keep track of all our instances in an array.
@@ -99,13 +99,13 @@ function datepicker(selectorOrElement, options) {
  *  The goal is to ever only have one set of listeners regardless
  *  of how many datepicker instances have been initialized.
  */
-function applyListeners(documentOrShadowDom, useShadowDomHandler) {
+function applyListeners(documentOrShadowDom) {
   /*
     Using document instead of window because #iphone :/
     Safari won't handle the click event properly if it's on the window.
   */
   events.forEach(function(event) {
-    documentOrShadowDom.addEventListener(event, useShadowDomHandler ? shadowDomHandler : oneHandler)
+    documentOrShadowDom.addEventListener(event, documentOrShadowDom === document ? oneHandler : shadowDomHandler)
   })
 }
 

@@ -21,6 +21,8 @@ _Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
 ### Table of Contents
 
 * [Installation](#installation)
+* [Basic Usage](#basic-usage)
+* [Custom Elements / Shadow DOM Usage](#custom-elements--shadow-dom-usage)
 * [Manual Year & Month Navigation](#manual-year--month-navigation)
 * [Using As A Daterange Picker](#using-as-a-daterange-picker)
 * [Calendar Examples](#examples)
@@ -128,7 +130,7 @@ Files & locations:
 | datepicker.scss    | node_modules/js-datepicker/src  | Scss file. Use it in your own builds.  |
 
 
-## Usage
+## Basic Usage
 
 Importing the library if you're using it in Node:
 ```javascript
@@ -143,7 +145,7 @@ const picker = datepicker(selector, options)
 ```
 
 Importing the styles into your project using Node:
-```
+```javascript
 // From within a scss file,
 // import datepickers scss file...
 @import '~js-datepicker/src/datepicker';
@@ -192,6 +194,34 @@ start.getRange() // { start: <JS date object>, end: <JS date object> }
 end.getRange() // Gives you the same as above!
 ```
 
+## Custom Elements / Shadow DOM Usage
+
+You can use Datepicker within a Shadow DOM and custom elements. In order to do so, _you must_ pass a ___node___ as the 1st argument:
+
+```javascript
+class MyElement extends HTMLElement {
+  constructor() {
+    super()
+    const shadowRoot = this.attachShadow({ mode: 'open' })
+    shadowRoot.innerHTML = `
+      <div>
+        <style>${textOfDatepickersCSS}</style>
+        <input />
+      </div>
+    `
+    this.input = shadowRoot.querySelector('input')
+  }
+
+  connectedCallback() {
+    // Pass datepicker a node within the shadow DOM.
+    datepicker(this.input)
+  }
+}
+
+customElements.define('my-element', MyElement)
+```
+
+All other options work as expected, including dateranges. You can even have a date range pair with one calendar in the shadow DOM and another outside it!
 
 <hr>
 

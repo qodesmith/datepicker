@@ -203,6 +203,9 @@ function createInstance(selectorOrElement, opts) {
 
     If `noPosition` is true, this value will be ignored further down the chain.
     If `parent` is a shadow DOM, this could be the custom element associated with that shadow DOM.
+
+    If the next element up the chain (el.parentElement) IS the shadow DOM, el.parentElement will be null
+    since a shadow DOM isn't an element. Hence why we go even further up the chain and assign customElement.
   */
   var positionedEl = shadowDom ? (el.parentElement || customElement) : parent
 

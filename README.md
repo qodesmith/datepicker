@@ -11,9 +11,7 @@
 ```
 
 # Datepicker.js
-Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.7kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
-
-_Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
+Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.9kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 ![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/calendar.png "Get a date with JavaScript!")
 
@@ -123,11 +121,11 @@ npm install js-datepicker
 
 Files & locations:
 
-|        File        |             Folder              |              Description               |
-| ------------------ | ------------------------------- | -------------------------------------- |
-| datepicker.min.js  | node_modules/js-datepicker/dist | production build - (ES5, 5kb gzipped!) |
-| datepicker.min.css | node_modules/js-datepicker/dist | production stylesheet                  |
-| datepicker.scss    | node_modules/js-datepicker/src  | Scss file. Use it in your own builds.  |
+|        File        |             Folder              |               Description               |
+| ------------------ | ------------------------------- | --------------------------------------- |
+| datepicker.min.js  | node_modules/js-datepicker/dist | production build - (ES5, 5.9kb gzipped) |
+| datepicker.min.css | node_modules/js-datepicker/dist | production stylesheet                   |
+| datepicker.scss    | node_modules/js-datepicker/src  | Scss file. Use it in your own builds.   |
 
 
 ## Basic Usage

@@ -84,8 +84,6 @@ Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicke
 
 See the [examples](#examples) below.
 
-<!-- [Live Demo](http://aaroncordova.xyz/datepicker) -->
-
 
 ## Installation
 

@@ -926,6 +926,7 @@ function selectDay(target, instance, deselect) {
       Daterange - if we're selecting a date on the "start" calendar,
       navigate the "end" calendar to the same month & year only if
       no date has already been selected on the "end" calendar.
+      We don't do the opposite - the start calendar is never auto-navigated.
     */
     if (instance.first && !sibling.dateSelected) {
       sibling.currentYear = instance.currentYear
@@ -1249,8 +1250,10 @@ function oneHandler(e) {
     // Clicking a number square - process whether to select that day or not.
     } else if (classList.contains('qs-num')) {
       var targ = target.nodeName === 'SPAN' ? target.parentNode : target
+      var num = target.textContent
+      var dateInQuestion = new Date(instance.currentYear, instance.currentMonth, num)
 
-      if (targ.classList.contains('qs-active')) {
+      if (+dateInQuestion === +instance.dateSelected) {
         selectDay(targ, instance, true)
       } else if (!targ.classList.contains('qs-disabled')) {
         selectDay(targ, instance)
@@ -1610,7 +1613,12 @@ function remove() {
   if (shadowDom && !shadowDomStillInUse) removeEvents(shadowDom, shadowDomHandler)
 
   // Empty this instance of all properties.
-  for (prop in this) delete this[prop]
+  for (var prop in this) delete this[prop]
+
+  // If this was the last datepicker in the list, remove the event handlers.
+  if (!datepickers.length) {
+    events.forEach(function(event) { document.removeEventListener(event, oneHandler) })
+  }
 }
 
 

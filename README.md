@@ -11,9 +11,7 @@
 ```
 
 # Datepicker.js
-Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.7kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
-
-_Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
+Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.9kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 ![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/calendar.png "Get a date with JavaScript!")
 
@@ -21,6 +19,8 @@ _Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
 ### Table of Contents
 
 * [Installation](#installation)
+* [Basic Usage](#basic-usage)
+* [Custom Elements / Shadow DOM Usage](#custom-elements--shadow-dom-usage)
 * [Manual Year & Month Navigation](#manual-year--month-navigation)
 * [Using As A Daterange Picker](#using-as-a-daterange-picker)
 * [Calendar Examples](#examples)
@@ -84,8 +84,6 @@ _Note: Use_ `dist/datepicker.min.js` _to ensure ES5 compatibility._
 
 See the [examples](#examples) below.
 
-<!-- [Live Demo](http://aaroncordova.xyz/datepicker) -->
-
 
 ## Installation
 
@@ -121,14 +119,14 @@ npm install js-datepicker
 
 Files & locations:
 
-|        File        |             Folder              |              Description               |
-| ------------------ | ------------------------------- | -------------------------------------- |
-| datepicker.min.js  | node_modules/js-datepicker/dist | production build - (ES5, 5kb gzipped!) |
-| datepicker.min.css | node_modules/js-datepicker/dist | production stylesheet                  |
-| datepicker.scss    | node_modules/js-datepicker/src  | Scss file. Use it in your own builds.  |
+|        File        |             Folder              |               Description               |
+| ------------------ | ------------------------------- | --------------------------------------- |
+| datepicker.min.js  | node_modules/js-datepicker/dist | production build - (ES5, 5.9kb gzipped) |
+| datepicker.min.css | node_modules/js-datepicker/dist | production stylesheet                   |
+| datepicker.scss    | node_modules/js-datepicker/src  | Scss file. Use it in your own builds.   |
 
 
-## Usage
+## Basic Usage
 
 Importing the library if you're using it in Node:
 ```javascript
@@ -143,7 +141,7 @@ const picker = datepicker(selector, options)
 ```
 
 Importing the styles into your project using Node:
-```
+```javascript
 // From within a scss file,
 // import datepickers scss file...
 @import '~js-datepicker/src/datepicker';
@@ -192,6 +190,36 @@ start.getRange() // { start: <JS date object>, end: <JS date object> }
 end.getRange() // Gives you the same as above!
 ```
 
+## Custom Elements / Shadow DOM Usage
+
+You can use Datepicker within a Shadow DOM and custom elements. In order to do so, <span style="text-decoration: underline; font-style: italic; font-weight: bold;">must</span> pass a ___node___ as the 1st argument:
+
+```javascript
+class MyElement extends HTMLElement {
+  constructor() {
+    super()
+    const shadowRoot = this.attachShadow({ mode: 'open' })
+    shadowRoot.innerHTML = `
+      <div>
+        <style>${textOfDatepickersCSS}</style>
+        <input />
+      </div>
+    `
+
+    // Create the node we'll pass to datepicker.
+    this.input = shadowRoot.querySelector('input')
+  }
+
+  connectedCallback() {
+    // Pass datepicker a node within the shadow DOM.
+    datepicker(this.input)
+  }
+}
+
+customElements.define('my-element', MyElement)
+```
+
+All other options work as expected, including dateranges. You can even have a date range pair with one calendar in the shadow DOM and another outside it!
 
 <hr>
 

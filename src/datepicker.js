@@ -1629,7 +1629,7 @@ function remove() {
  */
 function navigate(dateOrNum, triggerCb) {
   date = new Date(dateOrNum)
-  if (!dateCheck(date)) throw '`setDate` needs a JavaScript Date object.'
+  if (!dateCheck(date)) throw '`navigate` needs a JavaScript Date object.'
 
   this.currentYear = date.getFullYear()
   this.currentMonth = date.getMonth()

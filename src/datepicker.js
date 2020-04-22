@@ -309,6 +309,9 @@ function createInstance(selectorOrElement, opts) {
     // Method to programmatically hide the calendar.
     hide: hide,
 
+    // Method to programmatically navigate the calendar
+    navigate: navigate,
+
 
 
     // Callback fired when a date is selected - triggered in `selectDay`.
@@ -1617,6 +1620,23 @@ function remove() {
   // If this was the last datepicker in the list, remove the event handlers.
   if (!datepickers.length) {
     events.forEach(function(event) { document.removeEventListener(event, oneHandler) })
+  }
+}
+
+/*
+ *  Navigates the calendar to a given year and month
+ *  (parsed from the supplied date) without affecting any selections.
+ */
+function navigate(dateOrNum, triggerCb) {
+  date = new Date(dateOrNum)
+  if (!dateCheck(date)) throw '`navigate` needs a JavaScript Date object.'
+
+  this.currentYear = date.getFullYear()
+  this.currentMonth = date.getMonth()
+  renderCalendar(this)
+
+  if (triggerCb) {
+    this.onMonthChange(this)
   }
 }
 

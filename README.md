@@ -10,7 +10,7 @@
                                     \/_/ By: The Qodesmith
 ```
 
-# Datepicker.js
+# Datepicker.js &middot; [![npm version](https://badge.fury.io/js/js-datepicker.svg)](https://badge.fury.io/js/js-datepicker)
 Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.9kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 ![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/calendar.png "Get a date with JavaScript!")

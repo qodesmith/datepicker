@@ -770,10 +770,6 @@ function createMonth(date, instance, overlayOpen) {
   var totalSquares = precedingRow + (((offset + daysInMonth) / 7 | 0) * 7)
   totalSquares += (offset + daysInMonth) % 7 ? 7 : 0
 
-  // If the offest happens to be 0 but we did specify a `startDay`,
-  // add 7 to prevent a missing row at the end of the calendar.
-  if (startDay !== 0 && offset === 0) totalSquares += 7
-
   for (var i = 1; i <= totalSquares; i++) {
     var weekdayIndex = (i - 1) % 7
     var weekday = days[weekdayIndex]

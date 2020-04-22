@@ -1,6 +1,11 @@
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
+/*
+  TODO: update how we test for the correct number of days.
+  Issue #86 (https://bit.ly/2XYVLKK) highlights this issue.
+*/
+
 
 describe('Initial calendar load with default settings', () => {
   const today = new Date()

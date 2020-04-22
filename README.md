@@ -671,6 +671,28 @@ picker.remove() // So fresh & so clean clean.
 ```
 
 
+### navigate
+
+Programmatically navigates the calendar to the date you provide. This doesn't select a date, it's literally just for navigation. You can optionally trigger the `onMonthChange` callback with the 2nd argument.
+
+```javascript
+const picker = datepicker('.some-input')
+const date = new Date(2020, 3, 1)
+
+/* ...so many things... */
+
+// Navigate to a new month.
+picker.navigate(date)
+
+// Navigate to a new month AND trigger the `onMonthChange` callback.
+picker.navigate(date, true)
+```
+
+* Arguments:
+    1. `date` - JavaScript date object.
+    2. `changeCalendar` - boolean (default is `false`)
+
+
 ### setDate
 
 Allows you to programmatically select or unselect a date on the calendar. To select a date on the calendar, pass in a JS date object for the 1st argument. If you set a date on a month other than what's currently displaying _and_ you want the calendar to automatically change to it, pass in `true` as the 2nd argument.

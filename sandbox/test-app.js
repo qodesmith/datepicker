@@ -6,6 +6,6 @@ window.dp = datepicker
 
 window.go = function() {
   const inputs = document.querySelectorAll('input')
-  x = dp(inputs[0], { id: 1, alwaysShow: 1 })
+  x = dp(inputs[0], { id: 1, alwaysShow: 1, onMonthChange: instance => console.log('NOW SHOWING:', new Date(instance.currentYear, instance.currentMonth).toLocaleDateString()) })
   y = dp(inputs[1], { id: 1, alwaysShow: 1 })
 }

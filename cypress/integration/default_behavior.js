@@ -2,8 +2,18 @@ const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 /*
+  The tests need to be rethought so as to be independent.
+  State should not persist from test to test.
+  Each piece should be testable independently.
+
+  TODO: Refactor / rethink / cleanup the sandbox folder.
+  These files should truly reflect a separate sandbox for
+  developing from the app that Cypress runs for E2E testing.
+
   TODO: update how we test for the correct number of days.
   Issue #86 (https://bit.ly/2XYVLKK) highlights this issue.
+
+  TODO: add a test for the navigate method.
 */
 
 

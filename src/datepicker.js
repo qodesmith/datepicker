@@ -776,8 +776,6 @@ function createMonth(date, instance, overlayOpen) {
   /*
     Create all the numbered calendar days.
     Days of the week (top row) created below this loop.
-
-    Why do we start at 1 instead of 0?
   */
   for (var i = 1; i <= totalSquares; i++) {
     // The index of the day of the week that the current iteration is at.
@@ -1227,14 +1225,13 @@ function oneHandler(e) {
 
     // Clicking a number square - process whether to select that day or not.
     } else if (classList.contains('qs-num')) {
-      var targ = target.nodeName === 'SPAN' ? target.parentNode : target
       var num = target.textContent
       var dateInQuestion = new Date(instance.currentYear, instance.currentMonth, num)
 
       if (+dateInQuestion === +instance.dateSelected) {
-        selectDay(targ, instance, true)
-      } else if (!targ.classList.contains('qs-disabled')) {
-        selectDay(targ, instance)
+        selectDay(target, instance, true)
+      } else if (!target.classList.contains('qs-disabled')) {
+        selectDay(target, instance)
       }
 
       return

@@ -812,12 +812,16 @@ function createMonth(date, instance, overlayOpen) {
     // The display number to this iteration's date - can be an empty square as well.
     var thisDayNum = isEmpty ? '' : thisDay.getDate()
 
+    // Is this iteration's date currently selected?
+    var isSelected = +thisDay === +dateSelected
+
     // Create the class name for our calendar day element.
     var className = 'qs-square ' + weekday
     if (hasEvent) className += ' qs-event'
     if (outsideOfCurrentMonth) className += ' qs-outside-current-month'
     if (!outsideOfCurrentMonth || (outsideOfCurrentMonth && showAllDates)) className += ' qs-num'
     if (isEmpty) className += ' qs-empty'
+    if (isSelected) className += ' qs-active'
 
     calendarSquares.push('<div class="' + className + '">' + thisDayNum + '</div>')
   }

@@ -10,7 +10,7 @@
                                     \/_/ By: The Qodesmith
 ```
 
-# Datepicker.js
+# Datepicker.js &middot; [![npm version](https://badge.fury.io/js/js-datepicker.svg)](https://badge.fury.io/js/js-datepicker)
 Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicker has **no dependencies** and weighs in at **5.9kb gzipped**! Datepicker is simple to use and looks sexy on the screen. A calendar pops up and you pick a date. #Boom.
 
 ![Datepicker screenshot](https://raw.githubusercontent.com/qodesmith/datepicker/master/images/calendar.png "Get a date with JavaScript!")
@@ -669,6 +669,28 @@ const picker = datepicker('.some-input')
 
 picker.remove() // So fresh & so clean clean.
 ```
+
+
+### navigate
+
+Programmatically navigates the calendar to the date you provide. This doesn't select a date, it's literally just for navigation. You can optionally trigger the `onMonthChange` callback with the 2nd argument.
+
+```javascript
+const picker = datepicker('.some-input')
+const date = new Date(2020, 3, 1)
+
+/* ...so many things... */
+
+// Navigate to a new month.
+picker.navigate(date)
+
+// Navigate to a new month AND trigger the `onMonthChange` callback.
+picker.navigate(date, true)
+```
+
+* Arguments:
+    1. `date` - JavaScript date object.
+    2. `changeCalendar` - boolean (default is `false`)
 
 
 ### setDate

@@ -773,85 +773,61 @@ function createMonth(date, instance, overlayOpen) {
   var totalSquares = precedingRow + (((offset + daysInMonth) / 7 | 0) * 7)
   totalSquares += (offset + daysInMonth) % 7 ? 7 : 0
 
+  /*
+    Create all the numbered calendar days.
+    Days of the week (top row) created below this loop.
+
+    Why do we start at 1 instead of 0?
+  */
   for (var i = 1; i <= totalSquares; i++) {
-    var weekdayIndex = (i - 1) % 7
+    // The index of the day of the week that the current iteration is at.
+    var weekdayIndex = (i - 1) % 7 // Round robin values of 0 - 6, back to 0 again.
+
+    /*
+      "Thu" - text name for the day of the week as displayed on the calendar.
+      Added as a class name to each numbered day in the calendar.
+    */
     var weekday = days[weekdayIndex]
+
+    // Number displayed in the calendar for current iteration's day.
     var num = i - (offset >= 0 ? offset : (7 + offset))
-    var thisDay = new Date(currentYear, currentMonth, num) // No time so we can compare accurately :)
-    var eventClass = ' qs-event'
+
+    /*
+      JavaScript date object for the current iteration's day.
+      It has no time so we can compare accurately.
+      Used to find out of the current iteration is today.
+    */
+    var thisDay = new Date(currentYear, currentMonth, num)
+
+    // Does this iteration's date have an event?
     var hasEvent = events[+thisDay]
-    var thisDayNum = thisDay.getDate()
+
+    /*
+      Is the current iteration's date outside the current month?
+      These fall into the before & after squares shown on the calendar.
+    */
     var outsideOfCurrentMonth = num < 1 || num > daysInMonth
-    var otherClass = 'qs-num'
-    var span = '<span class="qs-num">' + thisDayNum + '</span>'
-    var dateInSelectedRange = start && end && +thisDay >= start && +thisDay <= end
 
-    // Squares outside the current month.
-    if (outsideOfCurrentMonth) {
-      otherClass = 'qs-empty qs-outside-current-month'
+    // Flag indicating the square on the calendar should be empty.
+    var isEmpty = outsideOfCurrentMonth && !showAllDates
 
-      // Show dim dates for dates in preceding and trailing months.
-      if (showAllDates) {
-        if (hasEvent) otherClass += eventClass
-        otherClass += ' qs-disabled'
+    // The display number to this iteration's date - can be an empty square as well.
+    var thisDayNum = isEmpty ? '' : thisDay.getDate()
 
-      // Show empty squares for dates in preceding and trailing months.
-      } else {
-        span = ''
-      }
+    // Create the class name for our calendar day element.
+    var className = 'qs-square ' + weekday
+    if (hasEvent) className += ' qs-event'
+    if (outsideOfCurrentMonth) className += ' qs-outside-current-month'
+    if (!outsideOfCurrentMonth || (outsideOfCurrentMonth && showAllDates)) className += ' qs-num'
+    if (isEmpty) className += ' qs-empty'
 
-    // Disabled, current, & date-range squares.
-    } else {
-      // Disabled dates.
-      if (
-        (minDate && thisDay < minDate) ||
-        (maxDate && thisDay > maxDate) ||
-        disabler(thisDay) ||
-        // disabledDates.includes(+thisDay) || // .includes isn't supported in older browsers.
-        disabledDates.some(function(num) { return num === +thisDay }) ||
-        (noWeekends && weekendIndices.some(function(idx) { return idx === weekdayIndex }))
-      ) otherClass = 'qs-disabled'
-
-      // Show events for squares with a number even if they are disabled.
-      if (hasEvent) otherClass += eventClass
-
-      // Current date, i.e. today's date.
-      if (isThisMonth && num === today.getDate()) otherClass += ' qs-current'
-
-      // Selected day.
-      if (+thisDay === +dateSelected) otherClass += ' qs-active'
-
-      // Date-range classes.
-      if (dateInSelectedRange) {
-        // Indicate what index day of the week this is - from first to last. Affects styles.
-        otherClass += ' qs-range-date-' + weekdayIndex
-
-        // Differentiate start & end range days.
-        if (start !== end) {
-          if (+thisDay === start) {
-            otherClass += ' qs-range-date-start qs-active'
-          } else if (+thisDay === end) {
-            otherClass += ' qs-range-date-end qs-active'
-          } else {
-            otherClass += ' qs-range-date-middle'
-          }
-        }
-      }
-    }
-
-    calendarSquares.push('<div class="qs-square ' + otherClass + ' ' + weekday + '">' + span + '</div>')
+    calendarSquares.push('<div class="' + className + '">' + thisDayNum + '</div>')
   }
 
   // Add the header row of days of the week.
   var daysAndSquares = days
     .map(function(day) { return '<div class="qs-square qs-day">' + day + '</div>' })
     .concat(calendarSquares)
-
-  // Throw error...
-  // The # of squares on the calendar should ALWAYS be a multiple of 7.
-  if (daysAndSquares.length % 7 !== 0 ) {
-    throw 'Calendar not constructed properly. The # of squares should be a multiple of 7.'
-  }
 
   // Wrap it all in a tidy div.
   daysAndSquares.unshift('<div class="qs-squares' + (overlayOpen ? ' qs-blur' : '') + '">')

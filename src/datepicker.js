@@ -1196,7 +1196,6 @@ function oneHandler(e) {
   */
   if (e.__qs_shadow_dom) return
 
-  var keyCode = e.keyCode
   var type = e.type
   var target = e.target
   var classList = target.classList
@@ -1283,7 +1282,7 @@ function oneHandler(e) {
 
     // Hide all other instances.
     hideOtherPickers(instance)
-  } else if (type === 'keydown' && keyCode === 9 && instance) {    
+  } else if (type === 'keydown' && e.keyCode === 9 && instance) {    
     // Hide this intance on tab out.
     hideCal(instance)    
   } else if (type === 'keydown' && instance && !instance.disabled) {

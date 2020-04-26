@@ -779,79 +779,73 @@ function createMonth(date, instance, overlayOpen) {
     Days of the week (top row) created below this loop.
   */
   for (var i = 1; i <= totalSquares; i++) {
-    // (function(i) {
-      // The index of the day of the week that the current iteration is at.
-      var weekdayIndex = (i - 1) % 7 // Round robin values of 0 - 6, back to 0 again.
+    // The index of the day of the week that the current iteration is at.
+    var weekdayIndex = (i - 1) % 7 // Round robin values of 0 - 6, back to 0 again.
 
-      /*
-        "Thu" - text name for the day of the week as displayed on the calendar.
-        Added as a class name to each numbered day in the calendar.
-      */
-      var weekday = days[weekdayIndex]
+    /*
+      "Thu" - text name for the day of the week as displayed on the calendar.
+      Added as a class name to each numbered day in the calendar.
+    */
+    var weekday = days[weekdayIndex]
 
-      // Number displayed in the calendar for current iteration's day.
-      var num = i - (offset >= 0 ? offset : (7 + offset))
+    // Number displayed in the calendar for current iteration's day.
+    var num = i - (offset >= 0 ? offset : (7 + offset))
 
-      /*
-        JavaScript date object for the current iteration's day.
-        It has no time so we can compare accurately.
-        Used to find out of the current iteration is today.
-      */
-      var thisDay = new Date(currentYear, currentMonth, num)
+    /*
+      JavaScript date object for the current iteration's day.
+      It has no time so we can compare accurately.
+      Used to find out of the current iteration is today.
+    */
+    var thisDay = new Date(currentYear, currentMonth, num)
 
-      // Does this iteration's date have an event?
-      var hasEvent = events[+thisDay]
+    // Does this iteration's date have an event?
+    var hasEvent = events[+thisDay]
 
-      /*
-        Is the current iteration's date outside the current month?
-        These fall into the before & after squares shown on the calendar.
-      */
-      var outsideOfCurrentMonth = num < 1 || num > daysInMonth
+    /*
+      Is the current iteration's date outside the current month?
+      These fall into the before & after squares shown on the calendar.
+    */
+    var outsideOfCurrentMonth = num < 1 || num > daysInMonth
 
-      /*
-        Days outside the current month need a [data-direction] attribute.
-        In the case we're showing all dates, users can click dates outside the current
-        month to navigate. This attribute tells the event handler the direction
-        of the month to navigate to.
-      */
-      var direction = outsideOfCurrentMonth ? num < 1 ? -1 : 1 : 0
+    /*
+      Days outside the current month need a [data-direction] attribute.
+      In the case we're showing all dates, users can click dates outside the current
+      month to navigate. This attribute tells the event handler the direction
+      of the month to navigate to.
+    */
+    var direction = outsideOfCurrentMonth ? num < 1 ? -1 : 1 : 0
 
-      // Flag indicating the square on the calendar should be empty.
-      var isEmpty = outsideOfCurrentMonth && !showAllDates
+    // Flag indicating the square on the calendar should be empty.
+    var isEmpty = outsideOfCurrentMonth && !showAllDates
 
-      // The display number to this iteration's date - can be an empty square as well.
-      var thisDayNum = isEmpty ? '' : thisDay.getDate()
+    // The display number to this iteration's date - can be an empty square as well.
+    var thisDayNum = isEmpty ? '' : thisDay.getDate()
 
-      // Is this iteration's date currently selected?
-      var isSelected = +thisDay === +dateSelected
+    // Is this iteration's date currently selected?
+    var isSelected = +thisDay === +dateSelected
 
-      // Is this iteration's date disabled?
-      var isDisabled = disabledDates[+thisDay]
+    // Is this iteration's date disabled?
+    var isDisabled = disabledDates[+thisDay]
 
-      // Is this iteration's date today?
-      var isToday = +today === +thisDay
+    // Is this iteration's date today?
+    var isToday = +today === +thisDay
 
-      // Base class name that every square will have.
-      var className = 'qs-square ' + weekday
+    // Base class name that every square will have.
+    var className = 'qs-square ' + weekday
 
-      // Create the rest of the class name for our calendar day element.
-      if (hasEvent && !isEmpty) className += ' qs-event' // Don't show events on empty squares.
-      if (outsideOfCurrentMonth) className += ' qs-outside-current-month'
-      if (showAllDates || !outsideOfCurrentMonth) className += ' qs-num'
-      if (isSelected) className += ' qs-active'
-      if (isDisabled && !isEmpty) className += ' qs-disabled' // Empty dates don't need the class name.
-      if (isToday) className += ' qs-current'
-      if (isEmpty) {
-        className += ' qs-empty'
-        thisDayNum = '' // Don't show numbers for empty squares.
-      }
+    // Create the rest of the class name for our calendar day element.
+    if (hasEvent && !isEmpty) className += ' qs-event' // Don't show events on empty squares.
+    if (outsideOfCurrentMonth) className += ' qs-outside-current-month'
+    if (showAllDates || !outsideOfCurrentMonth) className += ' qs-num'
+    if (isSelected) className += ' qs-active'
+    if (isDisabled && !isEmpty) className += ' qs-disabled' // Empty dates don't need the class name.
+    if (isToday) className += ' qs-current'
+    if (isEmpty) {
+      className += ' qs-empty'
+      thisDayNum = '' // Don't show numbers for empty squares.
+    }
 
-      if (instance.second) {
-        if (num === 1) debugger
-      }
-
-      calendarSquares.push('<div class="' + className + '" data-direction="' + direction + '">' + thisDayNum + '</div>')
-    // })(i)
+    calendarSquares.push('<div class="' + className + '" data-direction="' + direction + '">' + thisDayNum + '</div>')
   }
 
   // Add the header row of days of the week.

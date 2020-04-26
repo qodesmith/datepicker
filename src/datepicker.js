@@ -837,7 +837,7 @@ function createMonth(date, instance, overlayOpen) {
       // Create the rest of the class name for our calendar day element.
       if (hasEvent && !isEmpty) className += ' qs-event' // Don't show events on empty squares.
       if (outsideOfCurrentMonth) className += ' qs-outside-current-month'
-      if (!outsideOfCurrentMonth || (outsideOfCurrentMonth && showAllDates)) className += ' qs-num'
+      if (showAllDates || !outsideOfCurrentMonth) className += ' qs-num'
       if (isSelected) className += ' qs-active'
       if (isDisabled && !isEmpty) className += ' qs-disabled' // Empty dates don't need the class name.
       if (isToday) className += ' qs-current'

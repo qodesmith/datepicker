@@ -2,6 +2,7 @@ $width: 15.625em;
 $radius: $width * .016891;
 $transition: .3s;
 $font-size: $width * .056;
+$light-date-opacity: .2;
 
 /*
   All a user has to do to change the calendar size is
@@ -227,18 +228,23 @@ $font-size: $width * .056;
     transition: background .1s;
     border-radius: $radius;
 
+    // Today's date
     &.qs-current {
       font-weight: bold;
-
-      span {
-        text-decoration: underline;
-      }
+      text-decoration: underline;
     }
 
+    /*
+      3 possibilities:
+        1. Single, active date.
+        2. Daterange start selection.
+        3. Daterange end selection.
+    */
     &.qs-active {
       background: lightblue;
     }
 
+    // Daterange start selection.
     &.qs-range-date-start {
       &:not(.qs-range-date-6) {
         border-top-right-radius: 0;
@@ -246,6 +252,7 @@ $font-size: $width * .056;
       }
     }
 
+    // Daterange middle selections.
     &.qs-range-date-middle {
       background: lighten(lightblue, 10%);
 
@@ -264,6 +271,7 @@ $font-size: $width * .056;
       }
     }
 
+    // Daterange end selection.
     &.qs-range-date-end {
       &:not(.qs-range-date-0) {
         border-top-left-radius: 0;
@@ -271,18 +279,17 @@ $font-size: $width * .056;
       }
     }
 
-    &.qs-disabled {
-      span {
-        opacity: .2;
-      }
-    }
-
-    &.qs-empty {
-      cursor: default;
+    &.qs-disabled,
+    &.qs-outside-current-month {
+      opacity: $light-date-opacity;
     }
 
     &.qs-disabled {
       cursor: not-allowed;
+    }
+
+    &.qs-empty {
+      cursor: default;
     }
 
     &.qs-day {
@@ -310,13 +317,6 @@ $font-size: $width * .056;
       background: #07f;
       bottom: 0;
       right: 0;
-    }
-
-    &.qs-disabled,
-    &.qs-empty {
-      &:after {
-        background: lighten(#07f, 40);
-      }
     }
   }
 }

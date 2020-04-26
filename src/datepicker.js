@@ -526,15 +526,16 @@ function sanitizeOptions(opts) {
 
 
   // Checks around disabled dates.
-  options.disabledDates = (options.disabledDates || []).map(function(date) {
+  options.disabledDates = (options.disabledDates || []).reduce(function(acc, date) {
     var newDateNum = +stripTime(date)
 
     if (!dateCheck(date)) throw 'You supplied an invalid date to "options.disabledDates".'
     if (newDateNum === +stripTime(dateSelected)) throw '"disabledDates" cannot contain the same date as "dateSelected".'
 
-    // Return a number because `createMonth` checks this array for a number match.
-    return newDateNum
-  })
+    // Store a number because `createMonth` checks this array for a number match.
+    acc[newDateNum] = 1
+    return acc
+  }, {})
 
   // If id was provided, it cannot me null or undefined.
   if (options.hasOwnProperty('id') && id == null) {
@@ -743,7 +744,7 @@ function createMonth(date, instance, overlayOpen) {
   var end = +range.end
 
   // Same year, same month?
-  var today = new Date()
+  var today = stripTime(new Date())
   var isThisMonth = currentYear === today.getFullYear() && currentMonth === today.getMonth()
 
   // 1st of the month for whatever date we've been provided.
@@ -778,52 +779,75 @@ function createMonth(date, instance, overlayOpen) {
     Days of the week (top row) created below this loop.
   */
   for (var i = 1; i <= totalSquares; i++) {
-    // The index of the day of the week that the current iteration is at.
-    var weekdayIndex = (i - 1) % 7 // Round robin values of 0 - 6, back to 0 again.
+    (function (i) {
+      // The index of the day of the week that the current iteration is at.
+      var weekdayIndex = (i - 1) % 7 // Round robin values of 0 - 6, back to 0 again.
 
-    /*
-      "Thu" - text name for the day of the week as displayed on the calendar.
-      Added as a class name to each numbered day in the calendar.
-    */
-    var weekday = days[weekdayIndex]
+      /*
+        "Thu" - text name for the day of the week as displayed on the calendar.
+        Added as a class name to each numbered day in the calendar.
+      */
+      var weekday = days[weekdayIndex]
 
-    // Number displayed in the calendar for current iteration's day.
-    var num = i - (offset >= 0 ? offset : (7 + offset))
+      // Number displayed in the calendar for current iteration's day.
+      var num = i - (offset >= 0 ? offset : (7 + offset))
 
-    /*
-      JavaScript date object for the current iteration's day.
-      It has no time so we can compare accurately.
-      Used to find out of the current iteration is today.
-    */
-    var thisDay = new Date(currentYear, currentMonth, num)
+      /*
+        JavaScript date object for the current iteration's day.
+        It has no time so we can compare accurately.
+        Used to find out of the current iteration is today.
+      */
+      var thisDay = new Date(currentYear, currentMonth, num)
 
-    // Does this iteration's date have an event?
-    var hasEvent = events[+thisDay]
+      // The display number to this iteration's date - can be an empty square as well.
+      var thisDayNum = isEmpty ? '' : thisDay.getDate()
 
-    /*
-      Is the current iteration's date outside the current month?
-      These fall into the before & after squares shown on the calendar.
-    */
-    var outsideOfCurrentMonth = num < 1 || num > daysInMonth
+      // Does this iteration's date have an event?
+      var hasEvent = events[+thisDay]
 
-    // Flag indicating the square on the calendar should be empty.
-    var isEmpty = outsideOfCurrentMonth && !showAllDates
+      /*
+        Is the current iteration's date outside the current month?
+        These fall into the before & after squares shown on the calendar.
+      */
+      var outsideOfCurrentMonth = num < 1 || num > daysInMonth
 
-    // The display number to this iteration's date - can be an empty square as well.
-    var thisDayNum = isEmpty ? '' : thisDay.getDate()
+      /*
+        Days outside the current month need a [data-direction] attribute.
+        In the case we're showing all dates, users can click dates outside the current
+        month to navigate. This attribute tells the event handler the direction
+        of the month to navigate to.
+      */
+      var direction = outsideOfCurrentMonth ? num < 1 ? -1 : 1 : 0
 
-    // Is this iteration's date currently selected?
-    var isSelected = +thisDay === +dateSelected
+      // Flag indicating the square on the calendar should be empty.
+      var isEmpty = outsideOfCurrentMonth && !showAllDates
 
-    // Create the class name for our calendar day element.
-    var className = 'qs-square ' + weekday
-    if (hasEvent) className += ' qs-event'
-    if (outsideOfCurrentMonth) className += ' qs-outside-current-month'
-    if (!outsideOfCurrentMonth || (outsideOfCurrentMonth && showAllDates)) className += ' qs-num'
-    if (isEmpty) className += ' qs-empty'
-    if (isSelected) className += ' qs-active'
+      // Is this iteration's date currently selected?
+      var isSelected = +thisDay === +dateSelected
 
-    calendarSquares.push('<div class="' + className + '">' + thisDayNum + '</div>')
+      // Is this iteration's date disabled?
+      var isDisabled = disabledDates[+thisDay]
+
+      // Is this iteration's date today?
+      var isToday = +today === +thisDay
+
+      // Base class name that every square will have.
+      var className = 'qs-square ' + weekday
+
+      // Create the rest of the class name for our calendar day element.
+      if (hasEvent && !isEmpty) className += ' qs-event' // Don't show events on empty squares.
+      if (outsideOfCurrentMonth) className += ' qs-outside-current-month'
+      if (!outsideOfCurrentMonth || (outsideOfCurrentMonth && showAllDates)) className += ' qs-num'
+      if (isSelected) className += ' qs-active'
+      if (isDisabled) className += ' qs-disabled'
+      if (isToday) className += ' qs-current'
+      if (isEmpty) {
+        className += ' qs-empty'
+        thisDayNum = '' // Don't show numbers for empty squares.
+      }
+
+      calendarSquares.push('<div class="' + className + '" data-direction="' + direction + '">' + thisDayNum + '</div>')
+    })(i)
   }
 
   // Add the header row of days of the week.
@@ -1375,7 +1399,7 @@ function setDate(newDate, changeCalendar) {
 
   // Check if the date is selectable.
   if (
-    this.disabledDates.some(function(d) { return +d === +date }) ||
+    this.disabledDates[+date] ||
     date < this.minDate ||
     date > this.maxDate
   ) throw "You can't manually set a date that's disabled."

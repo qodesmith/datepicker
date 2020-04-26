@@ -779,7 +779,7 @@ function createMonth(date, instance, overlayOpen) {
     Days of the week (top row) created below this loop.
   */
   for (var i = 1; i <= totalSquares; i++) {
-    (function (i) {
+    (function(i) {
       // The index of the day of the week that the current iteration is at.
       var weekdayIndex = (i - 1) % 7 // Round robin values of 0 - 6, back to 0 again.
 
@@ -1284,9 +1284,9 @@ function oneHandler(e) {
 
     // Hide all other instances.
     hideOtherPickers(instance)
-  } else if (type === 'keydown' && keyCode === 9 && instance) {    
+  } else if (type === 'keydown' && keyCode === 9 && instance) {
     // Hide this instance on tab out.
-    hideCal(instance)    
+    hideCal(instance)
   } else if (type === 'keydown' && instance && !instance.disabled) {
     var overlay = instance.calendar.querySelector('.qs-overlay')
     var overlayShowing = !overlay.classList.contains('qs-hidden')

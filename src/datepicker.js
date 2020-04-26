@@ -779,7 +779,7 @@ function createMonth(date, instance, overlayOpen) {
     Days of the week (top row) created below this loop.
   */
   for (var i = 1; i <= totalSquares; i++) {
-    (function(i) {
+    // (function(i) {
       // The index of the day of the week that the current iteration is at.
       var weekdayIndex = (i - 1) % 7 // Round robin values of 0 - 6, back to 0 again.
 
@@ -798,9 +798,6 @@ function createMonth(date, instance, overlayOpen) {
         Used to find out of the current iteration is today.
       */
       var thisDay = new Date(currentYear, currentMonth, num)
-
-      // The display number to this iteration's date - can be an empty square as well.
-      var thisDayNum = isEmpty ? '' : thisDay.getDate()
 
       // Does this iteration's date have an event?
       var hasEvent = events[+thisDay]
@@ -821,6 +818,9 @@ function createMonth(date, instance, overlayOpen) {
 
       // Flag indicating the square on the calendar should be empty.
       var isEmpty = outsideOfCurrentMonth && !showAllDates
+
+      // The display number to this iteration's date - can be an empty square as well.
+      var thisDayNum = isEmpty ? '' : thisDay.getDate()
 
       // Is this iteration's date currently selected?
       var isSelected = +thisDay === +dateSelected
@@ -846,8 +846,12 @@ function createMonth(date, instance, overlayOpen) {
         thisDayNum = '' // Don't show numbers for empty squares.
       }
 
+      if (instance.second) {
+        if (num === 1) debugger
+      }
+
       calendarSquares.push('<div class="' + className + '" data-direction="' + direction + '">' + thisDayNum + '</div>')
-    })(i)
+    // })(i)
   }
 
   // Add the header row of days of the week.

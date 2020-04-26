@@ -1196,10 +1196,9 @@ function oneHandler(e) {
   */
   if (e.__qs_shadow_dom) return
 
-  var keyCode = e.keyCode
+  var keyCode = e.which || e.keyCode
   var type = e.type
   var target = e.target
-  var which = e.which
   var classList = target.classList
   var instance = datepickers.filter(function(picker) {
     return picker.calendar.contains(target) || picker.el === target
@@ -1284,19 +1283,19 @@ function oneHandler(e) {
 
     // Hide all other instances.
     hideOtherPickers(instance)
-  } else if (type === 'keydown' && (which || keyCode === 9) && instance) {    
-    // Hide this intance on tab out.
+  } else if (type === 'keydown' && keyCode === 9 && instance) {    
+    // Hide this instance on tab out.
     hideCal(instance)    
   } else if (type === 'keydown' && instance && !instance.disabled) {
     var overlay = instance.calendar.querySelector('.qs-overlay')
     var overlayShowing = !overlay.classList.contains('qs-hidden')
 
     // Pressing enter while the overlay is open.
-    if ((which || keyCode) === 13 && overlayShowing && onCal) {
+    if (keyCode === 13 && overlayShowing && onCal) {
       overlayYearEntry(e, target, instance)
 
     // ESC key pressed.
-    } else if ((which || keyCode) === 27 && overlayShowing && onCal) {
+    } else if (keyCode === 27 && overlayShowing && onCal) {
       toggleOverlay(true, instance)
     }
   } else if (type === 'input') {

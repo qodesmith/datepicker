@@ -2,6 +2,7 @@ $width: 15.625em;
 $radius: $width * .016891;
 $transition: .3s;
 $font-size: $width * .056;
+$lightblue: lightblue;
 
 /*
   All a user has to do to change the calendar size is
@@ -224,6 +225,8 @@ $font-size: $width * .056;
   justify-content: center;
   cursor: pointer;
   transition: background .1s;
+
+  // Overriden for date-range dates below.
   border-radius: $radius;
 
   &:not(.qs-empty):not(.qs-disabled):not(.qs-day):not(.qs-active) {
@@ -245,40 +248,42 @@ $font-size: $width * .056;
     2. Daterange start selection.
     3. Daterange end selection.
 */
-.qs-active {
-  background: lightblue;
+.qs-active,
+.qs-range-start,
+.qs-range-end {
+  background: $lightblue;
 }
 
 // Daterange start selection.
-.qs-range-date-start {
-  &:not(.qs-range-date-6) {
+.qs-range-start {
+  &:not(.qs-range-6) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
 }
 
 // Daterange middle selections.
-.qs-range-date-middle {
-  background: lighten(lightblue, 10%);
+.qs-range-middle {
+  background: lighten($lightblue, 10%);
 
-  &:not(.qs-range-date-0):not(.qs-range-date-6) {
+  &:not(.qs-range-0):not(.qs-range-6) {
     border-radius: 0;
   }
 
-  &.qs-range-date-0 {
+  &.qs-range-0 {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
 
-  &.qs-range-date-6 {
+  &.qs-range-6 {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
 }
 
 // Daterange end selection.
-.qs-range-date-end {
-  &:not(.qs-range-date-0) {
+.qs-range-end {
+  &:not(.qs-range-0) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }

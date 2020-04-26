@@ -831,6 +831,12 @@ function createMonth(date, instance, overlayOpen) {
     // Is this iteration's date today?
     var isToday = +today === +thisDay
 
+    // Daterange variables.
+    var isRangeStart = +thisDay === start
+    var isRangeEnd = +thisDay === end
+    var isRangeMiddle = +thisDay > start && +thisDay < end
+    var rangeIsNotSingleDay = start !== end
+
     // Base class name that every square will have.
     var className = 'qs-square ' + weekday
 
@@ -841,6 +847,9 @@ function createMonth(date, instance, overlayOpen) {
     if (isSelected) className += ' qs-active'
     if (isDisabled && !isEmpty) className += ' qs-disabled' // Empty dates don't need the class name.
     if (isToday) className += ' qs-current'
+    if (isRangeStart && end && rangeIsNotSingleDay) className += ' qs-range-start'
+    if (isRangeMiddle) className += ' qs-range-middle'
+    if (isRangeEnd && start && rangeIsNotSingleDay) className += ' qs-range-end'
     if (isEmpty) {
       className += ' qs-empty'
       thisDayNum = '' // Don't show numbers for empty squares.

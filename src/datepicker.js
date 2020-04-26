@@ -839,7 +839,7 @@ function createMonth(date, instance, overlayOpen) {
       if (outsideOfCurrentMonth) className += ' qs-outside-current-month'
       if (!outsideOfCurrentMonth || (outsideOfCurrentMonth && showAllDates)) className += ' qs-num'
       if (isSelected) className += ' qs-active'
-      if (isDisabled) className += ' qs-disabled'
+      if (isDisabled && !isEmpty) className += ' qs-disabled' // Empty dates don't need the class name.
       if (isToday) className += ' qs-current'
       if (isEmpty) {
         className += ' qs-empty'

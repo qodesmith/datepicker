@@ -2,7 +2,6 @@ $width: 15.625em;
 $radius: $width * .016891;
 $transition: .3s;
 $font-size: $width * .056;
-$light-date-opacity: .2;
 
 /*
   All a user has to do to change the calendar size is
@@ -281,7 +280,7 @@ $light-date-opacity: .2;
 
     &.qs-disabled,
     &.qs-outside-current-month {
-      opacity: $light-date-opacity;
+      opacity: .2;
     }
 
     &.qs-disabled {

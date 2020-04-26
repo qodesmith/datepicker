@@ -732,8 +732,6 @@ function createMonth(date, instance, overlayOpen) {
   // Static properties.
   var days = instance.days
   var disabledDates = instance.disabledDates
-  var disabler = instance.disabler
-  var noWeekends = instance.noWeekends
   var startDay = instance.startDay
   var weekendIndices = instance.weekendIndices
   var events = instance.events
@@ -824,8 +822,11 @@ function createMonth(date, instance, overlayOpen) {
     // Is this iteration's date currently selected?
     var isSelected = +thisDay === +dateSelected
 
+    // Is this day a weekend? Weekends for Datepicker are strictly Saturday & Sunday.
+    var isWeekend = weekdayIndex === 0 || weekdayIndex === 6
+
     // Is this iteration's date disabled?
-    var isDisabled = disabledDates[+thisDay]
+    var isDisabled = disabledDates[+thisDay] || instance.disabler(thisDay) || (isWeekend && instance.noWeekends)
 
     // Is this iteration's date today?
     var isToday = +today === +thisDay

@@ -11,14 +11,16 @@ window.go = function() {
     alwaysShow: 1,
     showAllDates: 1,
     disabledDates: [new Date(2020, 3, 22), new Date('3/29/2020')],
-    events: [new Date('3/29/2020'), new Date('4/10/2020'), new Date('4/22/2020')]
+    events: [new Date('3/29/2020'), new Date('4/10/2020'), new Date('4/22/2020')],
+    noWeekends: true
   })
 
   y = dp(inputs[1], {
     id: 1,
     alwaysShow: 1,
     disabledDates: [new Date('3/29/2020')],
-    events: [new Date('3/29/2020'), new Date('4/22/2020')]
+    events: [new Date('3/29/2020'), new Date('4/22/2020')],
+    noWeekends: true
   })
 }
 

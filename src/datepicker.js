@@ -1251,10 +1251,26 @@ function oneHandler(e) {
     } else if (newMonthIndex) {
       overlayYearEntry(e, input, instance, newMonthIndex)
 
+    // Clicking a disabled square or disabled overlay submit button.
+    } else if (classList.contains('qs-disabled')) {
+      return
+
     // Clicking a number square - process whether to select that day or not.
     } else if (classList.contains('qs-num')) {
       var num = target.textContent
-      var dateInQuestion = new Date(instance.currentYear, instance.currentMonth, num)
+      var monthDirection = +target.dataset.direction // -1, 0, or 1.
+      var dateInQuestion = new Date(instance.currentYear, instance.currentMonth + monthDirection, num)
+
+      /*
+        If the user clicked on a date within the previous or next month,
+        reset the year, month, and month name on the instance so that
+        the calendar will render the correct month.
+      */
+      if (monthDirection) {
+        instance.currentYear = dateInQuestion.getFullYear()
+        instance.currentMonth = dateInQuestion.getMonth()
+        instance.currentMonthName = months[instance.currentMonth]
+      }
 
       if (+dateInQuestion === +instance.dateSelected) {
         selectDay(target, instance, true)
@@ -1265,7 +1281,7 @@ function oneHandler(e) {
       return
 
     // Clicking the submit button in the overlay.
-    } else if (classList.contains('qs-submit') && !classList.contains('qs-disabled')) {
+    } else if (classList.contains('qs-submit')) {
       overlayYearEntry(e, input, instance)
     // Clicking the calendar's el for non-input's should show it.
     } else if (nonInput && target === instance.el) {

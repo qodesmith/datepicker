@@ -1632,7 +1632,7 @@ function remove() {
  *  (parsed from the supplied date) without affecting any selections.
  */
 function navigate(dateOrNum, triggerCb) {
-  date = new Date(dateOrNum)
+  var date = new Date(dateOrNum)
   if (!dateCheck(date)) throw '`navigate` needs a JavaScript Date object.'
 
   this.currentYear = date.getFullYear()

@@ -143,6 +143,7 @@ function createInstance(selectorOrElement, opts) {
     Also, datepicker doesn't support string selectors when using a shadow DOM, hence why we use `document`.
   */
   var el = selectorOrElement
+  
   if (typeof el === 'string') {
     el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
 
@@ -152,19 +153,40 @@ function createInstance(selectorOrElement, opts) {
 
   /*
     If the selector is not a string, we may have been given an element within a shadow DOM (or a shadow DOM itself).
-    IE doesn't support custom elements at all so that would have to be polyfilled.
-    Warn about this for good dev experience and then throw whatever error the browser gives.
+    Iterate up the chain to see what the root node is, throwing an error if shadow DOM is found and not supported.
+    IE doesn't support custom elements at all, neither does it support the `Node.getRootNode()` method,
+    which would have avoided having to use a while loop with all this logic.
   */
   } else {
-    try {
-      var rootNode = el.getRootNode() // Even if `el` IS the shadow DOM, this will still return the shadow DOM.
-      if (type(rootNode) === '[object ShadowRoot]') {
-        shadowDom = rootNode
-        customElement = rootNode.host
+    var hasShadowDomSupport = 'getRootNode' in window.Node.prototype
+    var rootFound
+    var currentParent = el.parentNode
+
+    while (!rootFound) {
+      var parentType = type(currentParent)
+
+      // We've reached the document, which means there's no shadow DOM in use.
+      if (parentType === '[object HTMLDocument]') {
+        rootFound = true
+
+      // We're using a shadow DOM.
+      } else if (parentType === '[object ShadowRoot]') {
+        rootFound = true
+
+        // Throw an error if it's not supported.
+        if (!hasShadowDomSupport) {
+          throw 'The shadow DOM is not supported in your browser.'
+
+        // Store the relevant objects.
+        } else {
+          shadowDom = currentParent
+          customElement = currentParen.host
+        }
+
+      // Focus up the chain to the next parent and keep iterating.
+      } else {
+        currentParent = currentParent.parentNode
       }
-    } catch(e) {
-      console.warn('You have to polyfill the web components spec - http://bit.ly/3axUZHC')
-      throw e
     }
   }
 

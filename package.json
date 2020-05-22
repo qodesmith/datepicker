@@ -6,9 +6,8 @@
   "style": "./src/datepicker.scss",
   "scripts": {
     "build": "webpack --mode production --env.prod",
-    "test": "start-server-and-test test-app http-get://localhost:9001 start-cypress-test",
+    "test": "start-server-and-test start http-get://localhost:9001 start-cypress-test",
     "start": "webpack-dev-server --mode development --env.dev --progress",
-    "test-app": "webpack-dev-server --mode development --env.test --progress",
     "start-cypress-test": "cypress open"
   },
   "keywords": [

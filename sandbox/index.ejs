@@ -1,15 +1,26 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-  <title><%= htmlWebpackPlugin.options.title %></title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="../sandbox/sandbox.css">
 </head>
 <body>
-  <div class="container">
-    <input type="text" class="start" aria-label="test">
-    <input type="text" class="end">
-  </div>
+  <!-- SINGLE DATEPICKER -->
+  <section>
+    <div class="container">
+      <h2>Single Datepicker</h2>
+      <input data-cy="single-datepicker-input" type="text">
+    </h2>
+  </section>
+
+
+  <!-- DATERANGE -->
+  <section data-cy="daterange-section">
+    <div class="container">
+      <h2>Daterange</h2>
+      <input data-cy="daterange-input-start" type="text">
+      <input data-cy="daterange-input-end" type="text">
+    </div>
+  </section>
 </body>
 </html>

@@ -2,7 +2,7 @@
   Importing this scss file so as to declare it's a dependency in the library.
   Webpack will then separate it out into its own css file and include it in the dist folder.
 */
-require('./datepicker.scss')
+import './datepicker.scss'
 
 
 var datepickers = [] // Get's reassigned in `remove()` below.
@@ -143,7 +143,7 @@ function createInstance(selectorOrElement, opts) {
     Also, datepicker doesn't support string selectors when using a shadow DOM, hence why we use `document`.
   */
   var el = selectorOrElement
-  
+
   if (typeof el === 'string') {
     el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
 
@@ -548,15 +548,16 @@ function sanitizeOptions(opts) {
 
 
   // Checks around disabled dates.
-  options.disabledDates = (options.disabledDates || []).map(function(date) {
+  options.disabledDates = (options.disabledDates || []).reduce(function(acc, date) {
     var newDateNum = +stripTime(date)
 
     if (!dateCheck(date)) throw 'You supplied an invalid date to "options.disabledDates".'
     if (newDateNum === +stripTime(dateSelected)) throw '"disabledDates" cannot contain the same date as "dateSelected".'
 
-    // Return a number because `createMonth` checks this array for a number match.
-    return newDateNum
-  })
+    // Store a number because `createMonth` checks this array for a number match.
+    acc[newDateNum] = 1
+    return acc
+  }, {})
 
   // If id was provided, it cannot me null or undefined.
   if (options.hasOwnProperty('id') && id == null) {
@@ -753,8 +754,6 @@ function createMonth(date, instance, overlayOpen) {
   // Static properties.
   var days = instance.days
   var disabledDates = instance.disabledDates
-  var disabler = instance.disabler
-  var noWeekends = instance.noWeekends
   var startDay = instance.startDay
   var weekendIndices = instance.weekendIndices
   var events = instance.events
@@ -765,7 +764,7 @@ function createMonth(date, instance, overlayOpen) {
   var end = +range.end
 
   // Same year, same month?
-  var today = new Date()
+  var today = stripTime(new Date())
   var isThisMonth = currentYear === today.getFullYear() && currentMonth === today.getMonth()
 
   // 1st of the month for whatever date we've been provided.
@@ -795,85 +794,96 @@ function createMonth(date, instance, overlayOpen) {
   var totalSquares = precedingRow + (((offset + daysInMonth) / 7 | 0) * 7)
   totalSquares += (offset + daysInMonth) % 7 ? 7 : 0
 
+  /*
+    Create all the numbered calendar days.
+    Days of the week (top row) created below this loop.
+  */
   for (var i = 1; i <= totalSquares; i++) {
-    var weekdayIndex = (i - 1) % 7
+    // The index of the day of the week that the current iteration is at.
+    var weekdayIndex = (i - 1) % 7 // Round robin values of 0 - 6, back to 0 again.
+
+    /*
+      "Thu" - text name for the day of the week as displayed on the calendar.
+      Added as a class name to each numbered day in the calendar.
+    */
     var weekday = days[weekdayIndex]
+
+    // Number displayed in the calendar for current iteration's day.
     var num = i - (offset >= 0 ? offset : (7 + offset))
-    var thisDay = new Date(currentYear, currentMonth, num) // No time so we can compare accurately :)
-    var eventClass = ' qs-event'
+
+    /*
+      JavaScript date object for the current iteration's day.
+      It has no time so we can compare accurately.
+      Used to find out of the current iteration is today.
+    */
+    var thisDay = new Date(currentYear, currentMonth, num)
+
+    // Does this iteration's date have an event?
     var hasEvent = events[+thisDay]
-    var thisDayNum = thisDay.getDate()
+
+    /*
+      Is the current iteration's date outside the current month?
+      These fall into the before & after squares shown on the calendar.
+    */
     var outsideOfCurrentMonth = num < 1 || num > daysInMonth
-    var otherClass = 'qs-num'
-    var span = '<span class="qs-num">' + thisDayNum + '</span>'
-    var dateInSelectedRange = start && end && +thisDay >= start && +thisDay <= end
 
-    // Squares outside the current month.
-    if (outsideOfCurrentMonth) {
-      otherClass = 'qs-empty qs-outside-current-month'
+    /*
+      Days outside the current month need a [data-direction] attribute.
+      In the case we're showing all dates, users can click dates outside the current
+      month to navigate. This attribute tells the event handler the direction
+      of the month to navigate to.
+    */
+    var direction = outsideOfCurrentMonth ? num < 1 ? -1 : 1 : 0
 
-      // Show dim dates for dates in preceding and trailing months.
-      if (showAllDates) {
-        if (hasEvent) otherClass += eventClass
-        otherClass += ' qs-disabled'
+    // Flag indicating the square on the calendar should be empty.
+    var isEmpty = outsideOfCurrentMonth && !showAllDates
 
-      // Show empty squares for dates in preceding and trailing months.
-      } else {
-        span = ''
-      }
+    // The display number to this iteration's date - can be an empty square as well.
+    var thisDayNum = isEmpty ? '' : thisDay.getDate()
 
-    // Disabled, current, & date-range squares.
-    } else {
-      // Disabled dates.
-      if (
-        (minDate && thisDay < minDate) ||
-        (maxDate && thisDay > maxDate) ||
-        disabler(thisDay) ||
-        // disabledDates.includes(+thisDay) || // .includes isn't supported in older browsers.
-        disabledDates.some(function(num) { return num === +thisDay }) ||
-        (noWeekends && weekendIndices.some(function(idx) { return idx === weekdayIndex }))
-      ) otherClass = 'qs-disabled'
+    // Is this iteration's date currently selected?
+    var isSelected = +thisDay === +dateSelected
 
-      // Show events for squares with a number even if they are disabled.
-      if (hasEvent) otherClass += eventClass
+    // Is this day a weekend? Weekends for Datepicker are strictly Saturday & Sunday.
+    var isWeekend = weekdayIndex === 0 || weekdayIndex === 6
 
-      // Current date, i.e. today's date.
-      if (isThisMonth && num === today.getDate()) otherClass += ' qs-current'
+    // Is this iteration's date disabled?
+    var isDisabled = disabledDates[+thisDay] || instance.disabler(thisDay) || (isWeekend && instance.noWeekends)
 
-      // Selected day.
-      if (+thisDay === +dateSelected) otherClass += ' qs-active'
+    // Is this iteration's date today?
+    var isToday = +today === +thisDay
 
-      // Date-range classes.
-      if (dateInSelectedRange) {
-        // Indicate what index day of the week this is - from first to last. Affects styles.
-        otherClass += ' qs-range-date-' + weekdayIndex
+    // Daterange variables.
+    var isRangeStart = +thisDay === start
+    var isRangeEnd = +thisDay === end
+    var isRangeMiddle = +thisDay > start && +thisDay < end
+    var rangeIsNotSingleDay = start !== end
 
-        // Differentiate start & end range days.
-        if (start !== end) {
-          if (+thisDay === start) {
-            otherClass += ' qs-range-date-start qs-active'
-          } else if (+thisDay === end) {
-            otherClass += ' qs-range-date-end qs-active'
-          } else {
-            otherClass += ' qs-range-date-middle'
-          }
-        }
-      }
+    // Base class name that every square will have.
+    var className = 'qs-square ' + weekday
+
+    // Create the rest of the class name for our calendar day element.
+    if (hasEvent && !isEmpty) className += ' qs-event' // Don't show events on empty squares.
+    if (outsideOfCurrentMonth) className += ' qs-outside-current-month'
+    if (showAllDates || !outsideOfCurrentMonth) className += ' qs-num'
+    if (isSelected) className += ' qs-active'
+    if (isDisabled && !isEmpty) className += ' qs-disabled' // Empty dates don't need the class name.
+    if (isToday) className += ' qs-current'
+    if (isRangeStart && end && rangeIsNotSingleDay) className += ' qs-range-start'
+    if (isRangeMiddle) className += ' qs-range-middle'
+    if (isRangeEnd && start && rangeIsNotSingleDay) className += ' qs-range-end'
+    if (isEmpty) {
+      className += ' qs-empty'
+      thisDayNum = '' // Don't show numbers for empty squares.
     }
 
-    calendarSquares.push('<div class="qs-square ' + otherClass + ' ' + weekday + '">' + span + '</div>')
+    calendarSquares.push('<div class="' + className + '" data-direction="' + direction + '">' + thisDayNum + '</div>')
   }
 
   // Add the header row of days of the week.
   var daysAndSquares = days
     .map(function(day) { return '<div class="qs-square qs-day">' + day + '</div>' })
     .concat(calendarSquares)
-
-  // Throw error...
-  // The # of squares on the calendar should ALWAYS be a multiple of 7.
-  if (daysAndSquares.length % 7 !== 0 ) {
-    throw 'Calendar not constructed properly. The # of squares should be a multiple of 7.'
-  }
 
   // Wrap it all in a tidy div.
   daysAndSquares.unshift('<div class="qs-squares' + (overlayOpen ? ' qs-blur' : '') + '">')
@@ -1272,22 +1282,57 @@ function oneHandler(e) {
     } else if (newMonthIndex) {
       overlayYearEntry(e, input, instance, newMonthIndex)
 
+    // Clicking a disabled square or disabled overlay submit button.
+    } else if (classList.contains('qs-disabled')) {
+      return
+
     // Clicking a number square - process whether to select that day or not.
     } else if (classList.contains('qs-num')) {
-      var targ = target.nodeName === 'SPAN' ? target.parentNode : target
       var num = target.textContent
-      var dateInQuestion = new Date(instance.currentYear, instance.currentMonth, num)
+      var monthDirection = +target.dataset.direction // -1, 0, or 1.
+      var dateInQuestion = new Date(instance.currentYear, instance.currentMonth + monthDirection, num)
+
+      /*
+        If the user clicked on a date within the previous or next month,
+        reset the year, month, and month name on the instance so that
+        the calendar will render the correct month.
+      */
+      if (monthDirection) {
+        instance.currentYear = dateInQuestion.getFullYear()
+        instance.currentMonth = dateInQuestion.getMonth()
+        instance.currentMonthName = months[instance.currentMonth]
+
+        // Re-render calendar to navigate to the new month.
+        renderCalendar(instance)
+
+        /*
+          Since re-rendering the calendar re-creates all the html,
+          the original target is gone. Reset it so that `selectDay`
+          can highlight (or unhighlight) the correct DOM element.
+        */
+        var newDays = instance.calendar.querySelectorAll('[data-direction="0"]')
+        var newTarget
+        var idx = 0
+
+        while (!newTarget) {
+          var newDay = newDays[idx]
+          if (newDay.textContent === num) newTarget = newDay
+          idx++
+        }
+
+        target = newTarget
+      }
 
       if (+dateInQuestion === +instance.dateSelected) {
-        selectDay(targ, instance, true)
-      } else if (!targ.classList.contains('qs-disabled')) {
-        selectDay(targ, instance)
+        selectDay(target, instance, true)
+      } else if (!target.classList.contains('qs-disabled')) {
+        selectDay(target, instance)
       }
 
       return
 
     // Clicking the submit button in the overlay.
-    } else if (classList.contains('qs-submit') && !classList.contains('qs-disabled')) {
+    } else if (classList.contains('qs-submit')) {
       overlayYearEntry(e, input, instance)
     // Clicking the calendar's el for non-input's should show it.
     } else if (nonInput && target === instance.el) {
@@ -1305,9 +1350,9 @@ function oneHandler(e) {
 
     // Hide all other instances.
     hideOtherPickers(instance)
-  } else if (type === 'keydown' && keyCode === 9 && instance) {    
+  } else if (type === 'keydown' && keyCode === 9 && instance) {
     // Hide this instance on tab out.
-    hideCal(instance)    
+    hideCal(instance)
   } else if (type === 'keydown' && instance && !instance.disabled) {
     var overlay = instance.calendar.querySelector('.qs-overlay')
     var overlayShowing = !overlay.classList.contains('qs-hidden')
@@ -1424,7 +1469,7 @@ function setDate(newDate, changeCalendar) {
 
   // Check if the date is selectable.
   if (
-    this.disabledDates.some(function(d) { return +d === +date }) ||
+    this.disabledDates[+date] ||
     date < this.minDate ||
     date > this.maxDate
   ) throw "You can't manually set a date that's disabled."
@@ -1667,4 +1712,4 @@ function navigate(dateOrNum, triggerCb) {
 }
 
 
-module.exports = datepicker
+export default datepicker

@@ -28,9 +28,9 @@ module.exports = (env, argv) => ({
         use: [
           MiniCssExtractPlugin.loader, // https://goo.gl/uUBr8G
           'css-loader',
-          env.prod && 'postcss-loader', // https://goo.gl/BCwCzg - needs to be *after* `css-loader`.
-          env.prod && 'sass-loader'
-        ].filter(Boolean)
+          'postcss-loader', // https://goo.gl/BCwCzg - needs to be *after* `css-loader`.
+          'sass-loader'
+        ]
       }
     ]
   },

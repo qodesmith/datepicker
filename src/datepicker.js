@@ -143,7 +143,7 @@ function createInstance(selectorOrElement, opts) {
     Also, datepicker doesn't support string selectors when using a shadow DOM, hence why we use `document`.
   */
   var el = selectorOrElement
-  
+
   if (typeof el === 'string') {
     el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
 
@@ -1301,6 +1301,26 @@ function oneHandler(e) {
         instance.currentYear = dateInQuestion.getFullYear()
         instance.currentMonth = dateInQuestion.getMonth()
         instance.currentMonthName = months[instance.currentMonth]
+
+        // Re-render calendar to navigate to the new month.
+        renderCalendar(instance)
+
+        /*
+          Since re-rendering the calendar re-creates all the html,
+          the original target is gone. Reset it so that `selectDay`
+          can highlight (or unhighlight) the correct DOM element.
+        */
+        var newDays = instance.calendar.querySelectorAll('[data-direction="0"]')
+        var newTarget
+        var idx = 0
+
+        while (!newTarget) {
+          var newDay = newDays[idx]
+          if (newDay.textContent === num) newTarget = newDay
+          idx++
+        }
+
+        target = newTarget
       }
 
       if (+dateInQuestion === +instance.dateSelected) {

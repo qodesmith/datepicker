@@ -149,7 +149,7 @@ function createInstance(selectorOrElement, opts) {
 
   // Maybe this will be supported one day once I understand the use-case.
   } else if (type(el) === '[object ShadowRoot]') {
-    throw 'Using a shadow DOM as your selector is not supported.'
+    throw new Error('Using a shadow DOM as your selector is not supported.')
 
   /*
     If the selector is not a string, we may have been given an element within a shadow DOM (or a shadow DOM itself).
@@ -175,7 +175,7 @@ function createInstance(selectorOrElement, opts) {
 
         // Throw an error if it's not supported.
         if (!hasShadowDomSupport) {
-          throw 'The shadow DOM is not supported in your browser.'
+          throw new Error('The shadow DOM is not supported in your browser.')
 
         // Store the relevant objects.
         } else {
@@ -190,10 +190,10 @@ function createInstance(selectorOrElement, opts) {
     }
   }
 
-  if (!el) throw ('No selector / element found.')
+  if (!el) throw new Error('No selector / element found.')
 
   // Check if the provided element already has a datepicker attached.
-  if (datepickers.some(function(picker) { return picker.el === el })) throw 'A datepicker already exists on that element.'
+  if (datepickers.some(function(picker) { return picker.el === el })) throw new Error('A datepicker already exists on that element.')
 
   /*
     `noPosition` tells future logic to avoid trying to style the parent element of datepicker.
@@ -514,7 +514,7 @@ function sanitizeOptions(opts) {
   */
   if (options.events) {
     options.events = options.events.reduce(function(acc, date) {
-      if (!dateCheck(date)) throw '"options.events" must only contain valid JavaScript Date objects.'
+      if (!dateCheck(date)) throw new Error('"options.events" must only contain valid JavaScript Date objects.')
       acc[+stripTime(date)] = true
       return acc
     }, {})
@@ -526,7 +526,7 @@ function sanitizeOptions(opts) {
   */
   ;['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(function(value) {
     var date = options[value]
-    if (date && !dateCheck(date)) throw '"options.' + value + '" needs to be a valid JavaScript Date object.'
+    if (date && !dateCheck(date)) throw new Error('"options.' + value + '" needs to be a valid JavaScript Date object.')
 
     /*
       Strip the time from the date.
@@ -551,8 +551,8 @@ function sanitizeOptions(opts) {
   options.disabledDates = (options.disabledDates || []).reduce(function(acc, date) {
     var newDateNum = +stripTime(date)
 
-    if (!dateCheck(date)) throw 'You supplied an invalid date to "options.disabledDates".'
-    if (newDateNum === +stripTime(dateSelected)) throw '"disabledDates" cannot contain the same date as "dateSelected".'
+    if (!dateCheck(date)) throw new Error('You supplied an invalid date to "options.disabledDates".')
+    if (newDateNum === +stripTime(dateSelected)) throw new Error('"disabledDates" cannot contain the same date as "dateSelected".')
 
     // Store a number because `createMonth` checks this array for a number match.
     acc[newDateNum] = 1
@@ -561,7 +561,7 @@ function sanitizeOptions(opts) {
 
   // If id was provided, it cannot me null or undefined.
   if (options.hasOwnProperty('id') && id == null) {
-    throw 'Id cannot be `null` or `undefined`'
+    throw new Error('Id cannot be `null` or `undefined`')
   }
 
   /*
@@ -577,7 +577,7 @@ function sanitizeOptions(opts) {
     var pickers = datepickers.filter(function(picker) { return picker.id === id })
 
     // No more than 2 pickers can have the same id.
-    if (pickers.length > 1) throw 'Only two datepickers can share an id.'
+    if (pickers.length > 1) throw new Error('Only two datepickers can share an id.')
 
     // 2nd - If we found a picker, THIS will be the 2nd in the pair. Set the sibling property on the options.
     if (pickers.length) {
@@ -597,16 +597,16 @@ function sanitizeOptions(opts) {
   */
   var positionFound = ['tr', 'tl', 'br', 'bl', 'c'].some(function(dir) { return position === dir })
   if (position && !positionFound) {
-    throw '"options.position" must be one of the following: tl, tr, bl, br, or c.'
+    throw new Error('"options.position" must be one of the following: tl, tr, bl, br, or c.')
   }
   options.position = establishPosition(position || 'bl')
 
   // Check proper relationship between `minDate`, `maxDate`, & `dateSelected`.
-  if (maxDate < minDate) throw '"maxDate" in options is less than "minDate".'
+  if (maxDate < minDate) throw new Error('"maxDate" in options is less than "minDate".')
   if (dateSelected) {
     function dsErr(min) {
       var lessOrGreater = min ? 'less' : 'greater'
-      throw '"dateSelected" in options is ' + lessOrGreater + ' than "' + (min || 'max') + 'Date".'
+      throw new Error('"dateSelected" in options is ' + lessOrGreater + ' than "' + (min || 'max') + 'Date".')
     }
     if (minDate > dateSelected) dsErr('min')
     if (maxDate < dateSelected) dsErr()
@@ -629,7 +629,7 @@ function sanitizeOptions(opts) {
       !Array.isArray(custom) || // Must be an array.
       custom.length !== num || // Must have the correct length.
       custom.some(function(item) { return typeof item !== 'string' }) // Must be an array of strings only.
-    ) throw '"' + label + '" must be an array with ${num} strings.'
+    ) throw new Error('"' + label + '" must be an array with ${num} strings.')
 
     options[!i ? 'days' : i < 2 ? 'months' : 'overlayMonths'] = custom
   })
@@ -1458,7 +1458,7 @@ function setDate(newDate, changeCalendar) {
 
   // Date isn't undefined or null but still falsey.
   } else if (!dateCheck(newDate)) {
-    throw '`setDate` needs a JavaScript Date object.'
+    throw new Error('`setDate` needs a JavaScript Date object.')
   }
 
 
@@ -1472,7 +1472,7 @@ function setDate(newDate, changeCalendar) {
     this.disabledDates[+date] ||
     date < this.minDate ||
     date > this.maxDate
-  ) throw "You can't manually set a date that's disabled."
+  ) throw new Error("You can't manually set a date that's disabled.")
 
   // Keep track of the new date.
   this.dateSelected = date
@@ -1532,7 +1532,7 @@ function changeMinOrMax(instance, date, isMin) {
   function origProp() { return 'original' + type + 'Date' }
   function prop() { return type.toLowerCase() + 'Date' }
   function method() { return 'set' + type }
-  function throwOutOfRangeError() { throw 'Out-of-range date passed to ' + method() }
+  function throwOutOfRangeError() { throw new Error('Out-of-range date passed to ' + method()) }
 
   // Removing min / max.
   if (date == null) {
@@ -1573,7 +1573,7 @@ function changeMinOrMax(instance, date, isMin) {
 
   // Throw an error for invalid dates.
   } else if (!dateCheck(date)) {
-    throw 'Invalid date passed to ' + method()
+    throw new Error('Invalid date passed to ' + method())
 
   // Setting min / max.
   } else if (sibling) {
@@ -1700,7 +1700,7 @@ function remove() {
  */
 function navigate(dateOrNum, triggerCb) {
   var date = new Date(dateOrNum)
-  if (!dateCheck(date)) throw '`navigate` needs a JavaScript Date object.'
+  if (!dateCheck(date)) throw new Error('`navigate` needs a JavaScript Date object.')
 
   this.currentYear = date.getFullYear()
   this.currentMonth = date.getMonth()

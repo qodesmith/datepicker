@@ -5,8 +5,6 @@ import './sandbox.css'
 window.datepicker = datepicker
 
 window.test = () => {
-  const picker = datepicker('[data-cy="single-datepicker-input"]', {
-    alwaysShow: 1,
-    showAllDates: 1,
-  })
+  window.start = datepicker('[data-cy="daterange-input-start"]', { id: 1, alwaysShow: 1 })
+  window.end = datepicker('[data-cy="daterange-input-end"]', { id: 1, alwaysShow: 1 })
 }

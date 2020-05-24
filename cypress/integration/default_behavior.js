@@ -1,5 +1,12 @@
-const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+import selectors from '../selectors'
+import pickerProperties from '../pickerProperties'
+
+const {
+  singleDatepickerInput,
+  daterangeInputEnd,
+  daterangeInputStart,
+} = selectors
+const { singleDatepickerProperties, getDaterangeProperties } = pickerProperties
 
 /*
   The tests need to be rethought so as to be independent.
@@ -16,129 +23,83 @@ const months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July',
   TODO: add a test for the navigate method.
 */
 
+// Temporary while writing new tests
+const x = { describe: () => {} }
 
-describe('Initial calendar load with default settings', () => {
+
+describe('Default properties and behavior', function() {
+  beforeEach(function() {
+    cy.visit('http://localhost:9001')
+
+    /*
+      We can't simply import the datepicker library up at the top because it will not
+      be associated with the correct window object. Instead, we can use a Cypress alias
+      that will expose what we want on `this`, so long as we avoid using arrow functions.
+    */
+    cy.window().then(global => cy.wrap(global.datepicker).as('datepicker'))
+  })
+
+  describe('Single instance', function() {
+    it('should have the correct properties and values', function() {
+      const picker = this.datepicker(singleDatepickerInput)
+
+      singleDatepickerProperties.forEach(({ property, defaultValue, domElement, selector, deepEqual, isFunction }) => {
+        const value = picker[property]
+
+        // The property should exist on ther picker.
+        expect(picker).to.haveOwnProperty(property)
+
+        // First get the dom element, then ensure it has the correct default value.
+        if (domElement) {
+          cy.get(selector).then(elements => {
+            expect(value).to.equal(defaultValue(elements))
+            expect(elements).to.have.lengthOf(1)
+          })
+
+        // Ensure the value is a function.
+        } else if (isFunction) {
+          assert.isFunction(value)
+
+        // The property should have the correct default value.
+        } else if (deepEqual) {
+          expect(value).to.deep.equal(defaultValue)
+        } else {
+          expect(value).to.equal(defaultValue)
+        }
+      })
+
+      // Ensure that only and all the properties are in the picker instance.
+      const pickerKeys = Object.keys(picker)
+      const numOfPropertiesExpected = singleDatepickerProperties.length
+      expect(pickerKeys).to.have.length(numOfPropertiesExpected)
+
+      singleDatepickerProperties.forEach(({ property }) => {
+        expect(picker).to.haveOwnProperty(property)
+      })
+    })
+  })
+
+  describe('Daterange pair', function() {
+    it('(they) should have the correct properties and values', () => {
+      const startPicker = this.datepicker(daterangeInputStart)
+      const endPicker = this.datepicker(daterangeInputEnd)
+
+      ['start', 'end'].forEach(type => {
+        getDateranceProperties(type).forEach(({ property, defaultValue, domElement, selector, deepEqual, isFunction }) => {
+
+        })
+      })
+    })
+  })
+})
+
+
+x.describe('Initial calendar load with default settings', () => {
   const today = new Date()
   const todayNoTime = new Date(today.getFullYear(), today.getMonth(), today.getDate())
   let picker
 
-  before(() => {
-    cy.visit('http://localhost:9001')
-    cy.window().then(win => {
-      picker = win.dp('[data-cy="input-1"]')
-    })
-  })
 
-  describe('Datepicker instance object properties', () => {
-    it('el', () => {
-      cy.get('[data-cy="input-1"]')
-        .then($el => expect($el[0]).to.equal(picker.el))
-    })
-
-    it('parent', () => {
-      cy.get('[data-cy="input-1"]')
-        .then($el => expect($el.parent()[0]).to.equal(picker.parent))
-    })
-
-    it('nonInput', () => expect(picker.nonInput).to.be.false)
-
-    it('noPosition', () => expect(picker.noPosition).to.be.false)
-
-    it('position', () => expect(picker.position).to.deep.equal({ bottom: 1, left: 1 }))
-
-    it('startDate', () => expect(+picker.startDate).to.equal(+todayNoTime))
-
-    it('dateSelected', () => expect(picker.dateSelected).to.be.undefined)
-
-    it('disabledDates', () => expect(picker.disabledDates).to.deep.equal([]))
-
-    it('minDate', () => expect(picker.minDate).to.be.undefined)
-
-    it('maxDate', () => expect(picker.maxDate).to.be.undefined)
-
-    it('noWeekends', () => expect(picker.noWeekends).to.be.false)
-
-    it('weekendIndices', () => expect(picker.weekendIndices).to.deep.equal([6, 0]))
-
-    it('calendarContainer', () => {
-      cy.get('.qs-datepicker-container').then($calendarContainer => {
-        expect(picker.calendarContainer).to.equal($calendarContainer[0])
-      })
-    })
-
-    it('calendar', () => {
-      cy.get('.qs-datepicker').then($calendar => {
-        expect(picker.calendar).to.equal($calendar[0])
-      })
-    })
-
-    it('currentMonth', () => expect(picker.currentMonth).to.equal(today.getMonth()))
-
-    it('currentMonthName', () => expect(picker.currentMonthName).to.equal(months[picker.currentMonth]))
-
-    it('currentYear', () => expect(picker.currentYear).to.equal(today.getFullYear()))
-
-    it('events', () => expect(picker.events).to.deep.equal({}))
-
-    it('should have specific properties that are functions', () => {
-      const functionProperties = [
-        'setDate',
-        'remove',
-        'setMin',
-        'setMax',
-        'show',
-        'hide',
-        'onSelect',
-        'onShow',
-        'onHide',
-        'onMonthChange',
-        'formatter',
-        'disabler'
-      ]
-
-      Object.keys(picker).forEach(prop => {
-        if (functionProperties.includes(prop)) {
-          expect(typeof picker[prop]).to.equal('function')
-        } else {
-          expect(typeof picker[prop]).not.to.equal('function')
-        }
-      })
-    })
-
-    it('months', () => expect(picker.months).to.deep.equal(months))
-
-    it('days', () => expect(picker.days).to.deep.equal(days))
-
-    it('startDay', () => expect(picker.startDay).to.equal(0))
-
-    it('overlayMonths', () => expect(picker.overlayMonths).to.deep.equal(months.map(month => month.slice(0, 3))))
-
-    it('overlayPlaceholder', () => expect(picker.overlayPlaceholder).to.equal('4-digit year'))
-
-    it('overlayButton', () => expect(picker.overlayButton).to.equal('Submit'))
-
-    it('disableYearOverlay', () => expect(picker.disableYearOverlay).to.be.false)
-
-    it('disableMobile', () => expect(picker.disableMobile).to.be.false)
-
-    it('isMobile', () => expect(picker.isMobile).to.be.false)
-
-    it('alwaysShow', () => expect(picker.alwaysShow).to.be.false)
-
-    it('id', () => expect(picker.id).to.be.undefined)
-
-    it('showAllDates', () => expect(picker.showAllDates).to.be.false)
-
-    it('respectDisabledReadOnly', () => expect(picker.respectDisabledReadOnly).to.be.false)
-
-    it('sibling', () => expect(picker.sibling).to.be.undefined)
-
-    it('first', () => expect(picker.first).to.be.undefined)
-
-    it('second', () => expect(picker.second).to.be.undefined)
-
-    it('inlinePosition', () => expect(picker.inlinePosition).to.be.true)
-  })
 
   describe('Datepicker UI (& corresponding changes to instance object properties)', () => {
     describe('Basic visuals and behavior', () => {

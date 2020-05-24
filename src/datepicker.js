@@ -763,10 +763,6 @@ function createMonth(date, instance, overlayOpen) {
   var start = +range.start
   var end = +range.end
 
-  // Same year, same month?
-  var today = stripTime(new Date())
-  var isThisMonth = currentYear === today.getFullYear() && currentMonth === today.getMonth()
-
   // 1st of the month for whatever date we've been provided.
   var copy = stripTime(new Date(date).setDate(1)) // 1st of the month.
 
@@ -848,10 +844,14 @@ function createMonth(date, instance, overlayOpen) {
     var isWeekend = weekdayIndex === 0 || weekdayIndex === 6
 
     // Is this iteration's date disabled?
-    var isDisabled = disabledDates[+thisDay] || instance.disabler(thisDay) || (isWeekend && instance.noWeekends)
+    var isDisabled = disabledDates[+thisDay] ||
+      instance.disabler(thisDay) ||
+      (isWeekend && instance.noWeekends) ||
+      (minDate && +thisDay < +minDate) ||
+      (maxDate && +thisDay > +maxDate)
 
     // Is this iteration's date today?
-    var isToday = +today === +thisDay
+    var isToday = +stripTime(new Date()) === +thisDay
 
     // Daterange variables.
     var isRangeStart = +thisDay === start

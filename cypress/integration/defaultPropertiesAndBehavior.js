@@ -68,6 +68,7 @@ describe('Default properties and behavior', function() {
       We can't simply import the datepicker library up at the top because it will not
       be associated with the correct window object. Instead, we can use a Cypress alias
       that will expose what we want on `this`, so long as we avoid using arrow functions.
+      This is possible because datepicker is assigned a value on the window object in `sandbox.js`.
     */
     cy.window().then(global => cy.wrap(global.datepicker).as('datepicker'))
   })
@@ -84,12 +85,115 @@ describe('Default properties and behavior', function() {
       expect(pickerKeys).to.have.length(numOfPropertiesExpected)
 
       singleDatepickerProperties.forEach(({ property }) => {
-        expect(picker).to.haveOwnProperty(property)
+        expect(picker, `"${property}"`).to.haveOwnProperty(property)
+      })
+    })
+
+    describe('UI (& corresponding changes to instance object properties)', function() {
+      describe('Basic visuals and behavior', function() {
+        it('should have the correct DOM structure', function() {
+          const date = new Date()
+          this.datepicker(singleDatepickerInput)
+
+          cy.get(selectors.single.calendarContainer).as('calendarContainer')
+          cy.get(selectors.single.calendar).as('calendar')
+          cy.get(selectors.single.controls).as('controls')
+          cy.get(`${selectors.single.controls} .qs-arrow`).as('arrows')
+          cy.get(`${selectors.single.controls} .qs-month-year`).as('monthYear')
+          cy.get(`${selectors.single.controls} .qs-month`).as('month')
+          cy.get(`${selectors.single.controls} .qs-year`).as('year')
+          cy.get(selectors.single.squares).as('squares')
+
+
+          // calendarContainer
+          cy.get(selectors.common.container).should('have.length', 1) // In the whole document.
+          cy.get('@calendarContainer').should('have.length', 1) // In the specified section of the document.
+          cy.get('@calendarContainer').children().should('have.length', 1)
+          cy.get('@calendarContainer').then($calendarContainer => {
+            assert.equal(
+              $calendarContainer.attr('class'),
+              'qs-datepicker-container qs-hidden',
+              'Calendar container full className.'
+            )
+          })
+
+          // calendar
+          cy.get(selectors.common.calendar).should('have.length', 1) // In the whole document.
+          cy.get('@calendar').should('have.length', 1) // In the specified section of the document.
+          cy.get('@calendar').children().should('have.length', 3)
+          cy.get('@calendar').then($calendar => {
+            assert.equal($calendar.attr('class'), 'qs-datepicker', 'Calendar full className.')
+          })
+
+          // calendar => controls
+          cy.get(selectors.common.controls).should('have.length', 1) // In the whole document.
+          cy.get('@controls').should('have.length', 1) // In the specified section of the document.
+          cy.get('@controls').children().should('have.length', 3)
+          cy.get('@controls').then($controls => {
+            assert.equal($controls.attr('class'), 'qs-controls', 'Controls full className.')
+          })
+
+          // calendar => controls => arrows
+          cy.get(`${selectors.common.controls} .qs-arrow`).should('have.length', 2) // In the whole document.
+          cy.get('@arrows').should('have.length', 2) // In the specified section of the document.
+          cy.get('@arrows').then($arrows => {
+            cy.get($arrows[0]).children().should('have.length', 0)
+            cy.get($arrows[1]).children().should('have.length', 0)
+
+            assert.equal($arrows[0].className, 'qs-arrow qs-left', 'Controls - left arrow.')
+            assert.equal($arrows[1].className, 'qs-arrow qs-right', 'Controls - right arrow.')
+          })
+
+          // calendar => controls => month/year
+          cy.get(`${selectors.common.controls} .qs-month-year`).should('have.length', 1) // In the whole document.
+          cy.get('@monthYear').should('have.length', 1) // In the specified section of the document.
+          cy.get('@monthYear').children().should('have.length', 2)
+          cy.get('@monthYear').then($monthYear => {
+            assert.equal($monthYear.attr('class'), 'qs-month-year', 'Month/year full className.')
+          })
+
+          // calendar => controls => month/year => month
+          cy.get(`${selectors.common.controls} .qs-month`).should('have.length', 1) // In the whole document.
+          cy.get('@month').should('have.length', 1) // In the specified section of the document.
+          cy.get('@month').children().should('have.length', 0)
+          cy.get('@month').should('have.text', pickerProperties.months[date.getMonth()])
+          cy.get('@month').then($month => {
+            assert.equal($month.attr('class'), 'qs-month', 'Month full className.')
+          })
+
+          // calendar => controls => month/year => year
+          cy.get(`${selectors.common.controls} .qs-year`).should('have.length', 1) // In the whole document.
+          cy.get('@year').should('have.length', 1) // In the specified section of the document.
+          cy.get('@year').children().should('have.length', 0)
+          cy.get('@year').should('have.text', date.getFullYear())
+          cy.get('@year').then($year => {
+            assert.equal($year.attr('class'), 'qs-year', 'Year full className.')
+          })
+
+          // calendar => squares
+          cy.get(selectors.common.squares).should('have.length', 1) // In the whole document.
+          cy.get('@squares').should('have.length', 1) // In the specified section of the document.
+          cy.get('@squares').then($squares => {
+            assert.equal($squares.attr('class'), 'qs-squares', 'Squares full className.')
+          })
+
+          // calendar => squares => various types of squares
+          cy.get('@squares').children().then($allSquares => {
+            cy.get(selectors.common.everySquare).should('have.length', $allSquares.length)
+          })
+          cy.get('@squares').children().filter('.qs-day')
+            .should('have.length', 7)
+            .should('have.attr', 'class', 'qs-square qs-day')
+
+
+          // calendar => overlay
+        })
       })
     })
   })
 
   describe('Daterange pair', function() {
+
     it('(they) should have the correct properties and values', function() {
       const options = { id: Math.random() } // Using Math.random to showcase that the id just needs to be consistent between both instances.
       const startPicker = this.datepicker(daterangeInputStart, options)

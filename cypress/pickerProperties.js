@@ -242,7 +242,7 @@ const singleDatepickerProperties = [
 ]
 
 function mergeProperties(singlePickerProps, daterangeProps) {
-  const finalArray = []
+  const properties = []
 
   for (let i = 0; i < singlePickerProps.length; i++) {
     const oldObj = singlePickerProps[i]
@@ -251,7 +251,7 @@ function mergeProperties(singlePickerProps, daterangeProps) {
     // Add the new item instead of the old one.
     if (overwriteIdx > -1) {
       // Add this item to the final array.
-      finalArray.push(daterangeProps[overwriteIdx])
+      properties.push(daterangeProps[overwriteIdx])
 
       // Get rid of this item in daterangeProps.
       daterangeProps[overwriteIdx] = null
@@ -259,12 +259,12 @@ function mergeProperties(singlePickerProps, daterangeProps) {
 
     // Add the old item.
     } else {
-      finalArray.push(singlePickerProps[i])
+      properties.push(singlePickerProps[i])
     }
   }
 
   // Include any remaining objects not found in the original singlePickerProps.
-  return finalArray.concat(daterangeProps)
+  return properties.concat(daterangeProps)
 }
 
 function getDaterangeProperties(type /* 'start' or 'end' */, startPicker, endPicker) {
@@ -336,6 +336,8 @@ function getDaterangeProperties(type /* 'start' or 'end' */, startPicker, endPic
 const pickerProperties = {
   singleDatepickerProperties,
   getDaterangeProperties,
+  months,
+  days,
 }
 
 export default pickerProperties

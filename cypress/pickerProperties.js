@@ -15,13 +15,13 @@ const singleDatepickerProperties = [
     property: 'calendar',
     defaultValue: getFirstElement,
     domElement: true,
-    selector: selectors.calendar,
+    selector: selectors.single.calendar,
   },
   {
     property: 'calendarContainer',
     defaultValue: getFirstElement,
     domElement: true,
-    selector: selectors.calendarContainer,
+    selector: selectors.single.calendarContainer,
   },
   {
     property: 'currentMonth',
@@ -240,29 +240,101 @@ const singleDatepickerProperties = [
   },
 ]
 
-function getDaterangeProperties(type) {
+function mergeProperties(singlePickerProps, daterangeProps) {
+  const finalArray = []
+
+  for (let i = 0; i < singlePickerProps.length; i++) {
+    const oldObj = singlePickerProps[i]
+    const overwriteIdx = daterangeProps.findIndex(obj => obj.property === oldObj.property)
+
+    // Add the new item instead of the old one.
+    if (overwriteIdx > -1) {
+      // Add this item to the final array.
+      finalArray.push(daterangeProps[overwriteIdx])
+
+      // Get rid of this item in daterangeProps.
+      daterangeProps[overwriteIdx] = null
+      daterangeProps = daterangeProps.filter(Boolean)
+
+    // Add the old item.
+    } else {
+      finalArray.push(singlePickerProps[i])
+    }
+  }
+
+  // Include any remaining objects not found in the original singlePickerProps.
+  return finalArray.concat(daterangeProps)
+}
+
+function getDaterangeProperties(type /* 'start' or 'end' */, startPicker, endPicker) {
   const daterangeProperties = [
-    ...singleDatepickerProperties,
     {
       property: 'calendar',
       defaultValue: getFirstElement,
       domElement: true,
-      selector: selectors.calendar,
+      selector: selectors.range[type].calendar,
     },
     {
       property: 'calendarContainer',
       defaultValue: getFirstElement,
       domElement: true,
-      selector: selectors.calendarContainer,
+      selector: selectors.range[type].calendarContainer,
+    },
+    {
+      property: 'el',
+      defaultValue: getFirstElement,
+      domElement: true,
+      selector: selectors[`daterangeInput${type === 'start' ? 'Start' : 'End'}`],
+    },
+    {
+      property: 'first',
+      defaultValue: type === 'start' || undefined,
+    },
+    {
+      property: 'getRange',
+      // defaultValue: '',
+      isFunction: true,
+    },
+    {
+      property: 'id',
+      // defaultValue: '',
+    },
+    {
+      property: 'originalMaxDate',
+      defaultValue: undefined,
+    },
+    {
+      property: 'originalMinDate',
+      defaultValue: undefined,
+    },
+    {
+      property: 'parent',
+      defaultValue: getFirstElement,
+      domElement: true,
+      selector: selectors.daterangeInputsParent,
+    },
+    {
+      property: 'positionedEl',
+      defaultValue: getFirstElement,
+      domElement: true,
+      selector: selectors.daterangeInputsParent,
+    },
+    {
+      property: 'second',
+      defaultValue: type === 'end' || undefined,
+    },
+    {
+      property: 'sibling',
+      defaultValue: type === 'start' ? endPicker : startPicker,
     },
   ]
 
-  return daterangeProperties
+  return mergeProperties(singleDatepickerProperties, daterangeProperties)
 }
 
 const pickerProperties = {
   singleDatepickerProperties,
-  daterangeProperties,
+  getDaterangeProperties,
 }
 
 export default pickerProperties

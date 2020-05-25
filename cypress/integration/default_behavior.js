@@ -26,6 +26,37 @@ const { singleDatepickerProperties, getDaterangeProperties } = pickerProperties
 // Temporary while writing new tests
 const x = { describe: () => {} }
 
+function checkPickerProperties(picker, isDaterange, id) {
+  return function({ property, defaultValue, domElement, selector, deepEqual, isFunction }) {
+    const value = picker[property]
+
+    // The property should exist on ther picker.
+    expect(picker).to.haveOwnProperty(property)
+
+    // Special case for id.
+    if (isDaterange && property === 'id') {
+      expect(value).to.equal(id)
+
+    // First get the dom element, then ensure it has the correct default value.
+    } else if (domElement) {
+      cy.get(selector).then(elements => {
+        expect(value).to.equal(defaultValue(elements))
+        expect(elements).to.have.lengthOf(1)
+      })
+
+    // Ensure the value is a function.
+    } else if (isFunction) {
+      assert.isFunction(value)
+
+    // The property should have the correct default value.
+    } else if (deepEqual) {
+      expect(value).to.deep.equal(defaultValue)
+    } else {
+      expect(value).to.equal(defaultValue)
+    }
+  }
+}
+
 
 describe('Default properties and behavior', function() {
   beforeEach(function() {
@@ -43,30 +74,7 @@ describe('Default properties and behavior', function() {
     it('should have the correct properties and values', function() {
       const picker = this.datepicker(singleDatepickerInput)
 
-      singleDatepickerProperties.forEach(({ property, defaultValue, domElement, selector, deepEqual, isFunction }) => {
-        const value = picker[property]
-
-        // The property should exist on ther picker.
-        expect(picker).to.haveOwnProperty(property)
-
-        // First get the dom element, then ensure it has the correct default value.
-        if (domElement) {
-          cy.get(selector).then(elements => {
-            expect(value).to.equal(defaultValue(elements))
-            expect(elements).to.have.lengthOf(1)
-          })
-
-        // Ensure the value is a function.
-        } else if (isFunction) {
-          assert.isFunction(value)
-
-        // The property should have the correct default value.
-        } else if (deepEqual) {
-          expect(value).to.deep.equal(defaultValue)
-        } else {
-          expect(value).to.equal(defaultValue)
-        }
-      })
+      singleDatepickerProperties.forEach(checkPickerProperties(picker))
 
       // Ensure that only and all the properties are in the picker instance.
       const pickerKeys = Object.keys(picker)
@@ -80,13 +88,24 @@ describe('Default properties and behavior', function() {
   })
 
   describe('Daterange pair', function() {
-    it('(they) should have the correct properties and values', () => {
-      const startPicker = this.datepicker(daterangeInputStart)
-      const endPicker = this.datepicker(daterangeInputEnd)
+    it('(they) should have the correct properties and values', function() {
+      const options = { id: Math.random() } // Using Math.random to showcase that the id just needs to be consistent between both instances.
+      const startPicker = this.datepicker(daterangeInputStart, options)
+      const endPicker = this.datepicker(daterangeInputEnd, options)
 
-      ['start', 'end'].forEach(type => {
-        getDateranceProperties(type).forEach(({ property, defaultValue, domElement, selector, deepEqual, isFunction }) => {
+      ;['start', 'end'].forEach(type => {
+        const pickerToCheck = type === 'start' ? startPicker : endPicker
+        const pickerProperties = getDaterangeProperties(type, startPicker, endPicker)
+        pickerProperties.forEach(checkPickerProperties(pickerToCheck, true, options.id))
 
+        // Ensure that only and all the properties are in the picker instance.
+        const pickerKeys = Object.keys(pickerToCheck)
+        const numOfPropertiesExpected = pickerProperties.length
+
+        expect(pickerKeys).to.have.length(numOfPropertiesExpected)
+
+        pickerProperties.forEach(({ property }) => {
+          expect(pickerToCheck).to.haveOwnProperty(property)
         })
       })
     })

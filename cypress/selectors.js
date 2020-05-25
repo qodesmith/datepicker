@@ -11,12 +11,18 @@ const dpCalendar =  '.qs-datepicker'
 
 const datepickerSelectors = {
   single: {
-    calendarContainer: `${appSelectors.singleDatepickerInputParent}${dpContainer}`,
-    calendar: `${appSelectors.singleDatepickerInputParent}${dpCalendar}`,
+    calendarContainer: `${appSelectors.singleDatepickerInputParent} ${dpContainer}`,
+    calendar: `${appSelectors.singleDatepickerInputParent} ${dpCalendar}`,
   },
   range: {
-    calendarContainer: `${appSelectors.daterangeInputsParent}${dpContainer}`,
-    calendar: `${appSelectors.daterangeInputsParent}${dpCalendar}`,
+    start: {
+      calendarContainer: `${appSelectors.daterangeInputsParent} ${dpContainer}:nth-of-type(1)`,
+      calendar: `${appSelectors.daterangeInputsParent} ${dpContainer}:nth-of-type(1) ${dpCalendar}`,
+    },
+    end: {
+      calendarContainer: `${appSelectors.daterangeInputsParent} ${dpContainer}:nth-of-type(2)`,
+      calendar: `${appSelectors.daterangeInputsParent} ${dpContainer}:nth-of-type(2) ${dpCalendar}`,
+    },
   },
 }
 

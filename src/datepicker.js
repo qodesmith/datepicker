@@ -148,7 +148,7 @@ function createInstance(selectorOrElement, opts) {
     el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
 
   // Maybe this will be supported one day once I understand the use-case.
-  } else if (type(el) === '[object ShadowRoot]') {
+  } else if (el instanceof ShadowRoot) {
     throw 'Using a shadow DOM as your selector is not supported.'
 
   /*
@@ -163,14 +163,12 @@ function createInstance(selectorOrElement, opts) {
     var currentParent = el.parentNode
 
     while (!rootFound) {
-      var parentType = type(currentParent)
-
       // We've reached the document, which means there's no shadow DOM in use.
-      if (parentType === '[object HTMLDocument]') {
+      if (currentParent instanceof HTMLDocument) {
         rootFound = true
 
       // We're using a shadow DOM.
-      } else if (parentType === '[object ShadowRoot]') {
+      } else if (currentParent.toString() === '[object ShadowRoot]') {
         rootFound = true
 
         // Throw an error if it's not supported.
@@ -490,7 +488,7 @@ function createInstance(selectorOrElement, opts) {
 function freshCopy(item) {
   if (Array.isArray(item)) return item.map(freshCopy)
 
-  if (type(item) === '[object Object]') {
+  if (item.toString() === '[object Object]') {
     return Object.keys(item).reduce(function(newObj, key) {
       newObj[key] = freshCopy(item[key])
       return newObj
@@ -1091,7 +1089,7 @@ function calculatePosition(instance) {
  */
 function dateCheck(date) {
   return (
-    type(date) === '[object Date]' &&
+    date instanceof Date &&
     date.toString() !== 'Invalid Date'
   )
 }
@@ -1195,13 +1193,6 @@ function overlayYearEntry(e, input, instance, overlayMonthIndex) {
     var submit = instance.calendar.querySelector('.qs-submit')
     submit.classList[badDate ? 'add' : 'remove']('qs-disabled')
   }
-}
-
-/*
- *  Returns the explicit type of something as a string.
- */
-function type(thing) {
-  return ({}).toString.call(thing)
 }
 
 /*

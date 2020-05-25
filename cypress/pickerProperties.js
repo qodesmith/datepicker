@@ -98,6 +98,7 @@ const singleDatepickerProperties = [
   {
     property: 'inlinePosition',
     defaultValue: true,
+    notOwnProperty: true,
   },
   {
     property: 'isMobile',

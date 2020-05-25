@@ -28,7 +28,7 @@ const datepickerSelectors = {
 
 const selectors = {
   ...appSelectors,
-  ...datepickerSelectors
+  ...datepickerSelectors,
 }
 
 export default selectors

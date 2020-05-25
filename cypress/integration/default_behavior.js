@@ -27,11 +27,13 @@ const { singleDatepickerProperties, getDaterangeProperties } = pickerProperties
 const x = { describe: () => {} }
 
 function checkPickerProperties(picker, isDaterange, id) {
-  return function({ property, defaultValue, domElement, selector, deepEqual, isFunction }) {
+  return function({ property, defaultValue, domElement, selector, deepEqual, isFunction, notOwnProperty }) {
     const value = picker[property]
 
-    // The property should exist on ther picker.
-    expect(picker).to.haveOwnProperty(property)
+    if (!notOwnProperty) {
+      // The property should exist on the picker.
+      expect(picker).to.haveOwnProperty(property)
+    }
 
     // Special case for id.
     if (isDaterange && property === 'id') {
@@ -40,7 +42,7 @@ function checkPickerProperties(picker, isDaterange, id) {
     // First get the dom element, then ensure it has the correct default value.
     } else if (domElement) {
       cy.get(selector).then(elements => {
-        expect(value).to.equal(defaultValue(elements))
+        assert.equal(value, defaultValue(elements), property)
         expect(elements).to.have.lengthOf(1)
       })
 
@@ -50,9 +52,9 @@ function checkPickerProperties(picker, isDaterange, id) {
 
     // The property should have the correct default value.
     } else if (deepEqual) {
-      expect(value).to.deep.equal(defaultValue)
+      assert.deepEqual(value, defaultValue, property)
     } else {
-      expect(value).to.equal(defaultValue)
+      assert.equal(value, defaultValue, property)
     }
   }
 }

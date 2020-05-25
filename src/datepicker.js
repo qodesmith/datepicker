@@ -467,9 +467,17 @@ function createInstance(selectorOrElement, opts) {
     This will ensure the styling is removed ONLY when the LAST picker inside it is removed.
     This condition will trigger when subsequent pickers are instantiated inside `postionedEl`.
   */
-  if (instance.inlinePosition) {
-    datepickers.forEach(function(picker) {
-      if (picker.positionedEl === instance.positionedEl) picker.inlinePosition = true
+  var pickersWithSamePositionedEl = datepickers.filter(function(picker) {
+    return picker.positionedEl === instance.positionedEl
+  })
+  var somePickerHasInlinePosition = pickersWithSamePositionedEl.some(function(picker) {
+    return picker.inlinePosition
+  })
+
+  if (somePickerHasInlinePosition) {
+    instance.inlinePosition = true // This instance is not in the datepickers array yet. Ensure it has this property.
+    pickersWithSamePositionedEl.forEach(function(picker) {
+      picker.inlinePosition = true
     })
   }
 

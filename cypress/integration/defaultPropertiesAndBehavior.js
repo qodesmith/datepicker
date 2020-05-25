@@ -32,29 +32,29 @@ function checkPickerProperties(picker, isDaterange, id) {
 
     if (!notOwnProperty) {
       // The property should exist on the picker.
-      expect(picker).to.haveOwnProperty(property)
+      expect(picker, `(checkPickerProperties) isDaterange<${isDaterange}>`).to.haveOwnProperty(property)
     }
 
     // Special case for id.
     if (isDaterange && property === 'id') {
-      expect(value).to.equal(id)
+      expect(value, 'id').to.equal(id)
 
     // First get the dom element, then ensure it has the correct default value.
     } else if (domElement) {
       cy.get(selector).then(elements => {
-        assert.equal(value, defaultValue(elements), property)
-        expect(elements).to.have.lengthOf(1)
+        expect(value, property).to.equal(defaultValue(elements))
+        expect(elements, selector).to.have.lengthOf(1)
       })
 
     // Ensure the value is a function.
     } else if (isFunction) {
-      assert.isFunction(value)
+      expect(value, property).to.be.a('function')
 
     // The property should have the correct default value.
     } else if (deepEqual) {
-      assert.deepEqual(value, defaultValue, property)
+      expect(value, property).to.deep.equal(defaultValue)
     } else {
-      assert.equal(value, defaultValue, property)
+      expect(value, property).to.equal(defaultValue)
     }
   }
 }
@@ -85,7 +85,7 @@ describe('Default properties and behavior', function() {
       expect(pickerKeys).to.have.length(numOfPropertiesExpected)
 
       singleDatepickerProperties.forEach(({ property }) => {
-        expect(picker, `"${property}"`).to.haveOwnProperty(property)
+        expect(picker, property).to.haveOwnProperty(property)
       })
     })
 
@@ -110,11 +110,7 @@ describe('Default properties and behavior', function() {
           cy.get('@calendarContainer').should('have.length', 1) // In the specified section of the document.
           cy.get('@calendarContainer').children().should('have.length', 1)
           cy.get('@calendarContainer').then($calendarContainer => {
-            assert.equal(
-              $calendarContainer.attr('class'),
-              'qs-datepicker-container qs-hidden',
-              'Calendar container full className.'
-            )
+            expect($calendarContainer, '@calendarContainer').to.have.attr('class', 'qs-datepicker-container qs-hidden')
           })
 
           // calendar
@@ -122,7 +118,7 @@ describe('Default properties and behavior', function() {
           cy.get('@calendar').should('have.length', 1) // In the specified section of the document.
           cy.get('@calendar').children().should('have.length', 3)
           cy.get('@calendar').then($calendar => {
-            assert.equal($calendar.attr('class'), 'qs-datepicker', 'Calendar full className.')
+            expect($calendar, '@calendar').to.have.attr('class', 'qs-datepicker')
           })
 
           // calendar => controls
@@ -130,7 +126,7 @@ describe('Default properties and behavior', function() {
           cy.get('@controls').should('have.length', 1) // In the specified section of the document.
           cy.get('@controls').children().should('have.length', 3)
           cy.get('@controls').then($controls => {
-            assert.equal($controls.attr('class'), 'qs-controls', 'Controls full className.')
+            expect($controls, '@controls').to.have.attr('class', 'qs-controls')
           })
 
           // calendar => controls => arrows
@@ -140,8 +136,8 @@ describe('Default properties and behavior', function() {
             cy.get($arrows[0]).children().should('have.length', 0)
             cy.get($arrows[1]).children().should('have.length', 0)
 
-            assert.equal($arrows[0].className, 'qs-arrow qs-left', 'Controls - left arrow.')
-            assert.equal($arrows[1].className, 'qs-arrow qs-right', 'Controls - right arrow.')
+            expect($arrows[0], '@arrows - left').to.have.attr('class', 'qs-arrow qs-left')
+            expect($arrows[1], '@arrows - right').to.have.attr('class', 'qs-arrow qs-right')
           })
 
           // calendar => controls => month/year
@@ -149,7 +145,7 @@ describe('Default properties and behavior', function() {
           cy.get('@monthYear').should('have.length', 1) // In the specified section of the document.
           cy.get('@monthYear').children().should('have.length', 2)
           cy.get('@monthYear').then($monthYear => {
-            assert.equal($monthYear.attr('class'), 'qs-month-year', 'Month/year full className.')
+            expect($monthYear, '@monthYear').to.have.attr('class', 'qs-month-year')
           })
 
           // calendar => controls => month/year => month
@@ -158,7 +154,7 @@ describe('Default properties and behavior', function() {
           cy.get('@month').children().should('have.length', 0)
           cy.get('@month').should('have.text', pickerProperties.months[date.getMonth()])
           cy.get('@month').then($month => {
-            assert.equal($month.attr('class'), 'qs-month', 'Month full className.')
+            expect($month, '@month').to.have.attr('class', 'qs-month')
           })
 
           // calendar => controls => month/year => year
@@ -167,14 +163,14 @@ describe('Default properties and behavior', function() {
           cy.get('@year').children().should('have.length', 0)
           cy.get('@year').should('have.text', date.getFullYear())
           cy.get('@year').then($year => {
-            assert.equal($year.attr('class'), 'qs-year', 'Year full className.')
+            expect($year, '@year').to.have.attr('class', 'qs-year')
           })
 
           // calendar => squares
           cy.get(selectors.common.squares).should('have.length', 1) // In the whole document.
           cy.get('@squares').should('have.length', 1) // In the specified section of the document.
           cy.get('@squares').then($squares => {
-            assert.equal($squares.attr('class'), 'qs-squares', 'Squares full className.')
+            expect($squares, '@squares').to.have.attr('class', 'qs-squares')
           })
 
           // calendar => squares => various types of squares
@@ -193,7 +189,6 @@ describe('Default properties and behavior', function() {
   })
 
   describe('Daterange pair', function() {
-
     it('(they) should have the correct properties and values', function() {
       const options = { id: Math.random() } // Using Math.random to showcase that the id just needs to be consistent between both instances.
       const startPicker = this.datepicker(daterangeInputStart, options)
@@ -211,7 +206,7 @@ describe('Default properties and behavior', function() {
         expect(pickerKeys).to.have.length(numOfPropertiesExpected)
 
         pickerProperties.forEach(({ property }) => {
-          expect(pickerToCheck).to.haveOwnProperty(property)
+          expect(pickerToCheck, property).to.haveOwnProperty(property)
         })
       })
     })

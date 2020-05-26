@@ -180,6 +180,18 @@ describe('Default properties and behavior', function() {
           cy.get('@squares').children().filter('.qs-day')
             .should('have.length', 7)
             .should('have.attr', 'class', 'qs-square qs-day')
+            .then($qsDays => {
+              $qsDays.each((i, qsDay) => {
+                expect(qsDay.textContent, '@squares/.qs-day').to.be.oneOf(pickerProperties.days)
+                expect(qsDay, '@squares/.qs-day').to.not.have.attr('data-direction')
+              })
+            })
+          cy.get('@squares').children().filter('.qs-outside-current-month').then($outsides => {
+            $outsides.each((i, outside) => {
+
+              // expect(outside.)
+            })
+          })
 
 
           // calendar => overlay

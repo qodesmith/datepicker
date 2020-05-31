@@ -3,8 +3,8 @@ import pickerProperties from '../pickerProperties'
 
 const {
   singleDatepickerInput,
-  daterangeInputEnd,
   daterangeInputStart,
+  daterangeInputEnd,
 } = selectors
 const { singleDatepickerProperties, getDaterangeProperties } = pickerProperties
 
@@ -59,6 +59,196 @@ function checkPickerProperties(picker, isDaterange, id) {
   }
 }
 
+function domStructure(pickerType) {
+  const date = new Date()
+  const lengthMultiplier = pickerType === 'single' ? 1 : 2
+
+  cy.get(selectors[pickerType].calendarContainer).as('calendarContainer')
+  cy.get(selectors[pickerType].calendar).as('calendar')
+  cy.get(selectors[pickerType].controls).as('controls')
+  cy.get(`${selectors[pickerType].controls} .qs-arrow`).as('arrows')
+  cy.get(`${selectors[pickerType].controls} .qs-month-year`).as('monthYear')
+  cy.get(`${selectors[pickerType].controls} .qs-month`).as('month')
+  cy.get(`${selectors[pickerType].controls} .qs-year`).as('year')
+  cy.get(selectors[pickerType].squaresContainer).as('squaresContainer')
+  cy.get(`${selectors[pickerType].squaresContainer} ${selectors.common.everySquare}`).as('squares')
+  cy.get(selectors[pickerType].overlay).as('overlay')
+  cy.get(selectors[pickerType].overlayInputContainer).as('overlayInputContainer')
+  cy.get(`${selectors[pickerType].overlayInputContainer} .qs-overlay-year`).as('overlayYearInput')
+  cy.get(`${selectors[pickerType].overlayInputContainer} .qs-close`).as('overlayClose')
+  cy.get(selectors[pickerType].overlayMonthContainer).as('overlayMonthContainer')
+
+
+  // calendarContainer
+  cy.get(selectors.common.container).should('have.length', 1) // Searching the whole document.
+  cy.get('@calendarContainer').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@calendarContainer').children().should('have.length', 1)
+  cy.get('@calendarContainer').should('have.attr', 'class', 'qs-datepicker-container qs-hidden')
+
+  // calendar
+  cy.get(selectors.common.calendar).should('have.length', 1) // Searching the whole document.
+  cy.get('@calendar').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@calendar').children().should('have.length', 3)
+  cy.get('@calendar').should('have.attr', 'class', 'qs-datepicker')
+
+  // calendar => controls
+  cy.get(selectors.common.controls).should('have.length', 1) // Searching the whole document.
+  cy.get('@controls').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@controls').children().should('have.length', 3)
+  cy.get('@controls').should('have.attr', 'class', 'qs-controls')
+
+  // calendar => controls => arrows
+  cy.get(`${selectors.common.controls} .qs-arrow`).should('have.length', 2) // Searching the whole document.
+  cy.get('@arrows').should('have.length', 2) // Searching within the specified section of the document.
+  cy.get('@arrows').then($arrows => {
+    cy.get($arrows[0]).children().should('have.length', 0)
+    cy.get($arrows[1]).children().should('have.length', 0)
+
+    expect($arrows[0], '@arrows - left').to.have.attr('class', 'qs-arrow qs-left')
+    expect($arrows[1], '@arrows - right').to.have.attr('class', 'qs-arrow qs-right')
+  })
+
+  // calendar => controls => month/year
+  cy.get(`${selectors.common.controls} .qs-month-year`).should('have.length', 1) // Searching the whole document.
+  cy.get('@monthYear').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@monthYear').children().should('have.length', 2)
+  cy.get('@monthYear').should('have.attr', 'class', 'qs-month-year')
+
+  // calendar => controls => month/year => month
+  cy.get(`${selectors.common.controls} .qs-month`).should('have.length', 1) // Searching the whole document.
+  cy.get('@month').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@month').children().should('have.length', 0)
+  cy.get('@month').should('have.text', pickerProperties.months[date.getMonth()])
+  cy.get('@month').should('have.attr', 'class', 'qs-month')
+
+  // calendar => controls => month/year => year
+  cy.get(`${selectors.common.controls} .qs-year`).should('have.length', 1) // Searching the whole document.
+  cy.get('@year').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@year').children().should('have.length', 0)
+  cy.get('@year').should('have.text', date.getFullYear())
+  cy.get('@year').should('have.attr', 'class', 'qs-year')
+
+  // calendar => squares
+  cy.get(selectors.common.squaresContainer).should('have.length', 1) // Searching the whole document.
+  cy.get('@squaresContainer').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@squaresContainer').should('have.attr', 'class', 'qs-squares')
+
+  // calendar => squares => various types of squares
+  cy.get('@squaresContainer').children().then($allSquares => {
+    cy.get(selectors.common.everySquare).should('have.length', $allSquares.length)
+  })
+  cy.get('@squares').filter('.qs-day')
+    .should('have.length', 7)
+    .should('have.attr', 'class', 'qs-square qs-day')
+    .then($qsDays => {
+      const message = '@squaresContainer/.qs-day'
+      $qsDays.each((i, qsDay) => {
+        pickerProperties.days.forEach(day => {
+          expect(qsDay.classList.contains(day), `${message} (day of week class: ${day})`).to.equal(false)
+        })
+        expect(qsDay.textContent, message).to.be.oneOf(pickerProperties.days)
+        expect(qsDay, message).to.not.have.attr('data-direction')
+      })
+    })
+  cy.get('@squares').filter('.qs-outside-current-month').then($outsides => {
+    $outsides.each((_, outside) => {
+      const message = '@squaresContainer/.qs-outside-current-month'
+      const hasDayClass = pickerProperties.days.reduce((found, day) => {
+        return found || outside.classList.contains(day)
+      }, false)
+
+      expect(hasDayClass, `${message} (has day of week class)`).to.equal(true)
+      expect(outside, message).to.have.text('')
+      expect(outside, message).to.have.class('qs-empty')
+      expect(outside, message).to.have.attr('data-direction')
+      expect(outside.dataset.direction, message).to.be.oneOf(['-1', '1'])
+    })
+  })
+  cy.get('@squares').filter('.qs-num').then($qsNums => {
+    const numOfDays = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+    const message = '@squaresContainer/.qs-num'
+
+    expect($qsNums.length, message).to.equal(numOfDays)
+
+    $qsNums.each((i, qsNum) => {
+      const hasDayClass = pickerProperties.days.reduce((found, day) => {
+        return found || qsNum.classList.contains(day)
+      }, false)
+
+      expect(hasDayClass, `${message} (has day of week class)`).to.equal(true)
+      expect(qsNum.dataset.direction, message).to.equal('0')
+      expect(qsNum.textContent, message).to.equal(`${i + 1}`)
+    })
+  })
+  cy.get('@squares').filter('.qs-current').then($qsCurrent => {
+    const message = '@squaresContainer/.qs-num/.qs-current'
+    const hasDayClass = pickerProperties.days.reduce((found, day) => {
+      return found || $qsCurrent[0].classList.contains(day)
+    }, false)
+
+    expect(hasDayClass, `${message} (has day of week class)`).to.equal(true)
+
+    expect($qsCurrent, message).to.have.length(1)
+    expect($qsCurrent.text(), message).to.equal(`${date.getDate()}`)
+  })
+
+  // calendar => overlay
+  cy.get(selectors.common.overlay).should('have.length', 1) // Searching the whole document.
+  cy.get('@overlay').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@overlay').should('have.attr', 'class', 'qs-overlay qs-hidden')
+  cy.get('@overlay').children().should('have.length', 3)
+
+  // calendar => overlay => overlayInputContainer
+  cy.get(selectors.common.overlayInputContainer).should('have.length', 1) // Searching the whole document.
+  cy.get('@overlayInputContainer').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@overlayInputContainer').children().should('have.length', 2)
+  cy.get('@overlayInputContainer').should('not.have.attr', 'class')
+  cy.get('@overlayInputContainer').then($overlayInputContainer => {
+    expect($overlayInputContainer[0].getAttributeNames(), '@overlayInputContainer - getAttributeNames()').to.deep.equal([])
+  })
+
+  // calendar => overlay => overlayInputContainer => year input
+  cy.get(selectors.common.overlayYearInput).should('have.length', 1) // Searching the whole document.
+  cy.get('@overlayYearInput').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@overlayYearInput').should('have.prop', 'tagName').should('eq', 'INPUT')
+  cy.get('@overlayYearInput').should('have.attr', 'class', 'qs-overlay-year')
+  cy.get('@overlayYearInput').should('have.attr', 'placeholder', '4-digit year')
+  cy.get('@overlayYearInput').should('have.prop', 'value', '')
+
+  // calendar => overlay => overlayInputContainer => close
+  cy.get(selectors.common.overlayClose).should('have.length', 1) // Searching the whole document.
+  cy.get('@overlayClose').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@overlayClose').should('have.attr', 'class', 'qs-close')
+  cy.get('@overlayClose').should('have.text', '✕')
+
+  // calendar => overlay => overlayMonthContainer
+  cy.get(selectors.common.overlayMonthContainer).should('have.length', 1) // Searching the whole document.
+  cy.get('@overlayMonthContainer').should('have.length', 1) // Searching within the specified section of the document.
+  cy.get('@overlayMonthContainer').children().should('have.length', 12)
+  cy.get('@overlayMonthContainer').should('have.attr', 'class', 'qs-overlay-month-container')
+
+  // calendar => overlay => overlayMonthContainer => overlayMonth
+  cy.get(selectors.common.overlayMonth).should('have.length', 12) // Searching the whole document.
+  cy.get('@overlayMonthContainer').children().then($qsOverlayMonths => {
+    $qsOverlayMonths.each((i, overlayMonth) => {
+      const message = `.qs-overlay-month [${i}]`
+
+      expect(overlayMonth.textContent, message).to.have.length(3)
+      expect(overlayMonth.textContent, message).to.equal(pickerProperties.months[i].slice(0, 3))
+      expect(overlayMonth, message).to.have.attr('class', 'qs-overlay-month')
+      expect(overlayMonth, message).to.have.attr('data-month-num', `${i}`)
+    })
+  })
+
+  // calendar => overlay => overlaySubmit
+  cy.get(selectors.common.overlaySubmit).should('have.length', 1) // Searching the whole document.
+  cy.get('@overlay').find(selectors.common.overlaySubmit) // Searching within the specified section of the document.
+    .should('have.length', 1)
+    .should('have.text', 'Submit')
+    .should('have.attr', 'class', 'qs-submit qs-disabled')
+    .should('have.prop', 'tagName').should('eq', 'DIV') // This element is not a <button> or <input type="submit"/>.
+
+}
 
 describe('Default properties and behavior', function() {
   beforeEach(function() {
@@ -91,110 +281,10 @@ describe('Default properties and behavior', function() {
 
     describe('UI (& corresponding changes to instance object properties)', function() {
       describe('Basic visuals and behavior', function() {
+
         it('should have the correct DOM structure', function() {
-          const date = new Date()
           this.datepicker(singleDatepickerInput)
-
-          cy.get(selectors.single.calendarContainer).as('calendarContainer')
-          cy.get(selectors.single.calendar).as('calendar')
-          cy.get(selectors.single.controls).as('controls')
-          cy.get(`${selectors.single.controls} .qs-arrow`).as('arrows')
-          cy.get(`${selectors.single.controls} .qs-month-year`).as('monthYear')
-          cy.get(`${selectors.single.controls} .qs-month`).as('month')
-          cy.get(`${selectors.single.controls} .qs-year`).as('year')
-          cy.get(selectors.single.squares).as('squares')
-
-
-          // calendarContainer
-          cy.get(selectors.common.container).should('have.length', 1) // In the whole document.
-          cy.get('@calendarContainer').should('have.length', 1) // In the specified section of the document.
-          cy.get('@calendarContainer').children().should('have.length', 1)
-          cy.get('@calendarContainer').then($calendarContainer => {
-            expect($calendarContainer, '@calendarContainer').to.have.attr('class', 'qs-datepicker-container qs-hidden')
-          })
-
-          // calendar
-          cy.get(selectors.common.calendar).should('have.length', 1) // In the whole document.
-          cy.get('@calendar').should('have.length', 1) // In the specified section of the document.
-          cy.get('@calendar').children().should('have.length', 3)
-          cy.get('@calendar').then($calendar => {
-            expect($calendar, '@calendar').to.have.attr('class', 'qs-datepicker')
-          })
-
-          // calendar => controls
-          cy.get(selectors.common.controls).should('have.length', 1) // In the whole document.
-          cy.get('@controls').should('have.length', 1) // In the specified section of the document.
-          cy.get('@controls').children().should('have.length', 3)
-          cy.get('@controls').then($controls => {
-            expect($controls, '@controls').to.have.attr('class', 'qs-controls')
-          })
-
-          // calendar => controls => arrows
-          cy.get(`${selectors.common.controls} .qs-arrow`).should('have.length', 2) // In the whole document.
-          cy.get('@arrows').should('have.length', 2) // In the specified section of the document.
-          cy.get('@arrows').then($arrows => {
-            cy.get($arrows[0]).children().should('have.length', 0)
-            cy.get($arrows[1]).children().should('have.length', 0)
-
-            expect($arrows[0], '@arrows - left').to.have.attr('class', 'qs-arrow qs-left')
-            expect($arrows[1], '@arrows - right').to.have.attr('class', 'qs-arrow qs-right')
-          })
-
-          // calendar => controls => month/year
-          cy.get(`${selectors.common.controls} .qs-month-year`).should('have.length', 1) // In the whole document.
-          cy.get('@monthYear').should('have.length', 1) // In the specified section of the document.
-          cy.get('@monthYear').children().should('have.length', 2)
-          cy.get('@monthYear').then($monthYear => {
-            expect($monthYear, '@monthYear').to.have.attr('class', 'qs-month-year')
-          })
-
-          // calendar => controls => month/year => month
-          cy.get(`${selectors.common.controls} .qs-month`).should('have.length', 1) // In the whole document.
-          cy.get('@month').should('have.length', 1) // In the specified section of the document.
-          cy.get('@month').children().should('have.length', 0)
-          cy.get('@month').should('have.text', pickerProperties.months[date.getMonth()])
-          cy.get('@month').then($month => {
-            expect($month, '@month').to.have.attr('class', 'qs-month')
-          })
-
-          // calendar => controls => month/year => year
-          cy.get(`${selectors.common.controls} .qs-year`).should('have.length', 1) // In the whole document.
-          cy.get('@year').should('have.length', 1) // In the specified section of the document.
-          cy.get('@year').children().should('have.length', 0)
-          cy.get('@year').should('have.text', date.getFullYear())
-          cy.get('@year').then($year => {
-            expect($year, '@year').to.have.attr('class', 'qs-year')
-          })
-
-          // calendar => squares
-          cy.get(selectors.common.squares).should('have.length', 1) // In the whole document.
-          cy.get('@squares').should('have.length', 1) // In the specified section of the document.
-          cy.get('@squares').then($squares => {
-            expect($squares, '@squares').to.have.attr('class', 'qs-squares')
-          })
-
-          // calendar => squares => various types of squares
-          cy.get('@squares').children().then($allSquares => {
-            cy.get(selectors.common.everySquare).should('have.length', $allSquares.length)
-          })
-          cy.get('@squares').children().filter('.qs-day')
-            .should('have.length', 7)
-            .should('have.attr', 'class', 'qs-square qs-day')
-            .then($qsDays => {
-              $qsDays.each((i, qsDay) => {
-                expect(qsDay.textContent, '@squares/.qs-day').to.be.oneOf(pickerProperties.days)
-                expect(qsDay, '@squares/.qs-day').to.not.have.attr('data-direction')
-              })
-            })
-          cy.get('@squares').children().filter('.qs-outside-current-month').then($outsides => {
-            $outsides.each((i, outside) => {
-
-              // expect(outside.)
-            })
-          })
-
-
-          // calendar => overlay
+          domStructure('single')
         })
       })
     })

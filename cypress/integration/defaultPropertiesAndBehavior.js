@@ -9,17 +9,6 @@ const {
 const { singleDatepickerProperties, getDaterangeProperties } = pickerProperties
 
 /*
-  The tests need to be rethought so as to be independent.
-  State should not persist from test to test.
-  Each piece should be testable independently.
-
-  TODO: Refactor / rethink / cleanup the sandbox folder.
-  These files should truly reflect a separate sandbox for
-  developing from the app that Cypress runs for E2E testing.
-
-  TODO: update how we test for the correct number of days.
-  Issue #86 (https://bit.ly/2XYVLKK) highlights this issue.
-
   TODO: add a test for the navigate method.
 */
 
@@ -59,24 +48,24 @@ function checkPickerProperties(picker, isDaterange, id) {
   }
 }
 
-function testDomStructure(pickerType) {
+function testDomStructure(pickerType, selectorObj) {
   const date = new Date()
   const lengthMultiplier = pickerType === 'single' ? 1 : 2
 
-  cy.get(selectors[pickerType].calendarContainer).as('calendarContainer')
-  cy.get(selectors[pickerType].calendar).as('calendar')
-  cy.get(selectors[pickerType].controls).as('controls')
-  cy.get(`${selectors[pickerType].controls} .qs-arrow`).as('arrows')
-  cy.get(`${selectors[pickerType].controls} .qs-month-year`).as('monthYear')
-  cy.get(`${selectors[pickerType].controls} .qs-month`).as('month')
-  cy.get(`${selectors[pickerType].controls} .qs-year`).as('year')
-  cy.get(selectors[pickerType].squaresContainer).as('squaresContainer')
-  cy.get(`${selectors[pickerType].squaresContainer} ${selectors.common.everySquare}`).as('squares')
-  cy.get(selectors[pickerType].overlay).as('overlay')
-  cy.get(selectors[pickerType].overlayInputContainer).as('overlayInputContainer')
-  cy.get(`${selectors[pickerType].overlayInputContainer} .qs-overlay-year`).as('overlayYearInput')
-  cy.get(`${selectors[pickerType].overlayInputContainer} .qs-close`).as('overlayClose')
-  cy.get(selectors[pickerType].overlayMonthContainer).as('overlayMonthContainer')
+  cy.get(selectorObj.calendarContainer).as('calendarContainer')
+  cy.get(selectorObj.calendar).as('calendar')
+  cy.get(selectorObj.controls).as('controls')
+  cy.get(`${selectorObj.controls} .qs-arrow`).as('arrows')
+  cy.get(`${selectorObj.controls} .qs-month-year`).as('monthYear')
+  cy.get(`${selectorObj.controls} .qs-month`).as('month')
+  cy.get(`${selectorObj.controls} .qs-year`).as('year')
+  cy.get(selectorObj.squaresContainer).as('squaresContainer')
+  cy.get(`${selectorObj.squaresContainer} ${selectors.common.everySquare}`).as('squares')
+  cy.get(selectorObj.overlay).as('overlay')
+  cy.get(selectorObj.overlayInputContainer).as('overlayInputContainer')
+  cy.get(`${selectorObj.overlayInputContainer} .qs-overlay-year`).as('overlayYearInput')
+  cy.get(`${selectorObj.overlayInputContainer} .qs-close`).as('overlayClose')
+  cy.get(selectorObj.overlayMonthContainer).as('overlayMonthContainer')
 
 
   // calendarContainer
@@ -136,6 +125,30 @@ function testDomStructure(pickerType) {
   // calendar => squares => various types of squares
   cy.get('@squaresContainer').children().then($allSquares => {
     cy.get(selectors.common.everySquare).should('have.length', $allSquares.length)
+
+    /*
+      It's a little hard to test the correct number of total squares since there's a lot
+      of logic involved. I don't want to simply repeat the logic in the library, defeating the
+      purpose of testing.
+
+      https://github.com/qodesmith/datepicker/issues/86
+      One thing we can do to guage if we have extra days is to test the 1st 7 and last 7 calendar days.
+      If any one of those sets are completely empty, we've got an extra row that shouldn't be there.
+    */
+
+    const arrayOfSquares = Array.from($allSquares)
+
+    // 1st 7 days - NOT the days of the week header.
+    const firstWeekHasContent = arrayOfSquares.slice(7, 14).some(square => square.textContent === '1')
+
+    // Last 7 days.
+    const lastWeekHasContent = arrayOfSquares.slice(-7).some(square => {
+      // The last day of any month will be on of these numbers. One of them should be found in the last week.
+      return ['28', '29', '30', '31'].some(num => square.textContent === num)
+    })
+
+    expect(firstWeekHasContent, '@squaresContainer - First week has content').to.equal(true)
+    expect(lastWeekHasContent, '@squaresContainer - Last week has content').to.equal(true)
   })
   cy.get('@squares').filter('.qs-day')
     .should('have.length', 7)
@@ -247,7 +260,6 @@ function testDomStructure(pickerType) {
     .should('have.text', 'Submit')
     .should('have.attr', 'class', 'qs-submit qs-disabled')
     .should('have.prop', 'tagName').should('eq', 'DIV') // This element is not a <button> or <input type="submit"/>.
-
 }
 
 describe('Default properties and behavior', function() {
@@ -284,7 +296,7 @@ describe('Default properties and behavior', function() {
 
         it('should have the correct DOM structure', function() {
           this.datepicker(singleDatepickerInput)
-          testDomStructure('single')
+          testDomStructure('single', selectors.single)
         })
       })
     })
@@ -309,6 +321,18 @@ describe('Default properties and behavior', function() {
 
         pickerProperties.forEach(({ property }) => {
           expect(pickerToCheck, property).to.haveOwnProperty(property)
+        })
+      })
+    })
+
+    describe('UI (& corresponding changes to instance object properties)', function() {
+      describe('Basic visuals and behavior', function() {
+
+        it('(they) should have the correct DOM structure(s)', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          testDomStructure('daterangeStart', selectors.range.start)
+          testDomStructure('daterangeEnd', selectors.range.end)
         })
       })
     })

@@ -908,11 +908,7 @@ function createOverlay(instance, overlayOpen) {
   var overlayButton = instance.overlayButton
   var overlayMonths = instance.overlayMonths
   var shortMonths = overlayMonths.map(function(m, i) {
-    return [
-      '<div class="qs-overlay-month" data-month-num="' + i + '">',
-      '<span data-month-num="' + i + '">' + m + '</span>',
-      '</div>'
-    ].join('')
+    return '<div class="qs-overlay-month" data-month-num="' + i + '">' + m + '</div>'
   }).join('')
 
   return [

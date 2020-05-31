@@ -59,7 +59,7 @@ function checkPickerProperties(picker, isDaterange, id) {
   }
 }
 
-function domStructure(pickerType) {
+function testDomStructure(pickerType) {
   const date = new Date()
   const lengthMultiplier = pickerType === 'single' ? 1 : 2
 
@@ -284,7 +284,7 @@ describe('Default properties and behavior', function() {
 
         it('should have the correct DOM structure', function() {
           this.datepicker(singleDatepickerInput)
-          domStructure('single')
+          testDomStructure('single')
         })
       })
     })

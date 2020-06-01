@@ -291,13 +291,14 @@ describe('Default properties and behavior', function() {
       })
     })
 
+    it('should have the correct DOM structure', function() {
+      this.datepicker(singleDatepickerInput)
+      testDomStructure('single', selectors.single)
+    })
+
     describe('UI (& corresponding changes to instance object properties)', function() {
       describe('Basic visuals and behavior', function() {
 
-        it('should have the correct DOM structure', function() {
-          this.datepicker(singleDatepickerInput)
-          testDomStructure('single', selectors.single)
-        })
       })
     })
   })
@@ -325,15 +326,16 @@ describe('Default properties and behavior', function() {
       })
     })
 
+    it('(they) should have the correct DOM structure(s)', function() {
+      this.datepicker(daterangeInputStart, { id: 1 })
+      this.datepicker(daterangeInputEnd, { id: 1 })
+      testDomStructure('daterangeStart', selectors.range.start)
+      testDomStructure('daterangeEnd', selectors.range.end)
+    })
+
     describe('UI (& corresponding changes to instance object properties)', function() {
       describe('Basic visuals and behavior', function() {
 
-        it('(they) should have the correct DOM structure(s)', function() {
-          this.datepicker(daterangeInputStart, { id: 1 })
-          this.datepicker(daterangeInputEnd, { id: 1 })
-          testDomStructure('daterangeStart', selectors.range.start)
-          testDomStructure('daterangeEnd', selectors.range.end)
-        })
       })
     })
   })

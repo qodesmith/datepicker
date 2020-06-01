@@ -50,7 +50,7 @@ function checkPickerProperties(picker, isDaterange, id) {
 
 function testDomStructure(pickerType, selectorObj) {
   const date = new Date()
-  const lengthMultiplier = pickerType === 'single' ? 1 : 2
+  const multiplier = pickerType === 'single' ? 1 : 2
 
   cy.get(selectorObj.calendarContainer).as('calendarContainer')
   cy.get(selectorObj.calendar).as('calendar')
@@ -69,25 +69,25 @@ function testDomStructure(pickerType, selectorObj) {
 
 
   // calendarContainer
-  cy.get(selectors.common.container).should('have.length', 1) // Searching the whole document.
+  cy.get(selectors.common.container).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@calendarContainer').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@calendarContainer').children().should('have.length', 1)
   cy.get('@calendarContainer').should('have.attr', 'class', 'qs-datepicker-container qs-hidden')
 
   // calendar
-  cy.get(selectors.common.calendar).should('have.length', 1) // Searching the whole document.
+  cy.get(selectors.common.calendar).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@calendar').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@calendar').children().should('have.length', 3)
   cy.get('@calendar').should('have.attr', 'class', 'qs-datepicker')
 
   // calendar => controls
-  cy.get(selectors.common.controls).should('have.length', 1) // Searching the whole document.
+  cy.get(selectors.common.controls).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@controls').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@controls').children().should('have.length', 3)
   cy.get('@controls').should('have.attr', 'class', 'qs-controls')
 
   // calendar => controls => arrows
-  cy.get(`${selectors.common.controls} .qs-arrow`).should('have.length', 2) // Searching the whole document.
+  cy.get(`${selectors.common.controls} .qs-arrow`).should('have.length', 2 * multiplier) // Searching the whole document.
   cy.get('@arrows').should('have.length', 2) // Searching within the specified section of the document.
   cy.get('@arrows').then($arrows => {
     cy.get($arrows[0]).children().should('have.length', 0)
@@ -98,33 +98,33 @@ function testDomStructure(pickerType, selectorObj) {
   })
 
   // calendar => controls => month/year
-  cy.get(`${selectors.common.controls} .qs-month-year`).should('have.length', 1) // Searching the whole document.
+  cy.get(`${selectors.common.controls} .qs-month-year`).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@monthYear').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@monthYear').children().should('have.length', 2)
   cy.get('@monthYear').should('have.attr', 'class', 'qs-month-year')
 
   // calendar => controls => month/year => month
-  cy.get(`${selectors.common.controls} .qs-month`).should('have.length', 1) // Searching the whole document.
+  cy.get(`${selectors.common.controls} .qs-month`).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@month').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@month').children().should('have.length', 0)
   cy.get('@month').should('have.text', pickerProperties.months[date.getMonth()])
   cy.get('@month').should('have.attr', 'class', 'qs-month')
 
   // calendar => controls => month/year => year
-  cy.get(`${selectors.common.controls} .qs-year`).should('have.length', 1) // Searching the whole document.
+  cy.get(`${selectors.common.controls} .qs-year`).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@year').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@year').children().should('have.length', 0)
   cy.get('@year').should('have.text', date.getFullYear())
   cy.get('@year').should('have.attr', 'class', 'qs-year')
 
   // calendar => squares
-  cy.get(selectors.common.squaresContainer).should('have.length', 1) // Searching the whole document.
+  cy.get(selectors.common.squaresContainer).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@squaresContainer').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@squaresContainer').should('have.attr', 'class', 'qs-squares')
 
   // calendar => squares => various types of squares
   cy.get('@squaresContainer').children().then($allSquares => {
-    cy.get(selectors.common.everySquare).should('have.length', $allSquares.length)
+    cy.get(selectors.common.everySquare).should('have.length', $allSquares.length * multiplier)
 
     /*
       It's a little hard to test the correct number of total squares since there's a lot
@@ -206,13 +206,13 @@ function testDomStructure(pickerType, selectorObj) {
   })
 
   // calendar => overlay
-  cy.get(selectors.common.overlay).should('have.length', 1) // Searching the whole document.
+  cy.get(selectors.common.overlay).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@overlay').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@overlay').should('have.attr', 'class', 'qs-overlay qs-hidden')
   cy.get('@overlay').children().should('have.length', 3)
 
   // calendar => overlay => overlayInputContainer
-  cy.get(selectors.common.overlayInputContainer).should('have.length', 1) // Searching the whole document.
+  cy.get(selectors.common.overlayInputContainer).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@overlayInputContainer').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@overlayInputContainer').children().should('have.length', 2)
   cy.get('@overlayInputContainer').should('not.have.attr', 'class')
@@ -221,7 +221,7 @@ function testDomStructure(pickerType, selectorObj) {
   })
 
   // calendar => overlay => overlayInputContainer => year input
-  cy.get(selectors.common.overlayYearInput).should('have.length', 1) // Searching the whole document.
+  cy.get(selectors.common.overlayYearInput).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@overlayYearInput').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@overlayYearInput').should('have.prop', 'tagName').should('eq', 'INPUT')
   cy.get('@overlayYearInput').should('have.attr', 'class', 'qs-overlay-year')
@@ -229,19 +229,19 @@ function testDomStructure(pickerType, selectorObj) {
   cy.get('@overlayYearInput').should('have.prop', 'value', '')
 
   // calendar => overlay => overlayInputContainer => close
-  cy.get(selectors.common.overlayClose).should('have.length', 1) // Searching the whole document.
+  cy.get(selectors.common.overlayClose).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@overlayClose').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@overlayClose').should('have.attr', 'class', 'qs-close')
   cy.get('@overlayClose').should('have.text', '✕')
 
   // calendar => overlay => overlayMonthContainer
-  cy.get(selectors.common.overlayMonthContainer).should('have.length', 1) // Searching the whole document.
+  cy.get(selectors.common.overlayMonthContainer).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@overlayMonthContainer').should('have.length', 1) // Searching within the specified section of the document.
   cy.get('@overlayMonthContainer').children().should('have.length', 12)
   cy.get('@overlayMonthContainer').should('have.attr', 'class', 'qs-overlay-month-container')
 
   // calendar => overlay => overlayMonthContainer => overlayMonth
-  cy.get(selectors.common.overlayMonth).should('have.length', 12) // Searching the whole document.
+  cy.get(selectors.common.overlayMonth).should('have.length', 12 * multiplier) // Searching the whole document.
   cy.get('@overlayMonthContainer').children().then($qsOverlayMonths => {
     $qsOverlayMonths.each((i, overlayMonth) => {
       const message = `.qs-overlay-month [${i}]`
@@ -254,7 +254,7 @@ function testDomStructure(pickerType, selectorObj) {
   })
 
   // calendar => overlay => overlaySubmit
-  cy.get(selectors.common.overlaySubmit).should('have.length', 1) // Searching the whole document.
+  cy.get(selectors.common.overlaySubmit).should('have.length', 1 * multiplier) // Searching the whole document.
   cy.get('@overlay').find(selectors.common.overlaySubmit) // Searching within the specified section of the document.
     .should('have.length', 1)
     .should('have.text', 'Submit')

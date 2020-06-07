@@ -296,9 +296,285 @@ describe('Default properties and behavior', function() {
       testDomStructure('single', selectors.single)
     })
 
-    describe('UI (& corresponding changes to instance object properties)', function() {
-      describe('Basic visuals and behavior', function() {
+    describe('Basic visuals, behavior, and property changes', function() {
+      it('is initially hidden in the DOM', function() {
+        this.datepicker(singleDatepickerInput)
+        cy.get(selectors.single.calendarContainer).should('not.be.visible')
+      })
 
+      it('should show the calendar when clicking into the input (and not show the overlay)', function() {
+        this.datepicker(singleDatepickerInput)
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(selectors.single.calendarContainer).should('be.visible')
+        cy.get(selectors.single.overlay).then($overlay => {
+          const message = '.qs-overlay styles'
+          const styles = getComputedStyle($overlay[0])
+
+          expect(styles.opacity, message).to.equal('0')
+          expect(styles.zIndex, message).to.equal('-1')
+        })
+      })
+
+      it('should show todays date bold and underlined, all others regular', function() {
+        const today = new Date()
+        this.datepicker(singleDatepickerInput)
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(`${selectors.single.squaresContainer} .qs-current`)
+          .should('have.text', today.getDate())
+          .then($qsCurrent => {
+            const message = '.qs-current styles'
+            const styles = getComputedStyle($qsCurrent[0])
+
+            expect(styles.fontWeight, message).to.equal('700')
+            expect(styles.textDecoration, message).to.equal('underline solid rgb(0, 0, 0)')
+            expect(styles.backgroundColor, message).to.equal('rgba(0, 0, 0, 0)')
+          })
+
+        cy.get(`${selectors.single.squaresContainer} [data-direction="0"]:not(.qs-current)`)
+          .should('have.length', new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate() - 1)
+          .then($allDaysButCurrentDay => {
+            const message = 'calendar day styles (not .qs-current)'
+
+            Array.from($allDaysButCurrentDay).forEach(el => {
+              const styles = getComputedStyle(el)
+
+              expect(styles.fontWeight, message).to.equal('400')
+              expect(styles.textDecoration, message).to.equal('none solid rgb(0, 0, 0)')
+              expect(styles.backgroundColor, message).to.equal('rgba(0, 0, 0, 0)')
+            })
+          })
+      })
+
+      it('hides the calendar when clicking outside the calendar and input', function() {
+        this.datepicker(singleDatepickerInput)
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(selectors.single.calendarContainer).should('be.visible')
+        cy.get('body').click()
+        cy.get(selectors.single.calendarContainer).should('not.be.visible')
+      })
+
+      it('should change months when the arrows are clicked', function() {
+        const today = new Date()
+        const previousMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+        this.datepicker(singleDatepickerInput)
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+        cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+
+        cy.get(`${selectors.single.controls} .qs-arrow.qs-left`).click()
+        cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[previousMonthDate.getMonth()])
+        cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${previousMonthDate.getFullYear()}`)
+
+        cy.get(`${selectors.single.controls} .qs-arrow.qs-right`).click()
+        cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+        cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+      })
+
+      describe('Overlay', function() {
+        it('should show the overlay when the month/year is clicked', function() {
+          this.datepicker(singleDatepickerInput)
+
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.controls} .qs-month-year`).click()
+          cy.wait(400)
+          cy.get(selectors.single.controls).then($controls => {
+            const message = '.qs-controls blurred when overlay is open'
+            const styles = getComputedStyle($controls[0])
+
+            expect(styles.filter, message).to.equal('blur(5px)')
+          })
+          cy.get(selectors.single.squaresContainer).then($squaresContainer => {
+            const message = '.qs-squares (container) blurred when overlay is open'
+            const styles = getComputedStyle($squaresContainer[0])
+
+            expect(styles.filter, message).to.equal('blur(5px)')
+          })
+          cy.get(selectors.single.overlay).then($overlay => {
+            const message = '.qs-overlay styles when open'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('1')
+            expect(styles.zIndex, message).to.equal('1')
+          })
+        })
+
+        it('should focus the overlay year input', function() {
+          this.datepicker(singleDatepickerInput)
+
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.controls} .qs-month-year`).click()
+          cy.wait(400)
+          cy.focused().should('have.attr', 'class', 'qs-overlay-year')
+        })
+
+        it('should change the year when using the input and hitting enter or clicking the submit button', function() {
+          const today = new Date()
+          const nextYear = today.getFullYear() + 1
+          this.datepicker(singleDatepickerInput)
+
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+          cy.get(`${selectors.single.overlay} .qs-submit`).should('have.attr', 'class', 'qs-submit qs-disabled')
+
+          cy.get(`${selectors.single.controls} .qs-month-year`).click()
+          cy.wait(400)
+          cy.get(`${selectors.single.overlayInputContainer} .qs-overlay-year`).type(`${nextYear}`)
+          cy.get(`${selectors.single.overlay} .qs-submit`).should('have.attr', 'class', 'qs-submit')
+          cy.get(`${selectors.single.overlayInputContainer} .qs-overlay-year`).focus().type('{enter}')
+          cy.wait(400)
+
+          cy.get(selectors.single.overlay).then($overlay => {
+            const message = '.qs-overlay styles after entering year'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('0')
+            expect(styles.zIndex, message).to.equal('-1')
+          })
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${nextYear}`)
+
+          cy.get(`${selectors.single.controls} .qs-month-year`).click()
+          cy.wait(400)
+          cy.get(`${selectors.single.overlayInputContainer} .qs-overlay-year`).type(`${today.getFullYear()}`)
+          cy.get(`${selectors.single.overlay} .qs-submit`)
+            .should('have.attr', 'class', 'qs-submit')
+            .click()
+          cy.wait(400)
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+        })
+
+        it('should not allow leading zeros or change the year if 4 digits have not been entered', function() {
+          this.datepicker(singleDatepickerInput)
+
+          cy.get(selectors.single.overlay).as('overlay')
+          cy.get(`${selectors.single.overlay} .qs-submit`).as('submit')
+          cy.get(`${selectors.single.overlayInputContainer} .qs-overlay-year`).as('yearInput')
+
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.controls} .qs-month-year`).click()
+          cy.wait(400)
+
+          cy.get('@overlay').then($overlay => {
+            const message = '.qs-overlay'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('1')
+            expect(styles.zIndex, message).to.equal('1')
+          })
+          cy.get('@submit').click()
+          cy.wait(400)
+          cy.get('@overlay').then($overlay => {
+            const message = '.qs-overlay'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('1')
+            expect(styles.zIndex, message).to.equal('1')
+          })
+          cy.get('@yearInput').type('{enter')
+          cy.wait(400)
+          cy.get('@overlay').then($overlay => {
+            const message = '.qs-overlay'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('1')
+            expect(styles.zIndex, message).to.equal('1')
+          })
+
+          cy.get('@yearInput')
+            .should('have.value', '')
+            .type('0000')
+            .should('have.value', '')
+
+          cy.get('@submit').should('have.attr', 'class', 'qs-submit qs-disabled')
+          cy.get('@yearInput').type('1').should('have.value', '1')
+          cy.get('@submit').should('have.attr', 'class', 'qs-submit qs-disabled')
+          cy.get('@yearInput').type('2').should('have.value', '12')
+          cy.get('@submit').should('have.attr', 'class', 'qs-submit qs-disabled')
+          cy.get('@yearInput').type('3').should('have.value', '123')
+          cy.get('@submit').should('have.attr', 'class', 'qs-submit qs-disabled')
+          cy.get('@yearInput').type('4').should('have.value', '1234')
+          cy.get('@submit').should('have.attr', 'class', 'qs-submit')
+        })
+
+        it('should change the month when a month name is clicked', function() {
+          const today = new Date()
+          this.datepicker(singleDatepickerInput)
+
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.controls} .qs-month-year`).click()
+          cy.wait(400)
+          cy.get(selectors.single.overlay).then($overlay => {
+            const message = '.qs-overlay styles after clicking month'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('1')
+            expect(styles.zIndex, message).to.equal('1')
+          })
+
+          cy.get(`${selectors.single.overlayMonthContainer} [data-month-num="0"]`).click()
+          cy.wait(400)
+          cy.get(selectors.single.overlay).then($overlay => {
+            const message = '.qs-overlay styles after clicking month'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('0')
+            expect(styles.zIndex, message).to.equal('-1')
+          })
+          cy.get(`${selectors.single.controls} .qs-month-year .qs-month`)
+            .should('have.text', pickerProperties.months[0])
+
+          cy.get(`${selectors.single.controls} .qs-month-year`).click()
+          cy.wait(400)
+          cy.get(selectors.single.overlay).then($overlay => {
+            const message = '.qs-overlay styles after clicking month'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('1')
+            expect(styles.zIndex, message).to.equal('1')
+          })
+          cy.get(`${selectors.single.overlayMonthContainer} [data-month-num="11"]`).click()
+          cy.wait(400)
+          cy.get(selectors.single.overlay).then($overlay => {
+            const message = '.qs-overlay styles after clicking month'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('0')
+            expect(styles.zIndex, message).to.equal('-1')
+          })
+          cy.get(`${selectors.single.controls} .qs-month-year .qs-month`)
+            .should('have.text', pickerProperties.months[11])
+        })
+
+        it('should close the overlay when clicking the close button', function() {
+          this.datepicker(singleDatepickerInput)
+
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.controls} .qs-month-year`).click()
+          cy.wait(400)
+          cy.get(selectors.single.overlay).then($overlay => {
+            const message = '.qs-overlay'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('1')
+            expect(styles.zIndex, message).to.equal('1')
+          })
+
+          cy.get(`${selectors.single.overlay} .qs-close`).click()
+          cy.wait(400)
+          cy.get(selectors.single.overlay).then($overlay => {
+            const message = '.qs-overlay'
+            const styles = getComputedStyle($overlay[0])
+
+            expect(styles.opacity, message).to.equal('0')
+            expect(styles.zIndex, message).to.equal('-1')
+          })
+        })
       })
     })
   })
@@ -333,9 +609,68 @@ describe('Default properties and behavior', function() {
       testDomStructure('daterangeEnd', selectors.range.end)
     })
 
-    describe('UI (& corresponding changes to instance object properties)', function() {
-      describe('Basic visuals and behavior', function() {
+    describe('Basic visuals and behavior', function() {
+      it('(they) are initially hidden in the DOM', function() {
+        this.datepicker(daterangeInputStart, { id: 1 })
+        this.datepicker(daterangeInputEnd, { id: 1 })
+        cy.get(selectors.range.start.calendarContainer).should('not.be.visible')
+        cy.get(selectors.range.end.calendarContainer).should('not.be.visible')
+      })
 
+      it('(they) should show the calendar (individually) when clicking into the input (and not show the overlay)', function() {
+        this.datepicker(daterangeInputStart, { id: 1 })
+        this.datepicker(daterangeInputEnd, { id: 1 })
+
+        cy.get(daterangeInputStart).click()
+        cy.get(selectors.range.start.calendarContainer).should('be.visible')
+        cy.get(selectors.range.start.overlay).then($overlay => {
+          const message = '.qs-overlay (start) styles'
+          const styles = getComputedStyle($overlay[0])
+
+          expect(styles.opacity, message).to.equal('0')
+          expect(styles.zIndex, message).to.equal('-1')
+        })
+
+        cy.get(daterangeInputEnd).click()
+        cy.get(selectors.range.start.calendarContainer).should('not.be.visible')
+        cy.get(selectors.range.end.calendarContainer).should('be.visible')
+        cy.get(selectors.range.end.overlay).then($overlay => {
+          const message = '.qs-overlay (end) styles'
+          const styles = getComputedStyle($overlay[0])
+
+          expect(styles.opacity, message).to.equal('0')
+          expect(styles.zIndex, message).to.equal('-1')
+        })
+      })
+
+      it('(they) should change months when the arrows are clicked, not affecting the other', function() {
+        const today = new Date()
+        const previousMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+        this.datepicker(daterangeInputStart, { id: 1 })
+        this.datepicker(daterangeInputEnd, { id: 1 })
+
+        cy.get(daterangeInputStart).click()
+        cy.get(`${selectors.range.start.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+        cy.get(`${selectors.range.start.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+        cy.get(daterangeInputEnd).click()
+        cy.get(`${selectors.range.end.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+        cy.get(`${selectors.range.end.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+
+        cy.get(daterangeInputStart).click()
+        cy.get(`${selectors.range.start.controls} .qs-arrow.qs-left`).click()
+        cy.get(`${selectors.range.start.controls} .qs-month`).should('have.text', pickerProperties.months[previousMonthDate.getMonth()])
+        cy.get(`${selectors.range.start.controls} .qs-year`).should('have.text', `${previousMonthDate.getFullYear()}`)
+        cy.get(daterangeInputEnd).click()
+        cy.get(`${selectors.range.end.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+        cy.get(`${selectors.range.end.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+
+        cy.get(daterangeInputStart).click()
+        cy.get(`${selectors.range.start.controls} .qs-arrow.qs-right`).click()
+        cy.get(`${selectors.range.start.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+        cy.get(`${selectors.range.start.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+        cy.get(daterangeInputEnd).click()
+        cy.get(`${selectors.range.end.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+        cy.get(`${selectors.range.end.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
       })
     })
   })
@@ -343,204 +678,7 @@ describe('Default properties and behavior', function() {
 
 
 x.describe('Initial calendar load with default settings', () => {
-  const today = new Date()
-  const todayNoTime = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  let picker
-
-
-
   describe('Datepicker UI (& corresponding changes to instance object properties)', () => {
-    describe('Basic visuals and behavior', () => {
-      it('has the calendar in the DOM but not visible', () => {
-        cy.get('.qs-datepicker-container')
-          .should('exist')
-          .should('not.be.visible')
-      })
-
-      it('should show the calendar when clicking into the input', () => {
-        cy.get('[data-cy="input-1"]').click()
-        cy.get('.qs-datepicker-container')
-          .should('be.visible')
-      })
-
-      it('defaults to showing the current month and year', () => {
-        cy.get('.qs-month').then($month => {
-          const month = $month.text()
-          const monthIndex = months.findIndex(m => m === month)
-
-          expect(today.getMonth()).to.equal(monthIndex)
-
-          cy.get('.qs-year').then($year => {
-            const year = $year.text()
-            expect(today.getFullYear()).to.equal(+year)
-          })
-        })
-      })
-
-      it('shows the calendar days of the week (top of calendar)', () => {
-        cy.get('.qs-squares .qs-day')
-          .should('have.length', 7)
-          .each(($day, i) => {
-            expect($day.text()).to.equal(days[i])
-          })
-      })
-
-      it('shows the calendar days of the month', () => {
-        cy.get('.qs-squares .qs-num')
-          .should('have.length.of.at.least', 28)
-      })
-
-      it('has the correct number of days on the calendar', () => {
-        const numOfDays = new Date(picker.currentYear, picker.currentMonth + 1, 0).getDate()
-
-        cy.get('div.qs-num')
-          .should('have.length', numOfDays)
-      })
-
-      it(`should show today's date in bold and underlined`, () => {
-        cy.get('.qs-current')
-          .should('have.text', `${today.getDate()}`)
-          .should('have.css', 'font-weight', '700')
-
-        cy.get('.qs-current .qs-num')
-          .should('have.css', 'text-decoration', 'underline solid rgb(0, 0, 0)')
-      })
-
-      it('should not have bold & underline on other dates', () => {
-        cy.get('div.qs-num:not(.qs-empty):not(.qs-current) span')
-          .eq(0)
-          .should('have.css', 'text-decoration', 'none solid rgb(0, 0, 0)')
-      })
-
-      it('should not be showing the overlay', () => {
-        cy.get('.qs-overlay')
-          .should('have.css', 'opacity', '0')
-      })
-
-      it('hides the calendar when clicking outside the calendar and input', () => {
-        cy.get('body').click()
-        cy.get('.qs-datepicker-container')
-          .should('not.be.visible')
-      })
-
-      it('should progress to the next month when the right arrow is clicked', () => {
-        const startingMonth = months[picker.currentMonth]
-        const nextMonthIndex = picker.currentMonth === 11 ? 0 : picker.currentMonth + 1
-        const nextMonth = months[nextMonthIndex]
-
-        cy.get('[data-cy="input-1"]').click()
-        cy.get('.qs-controls .qs-month').should('have.text', startingMonth)
-        cy.get('.qs-controls .qs-right').click().then(() => {
-          cy.get('.qs-controls .qs-month').should('have.text', nextMonth)
-          expect(picker.currentMonthName).to.equal(nextMonth)
-          expect(picker.currentMonth).to.equal(nextMonthIndex)
-        })
-      })
-
-      it('should navigate to the previous month when the left arrow is clicked', () => {
-        const startingMonth = months[picker.currentMonth]
-        const prevMonthIndex = picker.currentMonth === 0 ? 11 : picker.currentMonth - 1
-        const prevMonth = months[prevMonthIndex]
-
-        cy.get('.qs-controls .qs-month').should('have.text', startingMonth)
-        cy.get('.qs-controls .qs-left').click().then(() => {
-          cy.get('.qs-controls .qs-month').should('have.text', prevMonth)
-          expect(picker.currentMonthName).to.equal(prevMonth)
-          expect(picker.currentMonth).to.equal(prevMonthIndex)
-        })
-      })
-    })
-
-    describe('Overlay', () => {
-      it('should show the overlay when month/year is clicked', () => {
-        cy.get('.qs-month-year').click()
-        cy.get('.qs-overlay')
-          .should('have.css', 'opacity', '1')
-      })
-
-      it('should have the correct default placeholder for the overlay input', () => {
-        cy.get('.qs-overlay-year')
-          .should('have.attr', 'placeholder', '4-digit year')
-      })
-
-      it('should have the correct default submit button text', () => {
-        cy.get('.qs-submit')
-          .should('have.text', 'Submit')
-      })
-
-      it('should change the year & hide the overlay when using the input & pressing enter', () => {
-        cy.get('.qs-month-year .qs-year').then($year => {
-          const currentYear = +$year.text()
-          const nextYear = currentYear + 1
-
-          expect(picker.currentYear).to.equal(currentYear)
-          cy.get('.qs-overlay-year')
-            .type(`${nextYear}{enter}`)
-            .then(() => {
-              cy.get('.qs-month-year .qs-year')
-                .should('have.text', `${nextYear}`)
-
-              // http://bit.ly/2r5CJo4 - This is a current workaround for `.should('be.visible')` on elements with 0 opacity.
-              cy.get('.qs-overlay')
-                .should('have.css', 'opacity', '0')
-              expect(picker.currentYear).to.equal(nextYear)
-            })
-        })
-      })
-
-      it('should change the year & hide the overlay via the submit button', () => {
-        cy.get('.qs-month-year .qs-year').click().then($year => {
-          const currentYear = +$year.text()
-          const nextYear = currentYear + 1
-
-          expect(picker.currentYear).to.equal(currentYear)
-          cy.get('.qs-overlay-year')
-            .type(`${nextYear}`)
-          cy.get('.qs-overlay .qs-submit')
-            .click()
-            .then(() => {
-              cy.get('.qs-month-year .qs-year')
-                .should('have.text', `${nextYear}`)
-              cy.get('.qs-overlay')
-                .should('have.css', 'opacity', '0')
-              expect(picker.currentYear).to.equal(nextYear)
-            })
-        })
-      })
-
-      it('should change the month & hide the overlay when the user clicks a month', () => {
-        cy.get('.qs-month-year .qs-month').then($month => {
-          const currentMonthName = $month.text()
-          const currentMonthIndex = months.findIndex(month => month === currentMonthName)
-          const monthIndexToClick = currentMonthIndex === 11 ? 0 : currentMonthIndex + 1
-          const nextMonthName = months[monthIndexToClick]
-
-          expect(picker.currentMonthName).to.equal(currentMonthName)
-          cy.get('.qs-month-year').click()
-          cy.get('.qs-overlay-month-container .qs-overlay-month')
-            .eq(monthIndexToClick)
-            .click()
-            .then(() => {
-              cy.get('.qs-month-year .qs-month')
-                .should('have.text', nextMonthName)
-              cy.get('.qs-overlay')
-                .should('have.css', 'opacity', '0')
-              expect(picker.currentMonthName).to.equal(nextMonthName)
-            })
-        })
-      })
-
-      it('should close the overlay when clicking the close button', () => {
-        cy.get('.qs-month-year').click().then(() => {
-          cy.get('.qs-overlay')
-            .should('have.css', 'opacity', '1')
-          cy.get('.qs-close').click().then(() => {
-            cy.get('.qs-overlay')
-            .should('have.css', 'opacity', '0')
-          })
-        })
-      })
-    })
 
     describe('Date changes', () => {
       const dayToSelect = 15
@@ -596,159 +734,6 @@ x.describe('Initial calendar load with default settings', () => {
           cy.get('[data-cy="input-1"]')
             .should('have.value', '')
         })
-      })
-    })
-  })
-
-  describe('Datepicker HTML structure and element types', () => {
-    // Ensure the calendar is open before these tests - it should already be open, but just in case.
-    before(() => cy.get('[data-cy="input-1"]').click())
-
-    describe('Top-level containers', () => {
-      it('should have a div top-level container', () => {
-        cy.get('div.qs-datepicker-container')
-          .should('have.length', 1)
-          .children()
-          .should('have.length', 1) // The calendar container.
-      })
-
-      it('should have a div calendar container', () => {
-        cy.get('div.qs-datepicker')
-          .should('exist')
-          .should('have.length', 1)
-          .children()
-          .should('have.length', 3)
-      })
-    })
-
-    describe('Controls', () => {
-      it('should have a div for the controls', () => {
-        cy.get('div.qs-controls')
-          .should('have.length', 1)
-          .children()
-          .should('have.length', 3)
-      })
-
-      it('should have a div for the arrows', () => {
-        cy.get('div.qs-controls div.qs-arrow')
-          .should('have.length', 2)
-        cy.get('div.qs-arrow')
-          .should('have.length', 2)
-
-        cy.get('div.qs-controls div.qs-arrow.qs-left')
-          .should('have.length', 1)
-          .children()
-          .should('have.length', 0)
-        cy.get('div.qs-arrow.qs-left')
-          .should('have.length', 1)
-
-        cy.get('div.qs-controls div.qs-arrow.qs-right')
-          .should('have.length', 1)
-          .children()
-          .should('have.length', 0)
-        cy.get('div.qs-arrow.qs-right')
-          .should('have.length', 1)
-      })
-
-      it('should have a div for the month/year', () => {
-        cy.get('div.qs-controls div.qs-month-year')
-          .should('have.length', 1)
-          .children()
-          .should('have.length', 2)
-      })
-
-      it('should have spans for the month and year', () => {
-        cy.get('div.qs-controls div.qs-month-year span.qs-month')
-          .should('have.length', 1)
-          .children()
-          .should('have.length', 0)
-        cy.get('span.qs-month')
-          .should('have.length', 1)
-
-        cy.get('div.qs-controls div.qs-month-year span.qs-year')
-          .should('have.length', 1)
-          .children()
-          .should('have.length', 0)
-        cy.get('span.qs-year')
-          .should('have.length', 1)
-      })
-    })
-
-    describe('Calendar days', () => {
-      it('should have a div container for the days', () => {
-        cy.get('div.qs-squares')
-          .should('have.length', 1)
-          .children()
-          .its('length')
-          .should('be.gte', 35)
-          .should('be.lte', 49)
-      })
-
-      it('should have divs for the days', () => {
-        cy.get('div.qs-squares div.qs-square')
-          .its('length')
-          .should('be.gte', 35)
-          .should('be.lte', 49)
-        cy.get('div.qs-square')
-          .its('length')
-          .should('be.gte', 35)
-          .should('be.lte', 49)
-      })
-
-      it('should have 7 top-level divs for the days of the week', () => {
-        cy.get('div.qs-square.qs-day')
-          .should('have.length', 7)
-      })
-
-      it('only contains <span> children on the numbered days', () => {
-        cy.get('div.qs-squares div.qs-square').each($square => {
-          if ($square.hasClass('qs-num')) {
-            expect($square.children().length).to.equal(1)
-            expect($square.find('span.qs-num').length).to.equal(1)
-          } else {
-            expect($square.children().length).to.equal(0)
-          }
-        })
-      })
-    })
-
-    describe('Overlay', () => {
-      it('should have a div for the overlay container', () => {
-        cy.get('div.qs-overlay')
-          .should('have.length', 1)
-      })
-
-      it('should have a div container for the year input and close button', () => {
-        cy.get('div.qs-overlay div')
-          .first()
-          .children()
-          .should('have.length', 2)
-      })
-
-      it('should have a div for the close button', () => {
-        cy.get('div.qs-close')
-          .should('have.length', 1)
-      })
-
-      it('should have a div for the months container', () => {
-        cy.get('div.qs-overlay-month-container')
-          .should('have.length', 1)
-      })
-
-      it('should have 12 divs for the months with a span in each', () => {
-        cy.get('.qs-overlay-month')
-          .should('have.length', 12)
-          .each($month => {
-            expect($month.find('span').length).to.equal(1)
-          })
-
-        cy.get('span[data-month-num]')
-          .should('have.length', 12)
-      })
-
-      it('should have a div for the submit button', () => {
-        cy.get('div.qs-submit')
-          .should('have.length', 1)
       })
     })
   })

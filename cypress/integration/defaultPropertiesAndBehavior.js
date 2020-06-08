@@ -356,18 +356,27 @@ describe('Default properties and behavior', function() {
         cy.get(selectors.single.calendarContainer).should('not.be.visible')
       })
 
-      it('should change months when the arrows are clicked', function() {
+      it.only('should change months when the arrows are clicked', function() {
         const today = new Date()
         const previousMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-        this.datepicker(singleDatepickerInput)
+        const picker = this.datepicker(singleDatepickerInput)
 
         cy.get(singleDatepickerInput).click()
         cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
         cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+        expect(picker.currentMonth, 'picker.currentMonth').to.equal(today.getMonth())
+        expect(picker.currentMonthName, 'picker.currentMonthName').to.equal(pickerProperties.months[today.getMonth()])
+        expect(picker.currentYear, 'picker.currentYear').to.equal(today.getFullYear())
 
         cy.get(`${selectors.single.controls} .qs-arrow.qs-left`).click()
         cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[previousMonthDate.getMonth()])
-        cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${previousMonthDate.getFullYear()}`)
+        cy.get(`${selectors.single.controls} .qs-year`)
+          .should('have.text', `${previousMonthDate.getFullYear()}`)
+          .then(() => {
+            expect(picker.currentMonth, 'picker.currentMonth').to.equal(previousMonthDate.getMonth())
+            expect(picker.currentMonthName, 'picker.currentMonthName').to.equal(pickerProperties.months[previousMonthDate.getMonth()])
+            expect(picker.currentYear, 'picker.currentYear').to.equal(previousMonthDate.getFullYear())
+          })
 
         cy.get(`${selectors.single.controls} .qs-arrow.qs-right`).click()
         cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
@@ -574,6 +583,27 @@ describe('Default properties and behavior', function() {
             expect(styles.opacity, message).to.equal('0')
             expect(styles.zIndex, message).to.equal('-1')
           })
+        })
+      })
+    })
+
+    describe('Date changes', function() {
+
+      it.only('should select a date when clicking a day and fill in the input field', function() {
+        const todaysDate = new Date().getDate()
+        const dayIndex = todaysDate === 1 ? 1 : 0
+        this.datepicker(singleDatepickerInput)
+
+        cy.get(singleDatepickerInput).should('have.value', '').click()
+        cy.get(`${selectors.single.squaresContainer} .qs-active`).should('have.length', 0)
+        cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(dayIndex).click()
+        cy.get(`${selectors.single.squaresContainer} .qs-active`).should('have.length', 1)
+        cy.get(singleDatepickerInput).should('not.have.value', '')
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(dayIndex).then($selectedDay => {
+          const styles = getComputedStyle($selectedDay[0])
+          expect(styles.backgroundColor, 'Selected day').to.equal('rgb(173, 216, 230)')
         })
       })
     })

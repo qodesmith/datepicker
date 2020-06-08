@@ -180,7 +180,7 @@ function createInstance(selectorOrElement, opts) {
         // Store the relevant objects.
         } else {
           shadowDom = currentParent
-          customElement = currentParen.host
+          customElement = currentParent.host
         }
 
       // Focus up the chain to the next parent and keep iterating.

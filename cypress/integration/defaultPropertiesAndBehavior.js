@@ -588,22 +588,64 @@ describe('Default properties and behavior', function() {
     })
 
     describe('Date changes', function() {
-
-      it.only('should select a date when clicking a day and fill in the input field', function() {
-        const todaysDate = new Date().getDate()
+      it('should select a date when clicking a day, fill in the input field, and change a picker prop', function() {
+        const today = new Date()
+        const todaysDate = today.getDate()
         const dayIndex = todaysDate === 1 ? 1 : 0
-        this.datepicker(singleDatepickerInput)
+        const picker = this.datepicker(singleDatepickerInput)
+        const dateSelected = new Date(today.getFullYear(), today.getMonth(), dayIndex + 1)
 
+        expect(picker.dateSelected, 'picker.dateSelected').to.be.undefined
+        cy.get(selectors.single.calendarContainer).should('not.be.visible')
         cy.get(singleDatepickerInput).should('have.value', '').click()
+        cy.get(selectors.single.calendarContainer).should('be.visible')
+
         cy.get(`${selectors.single.squaresContainer} .qs-active`).should('have.length', 0)
         cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(dayIndex).click()
+        cy.get(selectors.single.calendarContainer).should('not.be.visible')
         cy.get(`${selectors.single.squaresContainer} .qs-active`).should('have.length', 1)
-        cy.get(singleDatepickerInput).should('not.have.value', '')
+        cy.get(singleDatepickerInput).then($input => {
+          const message = 'The input should be populated with the `toDateString()` method'
+          expect($input.val(), message).to.equal(dateSelected.toDateString())
+          expect(+picker.dateSelected, '`picker.dateSelected` date value').to.equal(+dateSelected)
+        })
 
         cy.get(singleDatepickerInput).click()
         cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(dayIndex).then($selectedDay => {
           const styles = getComputedStyle($selectedDay[0])
           expect(styles.backgroundColor, 'Selected day').to.equal('rgb(173, 216, 230)')
+        })
+      })
+
+      it.only('should de-select a date, clear the input field, and clear the picker prop', function() {
+        const today = new Date()
+        const todaysDate = today.getDate()
+        const dayIndex = todaysDate === 1 ? 1 : 0
+        const picker = this.datepicker(singleDatepickerInput)
+        const dateSelected = new Date(today.getFullYear(), today.getMonth(), dayIndex + 1)
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(dayIndex).click()
+        cy.get(selectors.single.calendarContainer).should('not.be.visible')
+        cy.get(`${selectors.single.squaresContainer} .qs-active`).should('have.length', 1).then(() => {
+          expect(+picker.dateSelected, '`picker.dateSelected` should be filled').to.equal(+dateSelected)
+        })
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(`${selectors.single.squaresContainer} .qs-active`)
+          .then($selectedDay => {
+            const styles = getComputedStyle($selectedDay[0])
+            expect(styles.backgroundColor, 'Selected day color').to.equal('rgb(173, 216, 230)')
+          })
+          .click()
+        cy.wait(200)
+        cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(dayIndex).then($selectedDay => {
+          const styles = getComputedStyle($selectedDay[0])
+          expect(styles.backgroundColor, 'Selected day color after de-selecting').to.equal('rgba(0, 0, 0, 0)')
+        })
+        cy.get(selectors.single.calendarContainer).should('be.visible')
+        cy.get(`${selectors.single.squaresContainer} .qs-active`).should('have.length', 0).then(() => {
+          expect(picker.dateSelected, 'picker.dateSelected').to.be.undefined
         })
       })
     })
@@ -712,35 +754,6 @@ x.describe('Initial calendar load with default settings', () => {
 
     describe('Date changes', () => {
       const dayToSelect = 15
-
-      describe('Selecting a date', () => {
-        it('should populate `dateSelected` on the instance object with the correct date', () => {
-          const correctDate = +new Date(picker.currentYear, picker.currentMonth, dayToSelect)
-
-          cy.get(`span.qs-num:contains('${dayToSelect}')`).click().then(() => {
-            expect(+picker.dateSelected).to.equal(correctDate)
-          })
-        })
-
-        it('should populate the input field using the `toDateString` method (default)', () => {
-          const dateString = picker.dateSelected.toDateString()
-
-          cy.get('[data-cy="input-1"]')
-            .should('have.value', dateString)
-        })
-
-        it('should hide the calendar', () => {
-          cy.get('.qs-datepicker-container')
-            .should('be.hidden')
-        })
-
-        it('should show the date selected highlighted when re-opening the calendar', () => {
-          cy.get('[data-cy="input-1"]').click()
-          cy.get('.qs-active')
-            .should('have.length.of', 1)
-            .should('have.text', `${dayToSelect}`)
-        })
-      })
 
       describe('De-selecting a date', () => {
         it('should have a value of undefined for `dateSelected` on the instance object', () => {

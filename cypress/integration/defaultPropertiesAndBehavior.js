@@ -617,7 +617,7 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      it.only('should de-select a date, clear the input field, and clear the picker prop', function() {
+      it('should de-select a date, clear the input field, and clear the picker prop', function() {
         const today = new Date()
         const todaysDate = today.getDate()
         const dayIndex = todaysDate === 1 ? 1 : 0

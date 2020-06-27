@@ -262,6 +262,17 @@ function testDomStructure(pickerType, selectorObj) {
     .should('have.prop', 'tagName').should('eq', 'DIV') // This element is not a <button> or <input type="submit"/>.
 }
 
+function daterangeSanityCheck(pickerStart, pickerEnd) {
+  expect(pickerStart.id, 'pickerStart.id (sanity check)').not.to.be.undefined
+  expect(pickerEnd.id, 'pickerEnd.id (sanity check)').not.to.be.undefined
+
+  expect(pickerStart.id, 'pickerStart.id (sanity check)').to.equal(pickerEnd.id)
+  expect(pickerEnd.id, 'pickerEnd.id (sanity check)').to.equal(pickerStart.id)
+
+  expect(pickerStart.sibling, 'pickerStart.sibling (sanity check)').to.equal(pickerEnd)
+  expect(pickerEnd.sibling, 'pickerEnd.sibling (sanity check)').to.equal(pickerStart)
+}
+
 describe('Default properties and behavior', function() {
   beforeEach(function() {
     cy.visit('http://localhost:9001')
@@ -337,12 +348,14 @@ describe('Default properties and behavior', function() {
           .then($allDaysButCurrentDay => {
             const message = 'calendar day styles (not .qs-current)'
 
-            Array.from($allDaysButCurrentDay).forEach(el => {
-              const styles = getComputedStyle(el)
+            cy.wait(1).then(() => {
+              Array.from($allDaysButCurrentDay).forEach(el => {
+                const styles = getComputedStyle(el)
 
-              expect(styles.fontWeight, message).to.equal('400')
-              expect(styles.textDecoration, message).to.equal('none solid rgb(0, 0, 0)')
-              expect(styles.backgroundColor, message).to.equal('rgba(0, 0, 0, 0)')
+                expect(styles.fontWeight, message).to.equal('400')
+                expect(styles.textDecoration, message).to.equal('none solid rgb(0, 0, 0)')
+                expect(styles.backgroundColor, message).to.equal('rgba(0, 0, 0, 0)')
+              })
             })
           })
       })
@@ -356,7 +369,7 @@ describe('Default properties and behavior', function() {
         cy.get(selectors.single.calendarContainer).should('not.be.visible')
       })
 
-      it.only('should change months when the arrows are clicked', function() {
+      it('should change months when the arrows are clicked', function() {
         const today = new Date()
         const previousMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1)
         const picker = this.datepicker(singleDatepickerInput)
@@ -389,12 +402,13 @@ describe('Default properties and behavior', function() {
 
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
-          cy.wait(400)
           cy.get(selectors.single.controls).then($controls => {
-            const message = '.qs-controls blurred when overlay is open'
-            const styles = getComputedStyle($controls[0])
+            cy.wait(400).then(() => {
+              const message = '.qs-controls blurred when overlay is open'
+              const styles = getComputedStyle($controls[0])
 
-            expect(styles.filter, message).to.equal('blur(5px)')
+              expect(styles.filter, message).to.equal('blur(5px)')
+            })
           })
           cy.get(selectors.single.squaresContainer).then($squaresContainer => {
             const message = '.qs-squares (container) blurred when overlay is open'
@@ -416,7 +430,7 @@ describe('Default properties and behavior', function() {
 
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
-          cy.wait(400)
+          cy.wait(1)
           cy.focused().should('have.attr', 'class', 'qs-overlay-year')
         })
 
@@ -425,35 +439,48 @@ describe('Default properties and behavior', function() {
           const nextYear = today.getFullYear() + 1
           this.datepicker(singleDatepickerInput)
 
+          /*
+            Datepicker uses requestAnimationFrame in order to toggle the overlay.
+            cy.clock will help us cy.wait the correct way. Look, it just works, k?
+          */
+          cy.clock()
+
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
           cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
           cy.get(`${selectors.single.overlay} .qs-submit`).should('have.attr', 'class', 'qs-submit qs-disabled')
 
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
-          cy.wait(400)
+          cy.wait(1)
           cy.get(`${selectors.single.overlayInputContainer} .qs-overlay-year`).type(`${nextYear}`)
           cy.get(`${selectors.single.overlay} .qs-submit`).should('have.attr', 'class', 'qs-submit')
           cy.get(`${selectors.single.overlayInputContainer} .qs-overlay-year`).focus().type('{enter}')
-          cy.wait(400)
 
-          cy.get(selectors.single.overlay).then($overlay => {
-            const message = '.qs-overlay styles after entering year'
-            const styles = getComputedStyle($overlay[0])
+          /*
+            Why do we need both cy.tick AND cy.wait? Because it's the only way the tests pass
+            for when the test browser is visible and when it's not. Don't ask me why.
+          */
+          cy.tick(400).then(() => {
+            cy.wait(400).then(() => {
+              cy.get(selectors.single.overlay).then($overlay => {
+                const message = '.qs-overlay styles after entering year'
+                const styles = getComputedStyle($overlay[0])
 
-            expect(styles.opacity, message).to.equal('0')
-            expect(styles.zIndex, message).to.equal('-1')
+                expect(styles.opacity, message).to.equal('0')
+                expect(styles.zIndex, message).to.equal('-1')
+              })
+            })
           })
           cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
           cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${nextYear}`)
 
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
-          cy.wait(400)
+          cy.wait(1)
           cy.get(`${selectors.single.overlayInputContainer} .qs-overlay-year`).type(`${today.getFullYear()}`)
           cy.get(`${selectors.single.overlay} .qs-submit`)
             .should('have.attr', 'class', 'qs-submit')
             .click()
-          cy.wait(400)
+          cy.wait(1)
           cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
           cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
         })
@@ -461,38 +488,46 @@ describe('Default properties and behavior', function() {
         it('should not allow leading zeros or change the year if 4 digits have not been entered', function() {
           this.datepicker(singleDatepickerInput)
 
+          // Set up some variables
           cy.get(selectors.single.overlay).as('overlay')
           cy.get(`${selectors.single.overlay} .qs-submit`).as('submit')
           cy.get(`${selectors.single.overlayInputContainer} .qs-overlay-year`).as('yearInput')
 
+          // Open the overlay.
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
-          cy.wait(400)
-
           cy.get('@overlay').then($overlay => {
-            const message = '.qs-overlay'
-            const styles = getComputedStyle($overlay[0])
+            cy.wait(400).then(() => {
+              const message = '.qs-overlay'
+              const styles = getComputedStyle($overlay[0])
 
-            expect(styles.opacity, message).to.equal('1')
-            expect(styles.zIndex, message).to.equal('1')
+              expect(styles.opacity, message).to.equal('1')
+              expect(styles.zIndex, message).to.equal('1')
+            })
           })
+
+          // Clicking the submit button should not change any styles (since it's a noop).
           cy.get('@submit').click()
-          cy.wait(400)
           cy.get('@overlay').then($overlay => {
-            const message = '.qs-overlay'
-            const styles = getComputedStyle($overlay[0])
+            cy.wait(400).then(() => {
+              const message = '.qs-overlay'
+              const styles = getComputedStyle($overlay[0])
 
-            expect(styles.opacity, message).to.equal('1')
-            expect(styles.zIndex, message).to.equal('1')
+              expect(styles.opacity, message).to.equal('1')
+              expect(styles.zIndex, message).to.equal('1')
+            })
           })
-          cy.get('@yearInput').type('{enter')
-          cy.wait(400)
-          cy.get('@overlay').then($overlay => {
-            const message = '.qs-overlay'
-            const styles = getComputedStyle($overlay[0])
 
-            expect(styles.opacity, message).to.equal('1')
-            expect(styles.zIndex, message).to.equal('1')
+          // Hitting the enter button while focused in the input should not change any styles (since it's a noop).
+          cy.get('@yearInput').focus().type('{enter}')
+          cy.get('@overlay').then($overlay => {
+            cy.wait(400).then(() => {
+              const message = '.qs-overlay'
+              const styles = getComputedStyle($overlay[0])
+
+              expect(styles.opacity, message).to.equal('1')
+              expect(styles.zIndex, message).to.equal('1')
+            })
           })
 
           cy.get('@yearInput')
@@ -515,46 +550,58 @@ describe('Default properties and behavior', function() {
           const today = new Date()
           this.datepicker(singleDatepickerInput)
 
+          cy.clock()
+
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
-          cy.wait(400)
           cy.get(selectors.single.overlay).then($overlay => {
-            const message = '.qs-overlay styles after clicking month'
-            const styles = getComputedStyle($overlay[0])
+            cy.wait(400).then(() => {
+              const message = '.qs-overlay styles after clicking month'
+              const styles = getComputedStyle($overlay[0])
 
-            expect(styles.opacity, message).to.equal('1')
-            expect(styles.zIndex, message).to.equal('1')
+              expect(styles.opacity, message).to.equal('1')
+              expect(styles.zIndex, message).to.equal('1')
+            })
           })
 
           cy.get(`${selectors.single.overlayMonthContainer} [data-month-num="0"]`).click()
-          cy.wait(400)
-          cy.get(selectors.single.overlay).then($overlay => {
-            const message = '.qs-overlay styles after clicking month'
-            const styles = getComputedStyle($overlay[0])
+          cy.tick(400).then(() => {
+            cy.wait(400).then(() => {
+              cy.get(selectors.single.overlay).then($overlay => {
+                const message = '.qs-overlay styles after clicking month'
+                const styles = getComputedStyle($overlay[0])
 
-            expect(styles.opacity, message).to.equal('0')
-            expect(styles.zIndex, message).to.equal('-1')
+                expect(styles.opacity, message).to.equal('0')
+                expect(styles.zIndex, message).to.equal('-1')
+              })
+            })
           })
           cy.get(`${selectors.single.controls} .qs-month-year .qs-month`)
             .should('have.text', pickerProperties.months[0])
 
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
-          cy.wait(400)
-          cy.get(selectors.single.overlay).then($overlay => {
-            const message = '.qs-overlay styles after clicking month'
-            const styles = getComputedStyle($overlay[0])
+          cy.tick(400).then(() => {
+            cy.get(selectors.single.overlay).then($overlay => {
+              cy.wait(400).then(() => {
+                const message = '.qs-overlay styles after clicking month'
+                const styles = getComputedStyle($overlay[0])
 
-            expect(styles.opacity, message).to.equal('1')
-            expect(styles.zIndex, message).to.equal('1')
+                expect(styles.opacity, message).to.equal('1')
+                expect(styles.zIndex, message).to.equal('1')
+              })
+            })
           })
           cy.get(`${selectors.single.overlayMonthContainer} [data-month-num="11"]`).click()
-          cy.wait(400)
-          cy.get(selectors.single.overlay).then($overlay => {
-            const message = '.qs-overlay styles after clicking month'
-            const styles = getComputedStyle($overlay[0])
+          cy.tick(400).then(() => {
+            cy.wait(400).then(() => {
+              cy.get(selectors.single.overlay).then($overlay => {
+                const message = '.qs-overlay styles after clicking month'
+                const styles = getComputedStyle($overlay[0])
 
-            expect(styles.opacity, message).to.equal('0')
-            expect(styles.zIndex, message).to.equal('-1')
+                expect(styles.opacity, message).to.equal('0')
+                expect(styles.zIndex, message).to.equal('-1')
+              })
+            })
           })
           cy.get(`${selectors.single.controls} .qs-month-year .qs-month`)
             .should('have.text', pickerProperties.months[11])
@@ -565,23 +612,25 @@ describe('Default properties and behavior', function() {
 
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
-          cy.wait(400)
           cy.get(selectors.single.overlay).then($overlay => {
-            const message = '.qs-overlay'
-            const styles = getComputedStyle($overlay[0])
+            cy.wait(400).then(() => {
+              const message = '.qs-overlay'
+              const styles = getComputedStyle($overlay[0])
 
-            expect(styles.opacity, message).to.equal('1')
-            expect(styles.zIndex, message).to.equal('1')
+              expect(styles.opacity, message).to.equal('1')
+              expect(styles.zIndex, message).to.equal('1')
+            })
           })
 
           cy.get(`${selectors.single.overlay} .qs-close`).click()
-          cy.wait(400)
           cy.get(selectors.single.overlay).then($overlay => {
-            const message = '.qs-overlay'
-            const styles = getComputedStyle($overlay[0])
+            cy.wait(400).then(() => {
+              const message = '.qs-overlay'
+              const styles = getComputedStyle($overlay[0])
 
-            expect(styles.opacity, message).to.equal('0')
-            expect(styles.zIndex, message).to.equal('-1')
+              expect(styles.opacity, message).to.equal('0')
+              expect(styles.zIndex, message).to.equal('-1')
+            })
           })
         })
       })
@@ -638,10 +687,11 @@ describe('Default properties and behavior', function() {
             expect(styles.backgroundColor, 'Selected day color').to.equal('rgb(173, 216, 230)')
           })
           .click()
-        cy.wait(200)
         cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(dayIndex).then($selectedDay => {
-          const styles = getComputedStyle($selectedDay[0])
-          expect(styles.backgroundColor, 'Selected day color after de-selecting').to.equal('rgba(0, 0, 0, 0)')
+          cy.wait(400).then(() => {
+            const styles = getComputedStyle($selectedDay[0])
+            expect(styles.backgroundColor, 'Selected day color after de-selecting').to.equal('rgba(0, 0, 0, 0)')
+          })
         })
         cy.get(selectors.single.calendarContainer).should('be.visible')
         cy.get(`${selectors.single.squaresContainer} .qs-active`).should('have.length', 0).then(() => {
@@ -656,6 +706,8 @@ describe('Default properties and behavior', function() {
       const options = { id: Math.random() } // Using Math.random to showcase that the id just needs to be consistent between both instances.
       const startPicker = this.datepicker(daterangeInputStart, options)
       const endPicker = this.datepicker(daterangeInputEnd, options)
+
+      daterangeSanityCheck(startPicker, endPicker)
 
       ;['start', 'end'].forEach(type => {
         const pickerToCheck = type === 'start' ? startPicker : endPicker
@@ -675,23 +727,30 @@ describe('Default properties and behavior', function() {
     })
 
     it('(they) should have the correct DOM structure(s)', function() {
-      this.datepicker(daterangeInputStart, { id: 1 })
-      this.datepicker(daterangeInputEnd, { id: 1 })
+      const startPicker = this.datepicker(daterangeInputStart, { id: 1 })
+      const endPicker = this.datepicker(daterangeInputEnd, { id: 1 })
+
+      daterangeSanityCheck(startPicker, endPicker)
       testDomStructure('daterangeStart', selectors.range.start)
       testDomStructure('daterangeEnd', selectors.range.end)
     })
 
     describe('Basic visuals and behavior', function() {
       it('(they) are initially hidden in the DOM', function() {
-        this.datepicker(daterangeInputStart, { id: 1 })
-        this.datepicker(daterangeInputEnd, { id: 1 })
+        const startPicker = this.datepicker(daterangeInputStart, { id: 1 })
+        const endPicker = this.datepicker(daterangeInputEnd, { id: 1 })
+
+        daterangeSanityCheck(startPicker, endPicker)
+
         cy.get(selectors.range.start.calendarContainer).should('not.be.visible')
         cy.get(selectors.range.end.calendarContainer).should('not.be.visible')
       })
 
       it('(they) should show the calendar (individually) when clicking into the input (and not show the overlay)', function() {
-        this.datepicker(daterangeInputStart, { id: 1 })
-        this.datepicker(daterangeInputEnd, { id: 1 })
+        const startPicker = this.datepicker(daterangeInputStart, { id: 1 })
+        const endPicker = this.datepicker(daterangeInputEnd, { id: 1 })
+
+        daterangeSanityCheck(startPicker, endPicker)
 
         cy.get(daterangeInputStart).click()
         cy.get(selectors.range.start.calendarContainer).should('be.visible')
@@ -718,8 +777,10 @@ describe('Default properties and behavior', function() {
       it('(they) should change months when the arrows are clicked, not affecting the other', function() {
         const today = new Date()
         const previousMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-        this.datepicker(daterangeInputStart, { id: 1 })
-        this.datepicker(daterangeInputEnd, { id: 1 })
+        const startPicker = this.datepicker(daterangeInputStart, { id: 1 })
+        const endPicker = this.datepicker(daterangeInputEnd, { id: 1 })
+
+        daterangeSanityCheck(startPicker, endPicker)
 
         cy.get(daterangeInputStart).click()
         cy.get(`${selectors.range.start.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
@@ -745,41 +806,241 @@ describe('Default properties and behavior', function() {
         cy.get(`${selectors.range.end.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
       })
     })
+
+    describe('Date changes', function() {
+      let today
+      let todaysDate
+      let startDayIndex
+      let endDayIndex
+      let startDateSelected
+      let endDateSelected
+      let dataDir0
+      let pickerStart
+      let pickerEnd
+      let daysInRange
+
+      beforeEach(function () {
+        today = new Date()
+        todaysDate = today.getDate()
+        startDayIndex = todaysDate === 1 ? 1 : 0
+        endDayIndex = 19
+        startDateSelected = new Date(today.getFullYear(), today.getMonth(), startDayIndex + 1)
+        endDateSelected = new Date(today.getFullYear(), today.getMonth(), endDayIndex + 1)
+        dataDir0 = '[data-direction="0"]'
+        pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+        pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+        daysInRange = (endDayIndex + 1) - (startDayIndex + 1) - 1
+
+        daterangeSanityCheck(pickerStart, pickerEnd)
+      })
+
+      function selectStartDate() {
+        // Open the START calendar and click on a day.
+        cy.get(daterangeInputStart).should('have.value', '').click()
+        cy.get(selectors.range.start.calendarContainer).should('be.visible')
+        cy.get(`${selectors.range.start.squaresContainer} ${dataDir0}`).eq(startDayIndex).click()
+      }
+
+      function selectEndDate() {
+        // Open the END calendar and click on a day.
+        cy.get(daterangeInputEnd).click()
+        cy.get(selectors.range.end.calendarContainer).should('be.visible')
+        cy.get(`${selectors.range.end.squaresContainer} ${dataDir0}`).eq(endDayIndex).click()
+      }
+
+      it('should have the correct props on both pickers prior to date selection', function() {
+        expect(pickerStart.dateSelected, 'pickerStart.dateSelected - before start date selection').to.be.undefined
+        expect(pickerStart.minDate, 'pickerStart.minDate - before start date selection').to.be.undefined
+        expect(pickerStart.maxDate, 'pickerStart.maxDate - before start date selection').to.be.undefined
+        expect(pickerEnd.dateSelected, 'pickerEnd.dateSelected - before start date selection').to.be.undefined
+        expect(pickerEnd.minDate, 'pickerEnd.minDate - before start date selection').to.be.undefined
+        expect(pickerEnd.maxDate, 'pickerEnd.maxDate - before start date selection').to.be.undefined
+      })
+
+      it('should have both calendars hidden prior to any action', function() {
+        cy.get(selectors.range.start.calendarContainer).should('not.be.visible')
+        cy.get(selectors.range.end.calendarContainer).should('not.be.visible')
+        cy.get(daterangeInputStart).should('have.value', '')
+        cy.get(daterangeInputEnd).should('have.value', '')
+      })
+
+      // SELECTING START DATE ONLY
+
+      it('should select a day on the start calendar and highlight it', function() {
+        selectStartDate()
+
+        cy.get('.qs-active').should('have.length', 1) // Only 1 selected day in the entire DOM.
+        cy.get(`${selectors.range.start.squaresContainer} .qs-active`)
+          .should('have.text', `${startDayIndex + 1}`)
+          .should('not.have.class', 'qs-range-start') // This class should only be added once a range is selected.
+          .then($selectedDay => {
+            const { backgroundColor, borderRadius } = getComputedStyle($selectedDay[0])
+
+            // Background color "highlighted" check.
+            expect(backgroundColor, 'Selected day').to.equal('rgb(173, 216, 230)')
+
+            // All 4 corners should have a border radius.
+            expect(borderRadius.split(' ').length, 'border radius - 1 value for all 4 corners').to.equal(1)
+            expect(borderRadius.endsWith('px'), 'border radius value ends with "px"').to.be.true
+            expect(borderRadius.startsWith('0'), 'border radius should not be 0').to.be.false
+          })
+      })
+
+      it('should only populate the start input field after selecting a start date', function() {
+        selectStartDate()
+
+        cy.get(daterangeInputStart).should('have.value', startDateSelected.toDateString())
+        cy.get(daterangeInputEnd).should('have.value', '')
+      })
+
+      it('should set some props on both pickers after selecting a start date', function() {
+        selectStartDate()
+
+        cy.wait(1).then(() => {
+          expect(+pickerStart.dateSelected, 'pickerStart.dateSelected - after start date selection').to.equal(+startDateSelected)
+          expect(pickerStart.minDate, 'pickerStart.minDate - after start date selection').to.be.undefined
+          expect(pickerStart.maxDate, 'pickerStart.maxDate - after start date selection').to.be.undefined
+          expect(pickerEnd.dateSelected, 'pickerEnd.dateSelected - after start date selection').to.be.undefined
+          expect(+pickerEnd.minDate, 'pickerEnd.minDate - after start date selection').to.equal(+startDateSelected)
+          expect(pickerEnd.maxDate, 'pickerEnd.maxDate - after start date selection').to.be.undefined
+        })
+      })
+
+      // SELECTING END DATE ONLY
+
+      it('should select a day on the end calendar and highlight it', function() {
+        selectEndDate()
+
+        cy.get('.qs-active').should('have.length', 1) // Only 1 selected day in the entire DOM.
+        cy.get(`${selectors.range.end.squaresContainer} .qs-active`)
+          .should('have.text', `${endDayIndex + 1}`)
+          .should('not.have.class', 'qs-range-endf') // This class should only be added once a range is selected.
+          .then($selectedDay => {
+            const { backgroundColor, borderRadius } = getComputedStyle($selectedDay[0])
+
+            // Background color "highlighted" check.
+            expect(backgroundColor, 'Selected day').to.equal('rgb(173, 216, 230)')
+
+            // All 4 corners should have a border radius.
+            expect(borderRadius.split(' ').length, 'border radius - 1 value for all 4 corners').to.equal(1)
+            expect(borderRadius.endsWith('px'), 'border radius value ends with "px"').to.be.true
+            expect(borderRadius.startsWith('0'), 'border radius should not be 0').to.be.false
+          })
+      })
+
+      it('should only populate the end input field after selecting an end date', function() {
+        selectEndDate()
+
+        cy.get(daterangeInputEnd).should('have.value', endDateSelected.toDateString())
+        cy.get(daterangeInputStart).should('have.value', '')
+      })
+
+      it('should set some props on both pickers after selecting an end date', function() {
+        selectEndDate()
+
+        cy.wait(1).then(() => {
+          expect(pickerStart.dateSelected, 'pickerStart.dateSelected - after end date selection').to.be.undefined
+          expect(pickerStart.minDate, 'pickerStart.minDate - after end date selection').to.be.undefined
+          expect(+pickerStart.maxDate, 'pickerStart.maxDate - after end date selection').to.equal(+endDateSelected)
+          expect(+pickerEnd.dateSelected, 'pickerEnd.dateSelected - after end date selection').to.equal(+endDateSelected)
+          expect(pickerEnd.minDate, 'pickerEnd.minDate - after end date selection').to.be.undefined
+          expect(pickerEnd.maxDate, 'pickerEnd.maxDate - after end date selection').to.be.undefined
+        })
+      })
+
+      // SELECTING START AND END DATES
+
+      it('should have two highlighted days and a range on each calendar after selecting start and end dates', function() {
+        selectStartDate()
+        selectEndDate()
+
+        // We should now have 2 highlighted days (start and end dates) and a range on each calendar.
+        cy.get(`${selectors.range.start.squaresContainer} .qs-active`)
+          .should('have.length', 1)
+          .should('have.class', 'qs-range-start')
+        cy.get(`${selectors.range.start.squaresContainer} .qs-range-start`).should('have.length', 1)
+        cy.get(`${selectors.range.start.squaresContainer} .qs-range-end`).should('have.length', 1)
+        cy.get(`${selectors.range.end.squaresContainer} .qs-active`)
+          .should('have.length', 1)
+          .should('have.class', 'qs-range-end')
+        cy.get(`${selectors.range.end.squaresContainer} .qs-range-start`).should('have.length', 1)
+        cy.get(`${selectors.range.end.squaresContainer} .qs-range-end`).should('have.length', 1)
+
+        // We should now have a range on each calendar (not including the start & end dates).
+        cy.get(`${selectors.range.start.squaresContainer} .qs-range-middle`).should('have.length', daysInRange)
+        cy.get(`${selectors.range.end.squaresContainer} .qs-range-middle`).should('have.length', daysInRange)
+
+        // The selected dates on both calendars should have the correct bg-color & some rounded corners.
+        ;[
+          `${selectors.range.start.squaresContainer} .qs-active.qs-range-start`,
+          `${selectors.range.start.squaresContainer} .qs-range-end`,
+        ].forEach((selector, i) => {
+          const isStart = i === 0
+          cy.get(selector).then($el => {
+            const { backgroundColor, borderRadius } = getComputedStyle($el[0])
+            const radii = borderRadius.split(' ')
+            const [topLeft, topRight, bottomRight, bottomLeft] = radii
+
+            // Background color "highlighted" check.
+            expect(backgroundColor, `Selected day (range ${isStart ? 'start' : 'end'} date) bg color`).to.equal('rgb(173, 216, 230)')
+
+            // Only the right 2 corners should have a border radius.
+            expect(radii.length, 'border radius - 4 values').to.equal(4)
+            expect(topLeft.startsWith('0'), 'border-radius value - top left').to.equal(!isStart)
+            expect(topRight.startsWith('0'), 'border-radius value - top right').to.equal(isStart)
+            expect(bottomRight.startsWith('0'), 'border-radius value - bottom right').to.equal(isStart)
+            expect(bottomLeft.startsWith('0'), 'border-radius value - bottom left').to.equal(!isStart)
+          })
+        })
+
+        // The ranges on both calendars should have the correct bg-color and no rounded corners.
+        ;[
+          `${selectors.range.start.squaresContainer} .qs-range-middle`,
+          `${selectors.range.start.squaresContainer} .qs-range-middle`,
+        ].forEach((selector, i) => {
+          const isStart = i === 0
+          cy.get(selector).then($rangeDates => {
+            Array.from($rangeDates).forEach(rangeDate => {
+              const { backgroundColor, borderRadius } = getComputedStyle(rangeDate)
+
+              // Background color "highlighted" check.
+              expect(backgroundColor, `Range day (${isStart ? 'start' : 'end'} calendar) bg color`).to.equal('rgb(212, 235, 242)')
+
+              // All 4 corners should have no radius
+              expect(borderRadius, `border-radius value - ${isStart ? 'start' : 'end'} calendar`).to.equal('0px')
+            })
+          })
+        })
+      })
+
+      it('should populate both input fields after selecting both dates', function() {
+        selectStartDate()
+        selectEndDate()
+
+        cy.get(daterangeInputStart).should('have.value', startDateSelected.toDateString())
+        cy.get(daterangeInputEnd).should('have.value', endDateSelected.toDateString())
+      })
+
+      it('should set some props on both pickers after selecting both dates', function() {
+        selectStartDate()
+        selectEndDate()
+
+        cy.wait(1).then(() => {
+          expect(+pickerStart.dateSelected, 'pickerStart.dateSelected - after end date selection').to.equal(+startDateSelected)
+          expect(pickerStart.minDate, 'pickerStart.minDate - after end date selection').to.be.undefined
+          expect(+pickerStart.maxDate, 'pickerStart.maxDate - after end date selection').to.equal(+endDateSelected)
+          expect(+pickerEnd.dateSelected, 'pickerEnd.dateSelected - after end date selection').to.equal(+endDateSelected)
+          expect(+pickerEnd.minDate, 'pickerEnd.minDate - after end date selection').to.equal(+startDateSelected)
+          expect(pickerEnd.maxDate, 'pickerEnd.maxDate - after end date selection').to.be.undefined
+        })
+      })
+    })
   })
 })
 
 
 x.describe('Initial calendar load with default settings', () => {
-  describe('Datepicker UI (& corresponding changes to instance object properties)', () => {
 
-    describe('Date changes', () => {
-      const dayToSelect = 15
-
-      describe('De-selecting a date', () => {
-        it('should have a value of undefined for `dateSelected` on the instance object', () => {
-          expect(picker.dateSelected).not.to.be.undefined
-          cy.get(`span.qs-num:contains('${dayToSelect}')`).click().then(() => {
-            expect(picker.dateSelected).to.be.undefined
-          })
-        })
-
-        it('should not hide the caledar', () => {
-          cy.get('.qs-datepicker-container')
-            .should('be.visible')
-        })
-
-        it('it should un-highlight the date on the calendar', () => {
-          cy.get('.qs-active')
-            .should('have.length.of', 0)
-        })
-
-        it('should clear the input value', () => {
-          cy.get('[data-cy="input-1"]')
-            .should('have.value', '')
-        })
-      })
-    })
-  })
 
   describe('Instance methods', () => {
     const dayToSelect = 23
@@ -787,9 +1048,9 @@ x.describe('Initial calendar load with default settings', () => {
     describe('setDate', () => {
       before(() => {
         cy.get('body').click()
-        cy.wait(100)
+        cy.wait(1)
         cy.get('[data-cy="input-1"]').click()
-        cy.wait(100)
+        cy.wait(1)
 
         expect(picker.dateSelected).to.be.undefined
         cy.get('.qs-active')

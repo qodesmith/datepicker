@@ -1186,12 +1186,13 @@ function overlayYearEntry(e, input, instance, overlayMonthIndex) {
   var badDate = isNaN(+new Date().setFullYear(input.value || undefined))
   var value = badDate ? null : input.value
 
+
   // Enter has been pressed OR submit was clicked.
-  if ((e.which || e.keyCode) === 13 || e.type === 'click') {
+  if (e.which === 13 || e.keyCode === 13 || e.type === 'click') {
     if (overlayMonthIndex) {
       changeMonthYear(null, instance, value, overlayMonthIndex)
     } else if (!badDate && !input.classList.contains('qs-disabled')) {
-      changeMonthYear(null, instance, value, overlayMonthIndex)
+      changeMonthYear(null, instance, value)
     }
 
   // Enable / disabled the submit button.

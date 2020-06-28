@@ -1038,6 +1038,18 @@ describe('Default properties and behavior', function() {
         })
       })
 
+      describe('hide', function() {
+        it('should hide the calendar when called', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.calendarContainer}`)
+            .should('be.visible')
+            .then(() => picker.hide())
+          cy.get(`${selectors.single.calendarContainer}`).should('not.be.visible')
+        })
+      })
+
       describe('hide', function() {})
       describe('remove', function() {})
       describe('navigate', function() {})

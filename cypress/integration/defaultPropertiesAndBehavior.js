@@ -435,15 +435,15 @@ describe('Default properties and behavior', function() {
         })
 
         it('should change the year when using the input and hitting enter or clicking the submit button', function() {
-          const today = new Date()
-          const nextYear = today.getFullYear() + 1
-          this.datepicker(singleDatepickerInput)
-
           /*
             Datepicker uses requestAnimationFrame in order to toggle the overlay.
             cy.clock will help us cy.wait the correct way. Look, it just works, k?
           */
           cy.clock()
+
+          const today = new Date()
+          const nextYear = today.getFullYear() + 1
+          this.datepicker(singleDatepickerInput)
 
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
@@ -698,6 +698,343 @@ describe('Default properties and behavior', function() {
           expect(picker.dateSelected, 'picker.dateSelected').to.be.undefined
         })
       })
+    })
+
+    describe('Instance methods', function() {
+      it('should not have a getRange method', function() {
+        const picker = this.datepicker(singleDatepickerInput)
+        expect(picker.getRange).to.be.undefined
+      })
+
+      describe('setDate', function() {
+        it('should be a function', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          expect(picker.setDate).to.be.a('function')
+        })
+
+        it('should populate `dateSelected` on the instance object', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const date = new Date()
+
+          expect(picker.dateSelected).to.be.undefined
+          picker.setDate(date)
+          expect(+picker.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+        })
+
+        it('should programmatically select a date on the calendar', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const today = new Date()
+
+          expect(picker.dateSelected).to.be.undefined
+          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+            .should('have.length', 0)
+            .then(() => picker.setDate(today))
+          cy.get(`${selectors.single.squaresContainer} .qs-active`).should('have.length', 1)
+        })
+
+        it('should populate the input field with that date', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const today = new Date()
+
+          cy.get(singleDatepickerInput).should('have.value', '')
+            .then(() => picker.setDate(today))
+          cy.get(singleDatepickerInput).should('have.value', today.toDateString())
+        })
+
+        it('should navigate the calendar to a date with the 2nd argument', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const today = new Date()
+          const date = new Date()
+          date.setMonth(today.getMonth() + 1)
+
+          cy.get(`${selectors.single.controls} .qs-month`)
+            .should('have.text', pickerProperties.months[today.getMonth() % 12])
+            .then(() => picker.setDate(date, true))
+          cy.get(`${selectors.single.controls} .qs-month`)
+            .should('have.text', pickerProperties.months[date.getMonth() % 12])
+        })
+
+        it('should remove the selected date when no arguments are passed', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const date = new Date()
+
+          expect(picker.dateSelected).to.be.undefined
+          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+            .should('have.length', 0)
+            .then(() => {
+              picker.setDate(date)
+              expect(+picker.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+            })
+          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+            .should('have.length', 1)
+            .then(() => {
+              picker.setDate()
+              expect(picker.dateSelected).to.be.undefined
+            })
+          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+            .should('have.length', 0)
+        })
+      })
+
+      describe('setMin', function() {
+        it('should be a function', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          expect(picker.setMin).to.be.a('function')
+        })
+
+        it('should populate `minDate` on the instance object', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const date = new Date()
+
+          expect(picker.minDate).to.be.undefined
+          picker.setMin(date)
+          expect(+picker.minDate).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+        })
+
+        it('should disable dates prior to the provided value (including previous months)', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const minDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), minDay)
+
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day, `Days shouldn't have qs-disabled class prior to calling setMin.`).not.to.have.class('qs-disabled')
+            })
+
+            picker.setMin(date)
+          })
+
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach((day, i) => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal(i < (minDay - 1) ? '0.2' : '1')
+
+              if (i < (minDay - 1)) {
+                expect(day, 'Disabled days from setMin').to.have.class('qs-disabled')
+              } else {
+                expect(day, 'Unaffected days from setMin').not.to.have.class('qs-disabled')
+              }
+            })
+          })
+
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('0.2')
+              expect(day).to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.single.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.single.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day).not.to.have.class('qs-disabled')
+            })
+          })
+        })
+
+        it('should prevent disabled dates from being selected', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const minDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), minDay)
+          picker.setMin(date)
+
+          // Assert a few values prior to clicking.
+          cy.get(singleDatepickerInput).should('have.value', '')
+          expect(picker.dateSelected).to.be.undefined
+
+          // Click a disabled date (the 1st of the month) and assert a few more values.
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(0).click()
+          cy.wait(1).then(() => {
+            cy.get(singleDatepickerInput).should('have.value', '')
+            expect(picker.dateSelected).to.be.undefined
+          })
+
+          // Navigate to the previous month and assert you can't click dates.
+          cy.get(`${selectors.single.controls} .qs-arrow.qs-left`).click().then(() => {
+            cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(0).click()
+            cy.wait(1).then(() => {
+              cy.get(singleDatepickerInput).should('have.value', '')
+              expect(picker.dateSelected).to.be.undefined
+            })
+          })
+
+          // For sanity reasons, assert that clicking a non-disabled date works.
+          cy.get(`${selectors.single.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(14).click()
+          cy.wait(1).then(() => {
+            cy.get(singleDatepickerInput).should('not.have.value', '')
+            expect(picker.dateSelected).not.to.be.undefined
+          })
+        })
+
+        it('should remove the minimum selectable date when called with no argument', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const minDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), minDay)
+          picker.setMin(date)
+
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', minDay - 1)
+            .then(() => {
+              expect(picker.minDate).not.to.be.undefined
+              picker.setMin()
+            })
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', 0)
+            .then(() => expect(picker.minDate).to.be.undefined)
+        })
+      })
+
+      describe('setMax', function() {
+        it('should be a function', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          expect(picker.setMax).to.be.a('function')
+        })
+
+        it('should populate `maxDate` on the instance object', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const date = new Date()
+
+          expect(picker.maxDate).to.be.undefined
+          picker.setMax(date)
+          expect(+picker.maxDate).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+        })
+
+        it('should disable dates after to the provided value (including later months)', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const maxDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), maxDay)
+
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day, `Days shouldn't have qs-disabled class prior to calling setMax.`).not.to.have.class('qs-disabled')
+            })
+
+            picker.setMax(date)
+          })
+
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach((day, i) => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal(i < maxDay ? '1' : '0.2')
+
+              if (i < maxDay) {
+                expect(day, 'Unaffected days from setMax').not.to.have.class('qs-disabled')
+              } else {
+                expect(day, 'Disabled days from setMax').to.have.class('qs-disabled')
+              }
+            })
+          })
+
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('0.2')
+              expect(day).to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.single.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.single.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day).not.to.have.class('qs-disabled')
+            })
+          })
+        })
+
+        it('should prevent disabled dates from being selected', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const maxDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), maxDay)
+          picker.setMax(date)
+
+          // Assert a few values prior to clicking.
+          cy.get(singleDatepickerInput).should('have.value', '')
+          expect(picker.dateSelected).to.be.undefined
+
+          // Click a disabled date and assert a few more values.
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(maxDay + 1).click()
+          cy.wait(1).then(() => {
+            cy.get(singleDatepickerInput).should('have.value', '')
+            expect(picker.dateSelected).to.be.undefined
+          })
+
+          // Navigate to the next month and assert you can't click dates.
+          cy.get(`${selectors.single.controls} .qs-arrow.qs-right`).click().then(() => {
+            cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(0).click()
+            cy.wait(1).then(() => {
+              cy.get(singleDatepickerInput).should('have.value', '')
+              expect(picker.dateSelected).to.be.undefined
+            })
+          })
+
+          // For sanity reasons, assert that clicking a non-disabled date works.
+          cy.get(`${selectors.single.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(maxDay - 1).click()
+          cy.wait(1).then(() => {
+            cy.get(singleDatepickerInput).should('not.have.value', '')
+            expect(picker.dateSelected).not.to.be.undefined
+          })
+        })
+
+        it('should remove the maximum selectable date when called with no argument', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const maxDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), maxDay)
+          const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
+          picker.setMax(date)
+
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', daysInMonth - maxDay)
+            .then(() => {
+              expect(picker.maxDate).not.to.be.undefined
+              picker.setMax()
+            })
+          cy.get(`${selectors.single.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', 0)
+            .then(() => expect(picker.maxDate).to.be.undefined)
+        })
+      })
+
+      describe.only('show', function() {
+
+      })
+
+      describe('hide', function() {})
+      describe('remove', function() {})
+      describe('navigate', function() {})
+      describe('setDate', function() {})
     })
   })
 
@@ -1043,184 +1380,6 @@ x.describe('Initial calendar load with default settings', () => {
 
 
   describe('Instance methods', () => {
-    const dayToSelect = 23
-
-    describe('setDate', () => {
-      before(() => {
-        cy.get('body').click()
-        cy.wait(1)
-        cy.get('[data-cy="input-1"]').click()
-        cy.wait(1)
-
-        expect(picker.dateSelected).to.be.undefined
-        cy.get('.qs-active')
-          .should('have.length', 0)
-          .then(() => {
-            picker.setDate(new Date(picker.currentYear, picker.currentMonth, dayToSelect))
-          })
-      })
-
-      it('should programmatically set a date', () => {
-        cy.get('.qs-active')
-          .should('have.length', 1)
-          .should('have.text', `${dayToSelect}`)
-      })
-
-      it('should populate the input with that date', () => {
-        const expectedInputText = new Date(picker.currentYear, picker.currentMonth, dayToSelect).toDateString()
-        cy.get('[data-cy="input-1"]')
-          .should('have.value', expectedInputText)
-      })
-
-      it('should populate `dateSelected` on the instance object', () => {
-        expect(+picker.dateSelected).to.equal(+new Date(picker.currentYear, picker.currentMonth, dayToSelect))
-      })
-
-      it('should navigate the calendar to that date via the second argument', () => {
-        cy.get('.qs-active').click().then(() => {
-          const { currentMonthName, currentYear, currentMonth } = picker
-          const nextMonthIndex = currentMonth === 0 ? 1 : 0
-          const nextMonthName = months[nextMonthIndex]
-          const nextYear = currentYear + 1
-          const nextDate = 20
-
-          expect(picker.dateSelected).to.be.undefined
-
-          cy.get('.qs-active')
-            .should('have.length', 0)
-          cy.get('.qs-month')
-            .should('have.text', currentMonthName)
-          cy.get('.qs-year')
-            .should('have.text', `${currentYear}`)
-            .then(() => {
-              picker.setDate(new Date(nextYear, nextMonthIndex, nextDate), true)
-
-              cy.get('.qs-month')
-                .should('have.text', nextMonthName)
-              cy.get('.qs-year')
-                .should('have.text', `${nextYear}`)
-              cy.get('[data-cy="input-1"]')
-                .should('have.value', new Date(nextYear, nextMonthIndex, 20).toDateString())
-              cy.get('.qs-active')
-                .should('have.text', `${nextDate}`)
-            })
-        })
-      })
-
-      it('should remove the selected date when called with no argument', () => {
-        picker.setDate()
-
-        expect(picker.dateSelected).to.be.undefined
-        cy.get('.qs-active')
-          .should('have.length', 0)
-
-      })
-    })
-
-    describe('setMin', () => {
-      before(() => {
-        cy.get('.qs-square.qs-disabled')
-          .should('have.length', 0)
-        cy.get('.qs-active')
-          .should('have.length', 0)
-        expect(picker.minDate).to.be.undefined
-      })
-
-      it('should set the `minDate` property on the instance', () => {
-        const minDate = new Date(picker.currentYear, picker.currentMonth, dayToSelect)
-
-        picker.setMin(minDate)
-        expect(+picker.minDate).to.equal(+minDate)
-      })
-
-      it('should disable dates prior to the provided value (including prev months)', () => {
-        cy.get('.qs-square.qs-disabled')
-          .should('have.length', dayToSelect - 1)
-
-        cy.get('.qs-arrow.qs-left').click().then(() => {
-          const numOfDaysInMonth = new Date(picker.currentYear, picker.currentMonth + 1, 0).getDate()
-
-          cy.get('.qs-square.qs-disabled')
-            .should('have.length', numOfDaysInMonth)
-        })
-      })
-
-      it('should prevent disabled dates from being selected', () => {
-        expect(picker.dateSelected).to.be.undefined
-
-        cy.get('.qs-square.qs-disabled')
-          .first()
-          .should('have.text', '1')
-          .click()
-          .then(() => {
-            expect(picker.dateSelected).to.be.undefined
-
-            cy.get('.qs-active')
-              .should('have.length', 0)
-          })
-      })
-
-      it('should remove the min selectable date when called with no argument', () => {
-        picker.setMin()
-
-        expect(picker.minDate).to.be.undefined
-        cy.get('.qs-square.qs-disabled')
-          .should('have.length', 0)
-      })
-    })
-
-    describe('setMax', () => {
-      before(() => {
-        cy.get('.qs-square.qs-disabled')
-          .should('have.length', 0)
-          .then(() => {
-            expect(picker.maxDate).to.be.undefined
-            picker.setMax(new Date(picker.currentYear, picker.currentMonth, 1))
-          })
-      })
-
-      it('should set the `maxDate` property on the instnace', () => {
-        expect(+picker.maxDate).to.equal(+new Date(picker.currentYear, picker.currentMonth, 1))
-      })
-
-      it('should disabled dates after the provided value (including future months)', () => {
-        const numOfDaysInMonth = new Date(picker.currentYear, picker.currentMonth + 1, 0).getDate()
-        const numOfDaysNextMonth = new Date(picker.currentYear, picker.currentMonth + 2, 0).getDate()
-
-        cy.get('.qs-square.qs-disabled')
-          .should('have.length', numOfDaysInMonth - 1)
-        cy.get('.qs-arrow.qs-right').click().then(() => {
-          cy.get('.qs-square.qs-disabled')
-            .should('have.length', numOfDaysNextMonth)
-        })
-      })
-
-      it('should prevent disabled dates from being selected', () => {
-        expect(picker.dateSelected).to.be.undefined
-        cy.get('.qs-square.qs-disabled')
-          .first()
-          .should('have.text', '1')
-          .click()
-          .then(() => {
-            expect(picker.dateSelected).to.be.undefined
-          })
-      })
-
-      it('should remove the max selectable date when called with no argument', () => {
-        const numOfDaysInMonth = new Date(picker.currentYear, picker.currentMonth + 1, 0).getDate()
-
-        cy.get('.qs-square.qs-disabled')
-          .should('have.length', numOfDaysInMonth)
-          .then(() => {
-            expect(picker.maxDate).not.to.be.undefined
-            picker.setMax()
-            expect(picker.maxDate).to.be.undefined
-            cy.get('.qs-square.qs-disabled')
-              .should('have.length', 0)
-          })
-      })
-    })
-
     describe('show', () => {
       before(() => {
         cy.get('body').click()

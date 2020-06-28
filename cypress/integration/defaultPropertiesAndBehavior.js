@@ -1027,8 +1027,15 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe.only('show', function() {
+      describe('show', function() {
+        it('should show the calendar when called', function() {
+          const picker = this.datepicker(singleDatepickerInput)
 
+          cy.get(`${selectors.single.calendarContainer}`)
+            .should('not.be.visible')
+            .then(() => picker.show())
+          cy.get(`${selectors.single.calendarContainer}`).should('be.visible')
+        })
       })
 
       describe('hide', function() {})

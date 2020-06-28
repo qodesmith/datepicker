@@ -1050,8 +1050,25 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe('hide', function() {})
-      describe('remove', function() {})
+      describe('remove', function() {
+        it('should remove the calendar from the DOM', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+
+          cy.get(`${selectors.single.calendarContainer}`)
+            .should('have.length', 1)
+            .then(() => picker.remove())
+          cy.get(`${selectors.single.calendarContainer}`).should('have.length', 0)
+        })
+
+        it('should remove all properties from the instance object', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+
+          expect(Object.keys(picker).length).to.be.greaterThan(0)
+          picker.remove()
+          expect(Object.keys(picker).length).to.equal(0)
+        })
+      })
+
       describe('navigate', function() {})
       describe('setDate', function() {})
     })
@@ -1399,28 +1416,6 @@ x.describe('Initial calendar load with default settings', () => {
 
 
   describe('Instance methods', () => {
-    describe('show', () => {
-      before(() => {
-        cy.get('body').click()
-        cy.get('.qs-datepicker-container')
-          .should('not.be.visible')
-      })
-
-      it('should show the calendar when called', () => {
-        picker.show()
-        cy.get('.qs-datepicker-container')
-          .should('be.visible')
-      })
-    })
-
-    describe('hide', () => {
-      it('should hide the calendar when called', () => {
-        picker.hide()
-        cy.get('.qs-datepicker-container')
-          .should('not.be.visible')
-      })
-    })
-
     describe('remove', () => {
       before(() => {
         cy.get('.qs-datepicker-container')

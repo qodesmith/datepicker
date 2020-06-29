@@ -1517,7 +1517,85 @@ describe('Default properties and behavior', function() {
     })
 
     describe('Instance methods', function() {
-      describe.only('getRange', function() {})
+      describe('getRange', function() {
+        it('should be function', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.getRange).to.be.a('function')
+          expect(pickerEnd.getRange).to.be.a('function')
+        })
+
+        it('should return an object with `start` and `end` properties', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const results = { start: undefined, end: undefined }
+
+          expect(pickerStart.getRange()).to.deep.equal(results)
+          expect(pickerEnd.getRange()).to.deep.equal(results)
+        })
+
+        it('should return the correct values for `start` when a start date is selected', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const today = new Date()
+          const startDate = new Date(today.getFullYear(), today.getMonth(), 1)
+
+          cy.get(daterangeInputStart).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).eq(0).click()
+          cy.wait(1).then(() => {
+            const startRange = pickerStart.getRange()
+            const endRange = pickerEnd.getRange()
+
+            expect(+startRange.start).to.equal(+startDate)
+            expect(startRange.end).to.be.undefined
+            expect(+endRange.start).to.equal(+startDate)
+            expect(endRange.end).to.be.undefined
+          })
+        })
+
+        it('should return the correct values for `end` when an end date is selected', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const today = new Date()
+          const endDate = new Date(today.getFullYear(), today.getMonth(), 1)
+
+          cy.get(daterangeInputEnd).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).eq(0).click()
+          cy.wait(1).then(() => {
+            const startRange = pickerStart.getRange()
+            const endRange = pickerEnd.getRange()
+
+            expect(startRange.start).to.be.undefined
+            expect(+startRange.end).to.equal(+endDate)
+            expect(endRange.start).to.be.undefined
+            expect(+endRange.end).to.equal(+endDate)
+          })
+        })
+
+        it('should return the correct values for `start` and `end` when both dates are selected', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const today = new Date()
+          const startDate = new Date(today.getFullYear(), today.getMonth(), 1)
+          const endDate = new Date(today.getFullYear(), today.getMonth(), 20)
+
+          cy.get(daterangeInputStart).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).eq(0).click()
+          cy.get(daterangeInputEnd).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).eq(19).click()
+          cy.wait(1).then(() => {
+            const startRange = pickerStart.getRange()
+            const endRange = pickerEnd.getRange()
+
+            expect(+startRange.start).to.equal(+startDate)
+            expect(+startRange.end).to.equal(+endDate)
+            expect(+endRange.start).to.equal(+startDate)
+            expect(+endRange.end).to.equal(+endDate)
+          })
+        })
+      })
+
       describe('setDate', function() {})
       describe('setMin', function() {})
       describe('setMax', function() {})

@@ -700,76 +700,6 @@ describe('Default properties and behavior', function() {
         expect(picker.getRange).to.be.undefined
       })
 
-      describe('setDate', function() {
-        it('should be a function', function() {
-          const picker = this.datepicker(singleDatepickerInput)
-          expect(picker.setDate).to.be.a('function')
-        })
-
-        it('should populate `dateSelected` on the instance object', function() {
-          const picker = this.datepicker(singleDatepickerInput)
-          const date = new Date()
-
-          expect(picker.dateSelected).to.be.undefined
-          picker.setDate(date)
-          expect(+picker.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
-        })
-
-        it('should programmatically select a date on the calendar', function() {
-          const picker = this.datepicker(singleDatepickerInput)
-          const today = new Date()
-
-          expect(picker.dateSelected).to.be.undefined
-          cy.get(`${selectors.single.squaresContainer} .qs-active`)
-            .should('have.length', 0)
-            .then(() => picker.setDate(today))
-          cy.get(`${selectors.single.squaresContainer} .qs-active`).should('have.length', 1)
-        })
-
-        it('should populate the input field with that date', function() {
-          const picker = this.datepicker(singleDatepickerInput)
-          const today = new Date()
-
-          cy.get(singleDatepickerInput).should('have.value', '')
-            .then(() => picker.setDate(today))
-          cy.get(singleDatepickerInput).should('have.value', today.toDateString())
-        })
-
-        it('should navigate the calendar to a date with the 2nd argument', function() {
-          const picker = this.datepicker(singleDatepickerInput)
-          const today = new Date()
-          const date = new Date()
-          date.setMonth(today.getMonth() + 1)
-
-          cy.get(`${selectors.single.controls} .qs-month`)
-            .should('have.text', pickerProperties.months[today.getMonth() % 12])
-            .then(() => picker.setDate(date, true))
-          cy.get(`${selectors.single.controls} .qs-month`)
-            .should('have.text', pickerProperties.months[date.getMonth() % 12])
-        })
-
-        it('should remove the selected date when no arguments are passed', function() {
-          const picker = this.datepicker(singleDatepickerInput)
-          const date = new Date()
-
-          expect(picker.dateSelected).to.be.undefined
-          cy.get(`${selectors.single.squaresContainer} .qs-active`)
-            .should('have.length', 0)
-            .then(() => {
-              picker.setDate(date)
-              expect(+picker.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
-            })
-          cy.get(`${selectors.single.squaresContainer} .qs-active`)
-            .should('have.length', 1)
-            .then(() => {
-              picker.setDate()
-              expect(picker.dateSelected).to.be.undefined
-            })
-          cy.get(`${selectors.single.squaresContainer} .qs-active`)
-            .should('have.length', 0)
-        })
-      })
-
       describe('setMin', function() {
         it('should be a function', function() {
           const picker = this.datepicker(singleDatepickerInput)
@@ -1135,6 +1065,27 @@ describe('Default properties and behavior', function() {
 
           cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
           cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+        })
+
+        it('should remove the selected date when no arguments are passed', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const date = new Date()
+
+          expect(picker.dateSelected).to.be.undefined
+          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+            .should('have.length', 0)
+            .then(() => {
+              picker.setDate(date)
+              expect(+picker.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+            })
+          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+            .should('have.length', 1)
+            .then(() => {
+              picker.setDate()
+              expect(picker.dateSelected).to.be.undefined
+            })
+          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+            .should('have.length', 0)
         })
       })
 
@@ -1596,7 +1547,7 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe('setDate', function() {})
+      describe.only('setDate', function() {})
       describe('setMin', function() {})
       describe('setMax', function() {})
       describe('show', function() {})

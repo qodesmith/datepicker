@@ -8,12 +8,6 @@ const {
 } = selectors
 const { singleDatepickerProperties, getDaterangeProperties } = pickerProperties
 
-/*
-  TODO: add a test for the navigate method.
-*/
-
-// Temporary while writing new tests
-const x = { describe: () => {} }
 
 function checkPickerProperties(picker, isDaterange, id) {
   return function({ property, defaultValue, domElement, selector, deepEqual, isFunction, notOwnProperty }) {
@@ -1028,6 +1022,11 @@ describe('Default properties and behavior', function() {
       })
 
       describe('show', function() {
+        it('should be a function', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          expect(picker.show).to.be.a('function')
+        })
+
         it('should show the calendar when called', function() {
           const picker = this.datepicker(singleDatepickerInput)
 
@@ -1039,6 +1038,11 @@ describe('Default properties and behavior', function() {
       })
 
       describe('hide', function() {
+        it('should be a function', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          expect(picker.hide).to.be.a('function')
+        })
+
         it('should hide the calendar when called', function() {
           const picker = this.datepicker(singleDatepickerInput)
 
@@ -1051,6 +1055,11 @@ describe('Default properties and behavior', function() {
       })
 
       describe('remove', function() {
+        it('should be a function', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          expect(picker.remove).to.be.a('function')
+        })
+
         it('should remove the calendar from the DOM', function() {
           const picker = this.datepicker(singleDatepickerInput)
 
@@ -1069,8 +1078,106 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe('navigate', function() {})
-      describe('setDate', function() {})
+      describe('setDate', function() {
+        it('should be a function', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          expect(picker.setDate).to.be.a('function')
+        })
+
+        it('should set a date on the calendar', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const date = new Date()
+
+          cy.get('.qs-active').should('have.length', 0).then(() => picker.setDate(date))
+          cy.get('.qs-active').should('have.length', 1)
+        })
+
+        it('should set the input value', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const date = new Date()
+
+          cy.get(singleDatepickerInput).should('have.value', '').then(() => picker.setDate(date))
+          cy.get(singleDatepickerInput).should('have.value', date.toDateString())
+        })
+
+        it('should set the `dateSelected` prop on the instance object', function () {
+          const picker = this.datepicker(singleDatepickerInput)
+          const date = new Date()
+
+          expect(picker.dateSelected).to.be.undefined
+          picker.setDate(date)
+          expect(+picker.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+        })
+
+        it('should set a date and navigate to that date via the 2nd argument', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`)
+            .should('have.text', `${today.getFullYear()}`)
+            .then(() => picker.setDate(date, true))
+
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[date.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${date.getFullYear()}`)
+        })
+
+        it('should not navigate to a future date when the 2nd argument is not used', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`)
+            .should('have.text', `${today.getFullYear()}`)
+            .then(() => picker.setDate(date))
+
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+        })
+      })
+
+      describe('navigate', function() {
+        it('should be a function', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          expect(picker.navigate).to.be.a('function')
+        })
+
+        it('should navigate to a given date without affecting the selection', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          picker.setDate(today)
+          expect(+picker.dateSelected).to.equal(+new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+
+          picker.navigate(date)
+          cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${date.getFullYear()}`)
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[date.getMonth()])
+          expect(+picker.dateSelected).to.equal(+new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+
+          cy.wait(1).then(() => {
+            picker.navigate(today)
+            cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+            cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+            expect(+picker.dateSelected).to.equal(+new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+          })
+        })
+
+        it('should navigate to a given date and trigger `onMonthChange` when the 2nd argument is used', function() {
+          const pickerOptions = { onMonthChange: () => {} }
+          cy.spy(pickerOptions, 'onMonthChange')
+
+          const picker = this.datepicker(singleDatepickerInput, pickerOptions)
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          expect(pickerOptions.onMonthChange).not.to.be.called
+          picker.navigate(date, true)
+          expect(pickerOptions.onMonthChange).to.be.called
+        })
+      })
     })
   })
 
@@ -1406,34 +1513,6 @@ describe('Default properties and behavior', function() {
           expect(+pickerEnd.minDate, 'pickerEnd.minDate - after end date selection').to.equal(+startDateSelected)
           expect(pickerEnd.maxDate, 'pickerEnd.maxDate - after end date selection').to.be.undefined
         })
-      })
-    })
-  })
-})
-
-
-x.describe('Initial calendar load with default settings', () => {
-
-
-  describe('Instance methods', () => {
-    describe('remove', () => {
-      before(() => {
-        cy.get('.qs-datepicker-container')
-          .should('have.length', 1)
-      })
-
-      it('should completely nuke the instance object', () => {
-        const originalNumOfProps = Object.keys(picker).length
-        picker.remove()
-        const numOfProps = Object.keys(picker).length
-
-        expect(originalNumOfProps).to.be.gt(0)
-        expect(numOfProps).to.equal(0)
-      })
-
-      it('should remove the calendar from the DOM', () => {
-        cy.get('.qs-datepicker-container')
-          .should('have.length', 0)
       })
     })
   })

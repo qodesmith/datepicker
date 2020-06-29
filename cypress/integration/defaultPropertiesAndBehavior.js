@@ -1515,5 +1515,17 @@ describe('Default properties and behavior', function() {
         })
       })
     })
+
+    describe('Instance methods', function() {
+      describe.only('getRange', function() {})
+      describe('setDate', function() {})
+      describe('setMin', function() {})
+      describe('setMax', function() {})
+      describe('show', function() {})
+      describe('hide', function() {})
+      describe('remove', function() {})
+      describe('setDate', function() {})
+      describe('navigate', function() {})
+    })
   })
 })

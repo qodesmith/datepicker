@@ -72,6 +72,7 @@ Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicke
 
 #### Instance Methods
 
+* [navigate](#navigate)
 * [remove](#remove)
 * [setDate](#setdate)
 * [setMin](#setmin)
@@ -690,7 +691,7 @@ picker.navigate(date, true)
 
 * Arguments:
     1. `date` - JavaScript date object.
-    2. `changeCalendar` - boolean (default is `false`)
+    2. `trigger onMonthChange` - boolean (default is `false`)
 
 
 ### setDate

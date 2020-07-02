@@ -1547,7 +1547,7 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe('setMin', function() {
+      describe.only('setMin', function() {
         it('should be a function', function() {
           const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
           const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
@@ -1779,9 +1779,131 @@ describe('Default properties and behavior', function() {
             })
           })
         })
+
+        it('(start) should prevent disabled dates from being selected', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const minDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), minDay)
+          pickerStart.setMin(date)
+
+          // Assert a few values prior to clicking.
+          cy.get(daterangeInputStart).should('have.value', '')
+          expect(pickerStart.dateSelected).to.be.undefined
+
+          // Click a disabled date (the 1st of the month) and assert a few more values.
+          cy.get(daterangeInputStart).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).eq(0).click()
+          cy.wait(1).then(() => {
+            cy.get(daterangeInputStart).should('have.value', '')
+            expect(pickerStart.dateSelected).to.be.undefined
+          })
+
+          // Navigate to the previous month and assert you can't click dates.
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-left`).click().then(() => {
+            cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).eq(0).click()
+            cy.wait(1).then(() => {
+              cy.get(daterangeInputStart).should('have.value', '')
+              expect(pickerStart.dateSelected).to.be.undefined
+            })
+          })
+
+          // For sanity reasons, assert that clicking a non-disabled date works.
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).eq(14).click()
+          cy.wait(1).then(() => {
+            cy.get(daterangeInputStart).should('not.have.value', '')
+            expect(pickerStart.dateSelected).not.to.be.undefined
+          })
+        })
+
+        it('(end) should prevent disabled dates from being selected', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const minDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), minDay)
+          pickerEnd.setMin(date)
+
+          // Assert a few values prior to clicking.
+          cy.get(daterangeInputEnd).should('have.value', '')
+          expect(pickerEnd.dateSelected).to.be.undefined
+
+          // Click a disabled date (the 1st of the month) and assert a few more values.
+          cy.get(daterangeInputEnd).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).eq(0).click()
+          cy.wait(1).then(() => {
+            cy.get(daterangeInputEnd).should('have.value', '')
+            expect(pickerEnd.dateSelected).to.be.undefined
+          })
+
+          // Navigate to the previous month and assert you can't click dates.
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-left`).click().then(() => {
+            cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).eq(0).click()
+            cy.wait(1).then(() => {
+              cy.get(daterangeInputEnd).should('have.value', '')
+              expect(pickerEnd.dateSelected).to.be.undefined
+            })
+          })
+
+          // For sanity reasons, assert that clicking a non-disabled date works.
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).eq(14).click()
+          cy.wait(1).then(() => {
+            cy.get(daterangeInputEnd).should('not.have.value', '')
+            expect(pickerEnd.dateSelected).not.to.be.undefined
+          })
+        })
+
+        it('(start) should remove the minimum selectable date when called with no argument', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const minDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), minDay)
+          pickerStart.setMin(date)
+
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', minDay - 1)
+            .then(() => {
+              expect(pickerStart.minDate).not.to.be.undefined
+              pickerStart.setMin()
+            })
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', 0)
+            .then(() => expect(pickerStart.minDate).to.be.undefined)
+        })
+
+        it('(end) should remove the minimum selectable date when called with no argument', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const minDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), minDay)
+          pickerEnd.setMin(date)
+
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', minDay - 1)
+            .then(() => {
+              expect(pickerEnd.minDate).not.to.be.undefined
+              pickerEnd.setMin()
+            })
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', 0)
+            .then(() => expect(pickerEnd.minDate).to.be.undefined)
+        })
       })
 
-      describe('setMax', function() {})
+      describe.only('setMax', function() {
+        it('should be a function', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.setMax).to.be.a('function')
+          expect(pickerEnd.setMax).to.be.a('function')
+        })
+      })
       describe('show', function() {})
       describe('hide', function() {})
       describe('remove', function() {})

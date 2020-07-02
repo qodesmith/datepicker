@@ -1547,8 +1547,240 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe.only('setDate', function() {})
-      describe('setMin', function() {})
+      describe('setMin', function() {
+        it('should be a function', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.setMin).to.be.a('function')
+          expect(pickerEnd.setMin).to.be.a('function')
+        })
+
+        it('(start) should populate `minDate` on the instance objects', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+
+          expect(pickerStart.minDate).to.be.undefined
+          expect(pickerEnd.minDate).to.be.undefined
+          pickerStart.setMin(date)
+          expect(+pickerStart.minDate).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+          expect(+pickerEnd.minDate).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+        })
+
+        it('(end) should populate `minDate` on the instance objects', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+
+          expect(pickerStart.minDate).to.be.undefined
+          expect(pickerEnd.minDate).to.be.undefined
+          pickerEnd.setMin(date)
+          expect(+pickerStart.minDate).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+          expect(+pickerEnd.minDate).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+        })
+
+        it('(start) should disable dates prior to the provided value (including previous months)', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const minDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), minDay)
+
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day, `(start cal) Days shouldn't have qs-disabled class prior to calling setMin.`).not.to.have.class('qs-disabled')
+            })
+
+            cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+              Array.from($days).forEach(day => {
+                const styles = getComputedStyle(day)
+
+                expect(styles.opacity).to.equal('1')
+                expect(day, `(end cal) Days shouldn't have qs-disabled class prior to calling setMin.`).not.to.have.class('qs-disabled')
+              })
+
+              pickerStart.setMin(date)
+            })
+          })
+
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach((day, i) => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal(i < (minDay - 1) ? '0.2' : '1')
+
+              if (i < (minDay - 1)) {
+                expect(day, '(start cal) Disabled days from setMin').to.have.class('qs-disabled')
+              } else {
+                expect(day, '(start cal) Unaffected days from setMin').not.to.have.class('qs-disabled')
+              }
+            })
+
+            cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+              Array.from($days).forEach((day, i) => {
+                const styles = getComputedStyle(day)
+
+                expect(styles.opacity).to.equal(i < (minDay - 1) ? '0.2' : '1')
+
+                if (i < (minDay - 1)) {
+                  expect(day, '(end cal) Disabled days from setMin').to.have.class('qs-disabled')
+                } else {
+                  expect(day, '(end cal) Unaffected days from setMin').not.to.have.class('qs-disabled')
+                }
+              })
+            })
+          })
+
+          cy.get(daterangeInputStart).click()
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('0.2')
+              expect(day).to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day).not.to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(daterangeInputEnd).click()
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('0.2')
+              expect(day).to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day).not.to.have.class('qs-disabled')
+            })
+          })
+        })
+
+        it('(end) should disable dates prior to the provided value (including previous months)', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const minDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), minDay)
+
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day, `(start cal) Days shouldn't have qs-disabled class prior to calling setMin.`).not.to.have.class('qs-disabled')
+            })
+
+            cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+              Array.from($days).forEach(day => {
+                const styles = getComputedStyle(day)
+
+                expect(styles.opacity).to.equal('1')
+                expect(day, `(end cal) Days shouldn't have qs-disabled class prior to calling setMin.`).not.to.have.class('qs-disabled')
+              })
+
+              pickerEnd.setMin(date)
+            })
+          })
+
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach((day, i) => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal(i < (minDay - 1) ? '0.2' : '1')
+
+              if (i < (minDay - 1)) {
+                expect(day, '(start cal) Disabled days from setMin').to.have.class('qs-disabled')
+              } else {
+                expect(day, '(start cal) Unaffected days from setMin').not.to.have.class('qs-disabled')
+              }
+            })
+
+            cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+              Array.from($days).forEach((day, i) => {
+                const styles = getComputedStyle(day)
+
+                expect(styles.opacity).to.equal(i < (minDay - 1) ? '0.2' : '1')
+
+                if (i < (minDay - 1)) {
+                  expect(day, '(end cal) Disabled days from setMin').to.have.class('qs-disabled')
+                } else {
+                  expect(day, '(end cal) Unaffected days from setMin').not.to.have.class('qs-disabled')
+                }
+              })
+            })
+          })
+
+          cy.get(daterangeInputStart).click()
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('0.2')
+              expect(day).to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day).not.to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(daterangeInputEnd).click()
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('0.2')
+              expect(day).to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day).not.to.have.class('qs-disabled')
+            })
+          })
+        })
+      })
+
       describe('setMax', function() {})
       describe('show', function() {})
       describe('hide', function() {})

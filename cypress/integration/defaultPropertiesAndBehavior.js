@@ -2291,7 +2291,40 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe('hide', function() {})
+      describe('hide', function() {
+        it('should be a function', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.hide).to.be.a('function')
+          expect(pickerEnd.hide).to.be.a('function')
+        })
+
+        it('(start) should hide the calendar when called', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+
+
+          cy.get(daterangeInputStart).click()
+          cy.get(`${selectors.range.start.calendarContainer}`)
+            .should('be.visible')
+            .then(() => pickerStart.hide())
+          cy.get(`${selectors.range.start.calendarContainer}`).should('not.be.visible')
+        })
+
+        it('(end) should hide the calendar when called', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+
+          cy.get(daterangeInputEnd).click()
+          cy.get(`${selectors.range.end.calendarContainer}`)
+            .should('be.visible')
+            .then(() => pickerEnd.hide())
+          cy.get(`${selectors.range.end.calendarContainer}`).should('not.be.visible')
+        })
+      })
+
       describe('remove', function() {})
       describe('setDate', function() {})
       describe('navigate', function() {})

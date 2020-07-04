@@ -8,6 +8,12 @@ const {
 } = selectors
 const { singleDatepickerProperties, getDaterangeProperties } = pickerProperties
 
+/*
+  TODO's:
+    * Test for setting a datepicker on the same input more than once.
+    * Test for other error-throwing scenario's
+*/
+
 
 function checkPickerProperties(picker, isDaterange, id) {
   return function({ property, defaultValue, domElement, selector, deepEqual, isFunction, notOwnProperty }) {
@@ -1547,7 +1553,7 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe.only('setMin', function() {
+      describe('setMin', function() {
         it('should be a function', function() {
           const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
           const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
@@ -1895,7 +1901,7 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe.only('setMax', function() {
+      describe('setMax', function() {
         it('should be a function', function() {
           const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
           const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
@@ -1903,7 +1909,358 @@ describe('Default properties and behavior', function() {
           expect(pickerStart.setMax).to.be.a('function')
           expect(pickerEnd.setMax).to.be.a('function')
         })
+
+        it('(start) should populate `maxDate` on the instance objects', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+
+          expect(pickerStart.maxDate).to.be.undefined
+          pickerStart.setMax(date)
+          expect(+pickerStart.maxDate).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+        })
+
+        it('(end) should populate `maxDate` on the instance objects', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+
+          expect(pickerEnd.maxDate).to.be.undefined
+          pickerEnd.setMax(date)
+          expect(+pickerEnd.maxDate).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+        })
+
+        it('(start) should disable dates after to the provided value (including later months)', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const maxDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), maxDay)
+
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day, `(start cal) Days shouldn't have qs-disabled class prior to calling setMax.`).not.to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day, `(end cal) Days shouldn't have qs-disabled class prior to calling setMax.`).not.to.have.class('qs-disabled')
+            })
+
+            pickerStart.setMax(date)
+          })
+
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach((day, i) => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal(i < maxDay ? '1' : '0.2')
+
+              if (i < maxDay) {
+                expect(day, 'Unaffected days from setMax').not.to.have.class('qs-disabled')
+              } else {
+                expect(day, 'Disabled days from setMax').to.have.class('qs-disabled')
+              }
+            })
+          })
+
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach((day, i) => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal(i < maxDay ? '1' : '0.2')
+
+              if (i < maxDay) {
+                expect(day, 'Unaffected days from setMax').not.to.have.class('qs-disabled')
+              } else {
+                expect(day, 'Disabled days from setMax').to.have.class('qs-disabled')
+              }
+            })
+          })
+
+          cy.get(daterangeInputStart).click()
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('0.2')
+              expect(day).to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day).not.to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(daterangeInputEnd).click()
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('0.2')
+              expect(day).to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day).not.to.have.class('qs-disabled')
+            })
+          })
+        })
+
+        it('(end) should disable dates after to the provided value (including later months)', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const maxDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), maxDay)
+
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day, `(start cal) Days shouldn't have qs-disabled class prior to calling setMax.`).not.to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day, `(end cal) Days shouldn't have qs-disabled class prior to calling setMax.`).not.to.have.class('qs-disabled')
+            })
+
+            pickerEnd.setMax(date)
+          })
+
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach((day, i) => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal(i < maxDay ? '1' : '0.2')
+
+              if (i < maxDay) {
+                expect(day, 'Unaffected days from setMax').not.to.have.class('qs-disabled')
+              } else {
+                expect(day, 'Disabled days from setMax').to.have.class('qs-disabled')
+              }
+            })
+          })
+
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach((day, i) => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal(i < maxDay ? '1' : '0.2')
+
+              if (i < maxDay) {
+                expect(day, 'Unaffected days from setMax').not.to.have.class('qs-disabled')
+              } else {
+                expect(day, 'Disabled days from setMax').to.have.class('qs-disabled')
+              }
+            })
+          })
+
+          cy.get(daterangeInputStart).click()
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('0.2')
+              expect(day).to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day).not.to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(daterangeInputEnd).click()
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-right`).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('0.2')
+              expect(day).to.have.class('qs-disabled')
+            })
+          })
+
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              const styles = getComputedStyle(day)
+
+              expect(styles.opacity).to.equal('1')
+              expect(day).not.to.have.class('qs-disabled')
+            })
+          })
+        })
+
+        it('(start) should prevent disabled dates from being selected', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const maxDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), maxDay)
+          pickerStart.setMax(date)
+
+          // Assert a few values prior to clicking.
+          cy.get(daterangeInputStart).should('have.value', '')
+          expect(pickerStart.dateSelected).to.be.undefined
+
+          // Click a disabled date and assert a few more values.
+          cy.get(daterangeInputStart).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).eq(maxDay + 1).click()
+          cy.wait(1).then(() => {
+            cy.get(daterangeInputStart).should('have.value', '')
+            expect(pickerStart.dateSelected).to.be.undefined
+          })
+
+          // Navigate to the next month and assert you can't click dates.
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-right`).click().then(() => {
+            cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).eq(0).click()
+            cy.wait(1).then(() => {
+              cy.get(daterangeInputStart).should('have.value', '')
+              expect(pickerStart.dateSelected).to.be.undefined
+            })
+          })
+
+          // For sanity reasons, assert that clicking a non-disabled date works.
+          cy.get(`${selectors.range.start.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"]`).eq(maxDay - 1).click()
+          cy.wait(1).then(() => {
+            cy.get(daterangeInputStart).should('not.have.value', '')
+            expect(pickerStart.dateSelected).not.to.be.undefined
+          })
+        })
+
+        it('(end) should prevent disabled dates from being selected', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const maxDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), maxDay)
+          pickerEnd.setMax(date)
+
+          // Assert a few values prior to clicking.
+          cy.get(daterangeInputEnd).should('have.value', '')
+          expect(pickerEnd.dateSelected).to.be.undefined
+
+          // Click a disabled date and assert a few more values.
+          cy.get(daterangeInputEnd).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).eq(maxDay + 1).click()
+          cy.wait(1).then(() => {
+            cy.get(daterangeInputEnd).should('have.value', '')
+            expect(pickerEnd.dateSelected).to.be.undefined
+          })
+
+          // Navigate to the next month and assert you can't click dates.
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-right`).click().then(() => {
+            cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).eq(0).click()
+            cy.wait(1).then(() => {
+              cy.get(daterangeInputEnd).should('have.value', '')
+              expect(pickerEnd.dateSelected).to.be.undefined
+            })
+          })
+
+          // For sanity reasons, assert that clicking a non-disabled date works.
+          cy.get(`${selectors.range.end.controls} .qs-arrow.qs-left`).click()
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"]`).eq(maxDay - 1).click()
+          cy.wait(1).then(() => {
+            cy.get(daterangeInputEnd).should('not.have.value', '')
+            expect(pickerEnd.dateSelected).not.to.be.undefined
+          })
+        })
+
+        it('(start) should remove the maximum selectable date when called with no argument', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const maxDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), maxDay)
+          const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
+
+          expect(pickerStart.maxDate).to.be.undefined
+          expect(pickerEnd.maxDate).to.be.undefined
+          pickerStart.setMax(date)
+
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', daysInMonth - maxDay)
+            .then(() => {
+              expect(pickerStart.maxDate).not.to.be.undefined
+              expect(pickerEnd.maxDate).not.to.be.undefined
+              pickerStart.setMax()
+            })
+          cy.get(`${selectors.range.start.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', 0)
+            .then(() => {
+              expect(pickerStart.maxDate).to.be.undefined
+              expect(pickerEnd.maxDate).to.be.undefined
+            })
+        })
+
+        it('(end) should remove the maximum selectable date when called with no argument', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const maxDay = 15
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), maxDay)
+          const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
+
+          expect(pickerStart.maxDate).to.be.undefined
+          expect(pickerEnd.maxDate).to.be.undefined
+          pickerEnd.setMax(date)
+
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', daysInMonth - maxDay)
+            .then(() => {
+              expect(pickerStart.maxDate).not.to.be.undefined
+              expect(pickerEnd.maxDate).not.to.be.undefined
+              pickerEnd.setMax()
+            })
+          cy.get(`${selectors.range.end.squaresContainer} [data-direction="0"].qs-disabled`)
+            .should('have.length', 0)
+            .then(() => {
+              expect(pickerStart.maxDate).to.be.undefined
+              expect(pickerEnd.maxDate).to.be.undefined
+            })
+        })
       })
+
       describe('show', function() {})
       describe('hide', function() {})
       describe('remove', function() {})

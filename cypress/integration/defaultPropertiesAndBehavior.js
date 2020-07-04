@@ -2261,7 +2261,36 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe('show', function() {})
+      describe('show', function() {
+        it('should be a function', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.show).to.be.a('function')
+          expect(pickerEnd.show).to.be.a('function')
+        })
+
+        it('(start) should show the calendar when called', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+
+          cy.get(`${selectors.range.start.calendarContainer}`)
+            .should('not.be.visible')
+            .then(() => pickerStart.show())
+          cy.get(`${selectors.range.start.calendarContainer}`).should('be.visible')
+        })
+
+        it('(end) should show the calendar when called', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          cy.get(`${selectors.range.end.calendarContainer}`)
+            .should('not.be.visible')
+            .then(() => pickerEnd.show())
+          cy.get(`${selectors.range.end.calendarContainer}`).should('be.visible')
+        })
+      })
+
       describe('hide', function() {})
       describe('remove', function() {})
       describe('setDate', function() {})

@@ -2325,7 +2325,56 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe('remove', function() {})
+      describe('remove', function() {
+        it('should be a function', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.remove).to.be.a('function')
+          expect(pickerEnd.remove).to.be.a('function')
+        })
+
+        it('(start) should remove the calendar from the DOM', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+
+          cy.get(`${selectors.range.end.calendarContainer}`).should('have.length', 1)
+          cy.get(`${selectors.range.start.calendarContainer}`)
+            .should('have.length', 1)
+            .then(() => pickerStart.remove())
+          cy.get(`${selectors.range.start.calendarContainer}`).should('have.length', 0)
+          cy.get(`${selectors.range.end.calendarContainer}`).should('have.length', 1)
+        })
+
+        it('(end) should remove the calendar from the DOM', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          cy.get(`${selectors.range.end.calendarContainer}`)
+            .should('have.length', 1)
+            .then(() => pickerEnd.remove())
+          cy.get(`${selectors.range.end.calendarContainer}`).should('have.length', 0)
+          cy.get(`${selectors.range.start.calendarContainer}`).should('have.length', 1)
+        })
+
+        it('should remove all properties from the instance object', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(Object.keys(pickerStart).length).to.be.greaterThan(0)
+          expect(Object.keys(pickerEnd).length).to.be.greaterThan(0)
+
+          pickerStart.remove()
+          expect(Object.keys(pickerStart).length).to.equal(0)
+          expect(Object.keys(pickerEnd).length).to.be.greaterThan(0)
+
+          pickerEnd.remove()
+          expect(Object.keys(pickerEnd).length).to.equal(0)
+        })
+
+        it('should remove the sibling property from the sibling still active', function () {})
+      })
+
       describe('setDate', function() {})
       describe('navigate', function() {})
     })

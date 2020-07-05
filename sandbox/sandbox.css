@@ -32,6 +32,14 @@ section {
   padding-top: 1em;
 }
 
+#daterange-inputs-container {
+  display: flex;
+}
+
+#daterange-inputs-container > div {
+  margin: 0 5px;
+}
+
 h2 {
   text-align: center;
   margin-bottom: 5px;

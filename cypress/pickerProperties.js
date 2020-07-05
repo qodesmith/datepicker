@@ -312,13 +312,13 @@ function getDaterangeProperties(type /* 'start' or 'end' */, startPicker, endPic
       property: 'parent',
       defaultValue: getFirstElement,
       domElement: true,
-      selector: selectors.daterangeInputsParent,
+      selector: selectors[`daterangeInputs${type === 'start' ? 'Start' : 'End'}Container`],
     },
     {
       property: 'positionedEl',
       defaultValue: getFirstElement,
       domElement: true,
-      selector: selectors.daterangeInputsParent,
+      selector: selectors[`daterangeInputs${type === 'start' ? 'Start' : 'End'}Container`],
     },
     {
       property: 'second',

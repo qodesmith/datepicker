@@ -557,7 +557,7 @@ describe('Default properties and behavior', function() {
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
           cy.get(selectors.single.overlay).then($overlay => {
-            cy.tickj(400).then(() => {
+            cy.tick(400).then(() => {
               cy.wait(400).then(() => {
                 const message = '.qs-overlay styles after clicking month'
                 const styles = getComputedStyle($overlay[0])
@@ -681,6 +681,7 @@ describe('Default properties and behavior', function() {
       })
 
       it('should de-select a date, clear the input field, and clear the picker prop', function() {
+        cy.clock()
         const today = new Date()
         const todaysDate = today.getDate()
         const dayIndex = todaysDate === 1 ? 1 : 0

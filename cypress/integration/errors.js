@@ -1,6 +1,10 @@
-// TODO - implement these tests.
+/*
+  TODO's:
+    * Test for setting a datepicker on the same input more than once.
+    * Test for other error-throwing scenario's
+*/
 
-describe('Callback functions', function() {
+describe('Errors thrown by datepicker', function() {
   beforeEach(function() {
     cy.visit('http://localhost:9001')
 

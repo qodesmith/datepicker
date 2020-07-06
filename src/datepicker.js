@@ -1503,7 +1503,19 @@ function setDate(newDate, changeCalendar) {
   }
 
   var isSameMonth = currentYear === date.getFullYear() && currentMonth === date.getMonth()
-  if (isSameMonth || changeCalendar) renderCalendar(this, date)
+  if (isSameMonth || changeCalendar) {
+    renderCalendar(this, date)
+
+  /*
+    If we already have a date selected on the current month of the calendar
+    and we're using `setDate` to select a date for a different month,
+    we'll want to re-render the current calendar to remove the selected date
+    AND keep the current month visible without switching.
+    Effectively, we just want to de-select the date on the current month.
+  */
+  } else if (!isSameMonth) {
+    renderCalendar(this, new Date(currentYear, currentMonth, 1))
+  }
 
   return this
 }

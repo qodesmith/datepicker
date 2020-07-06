@@ -2573,7 +2573,7 @@ describe('Default properties and behavior', function() {
             .should('have.class', 'qs-disabled')
         })
 
-        it.only('(start) should remove the selected date on the current month if a different month was provided', function() {
+        it('(start) should remove the selected date on the current month if a different month was provided', function() {
           const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
           this.datepicker(daterangeInputEnd, { id: 1 })
           const date = new Date()
@@ -2593,7 +2593,7 @@ describe('Default properties and behavior', function() {
           })
         })
 
-        it.only('(end) should remove the selected date on the current month if a different month was provided', function() {
+        it('(end) should remove the selected date on the current month if a different month was provided', function() {
           this.datepicker(daterangeInputStart, { id: 1 })
           const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
           const date = new Date()
@@ -2614,58 +2614,106 @@ describe('Default properties and behavior', function() {
         })
 
         it('(start) should set a date and navigate to that date via the 2nd argument', function() {
-          const picker = this.datepicker(singleDatepickerInput)
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
           const today = new Date()
           const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
 
-          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
-          cy.get(`${selectors.single.controls} .qs-year`)
+          cy.get(`${selectors.range.start.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.range.start.controls} .qs-year`)
             .should('have.text', `${today.getFullYear()}`)
-            .then(() => picker.setDate(date, true))
+            .then(() => pickerStart.setDate(date, true))
 
-          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[date.getMonth()])
-          cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${date.getFullYear()}`)
+          cy.get(`${selectors.range.start.controls} .qs-month`).should('have.text', pickerProperties.months[date.getMonth()])
+          cy.get(`${selectors.range.start.controls} .qs-year`).should('have.text', `${date.getFullYear()}`)
         })
 
-
-
-
-
-
-
-
-        it('should not navigate to a future date when the 2nd argument is not used', function() {
-          const picker = this.datepicker(singleDatepickerInput)
+        it('(start) should set a date and navigate to that date via the 2nd argument', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
           const today = new Date()
           const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
 
-          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
-          cy.get(`${selectors.single.controls} .qs-year`)
+          cy.get(`${selectors.range.end.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.range.end.controls} .qs-year`)
             .should('have.text', `${today.getFullYear()}`)
-            .then(() => picker.setDate(date))
+            .then(() => pickerEnd.setDate(date, true))
 
-          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
-          cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+          cy.get(`${selectors.range.end.controls} .qs-month`).should('have.text', pickerProperties.months[date.getMonth()])
+          cy.get(`${selectors.range.end.controls} .qs-year`).should('have.text', `${date.getFullYear()}`)
         })
 
-        it('should remove the selected date when no arguments are passed', function() {
-          const picker = this.datepicker(singleDatepickerInput)
+        it('(start) should not navigate to a future date when the 2nd argument is not used', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          cy.get(`${selectors.range.start.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.range.start.controls} .qs-year`)
+            .should('have.text', `${today.getFullYear()}`)
+            .then(() => pickerStart.setDate(date))
+
+          cy.get(`${selectors.range.start.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.range.start.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+        })
+
+        it('(end) should not navigate to a future date when the 2nd argument is not used', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          cy.get(`${selectors.range.end.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.range.end.controls} .qs-year`)
+            .should('have.text', `${today.getFullYear()}`)
+            .then(() => pickerEnd.setDate(date))
+
+          cy.get(`${selectors.range.end.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.range.end.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+        })
+
+        it('(start) should remove the selected date when no arguments are passed', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
           const date = new Date()
 
-          expect(picker.dateSelected).to.be.undefined
-          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+          expect(pickerStart.dateSelected).to.be.undefined
+          cy.get(`${selectors.range.start.squaresContainer} .qs-active`)
             .should('have.length', 0)
             .then(() => {
-              picker.setDate(date)
-              expect(+picker.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+              pickerStart.setDate(date)
+              expect(+pickerStart.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
             })
-          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+          cy.get(`${selectors.range.start.squaresContainer} .qs-active`)
             .should('have.length', 1)
             .then(() => {
-              picker.setDate()
-              expect(picker.dateSelected).to.be.undefined
+              pickerStart.setDate()
+              expect(pickerStart.dateSelected).to.be.undefined
             })
-          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+          cy.get(`${selectors.range.start.squaresContainer} .qs-active`)
+            .should('have.length', 0)
+        })
+
+        it('(end) should remove the selected date when no arguments are passed', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+
+          expect(pickerEnd.dateSelected).to.be.undefined
+          cy.get(`${selectors.range.end.squaresContainer} .qs-active`)
+            .should('have.length', 0)
+            .then(() => {
+              pickerEnd.setDate(date)
+              expect(+pickerEnd.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+            })
+          cy.get(`${selectors.range.end.squaresContainer} .qs-active`)
+            .should('have.length', 1)
+            .then(() => {
+              pickerEnd.setDate()
+              expect(pickerEnd.dateSelected).to.be.undefined
+            })
+          cy.get(`${selectors.range.end.squaresContainer} .qs-active`)
             .should('have.length', 0)
         })
       })

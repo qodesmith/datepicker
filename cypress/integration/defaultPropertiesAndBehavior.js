@@ -2718,7 +2718,97 @@ describe('Default properties and behavior', function() {
         })
       })
 
-      describe('navigate', function() {})
+      describe('navigate', function() {
+        it('should be a function', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.navigate).to.be.a('function')
+          expect(pickerEnd.navigate).to.be.a('function')
+        })
+
+        it('(start) should navigate to a given date without affecting the selection', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          pickerStart.setDate(today)
+          expect(+pickerStart.dateSelected).to.equal(+new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+          expect(pickerEnd.dateSelected).to.be.undefined
+
+          pickerStart.navigate(date)
+          cy.get(`${selectors.range.start.controls} .qs-year`).should('have.text', `${date.getFullYear()}`)
+          cy.get(`${selectors.range.start.controls} .qs-month`).should('have.text', pickerProperties.months[date.getMonth()])
+          expect(+pickerStart.dateSelected).to.equal(+new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+
+          cy.wait(1).then(() => {
+            pickerStart.navigate(today)
+            cy.get(`${selectors.range.start.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+            cy.get(`${selectors.range.start.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+            expect(+pickerStart.dateSelected).to.equal(+new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+          })
+        })
+
+        it('(end) should navigate to a given date without affecting the selection', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          pickerEnd.setDate(today)
+          expect(+pickerEnd.dateSelected).to.equal(+new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+          expect(pickerStart.dateSelected).to.be.undefined
+
+          pickerEnd.navigate(date)
+          cy.get(`${selectors.range.end.controls} .qs-year`).should('have.text', `${date.getFullYear()}`)
+          cy.get(`${selectors.range.end.controls} .qs-month`).should('have.text', pickerProperties.months[date.getMonth()])
+          expect(+pickerEnd.dateSelected).to.equal(+new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+
+          cy.wait(1).then(() => {
+            pickerEnd.navigate(today)
+            cy.get(`${selectors.range.end.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+            cy.get(`${selectors.range.end.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+            expect(+pickerEnd.dateSelected).to.equal(+new Date(today.getFullYear(), today.getMonth(), today.getDate()))
+          })
+        })
+
+        it('(start) should navigate to a given date and trigger `onMonthChange` when the 2nd argument is used', function() {
+          const pickerStartOptions = { onMonthChange: () => {}, id: 1 }
+          const pickerEndOptions = { onMonthChange: () => {}, id: 1 }
+          cy.spy(pickerStartOptions, 'onMonthChange')
+          cy.spy(pickerEndOptions, 'onMonthChange')
+
+          const pickerStart = this.datepicker(daterangeInputStart, pickerStartOptions)
+          this.datepicker(daterangeInputEnd, pickerEndOptions)
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          expect(pickerStartOptions.onMonthChange).not.to.be.called
+          expect(pickerEndOptions.onMonthChange).not.to.be.called
+          pickerStart.navigate(date, true)
+          expect(pickerStartOptions.onMonthChange).to.be.called
+          expect(pickerEndOptions.onMonthChange).not.to.be.called
+        })
+
+        it('(end) should navigate to a given date and trigger `onMonthChange` when the 2nd argument is used', function() {
+          const pickerStartOptions = { onMonthChange: () => {}, id: 1 }
+          const pickerEndOptions = { onMonthChange: () => {}, id: 1 }
+          cy.spy(pickerStartOptions, 'onMonthChange')
+          cy.spy(pickerEndOptions, 'onMonthChange')
+
+          this.datepicker(daterangeInputStart, pickerStartOptions)
+          const pickerEnd = this.datepicker(daterangeInputEnd, pickerEndOptions)
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          expect(pickerStartOptions.onMonthChange).not.to.be.called
+          expect(pickerEndOptions.onMonthChange).not.to.be.called
+          pickerEnd.navigate(date, true)
+          expect(pickerStartOptions.onMonthChange).not.to.be.called
+          expect(pickerEndOptions.onMonthChange).to.be.called
+        })
+      })
     })
   })
 })

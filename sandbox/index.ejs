@@ -7,7 +7,7 @@
 <body>
   <!-- SINGLE DATEPICKER -->
   <section>
-    <div class="container">
+    <div data-cy="single-datepicker-input-parent">
       <h2>Single Datepicker</h2>
       <input data-cy="single-datepicker-input" type="text">
     </h2>
@@ -15,11 +15,17 @@
 
 
   <!-- DATERANGE -->
-  <section data-cy="daterange-section">
-    <div class="container">
+  <section id="daterange-section">
+    <div data-cy="daterange-inputs-parent">
       <h2>Daterange</h2>
-      <input data-cy="daterange-input-start" type="text">
-      <input data-cy="daterange-input-end" type="text">
+      <div id="daterange-inputs-container">
+        <div id="daterange-input-start-container" data-cy="daterange-input-start-container">
+          <input data-cy="daterange-input-start" type="text">
+        </div>
+        <div id="daterange-input-end-container" data-cy="daterange-input-end-container">
+          <input data-cy="daterange-input-end" type="text">
+        </div>
+      </div>
     </div>
   </section>
 </body>

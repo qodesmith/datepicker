@@ -6,9 +6,8 @@
   "style": "./src/datepicker.scss",
   "scripts": {
     "build": "webpack --mode production --env.prod",
-    "test": "start-server-and-test test-app http-get://localhost:9001 start-cypress-test",
+    "test": "start-server-and-test start http-get://localhost:9001 start-cypress-test",
     "start": "webpack-dev-server --mode development --env.dev --progress",
-    "test-app": "webpack-dev-server --mode development --env.test --progress",
     "start-cypress-test": "cypress open"
   },
   "keywords": [
@@ -35,10 +34,14 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@cypress/webpack-preprocessor": "^5.4.1",
     "autoprefixer": "^9.8.0",
+    "babel-loader": "^8.1.0",
     "css-loader": "^3.5.3",
     "cssnano": "^4.1.10",
-    "cypress": "^4.6.0",
+    "cypress": "^4.8.0",
     "eslint": "^7.0.0",
     "html-webpack-plugin": "^4.3.0",
     "mini-css-extract-plugin": "^0.9.0",

@@ -1,6 +1,6 @@
 // TODO - implement these tests.
 
-describe('Callback functions', function() {
+describe('User options', function() {
   beforeEach(function() {
     cy.visit('http://localhost:9001')
 

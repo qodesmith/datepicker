@@ -26,10 +26,18 @@ section {
   align-items: center;
 }
 
-section[data-cy="daterange-section"] {
+#daterange-section {
   align-items: flex-start;
   border-top: 1px solid;
   padding-top: 1em;
+}
+
+#daterange-inputs-container {
+  display: flex;
+}
+
+#daterange-inputs-container > div {
+  margin: 0 5px;
 }
 
 h2 {

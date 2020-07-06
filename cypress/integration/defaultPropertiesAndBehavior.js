@@ -2415,7 +2415,16 @@ describe('Default properties and behavior', function() {
           expect(Object.keys(pickerEnd).length).to.equal(0)
         })
 
-        it('should remove the sibling property from the sibling still active', function () {})
+        it.only('(start) should remove the sibling property from the sibling still active', function () {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.sibling).to.equal(pickerEnd)
+          expect(pickerEnd.sibling).to.equal(pickerStart)
+
+          pickerStart.remove()
+          expect(pickerEnd.sibling).to.be.undefined
+        })
       })
 
       describe('setDate', function() {

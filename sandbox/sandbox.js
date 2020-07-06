@@ -14,5 +14,7 @@ window.test = () => {
     alwaysShow: 0,
   })
 
-  window.single = datepicker('input')
+  window.single = datepicker('input', {
+    alwaysShow: 0,
+  })
 }

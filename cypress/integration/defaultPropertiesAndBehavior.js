@@ -1023,9 +1023,13 @@ describe('Default properties and behavior', function() {
         it('should set a date on the calendar', function() {
           const picker = this.datepicker(singleDatepickerInput)
           const date = new Date()
+          const dateNum = date.getDate()
 
           cy.get('.qs-active').should('have.length', 0).then(() => picker.setDate(date))
           cy.get('.qs-active').should('have.length', 1)
+          cy.get(`${selectors.single.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('have.class', 'qs-active')
         })
 
         it('should set the input value', function() {
@@ -1043,6 +1047,45 @@ describe('Default properties and behavior', function() {
           expect(picker.dateSelected).to.be.undefined
           picker.setDate(date)
           expect(+picker.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+        })
+
+        it('should change the date on the same month if a date was already selected', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const dateNum = 15
+          const dateNum2 = 16
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), dateNum)
+          const date2 = new Date(date.getFullYear(), date.getMonth(), dateNum2)
+
+          picker.setDate(date)
+          cy.get(`${selectors.single.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('have.class', 'qs-active')
+            .then(() => picker.setDate(date2))
+          cy.get(`${selectors.single.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('not.have.class', 'qs-active')
+
+          cy.get(`${selectors.single.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum2 - 1)
+            .should('have.class', 'qs-active')
+        })
+
+        it('should remove the selected date on the current month if a different month was provided', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const date = new Date()
+          const dateNum = date.getDate()
+          const date2 = new Date(date.getFullYear(), date.getMonth() + 1, dateNum)
+
+          picker.setDate(date)
+          cy.get(`${selectors.single.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('have.class', 'qs-active')
+            .then(() => picker.setDate(date2))
+
+          cy.get(`${selectors.single.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('not.have.class', 'qs-active')
         })
 
         it('should set a date and navigate to that date via the 2nd argument', function() {
@@ -2375,7 +2418,258 @@ describe('Default properties and behavior', function() {
         it('should remove the sibling property from the sibling still active', function () {})
       })
 
-      describe('setDate', function() {})
+      describe('setDate', function() {
+        it('should be a function', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.setDate).to.be.a('function')
+          expect(pickerEnd.setDate).to.be.a('function')
+        })
+
+        it('(start) should set a date on the calendar', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+          const dateNum = date.getDate()
+
+          cy.get('.qs-active').should('have.length', 0).then(() => pickerStart.setDate(date))
+          cy.get('.qs-active').should('have.length', 1)
+          cy.get(`${selectors.range.start.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('have.class', 'qs-active')
+        })
+
+        it('(end) should set a date on the calendar', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+          const dateNum = date.getDate()
+
+          cy.get('.qs-active').should('have.length', 0).then(() => pickerEnd.setDate(date))
+          cy.get('.qs-active').should('have.length', 1)
+          cy.get(`${selectors.range.end.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('have.class', 'qs-active')
+        })
+
+        it('(start) should set the input value', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+
+          cy.get(daterangeInputStart).should('have.value', '').then(() => pickerStart.setDate(date))
+          cy.get(daterangeInputStart).should('have.value', date.toDateString())
+          cy.get(daterangeInputEnd).should('have.value', '')
+        })
+
+        it('(end) should set the input value', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+
+          cy.get(daterangeInputEnd).should('have.value', '').then(() => pickerEnd.setDate(date))
+          cy.get(daterangeInputEnd).should('have.value', date.toDateString())
+          cy.get(daterangeInputStart).should('have.value', '')
+        })
+
+        it('(start) should set the `dateSelected` prop on the instance object', function () {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+
+          expect(pickerStart.dateSelected).to.be.undefined
+          pickerStart.setDate(date)
+          expect(+pickerStart.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+          expect(pickerEnd.dateSelected).to.be.undefined
+        })
+
+        it('(end) should set the `dateSelected` prop on the instance object', function () {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+
+          expect(pickerEnd.dateSelected).to.be.undefined
+          pickerEnd.setDate(date)
+          expect(+pickerEnd.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+          expect(pickerStart.dateSelected).to.be.undefined
+        })
+
+        it('(start) should change the date on the same month if a date was already selected', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const dateNum = 15
+          const dateNum2 = 16
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), dateNum)
+          const date2 = new Date(date.getFullYear(), date.getMonth(), dateNum2)
+          pickerStart.setDate(date)
+
+          // The end calendar should have the correct disabled / enabled range.
+          cy.get(`${selectors.range.end.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('not.have.class', 'qs-disabled')
+          cy.get(`${selectors.range.end.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 2)
+            .should('have.class', 'qs-disabled')
+
+          // Check the start calendar, then call `setDate` again, then check the start calendar again.
+          cy.get(`${selectors.range.start.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('have.class', 'qs-active')
+            .then(() => pickerStart.setDate(date2))
+          cy.get(`${selectors.range.start.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('not.have.class', 'qs-active')
+          cy.get(`${selectors.range.start.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum2 - 1)
+            .should('have.class', 'qs-active')
+
+          // Finally, check that the end calendar's range has changed accordingly.
+          cy.get(`${selectors.range.end.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum2 - 1)
+            .should('not.have.class', 'qs-disabled')
+          cy.get(`${selectors.range.end.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum2 - 2)
+            .should('have.class', 'qs-disabled')
+        })
+
+        it('(end) should change the date on the same month if a date was already selected', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const dateNum = 15
+          const dateNum2 = 16
+          const today = new Date()
+          const date = new Date(today.getFullYear(), today.getMonth(), dateNum)
+          const date2 = new Date(date.getFullYear(), date.getMonth(), dateNum2)
+          pickerEnd.setDate(date)
+
+          // The start calendar should have the correct disabled / enabled range.
+          cy.get(`${selectors.range.start.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('not.have.class', 'qs-disabled')
+          cy.get(`${selectors.range.start.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum)
+            .should('have.class', 'qs-disabled')
+
+          // Check the end calendar, then call `setDate` again, then check the end calendar again.
+          cy.get(`${selectors.range.end.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('have.class', 'qs-active')
+            .then(() => pickerEnd.setDate(date2))
+          cy.get(`${selectors.range.end.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('not.have.class', 'qs-active')
+          cy.get(`${selectors.range.end.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum2 - 1)
+            .should('have.class', 'qs-active')
+
+          // Finally, check that the start calendar's range has changed accordingly.
+          cy.get(`${selectors.range.start.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum2 - 1)
+            .should('not.have.class', 'qs-disabled')
+          cy.get(`${selectors.range.start.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum2)
+            .should('have.class', 'qs-disabled')
+        })
+
+        it.only('(start) should remove the selected date on the current month if a different month was provided', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+          const dateNum = date.getDate()
+          const date2 = new Date(date.getFullYear(), date.getMonth() + 1, dateNum)
+
+          pickerStart.setDate(date)
+          cy.get(`${selectors.range.start.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('have.class', 'qs-active')
+            .then(() => pickerStart.setDate(date2))
+
+          cy.get(`${selectors.range.start.calendarContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              expect(day).not.to.have.class('qs-active')
+            })
+          })
+        })
+
+        it.only('(end) should remove the selected date on the current month if a different month was provided', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+          const date = new Date()
+          const dateNum = date.getDate()
+          const date2 = new Date(date.getFullYear(), date.getMonth() + 1, dateNum)
+
+          pickerEnd.setDate(date)
+          cy.get(`${selectors.range.end.calendarContainer} [data-direction="0"]`)
+            .eq(dateNum - 1)
+            .should('have.class', 'qs-active')
+            .then(() => pickerEnd.setDate(date2))
+
+          cy.get(`${selectors.range.end.calendarContainer} [data-direction="0"]`).then($days => {
+            Array.from($days).forEach(day => {
+              expect(day).not.to.have.class('qs-active')
+            })
+          })
+        })
+
+        it('(start) should set a date and navigate to that date via the 2nd argument', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`)
+            .should('have.text', `${today.getFullYear()}`)
+            .then(() => picker.setDate(date, true))
+
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[date.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${date.getFullYear()}`)
+        })
+
+
+
+
+
+
+
+
+        it('should not navigate to a future date when the 2nd argument is not used', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const today = new Date()
+          const date = new Date(today.getFullYear() + 1, today.getMonth() + 1, today.getDate())
+
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`)
+            .should('have.text', `${today.getFullYear()}`)
+            .then(() => picker.setDate(date))
+
+          cy.get(`${selectors.single.controls} .qs-month`).should('have.text', pickerProperties.months[today.getMonth()])
+          cy.get(`${selectors.single.controls} .qs-year`).should('have.text', `${today.getFullYear()}`)
+        })
+
+        it('should remove the selected date when no arguments are passed', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          const date = new Date()
+
+          expect(picker.dateSelected).to.be.undefined
+          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+            .should('have.length', 0)
+            .then(() => {
+              picker.setDate(date)
+              expect(+picker.dateSelected).to.equal(+new Date(date.getFullYear(), date.getMonth(), date.getDate()))
+            })
+          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+            .should('have.length', 1)
+            .then(() => {
+              picker.setDate()
+              expect(picker.dateSelected).to.be.undefined
+            })
+          cy.get(`${selectors.single.squaresContainer} .qs-active`)
+            .should('have.length', 0)
+        })
+      })
+
       describe('navigate', function() {})
     })
   })

@@ -8,13 +8,6 @@ const {
 } = selectors
 const { singleDatepickerProperties, getDaterangeProperties } = pickerProperties
 
-/*
-  TODO's:
-    * Test for setting a datepicker on the same input more than once.
-    * Test for other error-throwing scenario's
-*/
-
-
 function checkPickerProperties(picker, isDaterange, id) {
   return function({ property, defaultValue, domElement, selector, deepEqual, isFunction, notOwnProperty }) {
     const value = picker[property]
@@ -398,16 +391,19 @@ describe('Default properties and behavior', function() {
 
       describe('Overlay', function() {
         it('should show the overlay when the month/year is clicked', function() {
+          cy.clock()
           this.datepicker(singleDatepickerInput)
 
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
           cy.get(selectors.single.controls).then($controls => {
-            cy.wait(400).then(() => {
-              const message = '.qs-controls blurred when overlay is open'
-              const styles = getComputedStyle($controls[0])
+            cy.tick(400).then(() => {
+              cy.wait(400).then(() => {
+                const message = '.qs-controls blurred when overlay is open'
+                const styles = getComputedStyle($controls[0])
 
-              expect(styles.filter, message).to.equal('blur(5px)')
+                expect(styles.filter, message).to.equal('blur(5px)')
+              })
             })
           })
           cy.get(selectors.single.squaresContainer).then($squaresContainer => {
@@ -486,6 +482,7 @@ describe('Default properties and behavior', function() {
         })
 
         it('should not allow leading zeros or change the year if 4 digits have not been entered', function() {
+          cy.clock()
           this.datepicker(singleDatepickerInput)
 
           // Set up some variables
@@ -497,36 +494,42 @@ describe('Default properties and behavior', function() {
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
           cy.get('@overlay').then($overlay => {
-            cy.wait(400).then(() => {
-              const message = '.qs-overlay'
-              const styles = getComputedStyle($overlay[0])
+            cy.tick(400).then(() => {
+              cy.wait(400).then(() => {
+                const message = '.qs-overlay'
+                const styles = getComputedStyle($overlay[0])
 
-              expect(styles.opacity, message).to.equal('1')
-              expect(styles.zIndex, message).to.equal('1')
+                expect(styles.opacity, message).to.equal('1')
+                expect(styles.zIndex, message).to.equal('1')
+              })
             })
           })
 
           // Clicking the submit button should not change any styles (since it's a noop).
           cy.get('@submit').click()
           cy.get('@overlay').then($overlay => {
-            cy.wait(400).then(() => {
-              const message = '.qs-overlay'
-              const styles = getComputedStyle($overlay[0])
+            cy.tick(400).then(() => {
+              cy.wait(400).then(() => {
+                const message = '.qs-overlay'
+                const styles = getComputedStyle($overlay[0])
 
-              expect(styles.opacity, message).to.equal('1')
-              expect(styles.zIndex, message).to.equal('1')
+                expect(styles.opacity, message).to.equal('1')
+                expect(styles.zIndex, message).to.equal('1')
+              })
             })
           })
 
           // Hitting the enter button while focused in the input should not change any styles (since it's a noop).
           cy.get('@yearInput').focus().type('{enter}')
           cy.get('@overlay').then($overlay => {
-            cy.wait(400).then(() => {
-              const message = '.qs-overlay'
-              const styles = getComputedStyle($overlay[0])
+            cy.tick(400).then(() => {
+              cy.wait(400).then(() => {
+                const message = '.qs-overlay'
+                const styles = getComputedStyle($overlay[0])
 
-              expect(styles.opacity, message).to.equal('1')
-              expect(styles.zIndex, message).to.equal('1')
+                expect(styles.opacity, message).to.equal('1')
+                expect(styles.zIndex, message).to.equal('1')
+              })
             })
           })
 
@@ -547,20 +550,21 @@ describe('Default properties and behavior', function() {
         })
 
         it('should change the month when a month name is clicked', function() {
+          cy.clock()
           const today = new Date()
           this.datepicker(singleDatepickerInput)
-
-          cy.clock()
 
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
           cy.get(selectors.single.overlay).then($overlay => {
-            cy.wait(400).then(() => {
-              const message = '.qs-overlay styles after clicking month'
-              const styles = getComputedStyle($overlay[0])
+            cy.tickj(400).then(() => {
+              cy.wait(400).then(() => {
+                const message = '.qs-overlay styles after clicking month'
+                const styles = getComputedStyle($overlay[0])
 
-              expect(styles.opacity, message).to.equal('1')
-              expect(styles.zIndex, message).to.equal('1')
+                expect(styles.opacity, message).to.equal('1')
+                expect(styles.zIndex, message).to.equal('1')
+              })
             })
           })
 
@@ -698,9 +702,11 @@ describe('Default properties and behavior', function() {
           })
           .click()
         cy.get(`${selectors.single.squaresContainer} [data-direction="0"]`).eq(dayIndex).then($selectedDay => {
-          cy.wait(400).then(() => {
-            const styles = getComputedStyle($selectedDay[0])
-            expect(styles.backgroundColor, 'Selected day color after de-selecting').to.equal('rgba(0, 0, 0, 0)')
+          cy.tick(400).then(() => {
+            cy.wait(400).then(() => {
+              const styles = getComputedStyle($selectedDay[0])
+              expect(styles.backgroundColor, 'Selected day color after de-selecting').to.equal('rgba(0, 0, 0, 0)')
+            })
           })
         })
         cy.get(selectors.single.calendarContainer).should('be.visible')

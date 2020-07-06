@@ -608,28 +608,38 @@ describe('Default properties and behavior', function() {
         })
 
         it('should close the overlay when clicking the close button', function() {
+          /*
+            Datepicker uses requestAnimationFrame in order to toggle the overlay.
+            cy.clock will help us cy.wait the correct way. Look, it just works, k?
+          */
+          cy.clock()
+
           this.datepicker(singleDatepickerInput)
 
           cy.get(singleDatepickerInput).click()
           cy.get(`${selectors.single.controls} .qs-month-year`).click()
           cy.get(selectors.single.overlay).then($overlay => {
-            cy.wait(400).then(() => {
-              const message = '.qs-overlay'
-              const styles = getComputedStyle($overlay[0])
+            cy.tick(400).then(() => {
+              cy.wait(400).then(() => {
+                const message = '.qs-overlay'
+                const styles = getComputedStyle($overlay[0])
 
-              expect(styles.opacity, message).to.equal('1')
-              expect(styles.zIndex, message).to.equal('1')
+                expect(styles.opacity, message).to.equal('1')
+                expect(styles.zIndex, message).to.equal('1')
+              })
             })
           })
 
           cy.get(`${selectors.single.overlay} .qs-close`).click()
           cy.get(selectors.single.overlay).then($overlay => {
-            cy.wait(400).then(() => {
-              const message = '.qs-overlay'
-              const styles = getComputedStyle($overlay[0])
+            cy.tick(400).then(() => {
+              cy.wait(400).then(() => {
+                const message = '.qs-overlay'
+                const styles = getComputedStyle($overlay[0])
 
-              expect(styles.opacity, message).to.equal('0')
-              expect(styles.zIndex, message).to.equal('-1')
+                expect(styles.opacity, message).to.equal('0')
+                expect(styles.zIndex, message).to.equal('-1')
+              })
             })
           })
         })
@@ -2415,7 +2425,7 @@ describe('Default properties and behavior', function() {
           expect(Object.keys(pickerEnd).length).to.equal(0)
         })
 
-        it.only('(start) should remove the sibling property from the sibling still active', function () {
+        it('(start) should remove the sibling property from the sibling still active', function () {
           const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
           const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
 
@@ -2424,6 +2434,17 @@ describe('Default properties and behavior', function() {
 
           pickerStart.remove()
           expect(pickerEnd.sibling).to.be.undefined
+        })
+
+        it('(end) should remove the sibling property from the sibling still active', function () {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.sibling).to.equal(pickerEnd)
+          expect(pickerEnd.sibling).to.equal(pickerStart)
+
+          pickerEnd.remove()
+          expect(pickerStart.sibling).to.be.undefined
         })
       })
 

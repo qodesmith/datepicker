@@ -158,7 +158,6 @@ function createInstance(selectorOrElement, opts) {
     which would have avoided having to use a while loop with all this logic.
   */
   } else {
-    var hasShadowDomSupport = 'getRootNode' in window.Node.prototype
     var rootFound
     var currentParent = el.parentNode
 
@@ -172,16 +171,8 @@ function createInstance(selectorOrElement, opts) {
       // We're using a shadow DOM.
       } else if (parentType === '[object ShadowRoot]') {
         rootFound = true
-
-        // Throw an error if it's not supported.
-        if (!hasShadowDomSupport) {
-          throw new Error('The shadow DOM is not supported in your browser.')
-
-        // Store the relevant objects.
-        } else {
-          shadowDom = currentParent
-          customElement = currentParent.host
-        }
+        shadowDom = currentParent
+        customElement = currentParent.host
 
       // Focus up the chain to the next parent and keep iterating.
       } else {

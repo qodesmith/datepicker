@@ -1,6 +1,6 @@
 // TODO - implement these tests.
 
-describe('Callback functions', function() {
+describe('Errors thrown by datepicker', function() {
   beforeEach(function() {
     cy.visit('http://localhost:9001')
 

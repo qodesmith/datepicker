@@ -560,7 +560,7 @@ function sanitizeOptions(opts) {
 
   // If id was provided, it cannot me null or undefined.
   if (options.hasOwnProperty('id') && id == null) {
-    throw new Error('Id cannot be `null` or `undefined`')
+    throw new Error('`id` cannot be `null` or `undefined`')
   }
 
   /*
@@ -629,7 +629,7 @@ function sanitizeOptions(opts) {
       !Array.isArray(custom) || // Must be an array.
       custom.length !== num || // Must have the correct length.
       custom.some(function(item) { return typeof item !== 'string' }) // Must be an array of strings only.
-    ) throw new Error('"' + label + '" must be an array with ${num} strings.')
+    ) throw new Error('"' + label + '" must be an array with ' + num + ' strings.')
 
     options[!i ? 'days' : i < 2 ? 'months' : 'overlayMonths'] = custom
   })

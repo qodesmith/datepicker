@@ -133,7 +133,7 @@ describe('Errors thrown by datepicker', function() {
         .to.throw('"options.position" must be one of the following: tl, tr, bl, br, or c.')
     })
 
-    // This test is dependant upon `datepicker.remove()`.
+    // This test is dependent upon `datepicker.remove()`.
     it(`should not throw if "position" is one of - 'tr', 'tl', 'br', 'bl', or 'c'`, function() {
       ['tr', 'tl', 'br', 'bl', 'c'].forEach(position => {
         let picker
@@ -161,7 +161,7 @@ describe('Errors thrown by datepicker', function() {
       expect(() => this.datepicker(singleDatepickerInput, { minDate, maxDate })).not.to.throw()
     })
 
-    // This test is dependant upon `datepicker.remove()`.
+    // This test is dependent upon `datepicker.remove()`.
     it('should not throw if "maxDate" is greater than "minDate" by at least a day', function() {
       let picker
       const noThrow1 = () => {
@@ -193,7 +193,7 @@ describe('Errors thrown by datepicker', function() {
         .to.throw('"dateSelected" in options is less than "minDate".')
     })
 
-    // This test is dependant upon `datepicker.remove()`.
+    // This test is dependent upon `datepicker.remove()`.
     it('should not throw if "dateSelected" is greater than or equal to "minDate"', function() {
       const minDate = new Date(2000, 1, 1)
       let picker
@@ -218,7 +218,7 @@ describe('Errors thrown by datepicker', function() {
         .to.throw('"dateSelected" in options is greater than "maxDate".')
     })
 
-    // This test is dependant upon `datepicker.remove()`.
+    // This test is dependent upon `datepicker.remove()`.
     it('should not throw if "dateSelected" is less than or equal to "maxDate"', function() {
       const maxDate = new Date(2095, 5, 15)
       let picker
@@ -320,4 +320,47 @@ describe('Errors thrown by datepicker', function() {
   })
 
   describe('Daterange pair', function() {})
+
+  describe.only('Methods', function() {
+    describe('setDate', function() {
+      // This test is dependent upon `datepicker.remove()`.
+      it(`should throw if the first argument isn't a date object`, function() {
+        let picker
+        const toThrow1 = () => {
+          picker = this.datepicker(singleDatepickerInput)
+          picker.setDate('hi')
+        }
+        const toThrow2 = () => {
+          picker = this.datepicker(singleDatepickerInput)
+          picker.setDate(Date.now())
+        }
+
+        expect(toThrow1).to.throw('`setDate` needs a JavaScript Date object.')
+        picker.remove()
+        expect(toThrow2).to.throw('`setDate` needs a JavaScript Date object.')
+      })
+
+      // This test is dependent upon `datepicker.remove()`.
+      it(`should not throw if the first argument is 'null' or 'undefined'`, function() {
+        const picker = this.datepicker(singleDatepickerInput)
+
+        expect(() => picker.setDate(null)).not.to.throw()
+        expect(() => picker.setDate(undefined)).not.to.throw()
+        expect(() => picker.setDate()).not.to.throw()
+      })
+
+      it('should throw if the first argument is a date contained in "disabledDates"', function() {
+        const today = new Date()
+        const disabledDates = [today]
+        const picker = this.datepicker(singleDatepickerInput, { disabledDates })
+
+        expect(() => picker.setDate(today)).to.throw("You can't manually set a date that's disabled.")
+      })
+
+      it('should not throw if the first argument is not a date contained in "disabledDates"', function() {
+        const picker = this.datepicker(singleDatepickerInput, { disabledDates: [] })
+        expect(() => picker.setDate(new Date())).not.to.throw()
+      })
+    })
+  })
 })

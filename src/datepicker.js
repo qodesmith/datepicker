@@ -158,7 +158,6 @@ function createInstance(selectorOrElement, opts) {
     which would have avoided having to use a while loop with all this logic.
   */
   } else {
-    var hasShadowDomSupport = 'getRootNode' in window.Node.prototype
     var rootFound
     var currentParent = el.parentNode
 
@@ -172,16 +171,8 @@ function createInstance(selectorOrElement, opts) {
       // We're using a shadow DOM.
       } else if (parentType === '[object ShadowRoot]') {
         rootFound = true
-
-        // Throw an error if it's not supported.
-        if (!hasShadowDomSupport) {
-          throw new Error('The shadow DOM is not supported in your browser.')
-
-        // Store the relevant objects.
-        } else {
-          shadowDom = currentParent
-          customElement = currentParent.host
-        }
+        shadowDom = currentParent
+        customElement = currentParent.host
 
       // Focus up the chain to the next parent and keep iterating.
       } else {
@@ -569,7 +560,7 @@ function sanitizeOptions(opts) {
 
   // If id was provided, it cannot me null or undefined.
   if (options.hasOwnProperty('id') && id == null) {
-    throw new Error('Id cannot be `null` or `undefined`')
+    throw new Error('`id` cannot be `null` or `undefined`')
   }
 
   /*
@@ -638,7 +629,7 @@ function sanitizeOptions(opts) {
       !Array.isArray(custom) || // Must be an array.
       custom.length !== num || // Must have the correct length.
       custom.some(function(item) { return typeof item !== 'string' }) // Must be an array of strings only.
-    ) throw new Error('"' + label + '" must be an array with ${num} strings.')
+    ) throw new Error('"' + label + '" must be an array with ' + num + ' strings.')
 
     options[!i ? 'days' : i < 2 ? 'months' : 'overlayMonths'] = custom
   })
@@ -1718,7 +1709,7 @@ function remove() {
  */
 function navigate(dateOrNum, triggerCb) {
   var date = new Date(dateOrNum)
-  if (!dateCheck(date)) throw new Error('`navigate` needs a JavaScript Date object.')
+  if (!dateCheck(date)) throw new Error('Invalid date passed to `navigate`')
 
   this.currentYear = date.getFullYear()
   this.currentMonth = date.getMonth()

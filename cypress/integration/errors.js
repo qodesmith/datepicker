@@ -279,7 +279,7 @@ describe('Errors thrown by datepicker', function() {
     })
   })
 
-  describe('Single instance', function() {
+  describe('General Errors', function() {
     it('should throw if a shadow DOM is used as the selector', function() {
       const datepicker = this.datepicker
 
@@ -319,9 +319,7 @@ describe('Errors thrown by datepicker', function() {
     })
   })
 
-  describe('Daterange pair', function() {})
-
-  describe.only('Methods', function() {
+  describe('Methods', function() {
     describe('setDate', function() {
       // This test is dependent upon `datepicker.remove()`.
       it(`should throw if the first argument isn't a date object`, function() {
@@ -360,6 +358,79 @@ describe('Errors thrown by datepicker', function() {
       it('should not throw if the first argument is not a date contained in "disabledDates"', function() {
         const picker = this.datepicker(singleDatepickerInput, { disabledDates: [] })
         expect(() => picker.setDate(new Date())).not.to.throw()
+      })
+    })
+
+    describe('setMin', function() {
+      it('should throw if an invalid date is given', function() {
+        const picker = this.datepicker(singleDatepickerInput)
+        expect(() => picker.setMin('not a date!')).to.throw('Invalid date passed to setMin')
+      })
+
+      it('(daterange - first) should throw if new date is > date selected', function() {
+        const dateSelected = new Date()
+        const newDate = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() + 1)
+        const startPicker = this.datepicker(daterangeInputStart, { dateSelected })
+        this.datepicker(daterangeInputEnd, { dateSelected })
+
+        expect(() => startPicker.setMin(newDate)).to.throw('Out-of-range date passed to setMin')
+      })
+
+      it('(daterange - second) should throw if new date is > date selected', function() {
+        const dateSelected = new Date()
+        const newDate = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() + 1)
+        this.datepicker(daterangeInputStart, { dateSelected })
+        const endPicker = this.datepicker(daterangeInputEnd, { dateSelected })
+
+        expect(() => endPicker.setMin(newDate)).to.throw('Out-of-range date passed to setMin')
+      })
+
+      it('should throw if new date is > date selected', function() {
+        const dateSelected = new Date()
+        const newDate = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() + 1)
+        const picker = this.datepicker(singleDatepickerInput, { dateSelected })
+
+        expect(() => picker.setMin(newDate)).to.throw('Out-of-range date passed to setMin')
+      })
+    })
+
+    describe('setMax', function() {
+      it('should throw if an invalid date is given', function() {
+        const picker = this.datepicker(singleDatepickerInput)
+        expect(() => picker.setMax('not a date!')).to.throw('Invalid date passed to setMax')
+      })
+
+      it('(daterange - first) should throw if new date is < date selected', function() {
+        const dateSelected = new Date()
+        const newDate = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() - 1)
+        const startPicker = this.datepicker(daterangeInputStart, { dateSelected })
+        this.datepicker(daterangeInputEnd, { dateSelected })
+
+        expect(() => startPicker.setMax(newDate)).to.throw('Out-of-range date passed to setMax')
+      })
+
+      it('(daterange - second) should throw if new date is < date selected', function() {
+        const dateSelected = new Date()
+        const newDate = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() - 1)
+        this.datepicker(daterangeInputStart, { dateSelected })
+        const endPicker = this.datepicker(daterangeInputEnd, { dateSelected })
+
+        expect(() => endPicker.setMax(newDate)).to.throw('Out-of-range date passed to setMax')
+      })
+
+      it('should throw if new date is < date selected', function() {
+        const dateSelected = new Date()
+        const newDate = new Date(dateSelected.getFullYear(), dateSelected.getMonth(), dateSelected.getDate() - 1)
+        const picker = this.datepicker(singleDatepickerInput, { dateSelected })
+
+        expect(() => picker.setMax(newDate)).to.throw('Out-of-range date passed to setMax')
+      })
+    })
+
+    describe('navigate', function() {
+      it('should throw if an invalid date is given', function() {
+        const picker = this.datepicker(singleDatepickerInput)
+        expect(() => picker.navigate('not a date!')).to.throw('Invalid date passed to `navigate`')
       })
     })
   })

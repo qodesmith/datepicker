@@ -609,13 +609,14 @@ function sanitizeOptions(opts) {
   }
   options.position = establishPosition(position || 'bl')
 
+  function dsErr(min) {
+    var lessOrGreater = min ? 'less' : 'greater'
+    throw new Error('"dateSelected" in options is ' + lessOrGreater + ' than "' + (min || 'max') + 'Date".')
+  }
+
   // Check proper relationship between `minDate`, `maxDate`, & `dateSelected`.
   if (maxDate < minDate) throw new Error('"maxDate" in options is less than "minDate".')
   if (dateSelected) {
-    function dsErr(min) {
-      var lessOrGreater = min ? 'less' : 'greater'
-      throw new Error('"dateSelected" in options is ' + lessOrGreater + ' than "' + (min || 'max') + 'Date".')
-    }
     if (minDate > dateSelected) dsErr('min')
     if (maxDate < dateSelected) dsErr()
   }

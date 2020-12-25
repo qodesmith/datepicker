@@ -78,12 +78,78 @@ describe('User options', function() {
     describe('position', function() {
       it('should position the calendar relative to the input - default (bottom left)', function() {
         this.datepicker(singleDatepickerInput)
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(single.calendarContainer).should('have.attr', 'style')
+        cy.get(single.calendarContainer).then($calendarContainer => {
+          const {top, right, bottom, left} = $calendarContainer[0].style
+
+          expect(+top.replace('px', '')).to.be.greaterThan(0)
+          expect(right).to.equal('')
+          expect(bottom).to.equal('')
+          expect(left).to.equal('0px')
+        })
       })
 
-      it('should position the calendar relative to the input - bottom left', function() {})
-      it('should position the calendar relative to the input - bottom right', function() {})
-      it('should position the calendar relative to the input - top left', function() {})
-      it('should position the calendar relative to the input - top right', function() {})
+      it('should position the calendar relative to the input - bottom left', function() {
+        this.datepicker(singleDatepickerInput, {position: 'bl'})
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(single.calendarContainer).should('have.attr', 'style')
+        cy.get(single.calendarContainer).then($calendarContainer => {
+          const {top, right, bottom, left} = $calendarContainer[0].style
+
+          expect(+top.replace('px', '')).to.be.greaterThan(0)
+          expect(right).to.equal('')
+          expect(bottom).to.equal('')
+          expect(left).to.equal('0px')
+        })
+      })
+
+      it('should position the calendar relative to the input - bottom right', function() {
+        this.datepicker(singleDatepickerInput, {position: 'br'})
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(single.calendarContainer).should('have.attr', 'style')
+        cy.get(single.calendarContainer).then($calendarContainer => {
+          const {top, right, bottom, left} = $calendarContainer[0].style
+
+          expect(+top.replace('px', '')).to.be.greaterThan(0)
+          expect(right).to.equal('')
+          expect(bottom).to.equal('')
+          expect(+left.replace('px', '')).to.be.greaterThan(0)
+        })
+      })
+
+      it('should position the calendar relative to the input - top left', function() {
+        this.datepicker(singleDatepickerInput, {position: 'tl'})
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(single.calendarContainer).should('have.attr', 'style')
+        cy.get(single.calendarContainer).then($calendarContainer => {
+          const {top, right, bottom, left} = $calendarContainer[0].style
+
+          expect(+top.replace('px', '')).to.be.lessThan(0)
+          expect(right).to.equal('')
+          expect(bottom).to.equal('')
+          expect(left).to.equal('0px')
+        })
+      })
+
+      it('should position the calendar relative to the input - top right', function() {
+        this.datepicker(singleDatepickerInput, {position: 'tr'})
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(single.calendarContainer).should('have.attr', 'style')
+        cy.get(single.calendarContainer).then($calendarContainer => {
+          const {top, right, bottom, left} = $calendarContainer[0].style
+
+          expect(+top.replace('px', '')).to.be.lessThan(0)
+          expect(right).to.equal('')
+          expect(bottom).to.equal('')
+          expect(+left.replace('px', '')).to.be.greaterThan(0)
+        })
+      })
     })
   })
 })

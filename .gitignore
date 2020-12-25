@@ -1,6 +1,7 @@
 # Files
 .DS_Store
 .idea
+package-lock.json
 
 # Folders
 node_modules

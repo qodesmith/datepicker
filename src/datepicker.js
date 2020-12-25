@@ -841,7 +841,7 @@ function createMonth(date, instance, overlayOpen) {
     var isSelected = +thisDay === +dateSelected
 
     // Is this day a weekend? Weekends for Datepicker are strictly Saturday & Sunday.
-    var isWeekend = weekdayIndex === 0 || weekdayIndex === 6
+    var isWeekend = weekdayIndex === weekendIndices[0] || weekdayIndex === weekendIndices[1]
 
     // Is this iteration's date disabled?
     var isDisabled = disabledDates[+thisDay] ||

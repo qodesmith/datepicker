@@ -151,5 +151,25 @@ describe('User options', function() {
         })
       })
     })
+
+    describe('startDay', function() {
+      it('should start the calendar on the specified day of the week (Monday)', function() {
+        this.datepicker(singleDatepickerInput, {startDay: 1})
+
+        cy.get(single.squares).then($squares => {
+          const [firstSquare] = $squares
+          expect(firstSquare.textContent).to.equal('Mon')
+        })
+      })
+
+      it('should start the calendar on the specified day of the week (Thursday)', function() {
+        this.datepicker(singleDatepickerInput, {startDay: 4})
+
+        cy.get(single.squares).then($squares => {
+          const [firstSquare] = $squares
+          expect(firstSquare.textContent).to.equal('Thu')
+        })
+      })
+    })
   })
 })

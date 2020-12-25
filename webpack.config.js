@@ -38,7 +38,6 @@ module.exports = (env, argv) => ({
     minimize: !!env.prod,
     minimizer: [
       new TerserPlugin({ // https://goo.gl/YgdtKb
-        cache: true, // https://goo.gl/QVWRtq
         parallel: true, //https://goo.gl/hUkvnK
         terserOptions: { // https://goo.gl/y3psR1
           ecma: 5,

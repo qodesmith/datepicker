@@ -286,5 +286,35 @@ describe('User options', function() {
         cy.get(common.overlayYearInput).should('have.attr', 'placeholder', overlayPlaceholder)
       })
     })
+
+    describe('events', function() {
+      it.only('should show a blue dot next to each day for the dates provided', function() {
+        const today = new Date()
+        const year = today.getFullYear()
+        const month = today.getMonth()
+        const days = [5, 10, 15]
+        const events = days.map(day => new Date(year, month, day))
+        this.datepicker(singleDatepickerInput, {events})
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(common.squareWithNum).then($squares => {
+          Array.from($squares).forEach((square, i) => {
+            const day = i + 1
+
+            if (days.includes(day)) {
+              // https://stackoverflow.com/a/55517628/2525633 - get pseudo element styles in Cypress.
+              const win = square.ownerDocument.defaultView
+              const after = win.getComputedStyle(square, 'after')
+
+              expect(square.classList.contains('qs-event'), day).to.equal(true)
+              expect(after.backgroundColor).to.equal('rgb(0, 119, 255)')
+              expect(after.borderRadius).to.equal('50%')
+            } else {
+              expect(square.classList.contains('qs-event'), day).to.equal(false)
+            }
+          })
+        })
+      })
+    })
   })
 })

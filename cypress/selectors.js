@@ -15,7 +15,7 @@ const squaresContainer = '.qs-squares'
 const everySquare = '.qs-square'
 const squareDayHeader = '.qs-day'
 const squareOutsideCurrentMonth = '.qs-outside-current-month'
-const sqareWithNum = '.qs-num'
+const squareWithNum = '.qs-num'
 const squareCurrentDay = '.qs-current'
 const overlay = '.qs-overlay'
 const overlayInputContainer = '.qs-overlay > div:nth-of-type(1)'
@@ -66,7 +66,7 @@ const datepickerSelectors = {
     everySquare,
     squareDayHeader,
     squareOutsideCurrentMonth,
-    sqareWithNum,
+    squareWithNum,
     squareCurrentDay,
 
     overlayInputContainer,

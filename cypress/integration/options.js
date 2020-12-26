@@ -268,5 +268,14 @@ describe('User options', function() {
         })
       })
     })
+
+    describe('overlayButton', function() {
+      it('should display custom text for the overlay button', function() {
+        const overlayButton = 'Qodesmith!'
+        this.datepicker(singleDatepickerInput, {overlayButton})
+
+        cy.get(common.overlaySubmit).should('have.text', overlayButton)
+      })
+    })
   })
 })

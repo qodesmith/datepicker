@@ -171,5 +171,102 @@ describe('User options', function() {
         })
       })
     })
+
+    describe('customDays', function() {
+      it('should display custom days in the calendar header', function() {
+        const customDays = 'abcdefg'.split('')
+        this.datepicker(singleDatepickerInput, {customDays})
+
+        cy.get(single.squares).then($squares => {
+          Array
+            .from($squares)
+            .slice(0, 7)
+            .map(el => el.textContent)
+            .forEach((text, i) => expect(text).to.equal(customDays[i]))
+        })
+      })
+    })
+
+    describe('customMonths', function() {
+      const customMonths = [
+        'Enero',
+        'Febrero',
+        'Marzo',
+        'Abril',
+        'Mayo',
+        'Junio',
+        'Julio',
+        'Agosto',
+        'Septiembre',
+        'Octubre',
+        'Noviembre',
+        'Diciembre'
+      ]
+
+      it('should display custom month names in the header', function() {
+        let currentMonthIndex = new Date().getMonth()
+
+        // `alwaysShow` is used simply to avoid having to click to open the calendar each time.
+        this.datepicker(singleDatepickerInput, {customMonths, alwaysShow: 1})
+
+        // https://stackoverflow.com/a/53487016/2525633 - Use array iteration as opposed to a for-loop.
+        Array.from({length: 12}, (_, i) => {
+          if (currentMonthIndex > 11) currentMonthIndex = 0
+
+          cy.get(`${single.controls} .qs-month`).should('have.text', customMonths[currentMonthIndex])
+          cy.get(`${single.controls} .qs-arrow.qs-right`).click()
+
+          currentMonthIndex++
+        })
+      })
+
+      it('should display abbreviated custom month names in the overlay', function() {
+        this.datepicker(singleDatepickerInput, {customMonths})
+
+        cy.get(common.overlayMonth).then($months => {
+          Array.from($months).forEach((month, i) => {
+            expect(month.textContent).to.equal(customMonths[i].slice(0, 3))
+          })
+        })
+      })
+    })
+
+    describe('customOverlayMonths', function() {
+      const customOverlayMonths = 'abcdefghijkl'.split('')
+
+      it('should display custom abbreviated month names in the overlay', function() {
+        this.datepicker(singleDatepickerInput, {customOverlayMonths})
+
+        cy.get(common.overlayMonth).then($months => {
+          Array.from($months).forEach((month, i) => {
+            expect(month.textContent).to.equal(customOverlayMonths[i])
+          })
+        })
+      })
+
+      it('should display custom abbreviated month names in the overlay, unaffected by `customMonths`', function() {
+        const customMonths = [
+          'Enero',
+          'Febrero',
+          'Marzo',
+          'Abril',
+          'Mayo',
+          'Junio',
+          'Julio',
+          'Agosto',
+          'Septiembre',
+          'Octubre',
+          'Noviembre',
+          'Diciembre'
+        ]
+        this.datepicker(singleDatepickerInput, {customOverlayMonths, customMonths})
+
+        cy.get(common.overlayMonth).then($months => {
+          Array.from($months).forEach((month, i) => {
+            expect(month.textContent).to.equal(customOverlayMonths[i])
+          })
+        })
+      })
+    })
   })
 })

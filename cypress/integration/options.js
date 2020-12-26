@@ -288,7 +288,7 @@ describe('User options', function() {
     })
 
     describe('events', function() {
-      it.only('should show a blue dot next to each day for the dates provided', function() {
+      it('should show a blue dot next to each day for the dates provided', function() {
         const today = new Date()
         const year = today.getFullYear()
         const month = today.getMonth()
@@ -312,6 +312,138 @@ describe('User options', function() {
             } else {
               expect(square.classList.contains('qs-event'), day).to.equal(false)
             }
+          })
+        })
+      })
+    })
+  })
+
+  describe('Settings', function() {
+    describe('alwaysShow', function() {
+      it('should always show the calendar', function() {
+        const todaysDate = new Date().getDate()
+        this.datepicker(singleDatepickerInput, {alwaysShow: true})
+
+        cy.get(single.calendarContainer).should('be.visible')
+        cy.get('body').click()
+        cy.get(single.calendarContainer).should('be.visible')
+        cy.get(common.squareWithNum).eq(todaysDate === 1 ? 1 : 0).click()
+        cy.get(single.calendarContainer).should('be.visible')
+      })
+    })
+
+    describe('dateSelected', function() {
+      it('should have a date selected on the calendar', function() {
+        const dateSelected = new Date()
+        const date = dateSelected.getDate()
+        this.datepicker(singleDatepickerInput, {dateSelected})
+
+        cy.get('.qs-active').should('have.text', date)
+        cy.get(singleDatepickerInput).should('have.value', dateSelected.toDateString())
+      })
+    })
+
+    describe('maxDate', function() {
+      it('should disable dates beyond the date provided', function() {
+        const maxDate = new Date()
+        const todaysDate = maxDate.getDate()
+        this.datepicker(singleDatepickerInput, {maxDate})
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(common.squareWithNum).then($squares => {
+          Array.from($squares).forEach((square, i) => {
+            const win = square.ownerDocument.defaultView
+            const {opacity, cursor} = win.getComputedStyle(square)
+
+            if (i + 1 > todaysDate) {
+              expect(square.classList.contains('qs-disabled')).to.equal(true)
+              expect(opacity, 'disabled date opacity').to.equal('0.2')
+              expect(cursor, 'disabled date cursor').to.equal('not-allowed')
+            } else {
+              expect(square.classList.contains('qs-disabled')).to.equal(false)
+              expect(opacity, 'enabled date opacity').to.equal('1')
+              expect(cursor, 'enabled date cursor').to.equal('pointer')
+            }
+          })
+        })
+
+        // Check the next month.
+        cy.get(`${single.controls} .qs-arrow.qs-right`).click()
+        cy.get(common.squareWithNum).then($squares => {
+          Array.from($squares).forEach((square, i) => {
+            const win = square.ownerDocument.defaultView
+            const {opacity, cursor} = win.getComputedStyle(square)
+
+            expect(square.classList.contains('qs-disabled')).to.equal(true)
+            expect(opacity, 'disabled date opacity').to.equal('0.2')
+            expect(cursor, 'disabled date cursor').to.equal('not-allowed')
+          })
+        })
+
+        // Check the month before.
+        cy.get(`${single.controls} .qs-arrow.qs-left`).click()
+        cy.get(`${single.controls} .qs-arrow.qs-left`).click()
+        cy.get(common.squareWithNum).then($squares => {
+          Array.from($squares).forEach((square, i) => {
+            const win = square.ownerDocument.defaultView
+            const {opacity, cursor} = win.getComputedStyle(square)
+
+            expect(square.classList.contains('qs-disabled')).to.equal(false)
+            expect(opacity, 'enabled date opacity').to.equal('1')
+            expect(cursor, 'enabled date cursor').to.equal('pointer')
+          })
+        })
+      })
+    })
+
+    describe('minDate', function() {
+      it('should disable dates beyond the date provided', function() {
+        const minDate = new Date()
+        const todaysDate = minDate.getDate()
+        this.datepicker(singleDatepickerInput, {minDate})
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(common.squareWithNum).then($squares => {
+          Array.from($squares).forEach((square, i) => {
+            const win = square.ownerDocument.defaultView
+            const {opacity, cursor} = win.getComputedStyle(square)
+
+            if (i + 1 < todaysDate) {
+              expect(square.classList.contains('qs-disabled')).to.equal(true)
+              expect(opacity, 'disabled date opacity').to.equal('0.2')
+              expect(cursor, 'disabled date cursor').to.equal('not-allowed')
+            } else {
+              expect(square.classList.contains('qs-disabled')).to.equal(false)
+              expect(opacity, 'enabled date opacity').to.equal('1')
+              expect(cursor, 'enabled date cursor').to.equal('pointer')
+            }
+          })
+        })
+
+        // Check the next month.
+        cy.get(`${single.controls} .qs-arrow.qs-right`).click()
+        cy.get(common.squareWithNum).then($squares => {
+          Array.from($squares).forEach((square, i) => {
+            const win = square.ownerDocument.defaultView
+            const {opacity, cursor} = win.getComputedStyle(square)
+
+            expect(square.classList.contains('qs-disabled')).to.equal(false)
+            expect(opacity, 'enabled date opacity').to.equal('1')
+            expect(cursor, 'enabled date cursor').to.equal('pointer')
+          })
+        })
+
+        // Check the month before.
+        cy.get(`${single.controls} .qs-arrow.qs-left`).click()
+        cy.get(`${single.controls} .qs-arrow.qs-left`).click()
+        cy.get(common.squareWithNum).then($squares => {
+          Array.from($squares).forEach((square, i) => {
+            const win = square.ownerDocument.defaultView
+            const {opacity, cursor} = win.getComputedStyle(square)
+
+            expect(square.classList.contains('qs-disabled')).to.equal(true)
+            expect(opacity, 'disabled date opacity').to.equal('0.2')
+            expect(cursor, 'disabled date cursor').to.equal('not-allowed')
           })
         })
       })

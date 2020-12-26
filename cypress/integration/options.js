@@ -271,10 +271,19 @@ describe('User options', function() {
 
     describe('overlayButton', function() {
       it('should display custom text for the overlay button', function() {
-        const overlayButton = 'Qodesmith!'
+        const overlayButton = '¡Vamanos!'
         this.datepicker(singleDatepickerInput, {overlayButton})
 
         cy.get(common.overlaySubmit).should('have.text', overlayButton)
+      })
+    })
+
+    describe('overlayPlaceholder', function() {
+      it('should display custom placeholder text for the overlay year-input', function() {
+        const overlayPlaceholder = 'Entrar un año'
+        this.datepicker(singleDatepickerInput, {overlayPlaceholder})
+
+        cy.get(common.overlayYearInput).should('have.attr', 'placeholder', overlayPlaceholder)
       })
     })
   })

@@ -1,4 +1,5 @@
 import selectors from '../selectors'
+import pickerProperties from '../pickerProperties'
 
 const {
   singleDatepickerInput,
@@ -448,5 +449,107 @@ describe('User options', function() {
         })
       })
     })
+
+    describe('startDate', function() {
+      it('should start the calendar in the month & year of the date provided', function() {
+        const {months} = pickerProperties
+        const startDate = new Date()
+        const year = startDate.getFullYear()
+        const currentMonthName = months[startDate.getMonth()]
+        this.datepicker(singleDatepickerInput, {startDate})
+
+        cy.get(`${single.controls} .qs-month`).should('have.text', currentMonthName)
+        cy.get(`${single.controls} .qs-year`).should('have.text', year)
+      })
+    })
+
+    describe('showAllDates', function() {
+      it('should show numbers for dates outside the current month', function() {
+        this.datepicker(singleDatepickerInput, {showAllDates: true})
+
+        cy.get(`${single.squaresContainer} .qs-outside-current-month`).then($squares => {
+          Array.from($squares).forEach(square => {
+            const win = square.ownerDocument.defaultView
+            const {opacity, cursor} = win.getComputedStyle(square)
+            const num = +square.textContent
+
+            const {dataset} = square
+            expect(dataset.hasOwnProperty('direction'))
+            expect(opacity, 'date outside current month - opacity').to.equal('0.2')
+            expect(cursor, 'date outside current month - cursor').to.equal('pointer')
+            expect(num, 'number inside square').to.be.greaterThan(0)
+          })
+        })
+      })
+    })
+
+    describe('respectDisabledReadOnly', function() {
+      it('should show a non-selectable calendar when the input has the `disabled` property', function() {
+        cy.window().then(global => {
+          const input = global.document.querySelector(singleDatepickerInput)
+          input.setAttribute('disabled', '')
+
+          // Using `alwaysShow` otherwise the calendar won't be able to be shown since the input is disabled.
+          global.datepicker(singleDatepickerInput, {respectDisabledReadOnly: true, alwaysShow: true})
+
+          // Selecting days should have no effect.
+          cy.get(`${single.squaresContainer} .qs-active`).should('have.length', 0)
+          cy.get(`${single.squaresContainer} .qs-num`).first().click()
+          cy.get(`${single.squaresContainer} .qs-active`).should('have.length', 0)
+
+          // You should be able to change months.
+          const initialMonthName = global.document.querySelector('.qs-month').textContent
+          cy.get(`${single.controls} .qs-arrow.qs-right`).click().then(() => {
+            const nextMonthName = global.document.querySelector('.qs-month').textContent
+            expect(initialMonthName).not.to.equal(nextMonthName)
+
+            // You should be able to use the overlay.
+            const initialYear = global.document.querySelector('.qs-year').textContent
+            cy.get('.qs-month-year').click()
+            cy.get(common.overlayYearInput).type('2099')
+            cy.get(common.overlaySubmit).click().then(() => {
+              const otherYear = global.document.querySelector('.qs-year').textContent
+              expect(initialYear).not.to.equal(otherYear)
+              cy.get('.qs-year').should('have.text', '2099')
+            })
+          })
+        })
+      })
+
+      it('should show a non-selectable calendar when the input has the `readonly` property', function() {
+        cy.window().then(global => {
+          const input = global.document.querySelector(singleDatepickerInput)
+          input.setAttribute('readonly', '')
+          global.datepicker(singleDatepickerInput, {respectDisabledReadOnly: true})
+
+          // Selecting days should have no effect.
+          cy.get(singleDatepickerInput).click()
+          cy.get(`${single.squaresContainer} .qs-active`).should('have.length', 0)
+          cy.get(`${single.squaresContainer} .qs-num`).first().click()
+          cy.get(`${single.squaresContainer} .qs-active`).should('have.length', 0)
+
+          // You should be able to change months.
+          const initialMonthName = global.document.querySelector('.qs-month').textContent
+          cy.get(`${single.controls} .qs-arrow.qs-right`).click().then(() => {
+            const nextMonthName = global.document.querySelector('.qs-month').textContent
+            expect(initialMonthName).not.to.equal(nextMonthName)
+
+            // You should be able to use the overlay.
+            const initialYear = global.document.querySelector('.qs-year').textContent
+            cy.get('.qs-month-year').click()
+            cy.get(common.overlayYearInput).type('2099')
+            cy.get(common.overlaySubmit).click().then(() => {
+              const otherYear = global.document.querySelector('.qs-year').textContent
+              expect(initialYear).not.to.equal(otherYear)
+              cy.get('.qs-year').should('have.text', '2099')
+            })
+          })
+        })
+      })
+    })
+  })
+
+  describe.only('Disabling Things', function() {
+
   })
 })

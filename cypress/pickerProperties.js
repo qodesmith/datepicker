@@ -4,7 +4,7 @@ const getFirstElement = elements => elements[0]
 const tempDate = new Date()
 const date = new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate())
 const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 const singleDatepickerProperties = [
   {

@@ -7,6 +7,8 @@ const {
   range,
   common,
   singleDatepickerInputParent,
+  daterangeInputStart,
+  daterangeInputEnd,
 } = selectors
 
 describe('User options', function() {
@@ -643,6 +645,91 @@ describe('User options', function() {
             expect(square.classList.contains('qs-disabled')).to.equal(true)
           })
         })
+      })
+    })
+
+    describe('disabledDates', function() {
+      it('should disable the dates provided', function() {
+        const today = new Date()
+        this.datepicker(singleDatepickerInput, {
+          disabledDates: [
+            new Date(today.getFullYear(), today.getMonth(), 1),
+            new Date(today.getFullYear(), today.getMonth(), 17),
+            new Date(today.getFullYear(), today.getMonth(), 25),
+          ],
+        })
+
+        cy.get(`${single.squaresContainer} .qs-disabled`)
+          .should('have.length', 3)
+          .should($days => {
+            expect($days.eq(0).text()).to.equal('1')
+            expect($days.eq(1).text()).to.equal('17')
+            expect($days.eq(2).text()).to.equal('25')
+          })
+      })
+    })
+
+    /*
+      I don't know how to test `disableMobile` since there is logic with that option
+      to check if the device is mobile or not.
+    */
+
+    describe('disableYearOverlay', function() {
+      it('should disable showing the overlay', function() {
+        this.datepicker(singleDatepickerInput, {disableYearOverlay: true})
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(single.overlay).should('have.class', 'qs-hidden')
+        cy.get(`${single.controls} .qs-month-year`).click()
+        cy.get(single.overlay).should('have.class', 'qs-hidden')
+      })
+    })
+
+    describe('disabled - an instance property, not an option property', function() {
+      it('should disable the calendar from showing', function() {
+        const instance = this.datepicker(singleDatepickerInput)
+        instance.disabled = true
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(single.calendarContainer).should('not.be.visible')
+      })
+
+      it('should disable all functionality for a calendar that is showing', function() {
+        const instance = this.datepicker(singleDatepickerInput, {alwaysShow: true})
+        instance.disabled = true
+        const currentMonthName = pickerProperties.months[new Date().getMonth()]
+
+        // Clicking a day.
+        cy.get(common.squareWithNum).eq(0).click()
+        cy.get(singleDatepickerInput).should('have.value', '')
+
+        // Clicking the arrows.
+        cy.get(`${single.controls} .qs-month`).should('have.text', currentMonthName)
+        cy.get(`${single.controls} .qs-arrow.qs-left`).click()
+        cy.get(`${single.controls} .qs-month`).should('have.text', currentMonthName)
+
+        // Clicking to try to show the overlay.
+        cy.get(`${single.controls} .qs-month-year`).click()
+        cy.get(common.overlay).should('not.be.visible')
+      })
+    })
+
+    describe('id - only for daterange pickers', function() {
+      it('should create and link a daterange pair', function() {
+        const id = 1
+        const pickerStart = this.datepicker(daterangeInputStart, {id})
+        const pickerEnd = this.datepicker(daterangeInputEnd, {id})
+        const pickerSingle = this.datepicker(singleDatepickerInput)
+
+        // `id` property.
+        expect(pickerStart.id).to.equal(id)
+        expect(pickerEnd.id).to.equal(id)
+        expect(pickerSingle.id).to.equal(undefined)
+
+        // Only ranges should have the `getRange` method.
+        expect(typeof pickerStart.getRange, 'getRange - start').to.equal('function')
+        expect(typeof pickerEnd.getRange, 'getRange - end').to.equal('function')
+        expect(pickerSingle.getRange, `getRange shouldn't exist on a single picker`).to.equal(undefined)
       })
     })
   })

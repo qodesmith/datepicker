@@ -617,5 +617,33 @@ describe('User options', function() {
         })
       })
     })
+
+    describe('disabler', function() {
+      it('should disable all odd days', function() {
+        this.datepicker(singleDatepickerInput, {
+          disabler: date => date.getDate() % 2,
+        })
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(common.squareWithNum).first().click()
+        cy.get(singleDatepickerInput).should('have.value', '')
+        cy.get(common.squareWithNum).eq(1).click()
+        cy.get(singleDatepickerInput).should('not.have.value', '')
+      })
+
+      it('should disable days outside the calendar month as well', function() {
+        this.datepicker(singleDatepickerInput, {
+          disabler: date => true,
+          showAllDates: true,
+        })
+
+        cy.get(singleDatepickerInput).click()
+        cy.get(common.squareOutsideCurrentMonth).should($squares => {
+          Array.from($squares).forEach(square => {
+            expect(square.classList.contains('qs-disabled')).to.equal(true)
+          })
+        })
+      })
+    })
   })
 })

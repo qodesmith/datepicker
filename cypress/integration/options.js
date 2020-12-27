@@ -549,7 +549,73 @@ describe('User options', function() {
     })
   })
 
-  describe.only('Disabling Things', function() {
+  describe('Disabling Things', function() {
+    describe('noWeekends', function() {
+      it('should disable Saturday and Sunday', function() {
+        const date = new Date()
+        this.datepicker(singleDatepickerInput, {noWeekends: true})
 
+        cy.get(common.squareWithNum).then($squares => {
+          const newDate = new Date(date.getFullYear(), date.getMonth(), 1)
+          let index = newDate.getDay()
+
+          Array.from($squares).forEach(square => {
+            if (index === 7) index = 0
+
+            if ((index === 0 || index === 6) && !square.classList.contains('qs-outside-current-month')) {
+              expect(square.classList.contains('qs-disabled'), square.textContent).to.equal(true)
+            } else {
+              expect(square.classList.contains('qs-disabled'), square.textContent).to.equal(false)
+            }
+
+            index++
+          })
+        })
+      })
+
+      it('should disable Saturday and Sunday even when Sunday is not the start day', function() {
+        const date = new Date()
+        this.datepicker(singleDatepickerInput, {noWeekends: true, startDay: 3})
+
+        cy.get(common.squareWithNum).then($squares => {
+          const newDate = new Date(date.getFullYear(), date.getMonth(), 1)
+          let index = newDate.getDay()
+
+          Array.from($squares).forEach(square => {
+            if (index === 7) index = 0
+
+            if ((index === 0 || index === 6) && !square.classList.contains('qs-outside-current-month')) {
+              expect(square.classList.contains('qs-disabled'), square.textContent).to.equal(true)
+            } else {
+              expect(square.classList.contains('qs-disabled'), square.textContent).to.equal(false)
+            }
+
+            index++
+          })
+        })
+      })
+
+      it('should disable Saturday and Sunday even when `showAllDates` is true', function() {
+        const date = new Date()
+        this.datepicker(singleDatepickerInput, {noWeekends: true, showAllDates: true})
+
+        cy.get(common.squareWithNum).then($squares => {
+          const newDate = new Date(date.getFullYear(), date.getMonth(), 1)
+          let index = 0
+
+          Array.from($squares).forEach(square => {
+            if (index === 7) index = 0
+
+            if (index === 0 || index === 6) {
+              expect(square.classList.contains('qs-disabled'), square.textContent).to.equal(true)
+            } else {
+              expect(square.classList.contains('qs-disabled'), square.textContent).to.equal(false)
+            }
+
+            index++
+          })
+        })
+      })
+    })
   })
 })

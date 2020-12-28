@@ -1723,6 +1723,10 @@ function navigate(dateOrNum, triggerCb) {
   }
 }
 
+/*
+ *  Programmatically toggles the overlay.
+ *  Only works when the calendar is open.
+ */
 function instanceToggleOverlay() {
   var calendarIsShowing = !this.calendarContainer.classList.contains('qs-hidden')
   var overlayIsShowing = !this.calendarContainer.querySelector('.qs-overlay').classList.contains('qs-hidden')

@@ -325,6 +325,9 @@ function createInstance(selectorOrElement, opts) {
     // Method to programmatically navigate the calendar
     navigate: navigate,
 
+    // Method to programmatically toggle the overlay.
+    toggleOverlay: instanceToggleOverlay,
+
 
 
     // Callback fired when a date is selected - triggered in `selectDay`.
@@ -1718,6 +1721,13 @@ function navigate(dateOrNum, triggerCb) {
   if (triggerCb) {
     this.onMonthChange(this)
   }
+}
+
+function instanceToggleOverlay() {
+  var calendarIsShowing = !this.calendarContainer.classList.contains('qs-hidden')
+  var overlayIsShowing = !this.calendarContainer.querySelector('.qs-overlay').classList.contains('qs-hidden')
+
+  calendarIsShowing && toggleOverlay(overlayIsShowing, this)
 }
 
 

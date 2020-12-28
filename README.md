@@ -80,6 +80,7 @@ Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicke
 * [show](#show)
 * [hide](#hide)
   * [Show / Hide "Gotcha"](#show--hide-gotcha)
+* [toggleOverlay](#toggleOverlay)
 * [getRange](#getrange) _(daterange only)_
 
 
@@ -797,6 +798,19 @@ button.addEventListener('click', e => {
   const isHidden = picker.calendarContainer.classList.contains('qs-hidden')
   picker[isHidden ? 'show' : 'hide']()
 })
+```
+
+
+### toggleOverlay
+
+Call this method on the picker to programmatically toggle the overlay. This will only work if the calendar is showing!
+
+```javascript
+const picker = datepicker('.some-input')
+
+// Click the input to show the calendar...
+
+picker.toggleOverlay()
 ```
 
 

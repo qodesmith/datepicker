@@ -24,19 +24,19 @@ function checkPickerProperties(picker, isDaterange, id) {
     // First get the dom element, then ensure it has the correct default value.
     } else if (domElement) {
       cy.get(selector).then(elements => {
-        expect(value, property).to.equal(defaultValue(elements))
-        expect(elements, selector).to.have.lengthOf(1)
+        expect(value, `(checkPickerProperties) ${property}`).to.equal(defaultValue(elements))
+        expect(elements, `(checkPickerProperties) ${selector}`).to.have.lengthOf(1)
       })
 
     // Ensure the value is a function.
     } else if (isFunction) {
-      expect(value, property).to.be.a('function')
+      expect(value, `(checkPickerProperties) method<${property}>`).to.be.a('function')
 
     // The property should have the correct default value.
     } else if (deepEqual) {
-      expect(value, property).to.deep.equal(defaultValue)
+      expect(value, `(checkPickerProperties) ${property}`).to.deep.equal(defaultValue)
     } else {
-      expect(value, property).to.equal(defaultValue)
+      expect(value, `(checkPickerProperties) ${property}`).to.equal(defaultValue)
     }
   }
 }
@@ -220,6 +220,7 @@ function testDomStructure(pickerType, selectorObj) {
   cy.get('@overlayYearInput').should('have.attr', 'class', 'qs-overlay-year')
   cy.get('@overlayYearInput').should('have.attr', 'placeholder', '4-digit year')
   cy.get('@overlayYearInput').should('have.prop', 'value', '')
+  cy.get('@overlayYearInput').should('have.attr', 'inputmode', 'numeric')
 
   // calendar => overlay => overlayInputContainer => close
   cy.get(selectors.common.overlayClose).should('have.length', 1 * multiplier) // Searching the whole document.
@@ -282,17 +283,20 @@ describe('Default properties and behavior', function() {
   describe('Single instance', function() {
     it('should have the correct properties and values', function() {
       const picker = this.datepicker(singleDatepickerInput)
+      const pickerProperties = Object.keys(picker)
+      const trackedProperties = singleDatepickerProperties.reduce((acc, {property}) => ({...acc, [property]: true}), {})
 
-      singleDatepickerProperties.forEach(checkPickerProperties(picker))
+      // Ensure that all the properties on the picker are tracked in our test data.
+      pickerProperties.forEach(property => {
+        expect(trackedProperties, `(trackedProperties) ${property}`).to.haveOwnProperty(property)
+      })
 
-      // Ensure that only and all the properties are in the picker instance.
-      const pickerKeys = Object.keys(picker)
-      const numOfPropertiesExpected = singleDatepickerProperties.length
-      expect(pickerKeys).to.have.length(numOfPropertiesExpected)
-
+      // Ensure all the properties in our test data are on the instance.
       singleDatepickerProperties.forEach(({ property }) => {
         expect(picker, property).to.haveOwnProperty(property)
       })
+
+      // singleDatepickerProperties.forEach(checkPickerProperties(picker))
     })
 
     it('should have the correct DOM structure', function() {
@@ -418,6 +422,21 @@ describe('Default properties and behavior', function() {
 
             expect(styles.opacity, message).to.equal('1')
             expect(styles.zIndex, message).to.equal('1')
+          })
+        })
+
+        it('should show the overlay if "defaultView" is set to "overlay"', function() {
+          this.datepicker(singleDatepickerInput, {defaultView: 'overlay'})
+
+          cy.get(selectors.single.overlay).should('not.be.visible')
+          cy.get(singleDatepickerInput).click().then(() => {
+            cy.get(selectors.single.overlay).should('be.visible')
+            cy.get(`${selectors.single.overlay} .qs-close`).click().then(() => {
+              cy.get(selectors.single.overlay).should('not.be.visible')
+              cy.get('body').click()
+              cy.get(singleDatepickerInput).click()
+              cy.get(selectors.single.overlay).should('be.visible')
+            })
           })
         })
 
@@ -1193,6 +1212,36 @@ describe('Default properties and behavior', function() {
           expect(pickerOptions.onMonthChange).not.to.be.called
           picker.navigate(date, true)
           expect(pickerOptions.onMonthChange).to.be.called
+        })
+      })
+
+      describe('toggleOverlay', function() {
+        it('should be a function', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          expect(picker.toggleOverlay).to.be.a('function')
+        })
+
+        it('should toggle the overlay', function() {
+          const picker = this.datepicker(singleDatepickerInput)
+
+          cy.get(singleDatepickerInput).click()
+          cy.get(selectors.common.overlay).should('not.be.visible').then(() => {
+            picker.toggleOverlay()
+            cy.get(selectors.common.overlay).should('be.visible')
+            cy.wait(500).then(() => {
+              picker.toggleOverlay()
+              cy.get(selectors.common.overlay).should('not.be.visible')
+            })
+          })
+        })
+
+        it(`should do nothing when the calendar isn't shown`, function() {
+          const picker = this.datepicker(singleDatepickerInput)
+          picker.toggleOverlay()
+          cy.get(singleDatepickerInput).click().then(() => {
+            cy.wait(500)
+            cy.get(selectors.common.overlay).should('not.be.visible')
+          })
         })
       })
     })
@@ -2844,6 +2893,68 @@ describe('Default properties and behavior', function() {
           pickerEnd.navigate(date, true)
           expect(pickerStartOptions.onMonthChange).not.to.be.called
           expect(pickerEndOptions.onMonthChange).to.be.called
+        })
+      })
+
+      describe('toggleOverlay', function() {
+        it('should be a function', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          expect(pickerStart.toggleOverlay).to.be.a('function')
+          expect(pickerEnd.toggleOverlay).to.be.a('function')
+        })
+
+        it('(start) should toggle the overlay', function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+
+          cy.get(daterangeInputStart).click()
+          cy.get(selectors.range.start.overlay).should('not.be.visible').then(() => {
+            pickerStart.toggleOverlay()
+            cy.get(selectors.range.start.overlay).should('be.visible')
+            cy.wait(500).then(() => {
+              pickerStart.toggleOverlay()
+              cy.get(selectors.range.start.overlay).should('not.be.visible')
+            })
+          })
+        })
+
+        it('(end) should toggle the overlay', function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          cy.get(daterangeInputEnd).click()
+          cy.get(selectors.range.end.overlay).should('not.be.visible').then(() => {
+            pickerEnd.toggleOverlay()
+            cy.get(selectors.range.end.overlay).should('be.visible')
+            cy.wait(500).then(() => {
+              pickerEnd.toggleOverlay()
+              cy.get(selectors.range.end.overlay).should('not.be.visible')
+            })
+          })
+        })
+
+        it(`(start) should do nothing when the calendar isn't shown`, function() {
+          const pickerStart = this.datepicker(daterangeInputStart, { id: 1 })
+          this.datepicker(daterangeInputEnd, { id: 1 })
+
+          pickerStart.toggleOverlay()
+          cy.get(daterangeInputStart).click().then(() => {
+            cy.wait(500)
+            cy.get(selectors.range.start.overlay).should('not.be.visible')
+          })
+        })
+
+        it(`(end) should do nothing when the calendar isn't shown`, function() {
+          this.datepicker(daterangeInputStart, { id: 1 })
+          const pickerEnd = this.datepicker(daterangeInputEnd, { id: 1 })
+
+          pickerEnd.toggleOverlay()
+          cy.get(daterangeInputEnd).click().then(() => {
+            cy.wait(500)
+            cy.get(selectors.range.end.overlay).should('not.be.visible')
+          })
         })
       })
     })

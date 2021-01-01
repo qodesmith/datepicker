@@ -277,6 +277,26 @@ describe('Errors thrown by datepicker', function() {
       expect(() => this.datepicker(singleDatepickerInput, { customMonths, customOverlayMonths }))
         .not.to.throw()
     })
+
+    it('should throw if "defaultView" is not the correct value', function() {
+      expect(() => this.datepicker(singleDatepickerInput, {defaultView: 'nope'}))
+        .to.throw('options.defaultView must either be "calendar" or "overlay".')
+    })
+
+    // This test is dependent upon `datepicker.remove()`.
+    it('should not throw if "defaultView" is the correct value', function() {
+      let picker
+      const noThrow1 = () => {
+        picker = this.datepicker(singleDatepickerInput, {defaultView: 'calendar'})
+      }
+      const noThrow2 = () => {
+        picker = this.datepicker(singleDatepickerInput, {defaultView: 'overlay'})
+      }
+
+      expect(noThrow1).not.to.throw()
+      picker.remove()
+      expect(noThrow2).not.to.throw()
+    })
   })
 
   describe('General Errors', function() {

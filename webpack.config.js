@@ -18,6 +18,7 @@ module.exports = (env, argv) => ({
   devServer: {
     open: true,
     contentBase: path.resolve(__dirname, './sandbox'),
+    host: '0.0.0.0', // Allow viewing site locally on a phone.
     port: 9001,
     public: 'http://localhost:9001'
   },

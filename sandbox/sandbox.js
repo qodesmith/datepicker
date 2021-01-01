@@ -16,5 +16,6 @@ window.test = () => {
 
   window.single = datepicker('input', {
     alwaysShow: 0,
+    defaultView: 'overlay',
   })
 }

@@ -302,6 +302,8 @@ function createInstance(selectorOrElement, opts) {
     // Events will show a small circle on calendar days.
     events: options.events || {},
 
+    defaultView: options.defaultView,
+
 
 
     // Method to programmatically set the calendar's date.
@@ -324,6 +326,9 @@ function createInstance(selectorOrElement, opts) {
 
     // Method to programmatically navigate the calendar
     navigate: navigate,
+
+    // Method to programmatically toggle the overlay.
+    toggleOverlay: instanceToggleOverlay,
 
 
 
@@ -664,6 +669,13 @@ function sanitizeOptions(opts) {
   if (typeof overlayPlaceholder !== 'string') delete options.overlayPlaceholder
   if (typeof overlayButton !== 'string') delete options.overlayButton
 
+  // Show either the calendar (default) or the overlay when the calendar is open.
+  var defaultView = options.defaultView
+  if (defaultView && (defaultView !== 'calendar' && defaultView !== 'overlay')) {
+    throw new Error('options.defaultView must either be "calendar" or "overlay".')
+  }
+  options.defaultView = defaultView || 'calendar'
+
   return options
 }
 
@@ -673,7 +685,8 @@ function sanitizeOptions(opts) {
 function defaults() {
   return {
     startDate: stripTime(new Date()),
-    position: 'bl'
+    position: 'bl',
+    defaultView: 'calendar',
   }
 }
 
@@ -906,7 +919,7 @@ function createOverlay(instance, overlayOpen) {
   return [
     '<div class="qs-overlay' + (overlayOpen ? '' : ' qs-hidden') + '">',
     '<div>',
-    '<input class="qs-overlay-year" placeholder="' + overlayPlaceholder + '" />',
+    '<input class="qs-overlay-year" placeholder="' + overlayPlaceholder + '" inputmode="numeric" />',
     '<div class="qs-close">&#10005;</div>',
     '</div>',
     '<div class="qs-overlay-month-container">' + shortMonths + '</div>',
@@ -1122,7 +1135,7 @@ function hideCal(instance) {
   var isShowing = !instance.calendarContainer.classList.contains('qs-hidden')
 
   if (isShowing && !instance.alwaysShow) {
-    toggleOverlay(true, instance)
+    instance.defaultView !== 'overlay' && toggleOverlay(true, instance)
     instance.calendarContainer.classList.add('qs-hidden')
     instance.onHide(instance)
   }
@@ -1135,6 +1148,7 @@ function showCal(instance) {
   if (instance.disabled) return
 
   instance.calendarContainer.classList.remove('qs-hidden')
+  instance.defaultView === 'overlay' && toggleOverlay(false, instance)
   calculatePosition(instance)
   instance.onShow(instance)
 }
@@ -1718,6 +1732,17 @@ function navigate(dateOrNum, triggerCb) {
   if (triggerCb) {
     this.onMonthChange(this)
   }
+}
+
+/*
+ *  Programmatically toggles the overlay.
+ *  Only works when the calendar is open.
+ */
+function instanceToggleOverlay() {
+  var calendarIsShowing = !this.calendarContainer.classList.contains('qs-hidden')
+  var overlayIsShowing = !this.calendarContainer.querySelector('.qs-overlay').classList.contains('qs-hidden')
+
+  calendarIsShowing && toggleOverlay(overlayIsShowing, this)
 }
 
 

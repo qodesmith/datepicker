@@ -43,6 +43,7 @@ Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicke
 * [customDays](#customdays)
 * [customMonths](#custommonths)
 * [customOverlayMonths](#customoverlaymonths)
+* [defaultView](#defaultView)
 * [overlayButton](#overlaybutton)
 * [overlayPlaceholder](#overlayplaceholder)
 * [events](#events)
@@ -80,6 +81,7 @@ Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicke
 * [show](#show)
 * [hide](#hide)
   * [Show / Hide "Gotcha"](#show--hide-gotcha)
+* [toggleOverlay](#toggleOverlay)
 * [getRange](#getrange) _(daterange only)_
 
 
@@ -406,6 +408,18 @@ const picker = datepicker('.some-input', {
 
 * Type - array
 * Default - The first 3 characters of each item in `customMonths`.
+
+
+### defaultView
+
+Want the overlay to be the default view when opening the calendar? This property is for you. Simply set this property to `'overlay'` and you're done. This is helpful if you want a month picker to be front and center.
+
+```javascript
+const picker = datepicker('.some-input', {defaultView: 'overlay'})
+```
+
+* Type - string (`'calendar'` or `'overlay'`)
+* Default - `'calendar'`
 
 
 ### overlayButton
@@ -797,6 +811,19 @@ button.addEventListener('click', e => {
   const isHidden = picker.calendarContainer.classList.contains('qs-hidden')
   picker[isHidden ? 'show' : 'hide']()
 })
+```
+
+
+### toggleOverlay
+
+Call this method on the picker to programmatically toggle the overlay. This will only work if the calendar is showing!
+
+```javascript
+const picker = datepicker('.some-input')
+
+// Click the input to show the calendar...
+
+picker.toggleOverlay()
 ```
 
 

@@ -43,6 +43,7 @@ Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicke
 * [customDays](#customdays)
 * [customMonths](#custommonths)
 * [customOverlayMonths](#customoverlaymonths)
+* [defaultView](#defaultView)
 * [overlayButton](#overlaybutton)
 * [overlayPlaceholder](#overlayplaceholder)
 * [events](#events)

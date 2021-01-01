@@ -49,6 +49,10 @@ const singleDatepickerProperties = [
     deepEqual: true,
   },
   {
+    property: 'defaultView',
+    defaultValue: 'calendar',
+  },
+  {
     property: 'disableMobile',
     defaultValue: false,
   },
@@ -233,6 +237,10 @@ const singleDatepickerProperties = [
   {
     property: 'startDay',
     defaultValue: 0,
+  },
+  {
+    property: 'toggleOverlay',
+    isFunction: true,
   },
   {
     property: 'weekendIndices',

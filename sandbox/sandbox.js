@@ -19,5 +19,3 @@ window.test = () => {
     defaultView: 'overlay',
   })
 }
-
-test()

@@ -409,6 +409,18 @@ const picker = datepicker('.some-input', {
 * Default - The first 3 characters of each item in `customMonths`.
 
 
+### defaultView
+
+Want the overlay to be the default view when opening the calendar? This property is for you. Simply set this property to `'overlay'` and you're done. This is helpful if you want a month picker to be front and center.
+
+```javascript
+const picker = datepicker('.some-input', {defaultView: 'overlay'})
+```
+
+* Type - string (`'calendar'` or `'overlay'`)
+* Default - `'calendar'`
+
+
 ### overlayButton
 
 Custom text for the year overlay submit button.

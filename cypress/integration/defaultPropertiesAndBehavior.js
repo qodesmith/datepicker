@@ -425,6 +425,21 @@ describe('Default properties and behavior', function() {
           })
         })
 
+        it('should show the overlay if "defaultView" is set to "overlay"', function() {
+          this.datepicker(singleDatepickerInput, {defaultView: 'overlay'})
+
+          cy.get(selectors.single.overlay).should('not.be.visible')
+          cy.get(singleDatepickerInput).click().then(() => {
+            cy.get(selectors.single.overlay).should('be.visible')
+            cy.get(`${selectors.single.overlay} .qs-close`).click().then(() => {
+              cy.get(selectors.single.overlay).should('not.be.visible')
+              cy.get('body').click()
+              cy.get(singleDatepickerInput).click()
+              cy.get(selectors.single.overlay).should('be.visible')
+            })
+          })
+        })
+
         it('should focus the overlay year input', function() {
           this.datepicker(singleDatepickerInput)
 

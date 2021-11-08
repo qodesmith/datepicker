@@ -116,7 +116,7 @@ $lightblue: lightblue;
     width: calc(100% / 3);
     cursor: pointer;
     opacity: .5;
-    transition: opacity $transition / 2;
+    transition: opacity $transition * .5;
 
     &.active, &:hover {
       opacity: 1;
@@ -141,8 +141,8 @@ $lightblue: lightblue;
 }
 
 .qs-arrow {
-  height: $width / 10;
-  width: $width / 10;
+  height: $width * .1;
+  width: $width * .1;
   position: relative;
   cursor: pointer;
   border-radius: $radius;
@@ -162,7 +162,7 @@ $lightblue: lightblue;
 
   &:after {
     content: '';
-    border: ($width / 40) solid transparent;
+    border: ($width * .025) solid transparent;
     position: absolute;
     top: 50%;
     transition: border .2s;
@@ -219,7 +219,7 @@ $lightblue: lightblue;
 
 .qs-square {
   width: calc(100% / 7);
-  height: $width / 10;
+  height: $width * .1;
   display: flex;
   align-items: center;
   justify-content: center;

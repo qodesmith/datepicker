@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 $width: 15.625em;
 $radius: $width * .016891;
 $transition: .3s;
@@ -116,7 +118,7 @@ $lightblue: lightblue;
     width: calc(100% / 3);
     cursor: pointer;
     opacity: .5;
-    transition: opacity $transition / 2;
+    transition: opacity math.div($transition, 2);
 
     &.active, &:hover {
       opacity: 1;
@@ -141,8 +143,8 @@ $lightblue: lightblue;
 }
 
 .qs-arrow {
-  height: $width / 10;
-  width: $width / 10;
+  height: math.div($width, 10);
+  width: math.div($width, 10);
   position: relative;
   cursor: pointer;
   border-radius: $radius;
@@ -162,7 +164,7 @@ $lightblue: lightblue;
 
   &:after {
     content: '';
-    border: ($width / 40) solid transparent;
+    border: math.div($width, 40) solid transparent;
     position: absolute;
     top: 50%;
     transition: border .2s;
@@ -219,7 +221,7 @@ $lightblue: lightblue;
 
 .qs-square {
   width: calc(100% / 7);
-  height: $width / 10;
+  height: math.div($width, 10);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -5,7 +5,7 @@
   "main": "dist/datepicker.min.js",
   "style": "./src/datepicker.scss",
   "scripts": {
-    "build": "webpack --mode production --env.prod",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --env.prod",
     "test": "start-server-and-test start http-get://localhost:9001 start-cypress-test",
     "start": "webpack-dev-server --mode development --env.dev --progress",
     "start-cypress-test": "cypress open"

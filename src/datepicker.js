@@ -742,7 +742,7 @@ function createControls(date, instance, overlayOpen) {
   return [
     '<div class="qs-controls' + (overlayOpen ? ' qs-blur' : '') + '">',
     '<div class="qs-arrow qs-left"></div>',
-    '<div class="qs-month-year">',
+    '<div class="qs-month-year' + (instance.disableYearOverlay ? ' qs-disabled-year-overlay' : '') + '">',
     '<span class="qs-month">' + instance.months[date.getMonth()] + '</span>',
     '<span class="qs-year">' + date.getFullYear() + '</span>',
     '</div>',

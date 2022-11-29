@@ -680,6 +680,7 @@ describe('User options', function() {
 
         cy.get(singleDatepickerInput).click()
         cy.get(single.overlay).should('have.class', 'qs-hidden')
+        cy.get(`${single.controls} .qs-month-year`).should('have.class', 'qs-disabled-year-overlay')
         cy.get(`${single.controls} .qs-month-year`).click()
         cy.get(single.overlay).should('have.class', 'qs-hidden')
       })

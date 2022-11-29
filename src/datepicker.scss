@@ -187,10 +187,13 @@ $lightblue: lightblue;
   font-weight: bold;
   transition: border .2s;
   border-bottom: 1px solid transparent;
-  cursor: pointer;
 
-  &:hover {
-    border-bottom: 1px solid gray;
+  &:not(.qs-disabled-year-overlay) {
+    cursor: pointer;
+    
+    &:hover {
+      border-bottom: 1px solid gray;
+    }
   }
 
   &:focus,

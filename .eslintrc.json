@@ -2,8 +2,5 @@
   "parserOptions": {
     "ecmaVersion": 3
   },
-  "ignorePatterns": [
-    "webpack.config.js",
-    "test-app.js"
-  ]
+  "ignorePatterns": ["webpack.config.js", "test-app.js", "sandbox.js"]
 }

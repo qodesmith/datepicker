@@ -15,7 +15,7 @@ export default function getEl(selector: Selector): HTMLElement {
 
   const type = getType(selector)
 
-  if (type.includes('Element')) {
+  if (type.endsWith('Element')) {
     return selector
   }
 

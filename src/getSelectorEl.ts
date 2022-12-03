@@ -13,8 +13,14 @@ export default function getEl(selector: Selector): HTMLElement {
     return el as HTMLElement
   }
 
-  if (getType(selector).includes('Element')) {
+  const type = getType(selector)
+
+  if (type.includes('Element')) {
     return selector
+  }
+
+  if (type === 'ShadowRoot') {
+    throwError('Using a shadow DOM as your selector is not supported.')
   }
 
   throwError('The selector provided is not a valid HTML element.')

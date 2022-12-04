@@ -1,14 +1,15 @@
+import checkForExistingPicker from './checkForExistingPicker'
 import getType from './getType'
 import throwError from './throwError'
 import {Selector} from './types'
 
-type GetElReturnType = {
+export type SelectorData = {
   el: HTMLElement
   shadowDom: null | ShadowRoot
   customElement: null | Element
 }
 
-export default function getSelectorData(selector: Selector): GetElReturnType {
+export default function getSelectorData(selector: Selector): SelectorData {
   let element: HTMLElement | null = null
   const type = getType(selector)
 
@@ -54,10 +55,12 @@ export default function getSelectorData(selector: Selector): GetElReturnType {
    *   * a shadow DOM
    */
   if (rootNodeType === 'HTMLDocument') {
+    checkForExistingPicker(element)
     return {el: element, shadowDom: null, customElement: null}
   }
 
   if (rootNodeType === 'ShadowRoot') {
+    checkForExistingPicker(element)
     return {
       el: element,
       shadowDom: rootNode as ShadowRoot,

@@ -1,3 +1,5 @@
+import {SelectorData} from './getSelectorData'
+
 export type DatepickerOptions = {
   /**
    * Callback function after a date has been selected. The 2nd argument is the selected date when a date is being selected and `undefined` when a date is being unselected. You unselect a date by clicking it again.
@@ -350,4 +352,11 @@ export type Sides = {
 
   // `centered` fixes the calendar smack in the middle of the screen. Useful for mobile devices.
   c: 'centered'
+}
+
+export type DatepickersMapItem = {
+  picker: DatepickerInstance | DaterangePickerInstance
+  pickerProperties: {
+    selectorData: SelectorData
+  }
 }

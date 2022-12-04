@@ -1,4 +1,4 @@
-import {Sides} from './types'
+import {DatepickersMapItem, Sides} from './types'
 
 export const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
 
@@ -34,3 +34,8 @@ export const sides: Sides = {
  * The default callback functions (onSelect, etc.) will be a noop function. Using this variable so we can simply reference the same function. Also, this allows us to check if the callback is a noop function by doing a `=== noop` anywhere we like.
  */
 export function noop() {}
+
+/**
+ * This map will contain all the created datepickers that haven't been removed.
+ */
+export const datepickersMap = new Map<HTMLElement, DatepickersMapItem>()

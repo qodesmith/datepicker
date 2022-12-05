@@ -1,4 +1,4 @@
-import checkForExistingPicker from './checkForExistingPicker'
+import checkForExistingPickerOnElement from './checkForExistingPickerOnElement'
 import getType from './getType'
 import throwError from './throwError'
 import {Selector} from './types'
@@ -55,12 +55,12 @@ export default function getSelectorData(selector: Selector): SelectorData {
    *   * a shadow DOM
    */
   if (rootNodeType === 'HTMLDocument') {
-    checkForExistingPicker(element)
+    checkForExistingPickerOnElement(element)
     return {el: element, shadowDom: null, customElement: null}
   }
 
   if (rootNodeType === 'ShadowRoot') {
-    checkForExistingPicker(element)
+    checkForExistingPickerOnElement(element)
     return {
       el: element,
       shadowDom: rootNode as ShadowRoot,

@@ -27,7 +27,7 @@ export const sides: Sides = {
   r: 'right',
   b: 'bottom',
   l: 'left',
-  c: 'centered',
+  c: 'c',
 } as const
 
 /**

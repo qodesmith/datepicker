@@ -2,8 +2,7 @@
   Importing this scss file so as to declare it's a dependency in the library.
   Webpack will then separate it out into its own css file and include it in the dist folder.
 */
-import './datepicker.scss'
-
+import './old-datepicker.scss'
 
 var datepickers = [] // Get's reassigned in `remove()` below.
 var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -19,7 +18,7 @@ var months = [
   'September',
   'October',
   'November',
-  'December'
+  'December',
 ]
 var sides = {
   // `t`, `r`, `b`, and `l` are all positioned relatively to the input the calendar is attached to.
@@ -29,7 +28,7 @@ var sides = {
   l: 'left',
 
   // `centered` fixes the calendar smack in the middle of the screen. Useful for mobile devices.
-  c: 'centered'
+  c: 'centered',
 }
 
 /*
@@ -47,12 +46,11 @@ function noop() {}
 */
 var events = ['click', 'focusin', 'keydown', 'input']
 
-
 /*
  *  Datepicker! Get a date with JavaScript...
  */
 function datepicker(selectorOrElement, options) {
-    // Create the datepicker instance!
+  // Create the datepicker instance!
   var instance = createInstance(selectorOrElement, options)
 
   // Apply the event listeners to the document only once.
@@ -60,7 +58,9 @@ function datepicker(selectorOrElement, options) {
 
   // Apply the event listeners to a particular shadow DOM only once.
   if (instance.shadowDom) {
-    var shadowDomAlreadyInUse = datepickers.some(function(picker) { return picker.shadowDom === instance.shadowDom })
+    var shadowDomAlreadyInUse = datepickers.some(function (picker) {
+      return picker.shadowDom === instance.shadowDom
+    })
     if (!shadowDomAlreadyInUse) applyListeners(instance.shadowDom)
   }
 
@@ -76,8 +76,8 @@ function datepicker(selectorOrElement, options) {
     var first = instance.sibling
 
     // Adjust both dateranges.
-    adjustDateranges({ instance: instance, deselect: !instance.dateSelected })
-    adjustDateranges({ instance: first, deselect: !first.dateSelected })
+    adjustDateranges({instance: instance, deselect: !instance.dateSelected})
+    adjustDateranges({instance: first, deselect: !first.dateSelected})
 
     // Re-render the first daterange instance - the 2nd will be rendered below.
     renderCalendar(first)
@@ -104,8 +104,11 @@ function applyListeners(documentOrShadowDom) {
     Using document instead of window because #iphone :/
     Safari won't handle the click event properly if it's on the window.
   */
-  events.forEach(function(event) {
-    documentOrShadowDom.addEventListener(event, documentOrShadowDom === document ? oneHandler : shadowDomHandler)
+  events.forEach(function (event) {
+    documentOrShadowDom.addEventListener(
+      event,
+      documentOrShadowDom === document ? oneHandler : shadowDomHandler
+    )
   })
 }
 
@@ -145,13 +148,16 @@ function createInstance(selectorOrElement, opts) {
   var el = selectorOrElement
 
   if (typeof el === 'string') {
-    el = el[0] === '#' ? document.getElementById(el.slice(1)) : document.querySelector(el)
+    el =
+      el[0] === '#'
+        ? document.getElementById(el.slice(1))
+        : document.querySelector(el)
 
-  // Maybe this will be supported one day once I understand the use-case.
+    // Maybe this will be supported one day once I understand the use-case.
   } else if (type(el) === '[object ShadowRoot]') {
     throw new Error('Using a shadow DOM as your selector is not supported.')
 
-  /*
+    /*
     If the selector is not a string, we may have been given an element within a shadow DOM (or a shadow DOM itself).
     Iterate up the chain to see what the root node is, throwing an error if shadow DOM is found and not supported.
     IE doesn't support custom elements at all, neither does it support the `Node.getRootNode()` method,
@@ -168,13 +174,13 @@ function createInstance(selectorOrElement, opts) {
       if (parentType === '[object HTMLDocument]') {
         rootFound = true
 
-      // We're using a shadow DOM.
+        // We're using a shadow DOM.
       } else if (parentType === '[object ShadowRoot]') {
         rootFound = true
         shadowDom = currentParent
         customElement = currentParent.host
 
-      // Focus up the chain to the next parent and keep iterating.
+        // Focus up the chain to the next parent and keep iterating.
       } else {
         currentParent = currentParent.parentNode
       }
@@ -184,7 +190,12 @@ function createInstance(selectorOrElement, opts) {
   if (!el) throw new Error('No selector / element found.')
 
   // Check if the provided element already has a datepicker attached.
-  if (datepickers.some(function(picker) { return picker.el === el })) throw new Error('A datepicker already exists on that element.')
+  if (
+    datepickers.some(function (picker) {
+      return picker.el === el
+    })
+  )
+    throw new Error('A datepicker already exists on that element.')
 
   /*
     `noPosition` tells future logic to avoid trying to style the parent element of datepicker.
@@ -205,7 +216,11 @@ function createInstance(selectorOrElement, opts) {
     shadow DOM. Otherwise, `parent` is assigned the parent of the element that was passed to datepicker
     in the first place (usually an <input>).
   */
-  var parent = shadowDom ? (el.parentElement || shadowDom) : noPosition ? document.body : el.parentElement
+  var parent = shadowDom
+    ? el.parentElement || shadowDom
+    : noPosition
+    ? document.body
+    : el.parentElement
 
   /*
     The calendar needs to be positioned relative `el`. Since we position the calendar absolutely, we need
@@ -220,8 +235,7 @@ function createInstance(selectorOrElement, opts) {
     If the next element up the chain (el.parentElement) IS the shadow DOM, el.parentElement will be null
     since a shadow DOM isn't an element. Hence why we go even further up the chain and assign customElement.
   */
-  var positionedEl = shadowDom ? (el.parentElement || customElement) : parent
-
+  var positionedEl = shadowDom ? el.parentElement || customElement : parent
 
   var calendarContainer = document.createElement('div')
   var calendar = document.createElement('div')
@@ -234,7 +248,6 @@ function createInstance(selectorOrElement, opts) {
   calendarContainer.className = 'qs-datepicker-container qs-hidden'
   calendar.className = 'qs-datepicker'
 
-
   var instance = {
     // If a datepicker is used within a shadow DOM, this will be populated with it.
     shadowDom: shadowDom,
@@ -242,8 +255,6 @@ function createInstance(selectorOrElement, opts) {
     // If a datepicker is used within a shadow DOM, this will be populated with the web component custom element.
     // This is not used internally, but provided as a convenience for users who might want a reference.
     customElement: customElement,
-
-
 
     // Used to help calculate the position of the calendar.
     positionedEl: positionedEl,
@@ -294,7 +305,9 @@ function createInstance(selectorOrElement, opts) {
     currentMonth: (options.startDate || options.dateSelected).getMonth(),
 
     // Month name in plain english - or not.
-    currentMonthName: (options.months || months)[(options.startDate || options.dateSelected).getMonth()],
+    currentMonthName: (options.months || months)[
+      (options.startDate || options.dateSelected).getMonth()
+    ],
 
     // Year of `startDate` or `dateSelected`.
     currentYear: (options.startDate || options.dateSelected).getFullYear(),
@@ -303,8 +316,6 @@ function createInstance(selectorOrElement, opts) {
     events: options.events || {},
 
     defaultView: options.defaultView,
-
-
 
     // Method to programmatically set the calendar's date.
     setDate: setDate,
@@ -330,8 +341,6 @@ function createInstance(selectorOrElement, opts) {
     // Method to programmatically toggle the overlay.
     toggleOverlay: instanceToggleOverlay,
 
-
-
     // Callback fired when a date is selected - triggered in `selectDay`.
     onSelect: options.onSelect,
 
@@ -350,8 +359,6 @@ function createInstance(selectorOrElement, opts) {
     // Function with custom logic that determines wether a given date is disabled or not.
     disabler: options.disabler,
 
-
-
     // Labels for months - custom or default.
     months: options.months || months,
 
@@ -362,7 +369,11 @@ function createInstance(selectorOrElement, opts) {
     startDay: options.startDay,
 
     // Custom overlay months - only the first 3 characters are used.
-    overlayMonths: options.overlayMonths || (options.months || months).map(function(m) { return m.slice(0, 3) }),
+    overlayMonths:
+      options.overlayMonths ||
+      (options.months || months).map(function (m) {
+        return m.slice(0, 3)
+      }),
 
     // Custom overlay placeholder.
     overlayPlaceholder: options.overlayPlaceholder || '4-digit year',
@@ -392,13 +403,11 @@ function createInstance(selectorOrElement, opts) {
     // Prevents Datepicker from selecting dates when attached to inputs that are `disabled` or `readonly`.
     respectDisabledReadOnly: !!options.respectDisabledReadOnly,
 
-
-
     // Indicates this is the 1st instance in a daterange pair.
     first: options.first,
 
     // Indicates this is the 2nd instance in a daterange pair.
-    second: options.second
+    second: options.second,
   }
 
   /*
@@ -463,16 +472,18 @@ function createInstance(selectorOrElement, opts) {
     This will ensure the styling is removed ONLY when the LAST picker inside it is removed.
     This condition will trigger when subsequent pickers are instantiated inside `postionedEl`.
   */
-  var pickersWithSamePositionedEl = datepickers.filter(function(picker) {
+  var pickersWithSamePositionedEl = datepickers.filter(function (picker) {
     return picker.positionedEl === instance.positionedEl
   })
-  var somePickerHasInlinePosition = pickersWithSamePositionedEl.some(function(picker) {
+  var somePickerHasInlinePosition = pickersWithSamePositionedEl.some(function (
+    picker
+  ) {
     return picker.inlinePosition
   })
 
   if (somePickerHasInlinePosition) {
     instance.inlinePosition = true // This instance is not in the datepickers array yet. Ensure it has this property.
-    pickersWithSamePositionedEl.forEach(function(picker) {
+    pickersWithSamePositionedEl.forEach(function (picker) {
       picker.inlinePosition = true
     })
   }
@@ -495,7 +506,7 @@ function freshCopy(item) {
   if (Array.isArray(item)) return item.map(freshCopy)
 
   if (type(item) === '[object Object]') {
-    return Object.keys(item).reduce(function(newObj, key) {
+    return Object.keys(item).reduce(function (newObj, key) {
       newObj[key] = freshCopy(item[key])
       return newObj
     }, {})
@@ -517,8 +528,11 @@ function sanitizeOptions(opts) {
     Store these on the instance as an object with JS datetimes as keys for fast lookup.
   */
   if (options.events) {
-    options.events = options.events.reduce(function(acc, date) {
-      if (!dateCheck(date)) throw new Error('"options.events" must only contain valid JavaScript Date objects.')
+    options.events = options.events.reduce(function (acc, date) {
+      if (!dateCheck(date))
+        throw new Error(
+          '"options.events" must only contain valid JavaScript Date objects.'
+        )
       acc[+stripTime(date)] = true
       return acc
     }, {})
@@ -528,9 +542,14 @@ function sanitizeOptions(opts) {
     Check that various options have been provided a JavaScript Date object.
     If so, strip the time from those dates (for accurate future comparisons).
   */
-  ;['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(function(value) {
+  ;['startDate', 'dateSelected', 'minDate', 'maxDate'].forEach(function (
+    value
+  ) {
     var date = options[value]
-    if (date && !dateCheck(date)) throw new Error('"options.' + value + '" needs to be a valid JavaScript Date object.')
+    if (date && !dateCheck(date))
+      throw new Error(
+        '"options.' + value + '" needs to be a valid JavaScript Date object.'
+      )
 
     /*
       Strip the time from the date.
@@ -550,18 +569,27 @@ function sanitizeOptions(opts) {
 
   options.startDate = stripTime(options.startDate || dateSelected || new Date())
 
-
   // Checks around disabled dates.
-  options.disabledDates = (options.disabledDates || []).reduce(function(acc, date) {
+  options.disabledDates = (options.disabledDates || []).reduce(function (
+    acc,
+    date
+  ) {
     var newDateNum = +stripTime(date)
 
-    if (!dateCheck(date)) throw new Error('You supplied an invalid date to "options.disabledDates".')
-    if (newDateNum === +stripTime(dateSelected)) throw new Error('"disabledDates" cannot contain the same date as "dateSelected".')
+    if (!dateCheck(date))
+      throw new Error(
+        'You supplied an invalid date to "options.disabledDates".'
+      )
+    if (newDateNum === +stripTime(dateSelected))
+      throw new Error(
+        '"disabledDates" cannot contain the same date as "dateSelected".'
+      )
 
     // Store a number because `createMonth` checks this array for a number match.
     acc[newDateNum] = 1
     return acc
-  }, {})
+  },
+  {})
 
   // If id was provided, it cannot me null or undefined.
   if (options.hasOwnProperty('id') && id == null) {
@@ -578,17 +606,20 @@ function sanitizeOptions(opts) {
   */
   if (id != null) {
     // Search through pickers already created and see if there's an id match for this one.
-    var pickers = datepickers.filter(function(picker) { return picker.id === id })
+    var pickers = datepickers.filter(function (picker) {
+      return picker.id === id
+    })
 
     // No more than 2 pickers can have the same id.
-    if (pickers.length > 1) throw new Error('Only two datepickers can share an id.')
+    if (pickers.length > 1)
+      throw new Error('Only two datepickers can share an id.')
 
     // 2nd - If we found a picker, THIS will be the 2nd in the pair. Set the sibling property on the options.
     if (pickers.length) {
       options.second = true
       options.sibling = pickers[0]
 
-    // 1st - If no pickers were found, this is the 1st in the pair.
+      // 1st - If no pickers were found, this is the 1st in the pair.
     } else {
       options.first = true
     }
@@ -599,31 +630,52 @@ function sanitizeOptions(opts) {
     The 'c' option positions the calendar smack in the middle of the screen,
     *not* relative to the input. This can be desirable for mobile devices.
   */
-  var positionFound = ['tr', 'tl', 'br', 'bl', 'c'].some(function(dir) { return position === dir })
+  var positionFound = ['tr', 'tl', 'br', 'bl', 'c'].some(function (dir) {
+    return position === dir
+  })
   if (position && !positionFound) {
-    throw new Error('"options.position" must be one of the following: tl, tr, bl, br, or c.')
+    throw new Error(
+      '"options.position" must be one of the following: tl, tr, bl, br, or c.'
+    )
   }
   options.position = establishPosition(position || 'bl')
 
   function dsErr(min) {
     var lessOrGreater = min ? 'less' : 'greater'
-    throw new Error('"dateSelected" in options is ' + lessOrGreater + ' than "' + (min || 'max') + 'Date".')
+    throw new Error(
+      '"dateSelected" in options is ' +
+        lessOrGreater +
+        ' than "' +
+        (min || 'max') +
+        'Date".'
+    )
   }
 
   // Check proper relationship between `minDate`, `maxDate`, & `dateSelected`.
-  if (maxDate < minDate) throw new Error('"maxDate" in options is less than "minDate".')
+  if (maxDate < minDate)
+    throw new Error('"maxDate" in options is less than "minDate".')
   if (dateSelected) {
     if (minDate > dateSelected) dsErr('min')
     if (maxDate < dateSelected) dsErr()
   }
 
   // Callbacks - default to a noop function.
-  ['onSelect', 'onShow', 'onHide', 'onMonthChange', 'formatter', 'disabler'].forEach(function(fxn) {
+  ;[
+    'onSelect',
+    'onShow',
+    'onHide',
+    'onMonthChange',
+    'formatter',
+    'disabler',
+  ].forEach(function (fxn) {
     if (typeof options[fxn] !== 'function') options[fxn] = noop // `noop` defined at the top.
   })
 
   // Custom labels for months & days.
-  ;['customDays', 'customMonths', 'customOverlayMonths'].forEach(function(label, i) {
+  ;['customDays', 'customMonths', 'customOverlayMonths'].forEach(function (
+    label,
+    i
+  ) {
     var custom = options[label]
     var num = i ? 12 : 7
 
@@ -633,8 +685,13 @@ function sanitizeOptions(opts) {
     if (
       !Array.isArray(custom) || // Must be an array.
       custom.length !== num || // Must have the correct length.
-      custom.some(function(item) { return typeof item !== 'string' }) // Must be an array of strings only.
-    ) throw new Error('"' + label + '" must be an array with ' + num + ' strings.')
+      custom.some(function (item) {
+        return typeof item !== 'string'
+      }) // Must be an array of strings only.
+    )
+      throw new Error(
+        '"' + label + '" must be an array with ' + num + ' strings.'
+      )
 
     options[!i ? 'days' : i < 2 ? 'months' : 'overlayMonths'] = custom
   })
@@ -658,7 +715,7 @@ function sanitizeOptions(opts) {
     options.startDay = +startDay
     options.weekendIndices = [
       daysCopy.length - 1, // Last item in the 1st half of the edited array.
-      daysCopy.length // Next item in the array, 1st item in the 2nd half of the edited array.
+      daysCopy.length, // Next item in the array, 1st item in the 2nd half of the edited array.
     ]
   } else {
     options.startDay = 0
@@ -671,8 +728,10 @@ function sanitizeOptions(opts) {
 
   // Show either the calendar (default) or the overlay when the calendar is open.
   var defaultView = options.defaultView
-  if (defaultView && (defaultView !== 'calendar' && defaultView !== 'overlay')) {
-    throw new Error('options.defaultView must either be "calendar" or "overlay".')
+  if (defaultView && defaultView !== 'calendar' && defaultView !== 'overlay') {
+    throw new Error(
+      'options.defaultView must either be "calendar" or "overlay".'
+    )
   }
   options.defaultView = defaultView || 'calendar'
 
@@ -720,7 +779,7 @@ function renderCalendar(instance, date) {
   instance.calendar.innerHTML = [
     createControls(date, instance, overlayOpen),
     createMonth(date, instance, overlayOpen),
-    createOverlay(instance, overlayOpen)
+    createOverlay(instance, overlayOpen),
   ].join('')
 
   /*
@@ -731,7 +790,10 @@ function renderCalendar(instance, date) {
 
     Good for IE >= 10.
   */
-  if (overlayOpen) window.requestAnimationFrame(function() { toggleOverlay(true, instance) })
+  if (overlayOpen)
+    window.requestAnimationFrame(function () {
+      toggleOverlay(true, instance)
+    })
 }
 
 /*
@@ -742,12 +804,14 @@ function createControls(date, instance, overlayOpen) {
   return [
     '<div class="qs-controls' + (overlayOpen ? ' qs-blur' : '') + '">',
     '<div class="qs-arrow qs-left"></div>',
-    '<div class="qs-month-year' + (instance.disableYearOverlay ? ' qs-disabled-year-overlay' : '') + '">',
+    '<div class="qs-month-year' +
+      (instance.disableYearOverlay ? ' qs-disabled-year-overlay' : '') +
+      '">',
     '<span class="qs-month">' + instance.months[date.getMonth()] + '</span>',
     '<span class="qs-year">' + date.getFullYear() + '</span>',
     '</div>',
     '<div class="qs-arrow qs-right"></div>',
-    '</div>'
+    '</div>',
   ].join('')
 }
 
@@ -800,7 +864,7 @@ function createMonth(date, instance, overlayOpen) {
 
   // Fancy calculations for the total # of squares.
   // The pipe operator truncates any decimals.
-  var totalSquares = precedingRow + (((offset + daysInMonth) / 7 | 0) * 7)
+  var totalSquares = precedingRow + (((offset + daysInMonth) / 7) | 0) * 7
   totalSquares += (offset + daysInMonth) % 7 ? 7 : 0
 
   /*
@@ -818,7 +882,7 @@ function createMonth(date, instance, overlayOpen) {
     var weekday = days[weekdayIndex]
 
     // Number displayed in the calendar for current iteration's day.
-    var num = i - (offset >= 0 ? offset : (7 + offset))
+    var num = i - (offset >= 0 ? offset : 7 + offset)
 
     /*
       JavaScript date object for the current iteration's day.
@@ -842,7 +906,7 @@ function createMonth(date, instance, overlayOpen) {
       month to navigate. This attribute tells the event handler the direction
       of the month to navigate to.
     */
-    var direction = outsideOfCurrentMonth ? num < 1 ? -1 : 1 : 0
+    var direction = outsideOfCurrentMonth ? (num < 1 ? -1 : 1) : 0
 
     // Flag indicating the square on the calendar should be empty.
     var isEmpty = outsideOfCurrentMonth && !showAllDates
@@ -854,10 +918,12 @@ function createMonth(date, instance, overlayOpen) {
     var isSelected = +thisDay === +dateSelected
 
     // Is this day a weekend? Weekends for Datepicker are strictly Saturday & Sunday.
-    var isWeekend = weekdayIndex === weekendIndices[0] || weekdayIndex === weekendIndices[1]
+    var isWeekend =
+      weekdayIndex === weekendIndices[0] || weekdayIndex === weekendIndices[1]
 
     // Is this iteration's date disabled?
-    var isDisabled = disabledDates[+thisDay] ||
+    var isDisabled =
+      disabledDates[+thisDay] ||
       instance.disabler(thisDay) ||
       (isWeekend && instance.noWeekends) ||
       (minDate && +thisDay < +minDate) ||
@@ -882,7 +948,8 @@ function createMonth(date, instance, overlayOpen) {
     if (isSelected) className += ' qs-active'
     if (isDisabled && !isEmpty) className += ' qs-disabled' // Empty dates don't need the class name.
     if (isToday) className += ' qs-current'
-    if (isRangeStart && end && rangeIsNotSingleDay) className += ' qs-range-start'
+    if (isRangeStart && end && rangeIsNotSingleDay)
+      className += ' qs-range-start'
     if (isRangeMiddle) className += ' qs-range-middle'
     if (isRangeEnd && start && rangeIsNotSingleDay) className += ' qs-range-end'
     if (isEmpty) {
@@ -890,16 +957,28 @@ function createMonth(date, instance, overlayOpen) {
       thisDayNum = '' // Don't show numbers for empty squares.
     }
 
-    calendarSquares.push('<div class="' + className + '" data-direction="' + direction + '">' + thisDayNum + '</div>')
+    calendarSquares.push(
+      '<div class="' +
+        className +
+        '" data-direction="' +
+        direction +
+        '">' +
+        thisDayNum +
+        '</div>'
+    )
   }
 
   // Add the header row of days of the week.
   var daysAndSquares = days
-    .map(function(day) { return '<div class="qs-square qs-day">' + day + '</div>' })
+    .map(function (day) {
+      return '<div class="qs-square qs-day">' + day + '</div>'
+    })
     .concat(calendarSquares)
 
   // Wrap it all in a tidy div.
-  daysAndSquares.unshift('<div class="qs-squares' + (overlayOpen ? ' qs-blur' : '') + '">')
+  daysAndSquares.unshift(
+    '<div class="qs-squares' + (overlayOpen ? ' qs-blur' : '') + '">'
+  )
   daysAndSquares.push('</div>')
   return daysAndSquares.join('')
 }
@@ -912,19 +991,29 @@ function createOverlay(instance, overlayOpen) {
   var overlayPlaceholder = instance.overlayPlaceholder
   var overlayButton = instance.overlayButton
   var overlayMonths = instance.overlayMonths
-  var shortMonths = overlayMonths.map(function(m, i) {
-    return '<div class="qs-overlay-month" data-month-num="' + i + '">' + m + '</div>'
-  }).join('')
+  var shortMonths = overlayMonths
+    .map(function (m, i) {
+      return (
+        '<div class="qs-overlay-month" data-month-num="' +
+        i +
+        '">' +
+        m +
+        '</div>'
+      )
+    })
+    .join('')
 
   return [
     '<div class="qs-overlay' + (overlayOpen ? '' : ' qs-hidden') + '">',
     '<div>',
-    '<input class="qs-overlay-year" placeholder="' + overlayPlaceholder + '" inputmode="numeric" />',
+    '<input class="qs-overlay-year" placeholder="' +
+      overlayPlaceholder +
+      '" inputmode="numeric" />',
     '<div class="qs-close">&#10005;</div>',
     '</div>',
     '<div class="qs-overlay-month-container">' + shortMonths + '</div>',
     '<div class="qs-submit qs-disabled">' + overlayButton + '</div>',
-    '</div>'
+    '</div>',
   ].join('')
 }
 
@@ -942,7 +1031,9 @@ function selectDay(target, instance, deselect) {
   if ((el.disabled || el.readOnly) && instance.respectDisabledReadOnly) return
 
   // Keep track of the currently selected date.
-  instance.dateSelected = deselect ? undefined : new Date(instance.currentYear, instance.currentMonth, num)
+  instance.dateSelected = deselect
+    ? undefined
+    : new Date(instance.currentYear, instance.currentMonth, num)
 
   // Re-establish the active (highlighted) date.
   if (active) active.classList.remove('qs-active')
@@ -962,7 +1053,7 @@ function selectDay(target, instance, deselect) {
 
   if (sibling) {
     // Update minDate & maxDate of both calendars.
-    adjustDateranges({ instance: instance, deselect: deselect })
+    adjustDateranges({instance: instance, deselect: deselect})
 
     /*
       http://bit.ly/2VdRx0r
@@ -982,11 +1073,13 @@ function selectDay(target, instance, deselect) {
     renderCalendar(sibling)
   }
 
-
   // Call the user-provided `onSelect` callback.
   // Passing in new date so there's no chance of mutating the original object.
   // In the case of a daterange, min & max dates are automatically set.
-  instance.onSelect(instance, deselect ? undefined : new Date(instance.dateSelected))
+  instance.onSelect(
+    instance,
+    deselect ? undefined : new Date(instance.dateSelected)
+  )
 }
 
 /*
@@ -1020,8 +1113,9 @@ function adjustDateranges(args) {
  */
 function setCalendarInputValue(el, instance, deselect) {
   if (instance.nonInput) return
-  if (deselect) return el.value = ''
-  if (instance.formatter !== noop) return instance.formatter(el, instance.dateSelected, instance)
+  if (deselect) return (el.value = '')
+  if (instance.formatter !== noop)
+    return instance.formatter(el, instance.dateSelected, instance)
   el.value = instance.dateSelected.toDateString()
 }
 
@@ -1042,7 +1136,7 @@ function changeMonthYear(classList, instance, year, overlayMonthIndex) {
     if (year) instance.currentYear = +year
     if (overlayMonthIndex) instance.currentMonth = +overlayMonthIndex
 
-  // Month change.
+    // Month change.
   } else {
     instance.currentMonth += classList.contains('qs-right') ? 1 : -1
 
@@ -1087,8 +1181,16 @@ function calculatePosition(instance) {
   var containerRects = instance.calendarContainer.getBoundingClientRect()
 
   // Calculate the position!
-  var topStyle = elRects.top - positionedElRects.top + (top ? (containerRects.height * -1) : elRects.height) + 'px'
-  var leftStyle = elRects.left - positionedElRects.left + (right ? (elRects.width - containerRects.width) : 0) + 'px'
+  var topStyle =
+    elRects.top -
+    positionedElRects.top +
+    (top ? containerRects.height * -1 : elRects.height) +
+    'px'
+  var leftStyle =
+    elRects.left -
+    positionedElRects.left +
+    (right ? elRects.width - containerRects.width : 0) +
+    'px'
 
   // Set the styles.
   instance.calendarContainer.style.setProperty('top', topStyle)
@@ -1099,10 +1201,7 @@ function calculatePosition(instance) {
  *  Checks for a valid date object.
  */
 function dateCheck(date) {
-  return (
-    type(date) === '[object Date]' &&
-    date.toString() !== 'Invalid Date'
-  )
+  return type(date) === '[object Date]' && date.toString() !== 'Invalid Date'
 }
 
 /*
@@ -1119,7 +1218,11 @@ function stripTime(dateOrNum) {
   */
 
   // Implicit `undefined` here, later checked elsewhere.
-  if (!dateCheck(dateOrNum) && (typeof dateOrNum !== 'number' || isNaN(dateOrNum))) return
+  if (
+    !dateCheck(dateOrNum) &&
+    (typeof dateOrNum !== 'number' || isNaN(dateOrNum))
+  )
+    return
 
   var date = new Date(+dateOrNum)
   return new Date(date.getFullYear(), date.getMonth(), date.getDate())
@@ -1192,7 +1295,6 @@ function overlayYearEntry(e, input, instance, overlayMonthIndex) {
   var badDate = isNaN(+new Date().setFullYear(input.value || undefined))
   var value = badDate ? null : input.value
 
-
   // Enter has been pressed OR submit was clicked.
   if (e.which === 13 || e.keyCode === 13 || e.type === 'click') {
     if (overlayMonthIndex) {
@@ -1201,8 +1303,9 @@ function overlayYearEntry(e, input, instance, overlayMonthIndex) {
       changeMonthYear(null, instance, value)
     }
 
-  // Enable / disabled the submit button.
-  } else if (instance.calendar.contains(input)) { // Scope to one calendar instance.
+    // Enable / disabled the submit button.
+  } else if (instance.calendar.contains(input)) {
+    // Scope to one calendar instance.
     var submit = instance.calendar.querySelector('.qs-submit')
     submit.classList[badDate ? 'add' : 'remove']('qs-disabled')
   }
@@ -1212,16 +1315,17 @@ function overlayYearEntry(e, input, instance, overlayMonthIndex) {
  *  Returns the explicit type of something as a string.
  */
 function type(thing) {
-  return ({}).toString.call(thing)
+  return {}.toString.call(thing)
 }
 
 /*
  *  Hides all instances aside from the one passed in.
  */
 function hideOtherPickers(instance) {
-  datepickers.forEach(function(picker) { if (picker !== instance) hideCal(picker) })
+  datepickers.forEach(function (picker) {
+    if (picker !== instance) hideCal(picker)
+  })
 }
-
 
 ///////////////////
 // EVENT HANDLER //
@@ -1243,15 +1347,13 @@ function oneHandler(e) {
   var type = e.type
   var target = e.target
   var classList = target.classList
-  var instance = datepickers.filter(function(picker) {
+  var instance = datepickers.filter(function (picker) {
     return picker.calendar.contains(target) || picker.el === target
   })[0]
   var onCal = instance && instance.calendar.contains(target)
 
-
   // Ignore event handling for mobile devices when disableMobile is true.
   if (instance && instance.isMobile && instance.disableMobile) return
-
 
   ////////////
   // EVENTS //
@@ -1270,7 +1372,9 @@ function oneHandler(e) {
     var nonInput = instance.nonInput
     var input = calendar.querySelector('.qs-overlay-year')
     var overlayClosed = !!calendar.querySelector('.qs-hidden')
-    var monthYearClicked = calendar.querySelector('.qs-month-year').contains(target)
+    var monthYearClicked = calendar
+      .querySelector('.qs-month-year')
+      .contains(target)
     var newMonthIndex = target.dataset.monthNum
 
     // Calendar's el is 'body'.
@@ -1280,28 +1384,32 @@ function oneHandler(e) {
       var calendarClosed = calendarContainer.classList.contains('qs-hidden')
       ;(calendarClosed ? showCal : hideCal)(instance)
 
-    // Clicking the arrow buttons - change the calendar month.
+      // Clicking the arrow buttons - change the calendar month.
     } else if (classList.contains('qs-arrow')) {
       changeMonthYear(classList, instance)
 
-    // Clicking the month/year - open the overlay.
-    // Clicking the X on the overlay - close the overlay.
+      // Clicking the month/year - open the overlay.
+      // Clicking the X on the overlay - close the overlay.
     } else if (monthYearClicked || classList.contains('qs-close')) {
       if (!disableYearOverlay) toggleOverlay(!overlayClosed, instance)
 
-    // Clicking a month in the overlay - the <span> inside might have been clicked.
+      // Clicking a month in the overlay - the <span> inside might have been clicked.
     } else if (newMonthIndex) {
       overlayYearEntry(e, input, instance, newMonthIndex)
 
-    // Clicking a disabled square or disabled overlay submit button.
+      // Clicking a disabled square or disabled overlay submit button.
     } else if (classList.contains('qs-disabled')) {
       return
 
-    // Clicking a number square - process whether to select that day or not.
+      // Clicking a number square - process whether to select that day or not.
     } else if (classList.contains('qs-num')) {
       var num = target.textContent
       var monthDirection = +target.dataset.direction // -1, 0, or 1.
-      var dateInQuestion = new Date(instance.currentYear, instance.currentMonth + monthDirection, num)
+      var dateInQuestion = new Date(
+        instance.currentYear,
+        instance.currentMonth + monthDirection,
+        num
+      )
 
       /*
         If the user clicked on a date within the previous or next month,
@@ -1342,16 +1450,16 @@ function oneHandler(e) {
 
       return
 
-    // Clicking the submit button in the overlay.
+      // Clicking the submit button in the overlay.
     } else if (classList.contains('qs-submit')) {
       overlayYearEntry(e, input, instance)
-    // Clicking the calendar's el for non-input's should show it.
+      // Clicking the calendar's el for non-input's should show it.
     } else if (nonInput && target === instance.el) {
       showCal(instance)
       hideOtherPickers(instance)
     }
 
-  /*
+    /*
     Only pay attention to `focusin` events if the calendar's el is an <input>.
     We use the `focusin` event because it bubbles - `focus` does not bubble.
   */
@@ -1372,7 +1480,7 @@ function oneHandler(e) {
     if (keyCode === 13 && overlayShowing && onCal) {
       overlayYearEntry(e, target, instance)
 
-    // ESC key pressed.
+      // ESC key pressed.
     } else if (keyCode === 27 && overlayShowing && onCal) {
       toggleOverlay(true, instance)
     }
@@ -1385,7 +1493,7 @@ function oneHandler(e) {
     var newValue = target.value
       .split('')
       // Prevent leading 0's.
-      .reduce(function(acc, char) {
+      .reduce(function (acc, char) {
         if (!acc && char === '0') return ''
         return acc + (char.match(/[0-9]/) ? char : '')
       }, '')
@@ -1393,7 +1501,9 @@ function oneHandler(e) {
 
     // Set the new value of the input and conditionally enable / disable the submit button.
     target.value = newValue
-    submitButton.classList[newValue.length === 4 ? 'remove' : 'add']('qs-disabled')
+    submitButton.classList[newValue.length === 4 ? 'remove' : 'add'](
+      'qs-disabled'
+    )
   }
 }
 
@@ -1414,9 +1524,10 @@ function shadowDomHandler(e) {
  *  Removes the event listeners on either the document or the shadow DOM.
  */
 function removeEvents(node, listener) {
-  events.forEach(function(event) { node.removeEventListener(event, listener) })
+  events.forEach(function (event) {
+    node.removeEventListener(event, listener)
+  })
 }
-
 
 //////////////////////
 // INSTANCE METHODS //
@@ -1457,7 +1568,7 @@ function setDate(newDate, changeCalendar) {
 
     // Daterange processing!
     if (sibling) {
-      adjustDateranges({ instance: this, deselect: true })
+      adjustDateranges({instance: this, deselect: true})
       renderCalendar(sibling)
     }
 
@@ -1467,23 +1578,18 @@ function setDate(newDate, changeCalendar) {
     // Return the instance to enable chaining methods.
     return this
 
-  // Date isn't undefined or null but still falsey.
+    // Date isn't undefined or null but still falsey.
   } else if (!dateCheck(newDate)) {
     throw new Error('`setDate` needs a JavaScript Date object.')
   }
-
 
   /*
    * Anything below this line is for setting a new date.
    */
 
-
   // Check if the date is selectable.
-  if (
-    this.disabledDates[+date] ||
-    date < this.minDate ||
-    date > this.maxDate
-  ) throw new Error("You can't manually set a date that's disabled.")
+  if (this.disabledDates[+date] || date < this.minDate || date > this.maxDate)
+    throw new Error("You can't manually set a date that's disabled.")
 
   // Keep track of the new date.
   this.dateSelected = date
@@ -1502,17 +1608,18 @@ function setDate(newDate, changeCalendar) {
 
   if (sibling) {
     // Adjust other date properties and re-render the sibling to show the same month as the other.
-    adjustDateranges({ instance: this })
+    adjustDateranges({instance: this})
 
     // Re-render the sibling to reflect possible disabled dates due to a selection.
     renderCalendar(sibling)
   }
 
-  var isSameMonth = currentYear === date.getFullYear() && currentMonth === date.getMonth()
+  var isSameMonth =
+    currentYear === date.getFullYear() && currentMonth === date.getMonth()
   if (isSameMonth || changeCalendar) {
     renderCalendar(this, date)
 
-  /*
+    /*
     If we already have a date selected on the current month of the calendar
     and we're using `setDate` to select a date for a different month,
     we'll want to re-render the current calendar to remove the selected date
@@ -1552,10 +1659,18 @@ function changeMinOrMax(instance, date, isMin) {
   var newDate = stripTime(date)
   var type = isMin ? 'Min' : 'Max'
 
-  function origProp() { return 'original' + type + 'Date' }
-  function prop() { return type.toLowerCase() + 'Date' }
-  function method() { return 'set' + type }
-  function throwOutOfRangeError() { throw new Error('Out-of-range date passed to ' + method()) }
+  function origProp() {
+    return 'original' + type + 'Date'
+  }
+  function prop() {
+    return type.toLowerCase() + 'Date'
+  }
+  function method() {
+    return 'set' + type
+  }
+  function throwOutOfRangeError() {
+    throw new Error('Out-of-range date passed to ' + method())
+  }
 
   // Removing min / max.
   if (date == null) {
@@ -1583,22 +1698,25 @@ function changeMinOrMax(instance, date, isMin) {
           sibling.minDate = undefined
         }
 
-      // Removing the max.
-      } else if ((first && !sibling.dateSelected) || (!first && !dateSelected)) {
+        // Removing the max.
+      } else if (
+        (first && !sibling.dateSelected) ||
+        (!first && !dateSelected)
+      ) {
         instance.maxDate = undefined
         sibling.maxDate = undefined
       }
 
-    // Regular instances.
+      // Regular instances.
     } else {
       instance[prop()] = undefined
     }
 
-  // Throw an error for invalid dates.
+    // Throw an error for invalid dates.
   } else if (!dateCheck(date)) {
     throw new Error('Invalid date passed to ' + method())
 
-  // Setting min / max.
+    // Setting min / max.
   } else if (sibling) {
     /*
       Acceptable ranges for setting minDate or maxDate:
@@ -1619,33 +1737,35 @@ function changeMinOrMax(instance, date, isMin) {
       // 1st instance checks.
       (first && isMin && newDate > (dateSelected || maxDate)) || // setMin
       (first && !isMin && newDate < (sibling.dateSelected || minDate)) || // setMax
-
       // 2nd instance checks.
       (!first && isMin && newDate > (sibling.dateSelected || maxDate)) || // setMin
       (!first && !isMin && newDate < (dateSelected || minDate)) // setMax
-    ) throwOutOfRangeError()
+    )
+      throwOutOfRangeError()
 
     instance[origProp()] = newDate
     sibling[origProp()] = newDate
 
     if (
       //setMin
-      (isMin && ((first && !dateSelected) || (!first && !sibling.dateSelected))) ||
-
+      (isMin &&
+        ((first && !dateSelected) || (!first && !sibling.dateSelected))) ||
       //setMax
-      (!isMin && ((first && !sibling.dateSelected) || (!first && !dateSelected)))
+      (!isMin &&
+        ((first && !sibling.dateSelected) || (!first && !dateSelected)))
     ) {
       instance[prop()] = newDate
       sibling[prop()] = newDate
     }
 
-  // Individual instance.
+    // Individual instance.
   } else {
     // Check for dates our of range for single instances.
     if (
       (isMin && newDate > (dateSelected || maxDate)) || // minDate
       (!isMin && newDate < (dateSelected || minDate)) // maxDate
-    ) throwOutOfRangeError()
+    )
+      throwOutOfRangeError()
 
     instance[prop()] = newDate
   }
@@ -1667,7 +1787,7 @@ function getRange() {
 
   return {
     start: first.dateSelected,
-    end: second.dateSelected
+    end: second.dateSelected,
   }
 }
 
@@ -1688,15 +1808,20 @@ function remove() {
     only if there are no other instances with the same `positionedEl`.
   */
   if (this.inlinePosition) {
-    var positionedElStillInUse = datepickers.some(function(picker) { return picker !== _this && picker.positionedEl === positionedEl })
-    if (!positionedElStillInUse) positionedEl.style.setProperty('position', null)
+    var positionedElStillInUse = datepickers.some(function (picker) {
+      return picker !== _this && picker.positionedEl === positionedEl
+    })
+    if (!positionedElStillInUse)
+      positionedEl.style.setProperty('position', null)
   }
 
   // Remove the calendar from the DOM.
   calendarContainer.remove()
 
   // Remove this instance from the list.
-  datepickers = datepickers.filter(function(picker) { return picker !== _this })
+  datepickers = datepickers.filter(function (picker) {
+    return picker !== _this
+  })
 
   // Remove siblings references.
   if (sibling) delete sibling.sibling
@@ -1705,15 +1830,20 @@ function remove() {
   if (!datepickers.length) removeEvents(document, oneHandler)
 
   // Remove the shadow DOM listener if this was the last picker in that shadow DOM.
-  var shadowDomStillInUse = datepickers.some(function(picker) { return picker.shadowDom === shadowDom })
-  if (shadowDom && !shadowDomStillInUse) removeEvents(shadowDom, shadowDomHandler)
+  var shadowDomStillInUse = datepickers.some(function (picker) {
+    return picker.shadowDom === shadowDom
+  })
+  if (shadowDom && !shadowDomStillInUse)
+    removeEvents(shadowDom, shadowDomHandler)
 
   // Empty this instance of all properties.
   for (var prop in this) delete this[prop]
 
   // If this was the last datepicker in the list, remove the event handlers.
   if (!datepickers.length) {
-    events.forEach(function(event) { document.removeEventListener(event, oneHandler) })
+    events.forEach(function (event) {
+      document.removeEventListener(event, oneHandler)
+    })
   }
 }
 
@@ -1739,11 +1869,13 @@ function navigate(dateOrNum, triggerCb) {
  *  Only works when the calendar is open.
  */
 function instanceToggleOverlay() {
-  var calendarIsShowing = !this.calendarContainer.classList.contains('qs-hidden')
-  var overlayIsShowing = !this.calendarContainer.querySelector('.qs-overlay').classList.contains('qs-hidden')
+  var calendarIsShowing =
+    !this.calendarContainer.classList.contains('qs-hidden')
+  var overlayIsShowing = !this.calendarContainer
+    .querySelector('.qs-overlay')
+    .classList.contains('qs-hidden')
 
   calendarIsShowing && toggleOverlay(overlayIsShowing, this)
 }
-
 
 export default datepicker

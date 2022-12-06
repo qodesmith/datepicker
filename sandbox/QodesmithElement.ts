@@ -4,6 +4,7 @@ export default class QodesmithElement extends HTMLElement {
   root: ShadowRoot
   div: HTMLDivElement
   input: HTMLInputElement
+  directChild: HTMLDivElement
   picker: ReturnType<typeof datepicker> | undefined
 
   constructor() {
@@ -14,13 +15,15 @@ export default class QodesmithElement extends HTMLElement {
         <div>Qodesmith Custom Element</div>
         <input id="qodesmith-custom-element-input type="text" />
       </div>
+      <div id="direct-shadow-child">I'm a shadow dom child</div>
     `
     this.div = this.root.querySelector('div')!
     this.input = this.root.querySelector('input')!
+    this.directChild = this.root.querySelector('#direct-shadow-child')!
   }
 
   connectedCallback() {
-    this.picker = datepicker(this.input)
+    this.picker = datepicker(this.directChild)
   }
 }
 

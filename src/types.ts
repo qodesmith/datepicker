@@ -278,7 +278,7 @@ export type DatepickerInstance = {
   /**
    * A 0-index number representing the current month. For example, 0 represents January.
    */
-  currentMonth: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11
+  currentMonth: number
 
   /**
    * Calendar month in plain english. E.x. January
@@ -321,14 +321,6 @@ export type DaterangePickerInstance = DatepickerInstance & {
    * If two datepickers have the same `id` option then this property will be available and refer to the other instance.
    */
   sibling: DaterangePickerInstance
-}
-
-export type DatepickerInstanceSettings = {
-  events: Record<number, boolean> // TODO - change this to Set<number>
-  startDate?: Date
-  dateSelected?: Date
-  minDate?: Date
-  maxDate?: Date
 }
 
 declare function datepicker(

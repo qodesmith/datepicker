@@ -356,7 +356,12 @@ export type DatepickersMapItem = {
 
 export type SelectorData = {
   el: HTMLElement
-  parent: HTMLElement | ShadowRoot
-  shadowDom: null | ShadowRoot
-  customElement: null | Element
+
+  /**
+   * The main use of datepicker is to associate it with an element (an <input /> in most cases) and have it positioned relative to that element. In order to accomplish this, a parent element needs to be explicitly positioned. This property is that element. If it doesn't contain any positioning already, `position: relative` will be added to it.
+   */
+  elementForPositioning: HTMLElement
+  elementPositioned: boolean
+  shadowDom: ShadowRoot | null
+  customElement: Element | null
 }

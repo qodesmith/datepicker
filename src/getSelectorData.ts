@@ -42,32 +42,48 @@ export default function getSelectorData(selector: Selector): SelectorData {
 
   const rootNode = element.getRootNode()
   const rootNodeType = getType(rootNode)
-  const parent = element.parentElement
+  const elementForPositioning = element.parentElement
 
   /**
-   * There are only 2 possible root nodes supported:
+   * There are only 2 possible root (top-level) nodes supported:
    *   * document
    *   * a shadow DOM
    */
   if (rootNodeType === 'HTMLDocument') {
     checkForExistingPickerOnElement(element)
 
-    if (!parent) {
+    if (!elementForPositioning) {
       throwError('No parent to selector found.')
     }
 
-    return {el: element, parent, shadowDom: null, customElement: null}
+    return {
+      el: element,
+      elementForPositioning,
+      elementPositioned: false,
+      shadowDom: null,
+      customElement: null,
+    }
   }
 
   if (rootNodeType === 'ShadowRoot') {
     checkForExistingPickerOnElement(element)
+
+    /**
+     * In the case of the selector being a direct child of the shadow DOM, we
+     * won't be able to apply css positioning styles to the parent which would
+     * be the shadow DOM itself. Rather, we move one step further up the chain
+     * and would apply those styles to the custom element rendered in the DOM.
+     */
     return {
       el: element,
-      parent: parent || (rootNode as ShadowRoot),
+      elementForPositioning:
+        elementForPositioning ?? ((rootNode as ShadowRoot).host as HTMLElement),
+      elementPositioned: false,
       shadowDom: rootNode as ShadowRoot,
       customElement: (rootNode as ShadowRoot).host,
     }
   }
 
+  // We should never get here.
   throwError(`Invalid root node found for selector: ${rootNodeType}`)
 }

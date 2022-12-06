@@ -19,7 +19,7 @@ export const months = [
 
 /**
  * `t`, `r`, `b`, and `l` are all positioned relatively to the input the calendar is attached to.
- * `centered` fixes the calendar smack in the middle of the screen. Useful for mobile devices.
+ * `c` fixes the calendar smack in the middle of the screen. Useful for mobile devices.
  */
 export const sides: Sides = {
   //

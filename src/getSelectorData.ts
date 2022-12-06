@@ -1,14 +1,7 @@
 import {checkForExistingPickerOnElement} from './checkForExistingPicker'
 import getType from './getType'
 import throwError from './throwError'
-import {Selector} from './types'
-
-export type SelectorData = {
-  el: HTMLElement
-  parent: HTMLElement | ShadowRoot
-  shadowDom: null | ShadowRoot
-  customElement: null | Element
-}
+import {Selector, SelectorData} from './types'
 
 export default function getSelectorData(selector: Selector): SelectorData {
   let element: HTMLElement | null = null

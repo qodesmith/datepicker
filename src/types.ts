@@ -1,5 +1,3 @@
-import {SelectorData} from './getSelectorData'
-
 export type DatepickerOptions = {
   /**
    * Callback function after a date has been selected. The 2nd argument is the selected date when a date is being selected and `undefined` when a date is being unselected. You unselect a date by clicking it again.
@@ -354,4 +352,11 @@ export type DatepickersMapItem = {
   selectorData: SelectorData
   type: PickerType
   id?: any
+}
+
+export type SelectorData = {
+  el: HTMLElement
+  parent: HTMLElement | ShadowRoot
+  shadowDom: null | ShadowRoot
+  customElement: null | Element
 }

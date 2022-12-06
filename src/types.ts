@@ -43,54 +43,28 @@ export type DatepickerOptions = {
    *
    * Default - 0
    */
-  startDay?: 0 | 1 | 2 | 3 | 4 | 5 | 6
+  startDay?: number
 
   /**
    * You can customize the display of days on the calendar by providing an array of 7 values. This can be used with the `startDay` option if your week starts on a day other than Sunday.
    *
    * Default - ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
    */
-  customDays?: [string, string, string, string, string, string, string]
+  customDays?: string[]
 
   /**
    * You can customize the display of the month name at the top of the calendar by providing an array of 12 strings.
    *
    * Default - ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
    */
-  customMonths?: [
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]
+  customMonths?: string[]
 
   /**
    * You can customize the display of the month names in the overlay view by providing an array of 12 strings. Keep in mind that if the values are too long, it could produce undesired results in the UI.
    *
    * Default - The first 3 characters of each item in `customMonths`.
    */
-  customOverlayMonths?: [
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string
-  ]
+  customOverlayMonths?: string[]
 
   /**
    * Want the overlay to be the default view when opening the calendar? This property is for you. Simply set this property to 'overlay' and you're done. This is helpful if you want a month picker to be front and center.

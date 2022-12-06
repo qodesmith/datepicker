@@ -1,10 +1,11 @@
-import checkForExistingPickerOnElement from './checkForExistingPickerOnElement'
+import {checkForExistingPickerOnElement} from './checkForExistingPicker'
 import getType from './getType'
 import throwError from './throwError'
 import {Selector} from './types'
 
 export type SelectorData = {
   el: HTMLElement
+  parent: HTMLElement | ShadowRoot
   shadowDom: null | ShadowRoot
   customElement: null | Element
 }
@@ -48,6 +49,7 @@ export default function getSelectorData(selector: Selector): SelectorData {
 
   const rootNode = element.getRootNode()
   const rootNodeType = getType(rootNode)
+  const parent = element.parentElement
 
   /**
    * There are only 2 possible root nodes supported:
@@ -56,13 +58,19 @@ export default function getSelectorData(selector: Selector): SelectorData {
    */
   if (rootNodeType === 'HTMLDocument') {
     checkForExistingPickerOnElement(element)
-    return {el: element, shadowDom: null, customElement: null}
+
+    if (!parent) {
+      throwError('No parent to selector found.')
+    }
+
+    return {el: element, parent, shadowDom: null, customElement: null}
   }
 
   if (rootNodeType === 'ShadowRoot') {
     checkForExistingPickerOnElement(element)
     return {
       el: element,
+      parent: parent || (rootNode as ShadowRoot),
       shadowDom: rootNode as ShadowRoot,
       customElement: (rootNode as ShadowRoot).host,
     }

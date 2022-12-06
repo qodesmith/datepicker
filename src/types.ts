@@ -33,11 +33,12 @@ export type DatepickerOptions = {
   ): void
 
   /**
-   * This option positions the calendar relative to the <input> field it's associated with. This can be 1 of 5 values: 'tr', 'tl', 'br', 'bl', 'page-center' representing top-right, top-left, bottom-right, bottom-left, and centered on the page respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument. For a value of 'page-center', Datepicker will position itself fixed, smack in the middle of the screen. This can be desirable for mobile devices.
+   * If you would like to render the calendar inside the provided selector, don't provide a value for this option.
+   * Providing a value for this option positions the calendar relative to the <input> field (or other element) it's associated with. This can be 1 of 5 values: 'tr', 'tl', 'br', 'bl', 'c' representing top-right, top-left, bottom-right, bottom-left, and centered on the page respectively. Datepicker will position itself accordingly relative to the element you reference in the 1st argument. For a value of 'c', Datepicker will position itself fixed, smack in the middle of the screen. This can be desirable for mobile devices.
    *
-   * Default - 'bl'
+   * Default - undefined
    */
-  position?: 'tr' | 'tl' | 'br' | 'bl' | 'page-center'
+  position?: 'tr' | 'tl' | 'br' | 'bl' | 'c'
 
   /**
    * Specify the day of the week your calendar starts on. 0 = Sunday, 1 = Monday, etc. Plays nice with the `customDays` option.
@@ -343,20 +344,22 @@ export type Datepicker = typeof datepicker
 
 export type Selector = string | HTMLElement
 
+/**
+ * `t`, `r`, `b`, and `l` are all positioned relatively to the input the calendar is attached to.
+ * `c` fixes the calendar smack in the middle of the screen. Useful for mobile devices.
+ */
 export type Sides = {
-  // `t`, `r`, `b`, and `l` are all positioned relatively to the input the calendar is attached to.
   t: 'top'
   r: 'right'
   b: 'bottom'
   l: 'left'
-
-  // `centered` fixes the calendar smack in the middle of the screen. Useful for mobile devices.
-  c: 'centered'
+  c: 'c'
 }
 
+export type PickerType = 'picker' | 'rangepicker'
+
 export type DatepickersMapItem = {
-  picker: DatepickerInstance | DaterangePickerInstance
-  pickerProperties: {
-    selectorData: SelectorData
-  }
+  selectorData: SelectorData
+  type: PickerType
+  id?: any
 }

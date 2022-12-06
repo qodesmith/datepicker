@@ -1,7 +1,8 @@
 import getDaysInMonth from './getDaysInMonth'
 
 /**
- * Creates an array of divs representing the days in a given month.
+ * Creates an array of divs representing the days in a given month. These
+ * elements will created once and are intended to be reused for each month.
  */
 export default function createCalendarDayElements(
   date: Date
@@ -19,6 +20,7 @@ export default function createCalendarDayElements(
 
     if (i > daysInMonth) {
       /**
+       * Days that aren't in the month should still be created but not shown.
        * Add inline position styles - https://mzl.la/3gYmnYj
        * I've seen that `element.style.position = '...'` isn't reliable.
        */

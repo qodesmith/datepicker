@@ -13,7 +13,7 @@ export default class QodesmithElement extends HTMLElement {
     this.root.innerHTML = `
       <div id="qodesmith-custom-elemen-div" style="border: 1px dashed">
         <div>Qodesmith Custom Element</div>
-        <input id="qodesmith-custom-element-input type="text" />
+        <input id="qodesmith-custom-element-input type="text" placeholder="qodesmith-custom-element-input" />
       </div>
       <div id="direct-shadow-child">I'm a shadow dom child</div>
     `

@@ -163,12 +163,13 @@ type CreateCalendarInput = {
   customMonths: DatepickerOptions['customMonths']
   customDays: DatepickerOptions['customDays']
 }
-type CreateCalendarReturnType = {
+
+export type PickerElements = {
   calendarContainer: HTMLDivElement
   controls: ControlElementsReturnType
-  weekdays: HTMLDivElement[]
+  weekdaysArray: HTMLDivElement[]
   weekdaysContainer: HTMLDivElement
-  calendarDays: HTMLDivElement[]
+  calendarDaysArray: HTMLDivElement[]
   daysContainer: HTMLDivElement
   overlay: OverlayReturnType
 }
@@ -177,12 +178,12 @@ export function createCalendarHTML({
   date,
   customMonths,
   customDays,
-}: CreateCalendarInput): CreateCalendarReturnType {
+}: CreateCalendarInput): PickerElements {
   const calendarContainer = document.createElement('div')
   const controls = createCalendarControlElements({date, customMonths})
-  const weekdays = createWeekdayElements(customDays)
+  const weekdaysArray = createWeekdayElements(customDays)
   const weekdaysContainer = document.createElement('div')
-  const calendarDays = createCalendarDayElements(date)
+  const calendarDaysArray = createCalendarDayElements(date)
   const daysContainer = document.createElement('div')
   const overlay = createCalendarOverlay(customMonths)
 
@@ -193,15 +194,15 @@ export function createCalendarHTML({
   calendarContainer.append(controls.controlsContainer)
   calendarContainer.append(weekdaysContainer)
   calendarContainer.append(daysContainer)
-  weekdays.forEach(el => weekdaysContainer.append(el))
-  calendarDays.forEach(el => daysContainer.append(el))
+  weekdaysArray.forEach(el => weekdaysContainer.append(el))
+  calendarDaysArray.forEach(el => daysContainer.append(el))
 
   return {
     calendarContainer,
     controls,
-    weekdays,
+    weekdaysArray,
     weekdaysContainer,
-    calendarDays,
+    calendarDaysArray,
     daysContainer,
     overlay,
   }

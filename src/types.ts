@@ -1,3 +1,5 @@
+import {PickerElements} from './createCalendarUtils'
+
 export type DatepickerOptions = {
   /**
    * Callback function after a date has been selected. The 2nd argument is the selected date when a date is being selected and `undefined` when a date is being unselected. You unselect a date by clicking it again.
@@ -323,9 +325,62 @@ export type Sides = {
 export type PickerType = 'picker' | 'rangepicker'
 
 export type DatepickersMapItem = {
+  /**
+   * All the existing DOM elements associated with the calendar.
+   */
   selectorData: SelectorData
   type: PickerType
   id?: any
+
+  /**
+   * All the DOM elements created for the calendar.
+   */
+  pickerElements: PickerElements
+
+  /**
+   * Either the default months or those provided by the user.
+   */
+  months: string[]
+
+  /**
+   * This date drives rendering the calendar. Only the month and year are used.
+   */
+  currentDate: Date
+
+  setDate(date?: Date): void // Programmatically set the calendars date.
+  remove(): void
+  setMin(): void
+  setMax(): void
+  show(): void
+  hide(): void
+  navigate(date: Date): void // Programmatically navigate the calendar to a new date.
+  toggleOverlay(): void
+  onSelect(): void
+  onShow(): void
+  onHide(): void
+  onMonthChange(): void
+  formatter(date: Date): string // Function to customize the date format updated on <input> elements.
+  disabler(date: Date): boolean
+
+  startDate: Date
+  dateSelected: Date
+  disabledDates: Set<number>
+  minDate: Date | undefined
+  maxDate: Date | undefined
+  noWeekends: boolean
+  events: Set<number>
+  startDay: number // Start day of the week.
+  overlayMonths: string[] // Will also be sliced to 1st 3 characters.
+  overlayPlaceholder: string // Default - '4-digit year'
+  overlayButtonText: string // Default - 'Submit'
+  disableOverlay: boolean
+  disabledMobile: boolean // Disable the datepicker on mobile devices. Allows the use of native datepicker if the input type is 'date'.
+  isMobile: boolean // 'ontouchstart' in window
+  alwaysShow: boolean
+  showAllDates: boolean // Shows a date in every square rendered on the calendar (preceding and trailing month days).
+  respectDisabledReadOnly: boolean // Prevents Datepicker from selecting dates when attached to inputs that are `disabled` or `readonly`.
+  first?: boolean // Indicates this is the 1st instance in a daterange pair.
+  second?: boolean // Indicates this is the 2nd instance in a daterange pair.
 }
 
 export type SelectorData = {

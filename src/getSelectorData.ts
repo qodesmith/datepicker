@@ -42,6 +42,9 @@ export default function getSelectorData(selector: Selector): SelectorData {
 
   const rootNode = element.getRootNode()
   const rootNodeType = getType(rootNode)
+  const parentElement = element.parentElement
+
+  checkForExistingPickerOnElement(element)
 
   /**
    * There are only 2 possible root (top-level) nodes supported:
@@ -49,20 +52,19 @@ export default function getSelectorData(selector: Selector): SelectorData {
    *   * a shadow DOM
    */
   if (rootNodeType === 'HTMLDocument') {
-    checkForExistingPickerOnElement(element)
-
-    if (!element.parentElement) {
+    // Elements not in a shadow DOM should always have a parent.
+    if (!parentElement) {
       throwError('No parent to selector found.')
     }
 
-    const originalPosition = getComputedStyle(element.parentElement).position
+    const originalPosition = getComputedStyle(parentElement).position
     if (originalPosition === '' || originalPosition === 'static') {
-      element.parentElement.style.setProperty('position', 'relative')
+      parentElement.style.setProperty('position', 'relative')
     }
 
     return {
       el: element,
-      elementForPositioning: element.parentElement,
+      elementForPositioning: parentElement,
       originalPosition,
       shadowDom: null,
       customElement: null,
@@ -70,8 +72,6 @@ export default function getSelectorData(selector: Selector): SelectorData {
   }
 
   if (rootNodeType === 'ShadowRoot') {
-    checkForExistingPickerOnElement(element)
-
     const customElement = (rootNode as ShadowRoot).host as HTMLElement
     const elementForPositioning = element.parentElement ?? customElement
     const originalPosition = getComputedStyle(elementForPositioning).position

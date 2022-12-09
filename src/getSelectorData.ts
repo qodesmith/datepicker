@@ -42,7 +42,6 @@ export default function getSelectorData(selector: Selector): SelectorData {
 
   const rootNode = element.getRootNode()
   const rootNodeType = getType(rootNode)
-  const elementForPositioning = element.parentElement
 
   /**
    * There are only 2 possible root (top-level) nodes supported:
@@ -52,14 +51,19 @@ export default function getSelectorData(selector: Selector): SelectorData {
   if (rootNodeType === 'HTMLDocument') {
     checkForExistingPickerOnElement(element)
 
-    if (!elementForPositioning) {
+    if (!element.parentElement) {
       throwError('No parent to selector found.')
+    }
+
+    const originalPosition = getComputedStyle(element.parentElement).position
+    if (originalPosition === '' || originalPosition === 'static') {
+      element.parentElement.style.setProperty('position', 'relative')
     }
 
     return {
       el: element,
-      elementForPositioning,
-      elementPositioned: false,
+      elementForPositioning: element.parentElement,
+      originalPosition,
       shadowDom: null,
       customElement: null,
     }
@@ -67,6 +71,14 @@ export default function getSelectorData(selector: Selector): SelectorData {
 
   if (rootNodeType === 'ShadowRoot') {
     checkForExistingPickerOnElement(element)
+
+    const customElement = (rootNode as ShadowRoot).host as HTMLElement
+    const elementForPositioning = element.parentElement ?? customElement
+    const originalPosition = getComputedStyle(elementForPositioning).position
+
+    if (originalPosition === '' || originalPosition === 'static') {
+      elementForPositioning.style.setProperty('position', 'relative')
+    }
 
     /**
      * In the case of the selector being a direct child of the shadow DOM, we
@@ -76,11 +88,10 @@ export default function getSelectorData(selector: Selector): SelectorData {
      */
     return {
       el: element,
-      elementForPositioning:
-        elementForPositioning ?? ((rootNode as ShadowRoot).host as HTMLElement),
-      elementPositioned: false,
+      elementForPositioning,
+      originalPosition,
       shadowDom: rootNode as ShadowRoot,
-      customElement: (rootNode as ShadowRoot).host,
+      customElement,
     }
   }
 

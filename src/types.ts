@@ -340,14 +340,14 @@ export type DatepickersMapItem = {
   /**
    * Either the default months or those provided by the user.
    */
-  months: string[]
+  months: readonly string[]
 
   /**
    * This date drives rendering the calendar. Only the month and year are used.
    */
   currentDate: Date
 
-  setDate(date?: Date): void // Programmatically set the calendars date.
+  setDate(date: Date): void // Programmatically set the calendars date.
   remove(): void
   setMin(): void
   setMax(): void
@@ -379,8 +379,9 @@ export type DatepickersMapItem = {
   alwaysShow: boolean
   showAllDates: boolean // Shows a date in every square rendered on the calendar (preceding and trailing month days).
   respectDisabledReadOnly: boolean // Prevents Datepicker from selecting dates when attached to inputs that are `disabled` or `readonly`.
-  first?: boolean // Indicates this is the 1st instance in a daterange pair.
-  second?: boolean // Indicates this is the 2nd instance in a daterange pair.
+
+  isFirst?: boolean // Indicates this is the 1st instance in a daterange pair.
+  sibling?: DatepickersMapItem
 }
 
 export type SelectorData = {
@@ -390,7 +391,16 @@ export type SelectorData = {
    * The main use of datepicker is to associate it with an element (an <input /> in most cases) and have it positioned relative to that element. In order to accomplish this, a parent element needs to be explicitly positioned. This property is that element. If it doesn't contain any positioning already, `position: relative` will be added to it.
    */
   elementForPositioning: HTMLElement
-  elementPositioned: boolean
+
+  /**
+   * The value of having run `getComputedStyle(elementForPositioning)`.
+   */
+  calculatedPosition: string
+
+  /**
+   * If the parent element already had an inline style set for position, this will be that value. Otherwise, it will be null.
+   */
+  originalPositionStyle: string | null
   shadowDom: ShadowRoot | null
   customElement: Element | null
 }

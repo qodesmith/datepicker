@@ -57,15 +57,18 @@ export default function getSelectorData(selector: Selector): SelectorData {
       throwError('No parent to selector found.')
     }
 
-    const originalPosition = getComputedStyle(parentElement).position
-    if (originalPosition === '' || originalPosition === 'static') {
+    const calculatedPosition = getComputedStyle(parentElement).position
+    const originalStyle = parentElement.getAttribute('style')
+    const originalPositionStyle = originalStyle ? calculatedPosition : null
+    if (calculatedPosition === '' || calculatedPosition === 'static') {
       parentElement.style.setProperty('position', 'relative')
     }
 
     return {
       el: element,
       elementForPositioning: parentElement,
-      originalPosition,
+      calculatedPosition,
+      originalPositionStyle,
       shadowDom: null,
       customElement: null,
     }
@@ -74,9 +77,11 @@ export default function getSelectorData(selector: Selector): SelectorData {
   if (rootNodeType === 'ShadowRoot') {
     const customElement = (rootNode as ShadowRoot).host as HTMLElement
     const elementForPositioning = element.parentElement ?? customElement
-    const originalPosition = getComputedStyle(elementForPositioning).position
+    const calculatedPosition = getComputedStyle(elementForPositioning).position
+    const originalStyle = elementForPositioning.getAttribute('style')
+    const originalPositionStyle = originalStyle ? calculatedPosition : null
 
-    if (originalPosition === '' || originalPosition === 'static') {
+    if (calculatedPosition === '' || calculatedPosition === 'static') {
       elementForPositioning.style.setProperty('position', 'relative')
     }
 
@@ -84,12 +89,13 @@ export default function getSelectorData(selector: Selector): SelectorData {
      * In the case of the selector being a direct child of the shadow DOM, we
      * won't be able to apply css positioning styles to the parent which would
      * be the shadow DOM itself. Rather, we move one step further up the chain
-     * and would apply those styles to the custom element rendered in the DOM.
+     * and apply those styles to the custom element rendered in the DOM.
      */
     return {
       el: element,
       elementForPositioning,
-      originalPosition,
+      calculatedPosition,
+      originalPositionStyle,
       shadowDom: rootNode as ShadowRoot,
       customElement,
     }

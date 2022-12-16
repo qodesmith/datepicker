@@ -65,7 +65,7 @@ export default function datepicker(
      * navigate more than once on either instance in the pair. It conditionally
      * calls the sibling's navigate only if `isFirstRun` is true.
      */
-    _navigate(isFirstRun: boolean, date: Date, triggerOnMonthChange?: boolean) {
+    _navigate(isFirstRun: boolean, {date, triggerOnMonthChange}) {
       const {currentDate, onMonthChange, isFirst, sibling} = internalPickerItem
 
       internalPickerItem.currentDate = stripTime(date)
@@ -83,7 +83,7 @@ export default function datepicker(
       if (sibling && isFirstRun) {
         const siblingDate = getSiblingDateForNavigate(isFirst, date)
 
-        sibling._navigate(false, siblingDate, triggerOnMonthChange)
+        sibling._navigate(false, {date: siblingDate, triggerOnMonthChange})
       }
     },
     _selectDate(
@@ -146,12 +146,9 @@ export default function datepicker(
         })
       }
     },
-    _setMinOrMax(
-      isFirstRun: boolean,
-      minOrMax: 'min' | 'max',
-      date: Date | undefined
-    ): void {
-      const {minDate, maxDate, selectedDate, sibling} = internalPickerItem
+    _setMinOrMax(isFirstRun, minOrMax, {date, triggerOnSelect}): void {
+      const {minDate, maxDate, selectedDate, sibling, onSelect} =
+        internalPickerItem
       const dateType = minOrMax === 'min' ? 'minDate' : 'maxDate'
       internalPickerItem[dateType] = date ? stripTime(date) : undefined
 
@@ -162,6 +159,10 @@ export default function datepicker(
         !isDateWithinRange({date, minDate, maxDate})
       ) {
         internalPickerItem.selectedDate = undefined
+
+        if (triggerOnSelect) {
+          onSelect({prevDate: selectedDate, newDate: undefined})
+        }
       }
 
       // Update the DOM with these changes.
@@ -169,7 +170,7 @@ export default function datepicker(
 
       // Prevent an infinite loop of sibling methods calling eachother.
       if (sibling && isFirstRun) {
-        sibling._setMinOrMax(false, minOrMax, date)
+        sibling._setMinOrMax(false, minOrMax, {date, triggerOnSelect})
       }
     },
   }
@@ -252,8 +253,8 @@ export default function datepicker(
         internalPickerItem.sibling.publicPicker.remove()
       }
     },
-    navigate(date: Date, triggerOnMonthChange?: boolean): void {
-      internalPickerItem._navigate(true, date, triggerOnMonthChange)
+    navigate(data): void {
+      internalPickerItem._navigate(true, data)
     },
 
     /**
@@ -263,11 +264,16 @@ export default function datepicker(
     selectDate(data): void {
       internalPickerItem._selectDate(true, data)
     },
-    setMin(date?: Date): void {
-      internalPickerItem._setMinOrMax(true, 'min', date)
+
+    /**
+     * `data.triggerOnSelect` will only run if there was a selected date that
+     * falls outside the new min/max range.
+     */
+    setMin(data): void {
+      internalPickerItem._setMinOrMax(true, 'min', data)
     },
-    setMax(date?: Date): void {
-      internalPickerItem._setMinOrMax(true, 'max', date)
+    setMax(data): void {
+      internalPickerItem._setMinOrMax(true, 'max', data)
     },
   }
 

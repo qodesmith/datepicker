@@ -373,41 +373,47 @@ export type InternalPickerData = {
   onSelect: NonNullable<DatepickerOptions['onSelect']>
   _navigate(
     isFirstRun: boolean,
-    ...args: Parameters<DatepickerInstance['navigate']>
+    data: Parameters<DatepickerInstance['navigate']>[0]
   ): void
   _selectDate(
     isFirstRun: boolean,
-    ...args: Parameters<DatepickerInstance['selectDate']>
+    data: Parameters<DatepickerInstance['selectDate']>[0]
   ): void
   _setMinOrMax(
     isFirstRun: boolean,
     minOrMax: 'min' | 'max',
-    date: Date | undefined
+    data: SetMinMaxInputType
   ): void
+}
+
+type SetMinMaxInputType = {
+  date?: Date
+  triggerOnSelect?: boolean
 }
 
 export type DatepickerInstance = {
   readonly currentDate: Date
   readonly selectedDate: Date | undefined
-  remove(): void
-  removePair(): void
-  navigate(date: Date, triggerOnMonthChange?: boolean): void
+  readonly remove: () => void
+  readonly removePair: () => void
+  readonly navigate: ({
+    date,
+    triggerOnMonthChange,
+  }: {
+    date: Date
+    triggerOnMonthChange?: boolean
+  }) => void
   /**
    * `changeCalendar` only runs if `date` was provided.
    */
-  selectDate({
-    date,
-    changeCalendar,
-    triggerOnMonthChange,
-    triggerOnSelect,
-  }: {
+  readonly selectDate: (data: {
     date?: Date
     changeCalendar?: boolean
     triggerOnMonthChange?: boolean
     triggerOnSelect?: boolean
-  }): void
-  setMin(date?: Date): void
-  setMax(date?: Date): void
+  }) => void
+  readonly setMin: (data: SetMinMaxInputType) => void
+  readonly setMax: (data: SetMinMaxInputType) => void
 }
 
 export type SelectorData = {

@@ -371,13 +371,18 @@ export type InternalPickerData = {
 
   onMonthChange: NonNullable<DatepickerOptions['onMonthChange']>
   onSelect: NonNullable<DatepickerOptions['onSelect']>
-  navigate(
+  _navigate(
     isFirstRun: boolean,
     ...args: Parameters<DatepickerInstance['navigate']>
   ): void
-  selectDate(
+  _selectDate(
     isFirstRun: boolean,
     ...args: Parameters<DatepickerInstance['selectDate']>
+  ): void
+  _setMinOrMax(
+    isFirstRun: boolean,
+    minOrMax: 'min' | 'max',
+    date: Date | undefined
   ): void
 }
 
@@ -402,6 +407,7 @@ export type DatepickerInstance = {
     triggerOnSelect?: boolean
   }): void
   setMin(date?: Date): void
+  setMax(date?: Date): void
 }
 
 export type SelectorData = {

@@ -48,6 +48,11 @@ export default function datepicker(
     selectorData,
     pickerElements,
     months: options?.customMonths ?? months,
+    disabledDates: new Set(
+      (options?.disabledDates ?? []).map(disabledDate => {
+        return +stripTime(disabledDate)
+      })
+    ),
     currentDate: stripTime(options?.startDate ?? new Date()),
     selectedDate: options?.selectedDate
       ? stripTime(options.selectedDate)
@@ -60,7 +65,7 @@ export default function datepicker(
      * navigate more than once on either instance in the pair. It conditionally
      * calls the sibling's navigate only if `isFirstRun` is true.
      */
-    navigate(isFirstRun: boolean, date: Date, triggerOnMonthChange?: boolean) {
+    _navigate(isFirstRun: boolean, date: Date, triggerOnMonthChange?: boolean) {
       const {currentDate, onMonthChange, isFirst, sibling} = internalPickerItem
 
       internalPickerItem.currentDate = stripTime(date)
@@ -78,10 +83,10 @@ export default function datepicker(
       if (sibling && isFirstRun) {
         const siblingDate = getSiblingDateForNavigate(isFirst, date)
 
-        sibling.navigate(false, siblingDate, triggerOnMonthChange)
+        sibling._navigate(false, siblingDate, triggerOnMonthChange)
       }
     },
-    selectDate(
+    _selectDate(
       isFirstRun,
       {date, changeCalendar, triggerOnMonthChange, triggerOnSelect}
     ) {
@@ -124,18 +129,47 @@ export default function datepicker(
         })
       }
 
+      // Update the DOM with these changes.
+      renderCalendar(internalPickerItem)
+
       // Prevent an infinite loop of sibling methods calling eachother.
       if (sibling && isFirstRun) {
         const siblingDate = date
           ? getSiblingDateForNavigate(isFirst, date)
           : undefined
 
-        sibling.selectDate(false, {
+        sibling._selectDate(false, {
           date: siblingDate,
           changeCalendar,
           triggerOnMonthChange,
           triggerOnSelect,
         })
+      }
+    },
+    _setMinOrMax(
+      isFirstRun: boolean,
+      minOrMax: 'min' | 'max',
+      date: Date | undefined
+    ): void {
+      const {minDate, maxDate, selectedDate, sibling} = internalPickerItem
+      const dateType = minOrMax === 'min' ? 'minDate' : 'maxDate'
+      internalPickerItem[dateType] = date ? stripTime(date) : undefined
+
+      // Unselect the selected date if it's out of range.
+      if (
+        selectedDate &&
+        date &&
+        !isDateWithinRange({date, minDate, maxDate})
+      ) {
+        internalPickerItem.selectedDate = undefined
+      }
+
+      // Update the DOM with these changes.
+      renderCalendar(internalPickerItem)
+
+      // Prevent an infinite loop of sibling methods calling eachother.
+      if (sibling && isFirstRun) {
+        sibling._setMinOrMax(false, minOrMax, date)
       }
     },
   }
@@ -219,53 +253,22 @@ export default function datepicker(
       }
     },
     navigate(date: Date, triggerOnMonthChange?: boolean): void {
-      internalPickerItem.navigate(true, date, triggerOnMonthChange)
+      internalPickerItem._navigate(true, date, triggerOnMonthChange)
     },
 
     /**
      * `changeCalendar` only runs if `date` was provided.
      * `triggerOnMonthChange` only runs if `date` was provided and the month actually changed.
      */
-    selectDate({date, changeCalendar, triggerOnMonthChange, triggerOnSelect}) {
-      const {currentDate, onMonthChange, onSelect} = internalPickerItem
-
-      // Do nothing if the date is out of range.
-      if (
-        date &&
-        !isDateWithinRange({
-          date,
-          minDate: internalPickerItem.minDate,
-          maxDate: internalPickerItem.maxDate,
-        })
-      ) {
-        return
-      }
-
-      // Update the selected date.
-      internalPickerItem.selectedDate = date ? stripTime(date) : undefined
-
-      // Re-render the calendar.
-      if (changeCalendar && date) {
-        // Update the month/year the calendar is visually at.
-        internalPickerItem.currentDate = stripTime(date)
-        renderCalendar(internalPickerItem)
-      }
-
-      if (triggerOnMonthChange && date && hasMonthChanged(currentDate, date)) {
-        onMonthChange({
-          prevDate: stripTime(currentDate),
-          newDate: stripTime(date),
-        })
-      }
-
-      if (triggerOnSelect) {
-        onSelect({
-          prevDate: stripTime(currentDate),
-          newDate: date ? stripTime(date) : date,
-        })
-      }
+    selectDate(data): void {
+      internalPickerItem._selectDate(true, data)
     },
-    setMin() {},
+    setMin(date?: Date): void {
+      internalPickerItem._setMinOrMax(true, 'min', date)
+    },
+    setMax(date?: Date): void {
+      internalPickerItem._setMinOrMax(true, 'max', date)
+    },
   }
 
   internalPickerItem.publicPicker = publicPicker

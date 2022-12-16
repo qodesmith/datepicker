@@ -37,8 +37,9 @@ export default function datepicker(
   // HANDLE POSITIONING OF CONTAINING ELEMENT.
 
   // CREATE CALENDAR HTML
+  const startDate = stripTime(options?.startDate ?? stripTime(new Date()))
   const pickerElements = createCalendarHTML({
-    date: new Date(2022, 1, 1),
+    date: startDate,
     customMonths: months.slice(),
     customDays: days.slice(),
   })
@@ -53,7 +54,7 @@ export default function datepicker(
         return +stripTime(disabledDate)
       })
     ),
-    currentDate: stripTime(options?.startDate ?? new Date()),
+    currentDate: startDate,
     selectedDate: options?.selectedDate
       ? stripTime(options.selectedDate)
       : undefined,
@@ -147,8 +148,8 @@ export default function datepicker(
       }
     },
     _setMinOrMax(isFirstRun, minOrMax, {date, triggerOnSelect}): void {
-      const {minDate, maxDate, selectedDate, sibling, onSelect} =
-        internalPickerItem
+      const {minDate, maxDate, sibling, onSelect} = internalPickerItem
+      const {selectedDate} = publicPicker // Must come from the public getter.
       const dateType = minOrMax === 'min' ? 'minDate' : 'maxDate'
       internalPickerItem[dateType] = date ? stripTime(date) : undefined
 

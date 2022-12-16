@@ -19,7 +19,7 @@ export type DatepickerOptions = {
   /**
    * Callback function when the month has changed.
    */
-  onMonthChange?(instance: DatepickerInstance): void
+  onMonthChange?(onMonthChangeOptions: {prevDate: Date; newDate: Date}): void
 
   /**
    * Using an input field with your datepicker? Want to customize its value anytime a date is selected? Provide a function that manually sets the provided input's value with your own formatting.
@@ -104,7 +104,7 @@ export type DatepickerOptions = {
   /**
    * This will start the calendar with a date already selected. If Datepicker is used with an <input> element, that field will be populated with this date as well.
    */
-  dateSelected?: Date
+  selectedDate?: Date
 
   /**
    * This will be the maximum threshold of selectable dates. Anything after it will be unselectable.
@@ -154,7 +154,7 @@ export type DatepickerOptions = {
   disabler?(date: Date): boolean
 
   /**
-   * Provide an array of JS date objects that will be disabled on the calendar. This array cannot include the same date as `dateSelected`. If you need more control over which dates are disabled, see the `disabler` option.
+   * Provide an array of JS date objects that will be disabled on the calendar. This array cannot include the same date as `selectedDate`. If you need more control over which dates are disabled, see the `disabler` option.
    */
   disabledDates?: Date[]
 
@@ -182,7 +182,7 @@ export type DaterangePickerOptions = DatepickerOptions & {
 
 export type Options = DatepickerOptions | DaterangePickerOptions
 
-export type DatepickerInstance = {
+export type DatepickerInstance_REFERENCE = {
   /**
    * TODO - move this into the initialize options.
    * Manually set this property to `true` to fully disable the calendar.
@@ -205,8 +205,8 @@ export type DatepickerInstance = {
    *
    * NOTE: This will not trigger the `onSelect` callback.
    */
-  setDate(date: Date, changeCalendar?: boolean): void
-  setDate(): void
+  selectDate(date: Date, changeCalendar?: boolean): void
+  selectDate(): void
 
   /**
    * Allows you to programmatically set the minimum selectable date or unset it. If this instance is part of a daterange instance (see the `id` option) then the other instance will be changed as well. To unset a minimum date, simply run the function with no arguments.
@@ -267,7 +267,7 @@ export type DatepickerInstance = {
   /**
    * The value of the selected date. This will be `undefined` if no date has been selected yet.
    */
-  dateSelected: Date | undefined
+  selectedDate: Date | undefined
 
   /**
    * The element datepicker is relatively positioned against (unless centered).
@@ -285,7 +285,7 @@ export type DatepickerInstance = {
   maxDate: Date | undefined
 }
 
-export type DaterangePickerInstance = DatepickerInstance & {
+export type DaterangePickerInstance = DatepickerInstance_REFERENCE & {
   /**
    * This method is only available on daterange pickers. It will return an object with `start` and `end` properties whose values are JavaScript date objects representing what the user selected on both calendars.
    */
@@ -324,7 +324,7 @@ export type Sides = {
 
 export type PickerType = 'picker' | 'rangepicker'
 
-export type DatepickersMapItem = {
+export type InternalPickerData = {
   /**
    * All the existing DOM elements associated with the calendar.
    */
@@ -347,23 +347,8 @@ export type DatepickersMapItem = {
    */
   currentDate: Date
 
-  setDate(date: Date): void // Programmatically set the calendars date.
-  remove(): void
-  setMin(): void
-  setMax(): void
-  show(): void
-  hide(): void
-  navigate(date: Date): void // Programmatically navigate the calendar to a new date.
-  toggleOverlay(): void
-  onSelect(): void
-  onShow(): void
-  onHide(): void
-  onMonthChange(): void
-  formatter(date: Date): string // Function to customize the date format updated on <input> elements.
-  disabler(date: Date): boolean
-
   startDate: Date
-  dateSelected: Date
+  selectedDate: Date | undefined
   disabledDates: Set<number>
   minDate: Date | undefined
   maxDate: Date | undefined
@@ -380,8 +365,29 @@ export type DatepickersMapItem = {
   showAllDates: boolean // Shows a date in every square rendered on the calendar (preceding and trailing month days).
   respectDisabledReadOnly: boolean // Prevents Datepicker from selecting dates when attached to inputs that are `disabled` or `readonly`.
 
+  publicPicker: DatepickerInstance // The object returned to the user.
   isFirst?: boolean // Indicates this is the 1st instance in a daterange pair.
-  sibling?: DatepickersMapItem
+  sibling?: InternalPickerData // Just a reference to the other internal object in the daterange pair.
+
+  onMonthChange: NonNullable<DatepickerOptions['onMonthChange']>
+}
+
+export type DatepickerInstance = {
+  readonly currentDate: Date
+  readonly selectedDate: Date | undefined
+  remove(): void
+  removePair(): void
+  navigate(date: Date, triggerOnMonthChange?: boolean): void
+  /**
+   * `changeCalendar` only runs if `date` was provided.
+   */
+  selectDate({
+    date,
+    changeCalendar,
+  }: {
+    date?: Date
+    changeCalendar?: boolean
+  }): void
 }
 
 export type SelectorData = {

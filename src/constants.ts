@@ -1,4 +1,4 @@
-import {DatepickersMapItem, Sides} from './types'
+import {InternalPickerData, Sides} from './types'
 
 export const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
 
@@ -37,5 +37,7 @@ export function noop() {}
 
 /**
  * This map will contain all the created datepickers that haven't been removed.
+ * It maps the datepicker element (not the calendar HTML, but the DOM element
+ * that the calendar is initialized with) to the internal picker item.
  */
-export const datepickersMap = new Map<HTMLElement, DatepickersMapItem>()
+export const datepickersMap = new Map<HTMLElement, InternalPickerData>()

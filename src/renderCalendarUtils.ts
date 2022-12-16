@@ -1,7 +1,7 @@
 import getDaysInMonth from './getDaysInMonth'
-import {DatepickersMapItem} from './types'
+import {InternalPickerData} from './types'
 
-export function renderCalendar(picker: DatepickersMapItem): void {
+export function renderCalendar(picker: InternalPickerData): void {
   const currentYear = picker.currentDate.getFullYear()
   const currentMonthNum = picker.currentDate.getMonth()
   const currentMonth = picker.months[currentMonthNum]
@@ -24,4 +24,6 @@ export function renderCalendar(picker: DatepickersMapItem): void {
   // Adjust the month and year in the calendar controls.
   picker.pickerElements.controls.monthName.textContent = currentMonth
   picker.pickerElements.controls.year.textContent = `${currentYear}`
+
+  //
 }

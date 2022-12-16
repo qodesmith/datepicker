@@ -371,6 +371,14 @@ export type InternalPickerData = {
 
   onMonthChange: NonNullable<DatepickerOptions['onMonthChange']>
   onSelect: NonNullable<DatepickerOptions['onSelect']>
+  navigate(
+    isFirstRun: boolean,
+    ...args: Parameters<DatepickerInstance['navigate']>
+  ): void
+  selectDate(
+    isFirstRun: boolean,
+    ...args: Parameters<DatepickerInstance['selectDate']>
+  ): void
 }
 
 export type DatepickerInstance = {
@@ -393,6 +401,7 @@ export type DatepickerInstance = {
     triggerOnMonthChange?: boolean
     triggerOnSelect?: boolean
   }): void
+  setMin(date?: Date): void
 }
 
 export type SelectorData = {

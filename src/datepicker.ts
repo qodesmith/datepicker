@@ -13,7 +13,14 @@ import {checkForExistingRangepickerPair} from './checkForExistingPicker'
 import {createCalendarHTML} from './createCalendarUtils'
 import {datepickersMap, days, months, noop} from './constants'
 import {renderCalendar} from './renderCalendarUtils'
-import {hasMonthChanged, stripTime} from './generalUtils'
+import {
+  getSiblingDateForNavigate,
+  hasMonthChanged,
+  isDateWithinRange,
+  stripTime,
+} from './generalUtils'
+
+// TODO - allow daterange pickers to have the same selector element.
 
 export default function datepicker(
   selector: Selector,
@@ -47,6 +54,90 @@ export default function datepicker(
       : undefined,
     onMonthChange: options?.onMonthChange ?? noop,
     onSelect: options?.onSelect ?? noop,
+
+    /**
+     * An internal function that is aware of a daterange pair and won't call
+     * navigate more than once on either instance in the pair. It conditionally
+     * calls the sibling's navigate only if `isFirstRun` is true.
+     */
+    navigate(isFirstRun: boolean, date: Date, triggerOnMonthChange?: boolean) {
+      const {currentDate, onMonthChange, isFirst, sibling} = internalPickerItem
+
+      internalPickerItem.currentDate = stripTime(date)
+      renderCalendar(internalPickerItem)
+
+      // Only trigger `onMonthChange` if the month has actually changed.
+      if (triggerOnMonthChange && hasMonthChanged(currentDate, date)) {
+        onMonthChange({
+          prevDate: stripTime(currentDate),
+          newDate: stripTime(date),
+        })
+      }
+
+      // Prevent an infinite loop of sibling methods calling eachother.
+      if (sibling && isFirstRun) {
+        const siblingDate = getSiblingDateForNavigate(isFirst, date)
+
+        sibling.navigate(false, siblingDate, triggerOnMonthChange)
+      }
+    },
+    selectDate(
+      isFirstRun,
+      {date, changeCalendar, triggerOnMonthChange, triggerOnSelect}
+    ) {
+      const {currentDate, onMonthChange, onSelect, isFirst, sibling} =
+        internalPickerItem
+
+      // Do nothing if the date is out of range.
+      if (
+        date &&
+        !isDateWithinRange({
+          date,
+          minDate: internalPickerItem.minDate,
+          maxDate: internalPickerItem.maxDate,
+        })
+      ) {
+        return
+      }
+
+      // Update the selected date.
+      internalPickerItem.selectedDate = date ? stripTime(date) : undefined
+
+      // Re-render the calendar.
+      if (changeCalendar && date) {
+        // Update the month/year the calendar is visually at.
+        internalPickerItem.currentDate = stripTime(date)
+        renderCalendar(internalPickerItem)
+      }
+
+      if (triggerOnMonthChange && date && hasMonthChanged(currentDate, date)) {
+        onMonthChange({
+          prevDate: stripTime(currentDate),
+          newDate: stripTime(date),
+        })
+      }
+
+      if (triggerOnSelect) {
+        onSelect({
+          prevDate: stripTime(currentDate),
+          newDate: date ? stripTime(date) : date,
+        })
+      }
+
+      // Prevent an infinite loop of sibling methods calling eachother.
+      if (sibling && isFirstRun) {
+        const siblingDate = date
+          ? getSiblingDateForNavigate(isFirst, date)
+          : undefined
+
+        sibling.selectDate(false, {
+          date: siblingDate,
+          changeCalendar,
+          triggerOnMonthChange,
+          triggerOnSelect,
+        })
+      }
+    },
   }
 
   // Flags for the public picker.
@@ -105,9 +196,15 @@ export default function datepicker(
         // TODO - remove event listeners.
       }
     },
+
+    /**
+     * This method exists because it's possible to individually remove one of
+     * the instances in a daterange pair. For convenience, you can call this
+     * method and remove them both at once.
+     */
     removePair(): void {
-      // Ensure the logic below is only executed once.
-      if (isPairRemoved) return
+      // Ensure the logic below is only executed once for daterange pairs.
+      if (isPairRemoved || !internalPickerItem.sibling) return
       isPairRemoved = true
 
       publicPicker.remove()
@@ -122,27 +219,7 @@ export default function datepicker(
       }
     },
     navigate(date: Date, triggerOnMonthChange?: boolean): void {
-      const {currentDate, onMonthChange} = internalPickerItem
-
-      internalPickerItem.currentDate = stripTime(date)
-      renderCalendar(internalPickerItem)
-
-      if (triggerOnMonthChange && hasMonthChanged(currentDate, date)) {
-        onMonthChange({
-          prevDate: stripTime(currentDate),
-          newDate: stripTime(date),
-        })
-      }
-
-      if (internalPickerItem.sibling) {
-        const siblingDate = new Date(
-          date.getFullYear(),
-          date.getMonth() + (internalPickerItem.isFirst ? 1 : -1)
-        )
-
-        internalPickerItem.sibling.currentDate = siblingDate
-        renderCalendar(internalPickerItem.sibling)
-      }
+      internalPickerItem.navigate(true, date, triggerOnMonthChange)
     },
 
     /**
@@ -151,6 +228,18 @@ export default function datepicker(
      */
     selectDate({date, changeCalendar, triggerOnMonthChange, triggerOnSelect}) {
       const {currentDate, onMonthChange, onSelect} = internalPickerItem
+
+      // Do nothing if the date is out of range.
+      if (
+        date &&
+        !isDateWithinRange({
+          date,
+          minDate: internalPickerItem.minDate,
+          maxDate: internalPickerItem.maxDate,
+        })
+      ) {
+        return
+      }
 
       // Update the selected date.
       internalPickerItem.selectedDate = date ? stripTime(date) : undefined
@@ -176,6 +265,7 @@ export default function datepicker(
         })
       }
     },
+    setMin() {},
   }
 
   internalPickerItem.publicPicker = publicPicker

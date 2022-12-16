@@ -98,6 +98,9 @@ export function createCalendarDayElements(date: Date): HTMLDivElement[] {
     el.className = 'dp-day'
     el.textContent = `${i}`
 
+    // This will be used by event handlers to know which date was clicked.
+    el.dataset.num = `${i}`
+
     if (i > daysInMonth) {
       // Days that aren't in the month should still be created but not shown.
       el.classList.add('dp-dn')

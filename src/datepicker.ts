@@ -275,6 +275,21 @@ export default function datepicker(
     setMax(data): void {
       internalPickerItem._setMinOrMax(true, 'max', data)
     },
+    getSelectedRange() {
+      if (internalPickerItem.sibling) {
+        const {isFirst} = internalPickerItem
+
+        // Ensure the dates are taken from the public picker getters.
+        const {selectedDate} = publicPicker
+        const {selectedDate: siblingSelectedDate} =
+          internalPickerItem.sibling.publicPicker
+
+        return {
+          start: isFirst ? selectedDate : siblingSelectedDate,
+          end: !isFirst ? selectedDate : siblingSelectedDate,
+        }
+      }
+    },
   }
 
   internalPickerItem.publicPicker = publicPicker

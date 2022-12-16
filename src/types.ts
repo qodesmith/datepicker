@@ -414,6 +414,10 @@ export type DatepickerInstance = {
   }) => void
   readonly setMin: (data: SetMinMaxInputType) => void
   readonly setMax: (data: SetMinMaxInputType) => void
+  readonly getSelectedRange: () => void | {
+    start: Date | undefined
+    end: Date | undefined
+  }
 }
 
 export type SelectorData = {

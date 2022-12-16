@@ -4,7 +4,7 @@ export type DatepickerOptions = {
   /**
    * Callback function after a date has been selected. The 2nd argument is the selected date when a date is being selected and `undefined` when a date is being unselected. You unselect a date by clicking it again.
    */
-  onSelect?(instance: DatepickerInstance, date?: Date): void
+  onSelect?(onSelectOptions: {prevDate: Date; newDate: Date | undefined}): void
 
   /**
    * Callback function when the calendar is shown.
@@ -370,6 +370,7 @@ export type InternalPickerData = {
   sibling?: InternalPickerData // Just a reference to the other internal object in the daterange pair.
 
   onMonthChange: NonNullable<DatepickerOptions['onMonthChange']>
+  onSelect: NonNullable<DatepickerOptions['onSelect']>
 }
 
 export type DatepickerInstance = {
@@ -384,9 +385,13 @@ export type DatepickerInstance = {
   selectDate({
     date,
     changeCalendar,
+    triggerOnMonthChange,
+    triggerOnSelect,
   }: {
     date?: Date
     changeCalendar?: boolean
+    triggerOnMonthChange?: boolean
+    triggerOnSelect?: boolean
   }): void
 }
 

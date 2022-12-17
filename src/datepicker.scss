@@ -5,3 +5,39 @@
 .dp-hidden {
   opacity: 0;
 }
+
+.dp-overlay-container {
+  animation-duration: 0.5s;
+  // Retains the beginning / ending styles of the animation.
+  animation-fill-mode: both;
+}
+
+.dp-overlay-show {
+  z-index: 1;
+  animation-name: dpOverlayShow;
+}
+
+.dp-overlay-hide {
+  animation-name: dpOverlayHide;
+}
+
+// https://stackoverflow.com/a/57924649/2525633
+@keyframes dpOverlayShow {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes dpOverlayHide {
+  0% {
+    opacity: 1;
+    z-index: 1;
+  }
+  100% {
+    opacity: 0;
+    z-index: -1;
+  }
+}

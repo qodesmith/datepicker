@@ -10,11 +10,11 @@ function App() {
   const ua = window.navigator.userAgent
 
   useEffect(() => {
-    const picker = datepicker('.dp-test')
-    // const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
+    // const picker = datepicker('.dp-test')
+    const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
 
     return () => {
-      // oldPicker.remove()
+      oldPicker.remove()
     }
   }, [])
 

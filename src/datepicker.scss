@@ -4,7 +4,7 @@
 
 .dp-controls-container,
 .dp-month-year-container {
-  display: flex;
+  display: grid;
 }
 
 .dp-calendar-container {
@@ -21,6 +21,32 @@
 .dp-weekdays-container {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+}
+
+.dp-controls-container {
+  grid-template-columns: repeat(3, min-content);
+  justify-content: space-between;
+}
+
+.dp-month-year-container {
+  grid-template-columns: min-content min-content;
+  gap: 0.5em;
+}
+
+.dp-left-arrow,
+.dp-right-arrow {
+  svg path {
+    fill: currentColor;
+  }
+}
+
+.dp-right-arrow svg {
+  transform: rotate(180deg);
+}
+
+.dp-weekday,
+.dp-day {
+  text-align: center;
 }
 
 .dp-overlay-container {

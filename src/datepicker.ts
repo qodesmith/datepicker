@@ -11,13 +11,7 @@ import './datepicker.scss'
 import getSelectorData from './getSelectorData'
 import {checkForExistingRangepickerPair} from './checkForExistingPicker'
 import {createCalendarHTML} from './createCalendarUtils'
-import {
-  datepickersMap,
-  days,
-  months,
-  noop,
-  overlayContainerCls,
-} from './constants'
+import {datepickersMap, days, months, noop} from './constants'
 import {renderCalendar} from './renderCalendarUtils'
 import {
   getOverlayClassName,
@@ -49,9 +43,7 @@ export default function datepicker(
     date: startDate,
     customMonths: months.slice(),
     customDays: days.slice(),
-    startWithOverlayOpen: Boolean(
-      options?.defaultView && options.defaultView === 'overlay'
-    ),
+    defaultView: options?.defaultView,
   })
 
   // CREATE INTERNAL PICKER DATA
@@ -314,16 +306,14 @@ export default function datepicker(
       const isOverlayShowing = defaultView === 'overlay'
 
       internalPickerItem.isOverlayShowing = isOverlayShowing
-      pickerElements.calendarContainer.classList.add('dp-show')
+      pickerElements.calendarContainer.classList.remove('dp-dn')
       pickerElements.overlay.overlayContainer.className = getOverlayClassName({
         action: 'calendarOpen',
         defaultView,
       })
     },
     hide(): void {
-      internalPickerItem.pickerElements.calendarContainer.classList.add(
-        'dp-hide'
-      )
+      internalPickerItem.pickerElements.calendarContainer.classList.add('dp-dn')
     },
     toggleOverlay(): void {
       const {isCalendarShowing, isOverlayShowing, pickerElements, defaultView} =

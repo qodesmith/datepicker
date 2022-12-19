@@ -1,4 +1,5 @@
-import {days, months, overlayContainerCls, overlayShownCls} from './constants'
+import {days, months} from './constants'
+import {getOverlayClassName} from './generalUtils'
 import getDaysInMonth from './getDaysInMonth'
 import {DatepickerOptions} from './types'
 
@@ -127,7 +128,7 @@ type OverlayReturnType = {
 
 export function createCalendarOverlay(
   customMonths: DatepickerOptions['customMonths'],
-  startWithOverlayOpen: boolean
+  defaultView: DatepickerOptions['defaultView']
 ): OverlayReturnType {
   const overlayContainer = document.createElement('div')
   const inputContainer = document.createElement('div')
@@ -152,19 +153,14 @@ export function createCalendarOverlay(
   overlayContainer.append(inputContainer)
   overlayContainer.append(overlayMonthsContainer)
 
-  overlayContainer.className = overlayContainerCls
   inputContainer.className = 'dp-overlay-input-container'
   input.className = 'dp-overlay-input'
   overlayClose.className = 'dp-overlay-close'
   overlayMonthsContainer.className = 'dp-overlay-months-container'
-
-  if (startWithOverlayOpen) {
-    /*
-      The styles from this class will get overridden once we start adding /
-      removing the classes that apply the show/hide animation styles.
-    */
-    overlayContainer.classList.add(overlayShownCls)
-  }
+  overlayContainer.className = getOverlayClassName({
+    action: 'initialize',
+    defaultView,
+  })
 
   return {
     overlayContainer,
@@ -189,13 +185,13 @@ type CreateCalendarInput = {
   date: Date
   customMonths: DatepickerOptions['customMonths']
   customDays: DatepickerOptions['customDays']
-  startWithOverlayOpen: boolean
+  defaultView: DatepickerOptions['defaultView']
 }
 export function createCalendarHTML({
   date,
   customMonths,
   customDays,
-  startWithOverlayOpen,
+  defaultView,
 }: CreateCalendarInput): PickerElements {
   const calendarContainer = document.createElement('div')
   const controls = createCalendarControlElements({date, customMonths})
@@ -203,7 +199,7 @@ export function createCalendarHTML({
   const weekdaysContainer = document.createElement('div')
   const calendarDaysArray = createCalendarDayElements(date)
   const daysContainer = document.createElement('div')
-  const overlay = createCalendarOverlay(customMonths, startWithOverlayOpen)
+  const overlay = createCalendarOverlay(customMonths, defaultView)
 
   calendarContainer.className = 'dp-calendar-container'
   weekdaysContainer.className = 'dp-weekdays-container'

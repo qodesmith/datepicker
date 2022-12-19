@@ -1,4 +1,4 @@
-import {useEffect, useRef} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import datepicker from '../src/datepicker'
 import QodesmithElement from './QodesmithElement'
 import oldDatepicker from '../src/old-datepicker'
@@ -8,6 +8,7 @@ window.QodesmithElement = QodesmithElement
 
 function App() {
   const newPickerRan = useRef(false)
+  const [range, setRange] = useState(1)
 
   useEffect(() => {
     if (!newPickerRan.current) {
@@ -37,7 +38,21 @@ function App() {
             '<input type="text" class="old-dp-input" placeholder="old-dp-input" />',
         }}
       />
+      <div>
+        <div>
+          Container font size: <code>{range.toFixed(2)}em</code>
+        </div>
+        <input
+          type="range"
+          min=".3"
+          max="5"
+          step=".01"
+          value={range}
+          onChange={e => setRange(+e.target.value)}
+        />
+      </div>
       <div
+        style={{fontSize: `${range}em`}}
         className="dp-test"
         dangerouslySetInnerHTML={{
           __html: '<div>This is a div that will container a picker.</div>',

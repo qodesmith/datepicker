@@ -212,7 +212,7 @@ export default function datepicker(
       datepickersMap.delete(selectorData.el)
 
       // Remove the picker from the DOM.
-      selectorData.el.remove()
+      pickerElements.calendarContainer.remove()
 
       // For daterange pickers, turn the sibling into a regular datepicker.
       if (internalPickerItem.sibling) {

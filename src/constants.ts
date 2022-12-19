@@ -41,3 +41,7 @@ export function noop() {}
  * that the calendar is initialized with) to the internal picker item.
  */
 export const datepickersMap = new Map<HTMLElement, InternalPickerData>()
+
+export const overlayContainerCls = 'dp-overlay-container'
+
+export const overlayShownCls = 'dp-overlay-shown'

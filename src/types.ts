@@ -384,6 +384,10 @@ export type InternalPickerData = {
     minOrMax: 'min' | 'max',
     data: SetMinMaxInputType
   ): void
+
+  isCalendarShowing: boolean
+  isOverlayShowing: boolean
+  defaultView: 'calendar' | 'overlay'
 }
 
 type SetMinMaxInputType = {
@@ -418,6 +422,9 @@ export type DatepickerInstance = {
     start: Date | undefined
     end: Date | undefined
   }
+  readonly show: () => void
+  readonly hide: () => void
+  readonly toggleOverlay: () => void
 }
 
 export type SelectorData = {

@@ -2,36 +2,43 @@
   display: none;
 }
 
-.dp-hidden {
-  opacity: 0;
-}
-
 .dp-overlay-container {
   animation-duration: 0.5s;
-  // Retains the beginning / ending styles of the animation.
+  // At the end of the animation, the styles will remain.
   animation-fill-mode: both;
 }
 
-.dp-overlay-show {
-  z-index: 1;
-  animation-name: dpOverlayShow;
+.dp-overlay-in {
+  animation-name: dpOverlayIn;
 }
 
-.dp-overlay-hide {
-  animation-name: dpOverlayHide;
+.dp-overlay-out {
+  animation-name: dpOverlayOut;
+}
+
+.dp-overlay-shown {
+  opacity: 1;
+  z-index: 1;
+}
+
+.dp-overlay-hidden {
+  opacity: 0;
+  z-index: -1;
 }
 
 // https://stackoverflow.com/a/57924649/2525633
-@keyframes dpOverlayShow {
+@keyframes dpOverlayIn {
   0% {
     opacity: 0;
+    z-index: 1;
   }
   100% {
     opacity: 1;
+    z-index: 1;
   }
 }
 
-@keyframes dpOverlayHide {
+@keyframes dpOverlayOut {
   0% {
     opacity: 1;
     z-index: 1;

@@ -11,9 +11,16 @@ import './datepicker.scss'
 import getSelectorData from './getSelectorData'
 import {checkForExistingRangepickerPair} from './checkForExistingPicker'
 import {createCalendarHTML} from './createCalendarUtils'
-import {datepickersMap, days, months, noop} from './constants'
+import {
+  datepickersMap,
+  days,
+  months,
+  noop,
+  overlayContainerCls,
+} from './constants'
 import {renderCalendar} from './renderCalendarUtils'
 import {
+  getOverlayClassName,
   getSiblingDateForNavigate,
   hasMonthChanged,
   isDateWithinRange,
@@ -42,6 +49,9 @@ export default function datepicker(
     date: startDate,
     customMonths: months.slice(),
     customDays: days.slice(),
+    startWithOverlayOpen: Boolean(
+      options?.defaultView && options.defaultView === 'overlay'
+    ),
   })
 
   // CREATE INTERNAL PICKER DATA
@@ -174,6 +184,9 @@ export default function datepicker(
         sibling._setMinOrMax(false, minOrMax, {date, triggerOnSelect})
       }
     },
+    isCalendarShowing: !!options?.alwaysShow,
+    defaultView: options?.defaultView ?? 'calendar',
+    isOverlayShowing: options?.defaultView === 'overlay',
   }
 
   // Flags for the public picker.
@@ -290,6 +303,47 @@ export default function datepicker(
           end: !isFirst ? selectedDate : siblingSelectedDate,
         }
       }
+    },
+
+    /*
+      TODO - check for the "gotcha" scenario with show / hide.
+      https://github.com/qodesmith/datepicker#show--hide-gotcha
+    */
+    show(): void {
+      const {pickerElements, defaultView} = internalPickerItem
+      const isOverlayShowing = defaultView === 'overlay'
+
+      internalPickerItem.isOverlayShowing = isOverlayShowing
+      pickerElements.calendarContainer.classList.add('dp-show')
+    },
+    hide(): void {
+      const {pickerElements} = internalPickerItem
+
+      pickerElements.calendarContainer.classList.add('dp-hide')
+
+      /*
+        We need to completely remove the class names from the overlay. This is
+        because the animation may run again when showing the calendar if the
+        overlay is set to be the default view. To mitigate that, we remove the
+        class here and add it back in the show method.
+      */
+      pickerElements.overlay.overlayContainer.className = overlayContainerCls
+    },
+    toggleOverlay(): void {
+      const {isCalendarShowing, isOverlayShowing, pickerElements, defaultView} =
+        internalPickerItem
+      const {overlay} = pickerElements
+
+      if (!isCalendarShowing) return
+
+      const overlayCls = getOverlayClassName({
+        action: 'overlayToggle',
+        defaultView,
+        isOverlayShowing,
+      })
+
+      internalPickerItem.isOverlayShowing = !isOverlayShowing
+      overlay.overlayContainer.className = overlayCls
     },
   }
 

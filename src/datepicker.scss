@@ -10,10 +10,26 @@
 .dp-calendar-container {
   box-sizing: border-box;
   width: 15.625em;
-  position: relative; // TODO - this is temporary.
+  position: relative; // TODO - this is temporary. Should be dynamically set in JS.
+  user-select: none;
+  border: 1px solid currentColor;
 
   * {
     box-sizing: border-box;
+  }
+
+  // https://stackoverflow.com/a/24626986/2525633
+  // Remove extra space below the SVG arrows which sit inside a divs.
+  svg {
+    display: block;
+
+    // TODO - control with CSS variable.
+    width: calc(15.625em / 12);
+    height: calc(15.625em / 12);
+
+    path {
+      fill: currentColor;
+    }
   }
 }
 
@@ -33,15 +49,13 @@
   gap: 0.5em;
 }
 
-.dp-left-arrow,
-.dp-right-arrow {
-  svg path {
-    fill: currentColor;
-  }
-}
+.dp-arrow {
+  display: flex;
+  align-items: center;
 
-.dp-right-arrow svg {
-  transform: rotate(180deg);
+  &.dp-arrow-right svg {
+    transform: rotate(180deg);
+  }
 }
 
 .dp-weekday,

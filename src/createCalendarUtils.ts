@@ -39,8 +39,8 @@ export function createCalendarControlElements({
 
   // Assign class names.
   controlsContainer.className = 'dp-controls-container'
-  leftArrow.className = 'dp-arrow dp-left-arrow'
-  rightArrow.className = 'dp-arrow dp-right-arrow'
+  leftArrow.className = 'dp-arrow dp-arrow-left'
+  rightArrow.className = 'dp-arrow dp-arrow-right'
   monthYearContainer.className = 'dp-month-year-container'
   monthName.className = 'dp-month-name'
   year.className = 'dp-year'
@@ -64,7 +64,7 @@ export function createCalendarControlElements({
 
 function createArrowSVG(): string {
   return `
-    <svg width="24px" height="24px" viewBox="0 0 24 24">
+    <svg viewBox="0 0 24 24">
       <path d="M15 17.898C15 18.972 13.7351 19.546 12.9268 18.8388L6.61617 13.3169C5.81935 12.6197 5.81935 11.3801 6.61617 10.6829L12.9268 5.16108C13.7351 4.45388 15 5.02785 15 6.1018L15 17.898Z" fill="#212121"/>
     </svg>
   `

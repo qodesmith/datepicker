@@ -1,3 +1,6 @@
+import {overlayContainerCls} from './constants'
+import {InternalPickerData} from './types'
+
 export function hasMonthChanged(prevDate: Date, newDate: Date): boolean {
   const prevYear = prevDate.getFullYear()
   const prevMonth = prevDate.getMonth()
@@ -34,4 +37,26 @@ export function getSiblingDateForNavigate(
   date: Date
 ): Date {
   return new Date(date.getFullYear(), date.getMonth() + (isFirst ? 1 : -1))
+}
+
+type GetOverlayClassInputType = {
+  action: 'calendarOpen' | 'overlayToggle'
+  defaultView: InternalPickerData['defaultView']
+  isOverlayShowing: InternalPickerData['isOverlayShowing']
+}
+export function getOverlayClassName({
+  action,
+  defaultView,
+  isOverlayShowing,
+}: GetOverlayClassInputType): string {
+  const isOverlayDefaultView = defaultView === 'overlay'
+  let otherCls = ''
+
+  if (action === 'calendarOpen') {
+    otherCls = `dp-overlay-${isOverlayDefaultView ? 'shown' : 'hidden'}`
+  } else {
+    otherCls = `dp-overlay-${isOverlayShowing ? 'out' : 'in'}`
+  }
+
+  return `${overlayContainerCls} ${otherCls}`
 }

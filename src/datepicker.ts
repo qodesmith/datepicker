@@ -358,4 +358,9 @@ export default function datepicker(
   // ADD EVENT LISTENERS - ONLY ADD THEM ONCE
 
   // RENDER CALENDAR
+
+  // TODO - remove this. Just temporary for testing.
+  selectorData.el.append(pickerElements.calendarContainer)
+
+  return publicPicker
 }

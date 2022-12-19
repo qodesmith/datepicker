@@ -2,10 +2,37 @@
   display: none;
 }
 
+.dp-controls-container,
+.dp-month-year-container {
+  display: flex;
+}
+
+.dp-calendar-container {
+  box-sizing: border-box;
+  width: 15.625em;
+  position: relative; // TODO - this is temporary.
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+.dp-days-container,
+.dp-weekdays-container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
 .dp-overlay-container {
   animation-duration: 0.5s;
   // At the end of the animation, the styles will remain.
   animation-fill-mode: both;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 255, 0.2);
 }
 
 .dp-overlay-in {

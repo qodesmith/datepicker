@@ -23,7 +23,7 @@ export default class QodesmithElement extends HTMLElement {
   }
 
   connectedCallback() {
-    this.picker = datepicker(this.directChild)
+    // this.picker = datepicker(this.directChild)
   }
 }
 

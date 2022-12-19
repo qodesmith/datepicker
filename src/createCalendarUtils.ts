@@ -138,11 +138,12 @@ export function createCalendarOverlay(
 
   for (let i = 0; i < 12; i++) {
     const overlayMonth = document.createElement('div')
-    overlayMonth.className = 'dp-overlay'
+    overlayMonth.className = 'dp-overlay-month'
     overlayMonthsContainer.append(overlayMonth)
 
     // Overlay month names are limited to 3 characters.
     overlayMonth.textContent = currentMonths[i].slice(0, 3)
+    overlayMonth.dataset.num = `${i}`
   }
 
   // Append all the elements to their containers.
@@ -152,6 +153,10 @@ export function createCalendarOverlay(
   overlayContainer.append(overlayMonthsContainer)
 
   overlayContainer.className = overlayContainerCls
+  inputContainer.className = 'dp-overlay-input-container'
+  input.className = 'dp-overlay-input'
+  overlayClose.className = 'dp-overlay-close'
+  overlayMonthsContainer.className = 'dp-overlay-months-container'
 
   if (startWithOverlayOpen) {
     /*
@@ -207,6 +212,7 @@ export function createCalendarHTML({
   calendarContainer.append(controls.controlsContainer)
   calendarContainer.append(weekdaysContainer)
   calendarContainer.append(daysContainer)
+  calendarContainer.append(overlay.overlayContainer)
   weekdaysArray.forEach(el => weekdaysContainer.append(el))
   calendarDaysArray.forEach(el => daysContainer.append(el))
 

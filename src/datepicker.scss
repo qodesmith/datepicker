@@ -8,11 +8,16 @@
 }
 
 .dp-calendar-container {
+  --size: 15.625em;
+  --radius: calc(var(--size) * 0.016891);
+  --arrow-size: calc(var(--size) / 12);
+
   box-sizing: border-box;
-  width: 15.625em;
+  width: var(--size);
   position: relative; // TODO - this is temporary. Should be dynamically set in JS.
   user-select: none;
   border: 1px solid currentColor;
+  border-radius: var(--radius);
 
   * {
     box-sizing: border-box;
@@ -22,10 +27,8 @@
   // Remove extra space below the SVG arrows which sit inside a divs.
   svg {
     display: block;
-
-    // TODO - control with CSS variable.
-    width: calc(15.625em / 12);
-    height: calc(15.625em / 12);
+    width: var(--arrow-size);
+    height: var(--arrow-size);
 
     path {
       fill: currentColor;

@@ -1,4 +1,4 @@
-import {useEffect} from 'react'
+import {useEffect, useRef} from 'react'
 import datepicker from '../src/datepicker'
 import QodesmithElement from './QodesmithElement'
 import oldDatepicker from '../src/old-datepicker'
@@ -7,23 +7,22 @@ import oldDatepicker from '../src/old-datepicker'
 window.QodesmithElement = QodesmithElement
 
 function App() {
-  const ua = window.navigator.userAgent
+  const newPickerRan = useRef(false)
 
   useEffect(() => {
-    // const picker = datepicker('.dp-test')
-    const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
+    if (!newPickerRan.current) {
+      window.x = datepicker('.dp-test', {alwaysShow: true})
+      newPickerRan.current = true
+    }
+    // const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
 
     return () => {
-      oldPicker.remove()
+      // oldPicker.remove()
     }
   }, [])
 
   return (
     <>
-      <div>Hello world!</div>
-      <div>
-        UA: <code>{ua}</code>
-      </div>
       <div>
         'ontouchstart' in window:{' '}
         <code>
@@ -38,7 +37,12 @@ function App() {
             '<input type="text" class="old-dp-input" placeholder="old-dp-input" />',
         }}
       />
-      <div className="dp-test" dangerouslySetInnerHTML={{__html: ''}} />
+      <div
+        className="dp-test"
+        dangerouslySetInnerHTML={{
+          __html: '<div>This is a div that will container a picker.</div>',
+        }}
+      />
       <div
         className="shadow-dom-test"
         dangerouslySetInnerHTML={{

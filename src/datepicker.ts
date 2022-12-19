@@ -315,19 +315,15 @@ export default function datepicker(
 
       internalPickerItem.isOverlayShowing = isOverlayShowing
       pickerElements.calendarContainer.classList.add('dp-show')
+      pickerElements.overlay.overlayContainer.className = getOverlayClassName({
+        action: 'calendarOpen',
+        defaultView,
+      })
     },
     hide(): void {
-      const {pickerElements} = internalPickerItem
-
-      pickerElements.calendarContainer.classList.add('dp-hide')
-
-      /*
-        We need to completely remove the class names from the overlay. This is
-        because the animation may run again when showing the calendar if the
-        overlay is set to be the default view. To mitigate that, we remove the
-        class here and add it back in the show method.
-      */
-      pickerElements.overlay.overlayContainer.className = overlayContainerCls
+      internalPickerItem.pickerElements.calendarContainer.classList.add(
+        'dp-hide'
+      )
     },
     toggleOverlay(): void {
       const {isCalendarShowing, isOverlayShowing, pickerElements, defaultView} =

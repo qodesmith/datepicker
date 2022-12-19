@@ -42,7 +42,7 @@ export function getSiblingDateForNavigate(
 type GetOverlayClassInputType = {
   action: 'calendarOpen' | 'overlayToggle'
   defaultView: InternalPickerData['defaultView']
-  isOverlayShowing: InternalPickerData['isOverlayShowing']
+  isOverlayShowing?: InternalPickerData['isOverlayShowing']
 }
 export function getOverlayClassName({
   action,

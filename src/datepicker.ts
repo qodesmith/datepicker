@@ -308,7 +308,7 @@ export default function datepicker(
       https://github.com/qodesmith/datepicker#show--hide-gotcha
     */
     show(): void {
-      const {pickerElements, defaultView} = internalPickerItem
+      const {defaultView} = internalPickerItem
       const isOverlayShowing = defaultView === 'overlay'
 
       internalPickerItem.isOverlayShowing = isOverlayShowing
@@ -318,17 +318,23 @@ export default function datepicker(
         defaultView,
       })
       internalPickerItem.isCalendarShowing = true
+
+      if (isOverlayShowing) {
+        pickerElements.overlay.input.focus()
+      }
     },
     hide(): void {
-      internalPickerItem.pickerElements.calendarContainer.classList.add('dp-dn')
-      internalPickerItem.pickerElements.calendarContainer.classList.remove(
-        'dp-blur'
-      )
+      pickerElements.calendarContainer.classList.add('dp-dn')
+      pickerElements.calendarContainer.classList.remove('dp-blur')
+      pickerElements.overlay.input.value = ''
       internalPickerItem.isCalendarShowing = false
     },
     toggleOverlay(): void {
-      const {isCalendarShowing, isOverlayShowing, pickerElements, defaultView} =
-        internalPickerItem
+      const {
+        isCalendarShowing,
+        isOverlayShowing: oldIsOverlayShowing,
+        defaultView,
+      } = internalPickerItem
       const {overlay, calendarContainer} = pickerElements
 
       if (!isCalendarShowing) return
@@ -336,16 +342,18 @@ export default function datepicker(
       const overlayCls = getOverlayClassName({
         action: 'overlayToggle',
         defaultView,
-        isOverlayShowing,
+        isOverlayShowing: oldIsOverlayShowing,
       })
 
-      if (isOverlayShowing) {
+      if (oldIsOverlayShowing) {
         calendarContainer.classList.remove('dp-blur')
       } else {
         calendarContainer.classList.add('dp-blur')
+        pickerElements.overlay.input.value = ''
+        pickerElements.overlay.input.focus()
       }
 
-      internalPickerItem.isOverlayShowing = !isOverlayShowing
+      internalPickerItem.isOverlayShowing = !oldIsOverlayShowing
       overlay.overlayContainer.className = overlayCls
     },
   }

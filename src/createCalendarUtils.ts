@@ -133,9 +133,10 @@ type CreateControlElementsInputType = {
 type OverlayReturnType = {
   overlayContainer: HTMLDivElement
   inputContainer: HTMLDivElement
-  input: HTMLDivElement
+  input: HTMLInputElement
   overlayClose: HTMLDivElement
   overlayMonthsContainer: HTMLDivElement
+  overlaySubmitButton: HTMLButtonElement
 }
 
 export function createCalendarOverlay(
@@ -185,6 +186,7 @@ export function createCalendarOverlay(
     input,
     overlayClose,
     overlayMonthsContainer,
+    overlaySubmitButton,
   }
 }
 

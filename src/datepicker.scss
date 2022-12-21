@@ -119,6 +119,8 @@
   text-align: center;
   border: none;
   border-bottom: 1px solid;
+  font-size: 0.85em;
+  background: transparent;
 }
 
 .dp-overlay-close {
@@ -128,7 +130,8 @@
 .dp-overlay-months-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  text-align: center;
+  justify-items: center;
+  align-items: center;
 }
 
 .dp-overlay-submit {

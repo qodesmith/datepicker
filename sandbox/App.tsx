@@ -13,7 +13,7 @@ function App() {
   const [parentElementFontSize, setParentElementFontSize] = useState(1)
   const [size, setSize] = useState(1)
   const [isShowing, setIsShowing] = useState(true)
-  const [color, setColor] = useState('#242424')
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const handleToggleCalendar = () => {
     isShowing ? picker?.hide() : picker?.show()
     setIsShowing(v => !v)
@@ -21,9 +21,18 @@ function App() {
 
   window.x = picker
 
+  if (theme === 'light') {
+    picker?.calendarContainer.classList.add('light')
+  } else {
+    picker?.calendarContainer.classList.remove('light')
+  }
+
   // Instantiate Datepicker.
   useEffect(() => {
-    const pickerObj = datepicker('.dp-test', {alwaysShow: true})
+    const pickerObj = datepicker('.dp-test', {
+      alwaysShow: true,
+      selectedDate: new Date(),
+    })
     setPicker(pickerObj)
     const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
 
@@ -162,7 +171,7 @@ function App() {
         </section>
 
         {/* DATEPICKER */}
-        <section style={{background: color}}>
+        <section style={{background: theme === 'dark' ? '#242424' : '#fff'}}>
           <div style={{marginBottom: '.5em', display: 'flex', gap: '.5em'}}>
             <button
               onClick={() => {
@@ -192,10 +201,10 @@ function App() {
             </button>
             <select
               name="background"
-              value={color}
-              onChange={e => setColor(e.target.value)}>
-              <option value="#242424">Dark</option>
-              <option value="#fff">Light</option>
+              value={theme}
+              onChange={e => setTheme(e.target.value as 'light' | 'dark')}>
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
             </select>
           </div>
           <div

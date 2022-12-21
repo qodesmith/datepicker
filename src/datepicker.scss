@@ -10,8 +10,19 @@
   --dp-color: rgba(255, 255, 255, 0.92);
   --dp-bg: #242424;
   --dp-controls-bg: rgba(255, 255, 255, 0.5);
+  --dp-controls-color: #242424;
   --dp-day-hover-bg: rgba(255, 255, 255, 0.3);
   --dp-overlay-bg: rgba(255, 255, 255, 0.1);
+  --dp-overlay-color: var(--dp-color);
+
+  &.light {
+    --dp-color: rgba(0, 0, 0, 0.92);
+    --dp-bg: #fff;
+    --dp-controls-bg: rgba(0, 0, 0, 0.2);
+    --dp-day-hover-bg: rgba(0, 0, 0, 0.3);
+    --dp-overlay-bg: rgba(0, 0, 0, 0.7);
+    --dp-overlay-color: var(--dp-bg);
+  }
 
   color: var(--dp-color);
   font-size: var(--dp-size);
@@ -81,7 +92,7 @@
   grid-template-columns: repeat(3, min-content);
   justify-content: space-between;
   background: var(--dp-controls-bg);
-  color: var(--dp-bg);
+  color: var(--dp-controls-color);
   font-weight: bold;
 }
 
@@ -161,6 +172,7 @@
   width: 100%;
   height: 100%;
   border-radius: var(--dp-radius);
+  color: var(--dp-overlay-color);
 
   // TODO - for dark mode, can we darken the calendar 1st (with another background layer)
   // and then add this ligher layer on top?

@@ -13,6 +13,7 @@ function App() {
   const [parentElementFontSize, setParentElementFontSize] = useState(1)
   const [size, setSize] = useState(1)
   const [isShowing, setIsShowing] = useState(true)
+  const [color, setColor] = useState('#242424')
   const handleToggleCalendar = () => {
     isShowing ? picker?.hide() : picker?.show()
     setIsShowing(v => !v)
@@ -32,6 +33,7 @@ function App() {
     }
   }, [])
 
+  // Set sizing properties on calendar DOM elements.
   if (picker?.calendarContainer) {
     if (picker.calendarContainer.parentElement) {
       picker.calendarContainer.parentElement.style.setProperty(
@@ -160,7 +162,7 @@ function App() {
         </section>
 
         {/* DATEPICKER */}
-        <section>
+        <section style={{background: color}}>
           <div style={{marginBottom: '.5em', display: 'flex', gap: '.5em'}}>
             <button
               onClick={() => {
@@ -188,9 +190,17 @@ function App() {
             <button onClick={() => picker?.toggleOverlay()}>
               Toggle Overlay
             </button>
+            <select
+              name="background"
+              value={color}
+              onChange={e => setColor(e.target.value)}>
+              <option value="#242424">Dark</option>
+              <option value="#fff">Light</option>
+            </select>
           </div>
           <div
             className="dp-test"
+            style={{display: 'flex', justifyContent: 'center'}}
             dangerouslySetInnerHTML={{
               __html: '',
             }}

@@ -21,6 +21,8 @@ import {
   stripTime,
 } from './generalUtils'
 
+let listnerAttached = false
+
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - throw error when trying to attach Datepicker to a void element.
 
@@ -238,6 +240,7 @@ export default function datepicker(
 
       if (datepickersMap.size === 0) {
         // TODO - remove event listeners.
+        listnerAttached = false
       }
     },
 

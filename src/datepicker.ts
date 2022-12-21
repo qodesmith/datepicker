@@ -8,18 +8,18 @@ import type {
 } from './types'
 
 import './datepicker.scss'
-import getSelectorData from './getSelectorData'
-import {checkForExistingRangepickerPair} from './checkForExistingPicker'
-import {createCalendarHTML} from './createCalendarUtils'
+import {createCalendarHTML} from './utilsCreateCalendar'
 import {datepickersMap, days, months, noop} from './constants'
-import {renderCalendar} from './renderCalendarUtils'
+import {renderCalendar} from './utilsRenderCalendar'
 import {
+  checkForExistingRangepickerPair,
   getOverlayClassName,
+  getSelectorData,
   getSiblingDateForNavigate,
   hasMonthChanged,
   isDateWithinRange,
   stripTime,
-} from './generalUtils'
+} from './utils'
 
 let listnerAttached = false
 

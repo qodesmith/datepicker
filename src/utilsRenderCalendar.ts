@@ -1,5 +1,9 @@
-import {getOffsetNumber, isDateWithinRange, stripTime} from './generalUtils'
-import getDaysInMonth from './getDaysInMonth'
+import {
+  getOffsetNumber,
+  isDateWithinRange,
+  stripTime,
+  getDaysInMonth,
+} from './utils'
 import {InternalPickerData} from './types'
 
 export function renderCalendar(picker: InternalPickerData): void {

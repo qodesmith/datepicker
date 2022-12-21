@@ -1,9 +1,28 @@
-import {checkForExistingPickerOnElement} from './checkForExistingPicker'
-import getType from './getType'
-import throwError from './throwError'
-import {Selector, SelectorData} from './types'
+import {datepickersMap, overlayContainerCls} from './constants'
+import {
+  DatepickerOptions,
+  InternalPickerData,
+  Selector,
+  SelectorData,
+} from './types'
 
-export default function getSelectorData(selector: Selector): SelectorData {
+/**
+ * Returns the type of an item.
+ * Examples:
+ *    * [object HTMLElement] => HTMLElement
+ *    * [object Object] => Object
+ *    * [object Array] => Array
+ */
+export function getType(item: any): string {
+  const type = {}.toString.call(item) as string
+  return type.slice(8, -1)
+}
+
+export function throwError(message: string): never {
+  throw new Error(message)
+}
+
+export function getSelectorData(selector: Selector): SelectorData {
   let element: HTMLElement | null = null
   const type = getType(selector)
 
@@ -103,4 +122,103 @@ export default function getSelectorData(selector: Selector): SelectorData {
 
   // We should never get here.
   throwError(`Invalid root node found for selector: ${rootNodeType}`)
+}
+
+export function getDaysInMonth(date: Date): number {
+  const newDate = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+  return newDate.getDate()
+}
+
+export function hasMonthChanged(prevDate: Date, newDate: Date): boolean {
+  const prevYear = prevDate.getFullYear()
+  const prevMonth = prevDate.getMonth()
+  const newYear = newDate.getFullYear()
+  const newMonth = newDate.getMonth()
+
+  if (prevYear !== newYear) return true
+  return prevMonth !== newMonth
+}
+
+export function stripTime(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+}
+
+type IsDateWithinRangeInputType = {
+  date: Date
+  minDate: Date | undefined
+  maxDate: Date | undefined
+}
+export function isDateWithinRange({
+  date,
+  minDate,
+  maxDate,
+}: IsDateWithinRangeInputType): boolean {
+  const num = +stripTime(date)
+  const min = minDate ? +stripTime(minDate) : -Infinity
+  const max = maxDate ? +stripTime(maxDate) : Infinity
+
+  return num > min && num < max
+}
+
+export function getSiblingDateForNavigate(
+  isFirst: boolean | undefined,
+  date: Date
+): Date {
+  return new Date(date.getFullYear(), date.getMonth() + (isFirst ? 1 : -1))
+}
+
+type GetOverlayClassInputType = {
+  action: 'initialize' | 'calendarOpen' | 'overlayToggle'
+  defaultView: DatepickerOptions['defaultView']
+  isOverlayShowing?: InternalPickerData['isOverlayShowing']
+}
+export function getOverlayClassName({
+  action,
+  defaultView,
+  isOverlayShowing,
+}: GetOverlayClassInputType): string {
+  const isOverlayDefaultView = defaultView === 'overlay'
+  let otherCls = ''
+
+  switch (action) {
+    case 'initialize':
+    case 'calendarOpen':
+      otherCls = `dp-overlay-${isOverlayDefaultView ? 'shown' : 'hidden'}`
+      break
+    case 'overlayToggle':
+      otherCls = `dp-overlay-${isOverlayShowing ? 'out' : 'in'}`
+      break
+  }
+
+  return `${overlayContainerCls} ${otherCls}`.trim()
+}
+
+export function getOffsetNumber(date: Date): number {
+  return new Date(date.getFullYear(), date.getMonth(), 1).getDay() + 1
+}
+
+/**
+ * Checks if a picker already exists on a given element. If so, it throws.
+ */
+export function checkForExistingPickerOnElement(el: HTMLElement): void {
+  if (datepickersMap.has(el)) {
+    throwError('A datepicker already exists on that element.')
+  }
+}
+
+/**
+ * Throws an error if a set of rangepickers already exists for a given id.
+ */
+export function checkForExistingRangepickerPair(id: any): void {
+  let rangepickersFound = 0
+
+  datepickersMap.forEach(picker => {
+    if (picker.type === 'rangepicker' && picker.id === id) {
+      rangepickersFound++
+    }
+  })
+
+  if (rangepickersFound > 1) {
+    throwError(`There is already a set of rangepickers for this id: "${id}"`)
+  }
 }

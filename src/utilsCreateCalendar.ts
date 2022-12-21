@@ -1,6 +1,5 @@
 import {days, months} from './constants'
-import {getOffsetNumber, getOverlayClassName} from './generalUtils'
-import getDaysInMonth from './getDaysInMonth'
+import {getOffsetNumber, getOverlayClassName, getDaysInMonth} from './utils'
 import {DatepickerOptions} from './types'
 
 type ControlElementsReturnType = {

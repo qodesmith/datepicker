@@ -12,13 +12,7 @@
   user-select: none;
   border: 1px solid currentColor;
   border-radius: var(--dp-radius);
-
-  // Needed! If line-height were specified in any parent element up the DOM
-  // tree, it would cause the calendar rows to remain static in height. This
-  // breaks our ability to scale the calendar and all it's elements dynamically
-  // by simply adjusting the font-size on the calendars container element. To
-  // avoid that, we set line-height to initial to prevent parent styling.
-  line-height: initial;
+  line-height: 1.6;
 
   * {
     box-sizing: border-box;
@@ -105,6 +99,7 @@
 
 .dp-overlay-container {
   display: grid;
+  grid-template-rows: min-content 1fr min-content;
   animation-duration: var(--dp-transition-time);
   animation-fill-mode: both; // At the end of the animation, the styles will remain.
   position: absolute;
@@ -115,10 +110,29 @@
   border-radius: var(--dp-radius);
 }
 
+.dp-overlay-input-container {
+  text-align: center;
+}
+
+.dp-overlay-input {
+  width: 80%;
+  text-align: center;
+  border: none;
+  border-bottom: 1px solid;
+}
+
+.dp-overlay-close {
+  position: absolute;
+}
+
 .dp-overlay-months-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   text-align: center;
+}
+
+.dp-overlay-submit {
+  justify-self: center;
 }
 
 .dp-overlay-in {

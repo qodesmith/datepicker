@@ -7,13 +7,15 @@
   --dp-radius: calc(var(--dp-width) * 0.02083);
   --dp-arrow-size: calc(var(--dp-width) / 12);
   --dp-transition-time: 0.3s;
+  --dp-color: white;
 
+  color: var(--dp-color);
   font-size: var(--dp-size);
   box-sizing: border-box;
   width: var(--dp-width);
   position: relative; // This will potentially be overwritten by JavaScript.
   user-select: none;
-  border: 1px solid currentColor;
+  border: 1px solid var(--dp-color);
   border-radius: var(--dp-radius);
   line-height: 1.7;
 
@@ -130,8 +132,15 @@
   text-align: center;
   border: none;
   border-bottom: 1px solid;
-  font-size: 0.85em;
+  font-family: inherit;
+  font-size: inherit;
   background: transparent;
+
+  &::placeholder {
+    color: currentColor;
+    opacity: 0.3;
+    font-style: italic;
+  }
 }
 
 .dp-overlay-close {
@@ -160,6 +169,11 @@
 .dp-overlay-submit {
   justify-self: center;
   margin-bottom: 0.5em;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0.25em 0.5em;
+  border-radius: var(--dp-radius);
+  border: 1px solid;
 }
 
 .dp-overlay-in {
@@ -200,5 +214,13 @@
   100% {
     opacity: 0;
     z-index: -1;
+  }
+}
+
+// Light mode - we default to a dark theme.
+@media (prefers-color-scheme: light) {
+  .dp-calendar-container {
+    // --body-bg: #FFFFFF;
+    // --body-color: #000000;
   }
 }

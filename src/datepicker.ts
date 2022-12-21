@@ -21,7 +21,8 @@ import {
   stripTime,
 } from './generalUtils'
 
-// TODO - allow daterange pickers to have the same selector element.
+// TODO - allow daterange pickers to have the same selector element except for inputs.
+// TODO - throw error when trying to attach Datepicker to a void element.
 
 export default function datepicker(
   selector: Selector,
@@ -44,6 +45,7 @@ export default function datepicker(
     customMonths: months.slice(),
     customDays: days.slice(),
     defaultView: options?.defaultView,
+    overlayButton: options?.overlayButton,
   })
 
   // CREATE INTERNAL PICKER DATA
@@ -312,14 +314,19 @@ export default function datepicker(
         action: 'calendarOpen',
         defaultView,
       })
+      internalPickerItem.isCalendarShowing = true
     },
     hide(): void {
       internalPickerItem.pickerElements.calendarContainer.classList.add('dp-dn')
+      internalPickerItem.pickerElements.calendarContainer.classList.remove(
+        'dp-blur'
+      )
+      internalPickerItem.isCalendarShowing = false
     },
     toggleOverlay(): void {
       const {isCalendarShowing, isOverlayShowing, pickerElements, defaultView} =
         internalPickerItem
-      const {overlay} = pickerElements
+      const {overlay, calendarContainer} = pickerElements
 
       if (!isCalendarShowing) return
 
@@ -328,6 +335,12 @@ export default function datepicker(
         defaultView,
         isOverlayShowing,
       })
+
+      if (isOverlayShowing) {
+        calendarContainer.classList.remove('dp-blur')
+      } else {
+        calendarContainer.classList.add('dp-blur')
+      }
 
       internalPickerItem.isOverlayShowing = !isOverlayShowing
       overlay.overlayContainer.className = overlayCls

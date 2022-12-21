@@ -33,7 +33,7 @@ h1 {
   line-height: 1.1;
 }
 
-button {
+button:not(.dp-overlay-submit) {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -44,11 +44,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
+button:hover:not(.dp-overlay-submit) {
   border-color: #646cff;
 }
-button:focus,
-button:focus-visible {
+button:focus:not(.dp-overlay-submit),
+button:focus-visible:not(.dp-overlay-submit) {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
@@ -71,7 +71,7 @@ table {
   a:hover {
     color: #747bff;
   }
-  button {
+  button:not(.dp-overlay-submit) {
     background-color: #f9f9f9;
   }
 }

@@ -22,10 +22,10 @@ function App() {
   useEffect(() => {
     const pickerObj = datepicker('.dp-test', {alwaysShow: true})
     setPicker(pickerObj)
-    // const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
+    const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
 
     return () => {
-      // oldPicker.remove()
+      oldPicker.remove()
       pickerObj.remove()
     }
   }, [])

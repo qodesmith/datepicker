@@ -3,6 +3,7 @@
   --dp-width: 15.625em; // 15.625em = 250px wide @ 16px/1rem
   --dp-radius: calc(var(--dp-width) * 0.02083);
   --dp-arrow-size: calc(var(--dp-width) / 12);
+  --dp-transition-time: 0.3s;
 
   font-size: var(--dp-size);
   box-sizing: border-box;
@@ -37,6 +38,21 @@
 
   &.dp-dn {
     display: none;
+  }
+
+  .dp-controls-container,
+  .dp-weekdays-container,
+  .dp-days-container {
+    transition: filter var(--dp-transition-time);
+    filter: blur(0px);
+  }
+
+  &.dp-blur {
+    .dp-controls-container,
+    .dp-weekdays-container,
+    .dp-days-container {
+      filter: blur(6px);
+    }
   }
 }
 
@@ -88,14 +104,21 @@
 }
 
 .dp-overlay-container {
-  animation-duration: 0.5s;
+  display: grid;
+  animation-duration: var(--dp-transition-time);
   animation-fill-mode: both; // At the end of the animation, the styles will remain.
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 255, 0.2);
+  border-radius: var(--dp-radius);
+}
+
+.dp-overlay-months-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  text-align: center;
 }
 
 .dp-overlay-in {

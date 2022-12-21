@@ -172,6 +172,7 @@ export function createCalendarOverlay(
   inputContainer.className = 'dp-overlay-input-container'
   input.className = 'dp-overlay-input'
   overlayClose.className = 'dp-overlay-close'
+  overlayClose.textContent = '✕'
   overlayMonthsContainer.className = 'dp-overlay-months-container'
   overlaySubmitButton.className = 'dp-overlay-submit'
   overlaySubmitButton.textContent = overlayButton ?? 'Submit'

@@ -111,11 +111,13 @@
 }
 
 .dp-overlay-input-container {
-  text-align: center;
+  display: grid;
+  grid-template-columns: 15% 70% 15%;
 }
 
 .dp-overlay-input {
-  width: 80%;
+  width: 100%;
+  grid-column: 2;
   text-align: center;
   border: none;
   border-bottom: 1px solid;
@@ -124,7 +126,9 @@
 }
 
 .dp-overlay-close {
-  position: absolute;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
 }
 
 .dp-overlay-months-container {
@@ -136,6 +140,7 @@
 
 .dp-overlay-submit {
   justify-self: center;
+  margin-bottom: 0.5em;
 }
 
 .dp-overlay-in {

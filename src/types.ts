@@ -396,6 +396,7 @@ type SetMinMaxInputType = {
 }
 
 export type DatepickerInstance = {
+  calendarContainer: HTMLDivElement
   readonly currentDate: Date
   readonly selectedDate: Date | undefined
   readonly remove: () => void

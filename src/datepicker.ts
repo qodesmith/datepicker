@@ -187,6 +187,7 @@ export default function datepicker(
 
   // CREATE PUBLIC PICKER DATA
   const publicPicker: DatepickerInstance = {
+    calendarContainer: pickerElements.calendarContainer,
     get currentDate() {
       return new Date(internalPickerItem.currentDate)
     },

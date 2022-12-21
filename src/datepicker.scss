@@ -2,22 +2,26 @@
   display: none;
 }
 
-.dp-controls-container,
-.dp-month-year-container {
-  display: grid;
-}
-
 .dp-calendar-container {
-  --size: 15.625em;
-  --radius: calc(var(--size) * 0.016891);
-  --arrow-size: calc(var(--size) / 12);
+  --dp-size: 1em;
+  --dp-width: 15.625em; // 15.625em = 250px wide @ 16px/1rem
+  --dp-radius: calc(var(--dp-width) * 0.02083); //03125 015625
+  --dp-arrow-size: calc(var(--dp-width) / 12);
 
+  font-size: var(--dp-size);
   box-sizing: border-box;
-  width: var(--size);
+  width: var(--dp-width);
   position: relative; // TODO - this is temporary. Should be dynamically set in JS.
   user-select: none;
   border: 1px solid currentColor;
-  border-radius: var(--radius);
+  border-radius: var(--dp-radius);
+
+  // Needed! If line-height were specified in any parent element up the DOM
+  // tree, it would cause the calendar rows to remain static in height. This
+  // breaks our ability to scale the calendar and all it's elements dynamically
+  // by simply adjusting the font-size on the calendars container element. To
+  // avoid that, we set line-height to initial to prevent parent styling.
+  line-height: initial;
 
   * {
     box-sizing: border-box;
@@ -27,8 +31,8 @@
   // Remove extra space below the SVG arrows which sit inside a divs.
   svg {
     display: block;
-    width: var(--arrow-size);
-    height: var(--arrow-size);
+    width: var(--dp-arrow-size);
+    height: var(--dp-arrow-size);
 
     path {
       fill: currentColor;
@@ -36,10 +40,21 @@
   }
 }
 
-.dp-days-container,
-.dp-weekdays-container {
+.dp-calendar-container,
+.dp-controls-container,
+.dp-month-year-container {
+  display: grid;
+}
+
+.dp-calendar-container {
+  grid-template-rows: repeat(3, min-content);
+}
+
+.dp-weekdays-container,
+.dp-days-container {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  font-size: 1em;
 }
 
 .dp-controls-container {
@@ -68,8 +83,7 @@
 
 .dp-overlay-container {
   animation-duration: 0.5s;
-  // At the end of the animation, the styles will remain.
-  animation-fill-mode: both;
+  animation-fill-mode: both; // At the end of the animation, the styles will remain.
   position: absolute;
   top: 0;
   left: 0;

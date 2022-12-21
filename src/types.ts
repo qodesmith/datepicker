@@ -377,12 +377,12 @@ export type InternalPickerData = {
   ): void
   _selectDate(
     isFirstRun: boolean,
-    data: Parameters<DatepickerInstance['selectDate']>[0]
+    data?: Parameters<DatepickerInstance['selectDate']>[0]
   ): void
   _setMinOrMax(
     isFirstRun: boolean,
     minOrMax: 'min' | 'max',
-    data: SetMinMaxInputType
+    data?: SetMinMaxInputType
   ): void
 
   isCalendarShowing: boolean
@@ -411,14 +411,14 @@ export type DatepickerInstance = {
   /**
    * `changeCalendar` only runs if `date` was provided.
    */
-  readonly selectDate: (data: {
+  readonly selectDate: (data?: {
     date?: Date
     changeCalendar?: boolean
     triggerOnMonthChange?: boolean
     triggerOnSelect?: boolean
   }) => void
-  readonly setMin: (data: SetMinMaxInputType) => void
-  readonly setMax: (data: SetMinMaxInputType) => void
+  readonly setMin: (data?: SetMinMaxInputType) => void
+  readonly setMax: (data?: SetMinMaxInputType) => void
   readonly getSelectedRange: () => void | {
     start: Date | undefined
     end: Date | undefined

@@ -95,7 +95,7 @@ export default function datepicker(
     },
     _selectDate(
       isFirstRun,
-      {date, changeCalendar, triggerOnMonthChange, triggerOnSelect}
+      {date, changeCalendar, triggerOnMonthChange, triggerOnSelect} = {}
     ) {
       const {currentDate, onMonthChange, onSelect, isFirst, sibling} =
         internalPickerItem
@@ -132,7 +132,7 @@ export default function datepicker(
       if (triggerOnSelect) {
         onSelect({
           prevDate: stripTime(currentDate),
-          newDate: date ? stripTime(date) : date,
+          newDate: date ? stripTime(date) : undefined,
         })
       }
 
@@ -153,10 +153,18 @@ export default function datepicker(
         })
       }
     },
-    _setMinOrMax(isFirstRun, minOrMax, {date, triggerOnSelect}): void {
+    _setMinOrMax(isFirstRun, minOrMax, {date, triggerOnSelect} = {}): void {
       const {minDate, maxDate, sibling, onSelect} = internalPickerItem
-      const {selectedDate} = publicPicker // Must come from the public getter.
       const dateType = minOrMax === 'min' ? 'minDate' : 'maxDate'
+
+      /*
+        This needs to come from the publicPicker because the field is a getter
+        which returns a new Date object with the correct values. This avoids
+        issues stemming from the user potentially mutating the date object.
+      */
+      const {selectedDate} = publicPicker
+
+      // Update the min/max date.
       internalPickerItem[dateType] = date ? stripTime(date) : undefined
 
       // Unselect the selected date if it's out of range.
@@ -374,7 +382,7 @@ export default function datepicker(
 
   // RENDER CALENDAR
 
-  // TODO - remove this. Just temporary for testing.
+  // TODO - remove this. Just temporary for testing. Appending the calendar is actually more complex than this.
   selectorData.el.append(pickerElements.calendarContainer)
 
   return publicPicker

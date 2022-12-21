@@ -2,26 +2,29 @@
 // TODO - implement light / dark theme
 
 .dp-calendar-container {
+  // Non-theme variables.
   --dp-size: 1em;
   --dp-width: 15.625em; // 15.625em = 250px wide @ 16px/1rem
   --dp-radius: calc(var(--dp-width) * 0.02083);
   --dp-arrow-size: calc(var(--dp-width) / 12);
   --dp-transition-time: 0.3s;
-  --dp-color: rgba(255, 255, 255, 0.92);
+
+  // Theme variables.
+  --dp-color: rgba(255, 255, 255, 0.92); // All colors other than the overlay.
   --dp-bg: #242424;
-  --dp-controls-bg: rgba(255, 255, 255, 0.5);
   --dp-controls-color: #242424;
+  --dp-controls-bg: rgba(255, 255, 255, 0.5);
+  // --dp-weekdays-color: ???
   --dp-day-hover-bg: rgba(255, 255, 255, 0.3);
-  --dp-overlay-bg: rgba(255, 255, 255, 0.1);
+  // --dp-day-selected-color: ???
+  // --dp-day-selected-bg: ???
+  // --dp-day-disabled-color: ???
+  // --dp-day-disabled-bg: ???
+  // --dp-day-event-color: ??? // The little dot
   --dp-overlay-color: var(--dp-color);
+  --dp-overlay-bg: rgba(255, 255, 255, 0.1);
 
   &.light {
-    --dp-color: rgba(0, 0, 0, 0.92);
-    --dp-bg: #fff;
-    --dp-controls-bg: rgba(0, 0, 0, 0.2);
-    --dp-day-hover-bg: rgba(0, 0, 0, 0.3);
-    --dp-overlay-bg: rgba(0, 0, 0, 0.7);
-    --dp-overlay-color: var(--dp-bg);
   }
 
   color: var(--dp-color);
@@ -37,18 +40,6 @@
 
   * {
     box-sizing: border-box;
-  }
-
-  // https://stackoverflow.com/a/24626986/2525633
-  // Remove extra space below the SVG arrows which sit inside a divs.
-  svg {
-    display: block;
-    width: var(--dp-arrow-size);
-    height: var(--dp-arrow-size);
-
-    path {
-      fill: currentColor;
-    }
   }
 
   &.dp-dn {
@@ -125,6 +116,18 @@
 
   &.dp-arrow-right svg {
     transform: rotate(180deg);
+  }
+
+  // https://stackoverflow.com/a/24626986/2525633
+  // Remove extra space below the SVG arrows which sit inside a divs.
+  svg {
+    display: block;
+    width: var(--dp-arrow-size);
+    height: var(--dp-arrow-size);
+
+    path {
+      fill: var(--dp-controls-color);
+    }
   }
 }
 

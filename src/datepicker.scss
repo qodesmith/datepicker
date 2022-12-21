@@ -5,7 +5,7 @@
 .dp-calendar-container {
   --dp-size: 1em;
   --dp-width: 15.625em; // 15.625em = 250px wide @ 16px/1rem
-  --dp-radius: calc(var(--dp-width) * 0.02083); //03125 015625
+  --dp-radius: calc(var(--dp-width) * 0.02083);
   --dp-arrow-size: calc(var(--dp-width) / 12);
 
   font-size: var(--dp-size);

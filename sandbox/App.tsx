@@ -162,6 +162,28 @@ function App() {
         {/* DATEPICKER */}
         <section>
           <div style={{marginBottom: '.5em', display: 'flex', gap: '.5em'}}>
+            <button
+              onClick={() => {
+                const {currentDate} = picker!
+                const date = new Date(
+                  currentDate.getFullYear(),
+                  currentDate.getMonth() - 1
+                )
+                picker?.navigate({date})
+              }}>
+              &lang;
+            </button>
+            <button
+              onClick={() => {
+                const {currentDate} = picker!
+                const date = new Date(
+                  currentDate.getFullYear(),
+                  currentDate.getMonth() + 1
+                )
+                picker?.navigate({date})
+              }}>
+              &rang;
+            </button>
             <button onClick={handleToggleCalendar}>Show / Hide</button>
             <button onClick={() => picker?.toggleOverlay()}>
               Toggle Overlay

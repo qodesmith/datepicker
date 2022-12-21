@@ -64,3 +64,7 @@ export function getOverlayClassName({
 
   return `${overlayContainerCls} ${otherCls}`.trim()
 }
+
+export function getOffsetNumber(date: Date): number {
+  return new Date(date.getFullYear(), date.getMonth(), 1).getDay() + 1
+}

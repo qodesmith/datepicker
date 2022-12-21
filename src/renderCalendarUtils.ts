@@ -1,4 +1,4 @@
-import {isDateWithinRange, stripTime} from './generalUtils'
+import {getOffsetNumber, isDateWithinRange, stripTime} from './generalUtils'
 import getDaysInMonth from './getDaysInMonth'
 import {InternalPickerData} from './types'
 
@@ -24,6 +24,12 @@ export function renderCalendar(picker: InternalPickerData): void {
       minDate,
       maxDate,
     })
+
+    // Adjsut the starting offest of the calendar.
+    if (i === 0) {
+      const offset = getOffsetNumber(dateForComparison)
+      day.style.setProperty('grid-column-start', `${offset}`)
+    }
 
     // Today.
     if (+today === dateNumForComparison) {

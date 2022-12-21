@@ -1,5 +1,5 @@
 import {days, months} from './constants'
-import {getOverlayClassName} from './generalUtils'
+import {getOffsetNumber, getOverlayClassName} from './generalUtils'
 import getDaysInMonth from './getDaysInMonth'
 import {DatepickerOptions} from './types'
 
@@ -102,6 +102,7 @@ export function createCalendarDayElements(date: Date): HTMLDivElement[] {
   const elements: HTMLDivElement[] = []
   const daysInMonth = getDaysInMonth(date)
   const todaysDate = date.getDate()
+  const offset = getOffsetNumber(date)
 
   /**
    * We use 31 since it's the maximum number of days in a month. Any number that
@@ -111,6 +112,11 @@ export function createCalendarDayElements(date: Date): HTMLDivElement[] {
     const day = document.createElement('div')
     day.className = 'dp-day'
     day.textContent = `${i}`
+
+    // Adjsut the starting offest of the calendar.
+    if (i === 1) {
+      day.style.setProperty('grid-column-start', `${offset}`)
+    }
 
     // This will be used by event handlers to know which date was clicked.
     day.dataset.num = `${i}`
@@ -240,8 +246,8 @@ export function createCalendarHTML({
   calendarContainer.append(weekdaysContainer)
   calendarContainer.append(daysContainer)
   calendarContainer.append(overlay.overlayContainer)
-  weekdaysArray.forEach(el => weekdaysContainer.append(el))
-  calendarDaysArray.forEach(el => daysContainer.append(el))
+  weekdaysArray.forEach(weekday => weekdaysContainer.append(weekday))
+  calendarDaysArray.forEach(day => daysContainer.append(day))
 
   return {
     calendarContainer,

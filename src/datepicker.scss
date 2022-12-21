@@ -1,7 +1,3 @@
-.dp-dn {
-  display: none;
-}
-
 .dp-calendar-container {
   --dp-size: 1em;
   --dp-width: 15.625em; // 15.625em = 250px wide @ 16px/1rem
@@ -37,6 +33,10 @@
     path {
       fill: currentColor;
     }
+  }
+
+  &.dp-dn {
+    display: none;
   }
 }
 
@@ -79,6 +79,12 @@
 .dp-weekday,
 .dp-day {
   text-align: center;
+}
+
+.dp-day {
+  &.dp-dn {
+    display: none;
+  }
 }
 
 .dp-overlay-container {

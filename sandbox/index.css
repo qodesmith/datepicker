@@ -53,13 +53,18 @@ button:focus-visible {
 }
 
 .dp-test {
-  padding-left: 2em;
+  padding-left: 30px;
 }
 
 .old-dp-test,
-.dp-test,
 .shadow-dom-test {
   padding: 1em;
+}
+
+table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  border: 3px solid purple;
 }
 
 @media (prefers-color-scheme: light) {

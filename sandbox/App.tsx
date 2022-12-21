@@ -12,6 +12,11 @@ function App() {
   const [picker, setPicker] = useState<DatepickerInstance>()
   const [parentElementFontSize, setParentElementFontSize] = useState(1)
   const [size, setSize] = useState(1)
+  const [isShowing, setIsShowing] = useState(true)
+  const handleToggleCalendar = () => {
+    isShowing ? picker?.hide() : picker?.show()
+    setIsShowing(v => !v)
+  }
 
   // Instantiate Datepicker.
   useEffect(() => {
@@ -69,7 +74,7 @@ function App() {
             padding: '.5em',
             margin: '.5em',
           }}>
-          <h2>Data</h2>
+          <h2 style={{margin: 0}}>Data</h2>
           <div>
             <code style={{fontSize: '.75em', color: 'gray'}}>
               getComputedStyle(picker.calendarContainer).fontSize
@@ -154,7 +159,12 @@ function App() {
 
         {/* DATEPICKER */}
         <section>
-          <div>⬇⬇⬇ This is a div that will container a picker.</div>
+          <div style={{marginBottom: '.5em', display: 'flex', gap: '.5em'}}>
+            <button onClick={handleToggleCalendar}>Show / Hide</button>
+            <button onClick={() => picker?.toggleOverlay()}>
+              Toggle Overlay
+            </button>
+          </div>
           <div
             className="dp-test"
             dangerouslySetInnerHTML={{

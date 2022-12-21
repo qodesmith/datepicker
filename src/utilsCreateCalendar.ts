@@ -1,6 +1,5 @@
-import {days, months} from './constants'
 import {getOffsetNumber, getOverlayClassName, getDaysInMonth} from './utils'
-import {DatepickerOptions} from './types'
+import {DatepickerOptions, InternalPickerData, ViewType} from './types'
 
 type ControlElementsReturnType = {
   controlsContainer: HTMLDivElement
@@ -11,7 +10,10 @@ type ControlElementsReturnType = {
   year: HTMLDivElement
 }
 
-/** */
+type CreateControlElementsInputType = {
+  date: Date
+  customMonths: CreateCalendarInput['customMonths']
+}
 export function createCalendarControlElements({
   date,
   customMonths,
@@ -24,8 +26,7 @@ export function createCalendarControlElements({
   const year = document.createElement('div')
 
   // Month
-  const currentMonths = customMonths ?? months
-  const monthText = currentMonths[date.getMonth()]
+  const monthText = customMonths[date.getMonth()]
   monthName.textContent = monthText
 
   // Year
@@ -75,9 +76,8 @@ function createArrowSVG(): string {
  * These elements are created once and are intended to be reused for each month
  */
 export function createWeekdayElements(
-  customDays: DatepickerOptions['customDays']
+  weekDays: CreateCalendarInput['customDays']
 ): HTMLDivElement[] {
-  const weekdays = customDays ?? days
   const weekdayElements: HTMLDivElement[] = []
 
   for (let i = 0; i < 7; i++) {
@@ -85,7 +85,7 @@ export function createWeekdayElements(
     el.className = 'dp-weekday'
 
     // Weekday names are limited to 3 characters.
-    el.textContent = weekdays[i].slice(0, 3)
+    el.textContent = weekDays[i].slice(0, 3)
 
     weekdayElements.push(el)
   }
@@ -135,11 +135,6 @@ export function createCalendarDayElements(date: Date): HTMLDivElement[] {
   return elements
 }
 
-type CreateControlElementsInputType = {
-  date: Date
-  customMonths: DatepickerOptions['customMonths']
-}
-
 type OverlayReturnType = {
   overlayContainer: HTMLDivElement
   inputContainer: HTMLDivElement
@@ -150,9 +145,10 @@ type OverlayReturnType = {
 }
 
 export function createCalendarOverlay(
-  customMonths: DatepickerOptions['customMonths'],
-  defaultView: DatepickerOptions['defaultView'],
-  overlayButton: DatepickerOptions['overlayButton']
+  customMonths: CreateCalendarInput['customMonths'],
+  defaultView: ViewType,
+  overlayButtonText: CreateCalendarInput['overlayButtonText'],
+  overlayPlaceholder: CreateCalendarInput['overlayPlaceholder']
 ): OverlayReturnType {
   const overlayContainer = document.createElement('div')
   const inputContainer = document.createElement('div')
@@ -160,7 +156,6 @@ export function createCalendarOverlay(
   const overlayClose = document.createElement('div')
   const overlayMonthsContainer = document.createElement('div')
   const overlaySubmitButton = document.createElement('button')
-  const currentMonths = customMonths ?? months
 
   for (let i = 0; i < 12; i++) {
     const overlayMonth = document.createElement('div')
@@ -168,7 +163,7 @@ export function createCalendarOverlay(
     overlayMonthsContainer.append(overlayMonth)
 
     // Overlay month names are limited to 3 characters.
-    overlayMonth.textContent = currentMonths[i].slice(0, 3)
+    overlayMonth.textContent = customMonths[i].slice(0, 3)
     overlayMonth.dataset.num = `${i}`
   }
 
@@ -181,11 +176,12 @@ export function createCalendarOverlay(
 
   inputContainer.className = 'dp-overlay-input-container'
   input.className = 'dp-overlay-input'
+  input.placeholder = overlayPlaceholder
   overlayClose.className = 'dp-overlay-close'
   overlayClose.textContent = '✕'
   overlayMonthsContainer.className = 'dp-overlay-months-container'
   overlaySubmitButton.className = 'dp-overlay-submit'
-  overlaySubmitButton.textContent = overlayButton ?? 'Submit'
+  overlaySubmitButton.textContent = overlayButtonText
   overlayContainer.className = getOverlayClassName({
     action: 'initialize',
     defaultView,
@@ -213,17 +209,19 @@ export type PickerElements = {
 
 type CreateCalendarInput = {
   date: Date
-  customMonths: DatepickerOptions['customMonths']
-  customDays: DatepickerOptions['customDays']
-  defaultView: DatepickerOptions['defaultView']
-  overlayButton: DatepickerOptions['overlayButton']
+  customMonths: InternalPickerData['months']
+  customDays: NonNullable<DatepickerOptions['customDays']>
+  defaultView: ViewType
+  overlayButtonText: InternalPickerData['overlayButtonText']
+  overlayPlaceholder: InternalPickerData['overlayPlaceholder']
 }
 export function createCalendarHTML({
   date,
   customMonths,
   customDays,
   defaultView,
-  overlayButton,
+  overlayButtonText,
+  overlayPlaceholder,
 }: CreateCalendarInput): PickerElements {
   const calendarContainer = document.createElement('div')
   const controls = createCalendarControlElements({date, customMonths})
@@ -234,7 +232,8 @@ export function createCalendarHTML({
   const overlay = createCalendarOverlay(
     customMonths,
     defaultView,
-    overlayButton
+    overlayButtonText,
+    overlayPlaceholder
   )
 
   calendarContainer.className = 'dp-calendar-container'

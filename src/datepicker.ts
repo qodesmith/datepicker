@@ -9,7 +9,7 @@ import type {
 
 import './datepicker.scss'
 import {createCalendarHTML} from './utilsCreateCalendar'
-import {datepickersMap, days, months, noop} from './constants'
+import {datepickersMap, defaultOptions, noop} from './constants'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
   checkForExistingRangepickerPair,
@@ -41,20 +41,23 @@ export default function datepicker(
   // HANDLE POSITIONING OF CONTAINING ELEMENT.
 
   // CREATE CALENDAR HTML
-  const startDate = stripTime(options?.startDate ?? stripTime(new Date()))
+  const startDate = stripTime(options?.startDate ?? new Date())
   const pickerElements = createCalendarHTML({
     date: startDate,
-    customMonths: months.slice(),
-    customDays: days.slice(),
-    defaultView: options?.defaultView,
-    overlayButton: options?.overlayButton,
+    customMonths: (options?.customMonths ?? defaultOptions.months).slice(),
+    customDays: (options?.customDays ?? defaultOptions.days).slice(),
+    defaultView: options?.defaultView ?? defaultOptions.defaultView,
+    overlayButtonText:
+      options?.overlayButton ?? defaultOptions.overlayButtonText,
+    overlayPlaceholder:
+      options?.overlayPlaceholder ?? defaultOptions.overlayPlaceholder,
   })
 
   // CREATE INTERNAL PICKER DATA
   const internalPickerItem: InternalPickerData = {
     selectorData,
     pickerElements,
-    months: options?.customMonths ?? months,
+    months: options?.customMonths ?? defaultOptions.months,
     disabledDates: new Set(
       (options?.disabledDates ?? []).map(disabledDate => {
         return +stripTime(disabledDate)
@@ -189,7 +192,7 @@ export default function datepicker(
       }
     },
     isCalendarShowing: !!options?.alwaysShow,
-    defaultView: options?.defaultView ?? 'calendar',
+    defaultView: options?.defaultView ?? defaultOptions.defaultView,
     isOverlayShowing: options?.defaultView === 'overlay',
   }
 

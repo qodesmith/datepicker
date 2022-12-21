@@ -1,22 +1,5 @@
 import {InternalPickerData, Sides} from './types'
 
-export const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
-
-export const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-] as const
-
 /**
  * `t`, `r`, `b`, and `l` are all positioned relatively to the input the calendar is attached to.
  * `c` fixes the calendar smack in the middle of the screen. Useful for mobile devices.
@@ -45,3 +28,24 @@ export const datepickersMap = new Map<HTMLElement, InternalPickerData>()
 export const overlayContainerCls = 'dp-overlay-container'
 
 export const overlayShownCls = 'dp-overlay-shown'
+
+export const defaultOptions = {
+  defaultView: 'calendar',
+  overlayPlaceholder: 'Enter a year',
+  overlayButtonText: 'Submit',
+  days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  months: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ],
+} as const

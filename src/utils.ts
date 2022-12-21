@@ -1,10 +1,5 @@
 import {datepickersMap, overlayContainerCls} from './constants'
-import {
-  DatepickerOptions,
-  InternalPickerData,
-  Selector,
-  SelectorData,
-} from './types'
+import {InternalPickerData, Selector, SelectorData, ViewType} from './types'
 
 /**
  * Returns the type of an item.
@@ -169,7 +164,7 @@ export function getSiblingDateForNavigate(
 
 type GetOverlayClassInputType = {
   action: 'initialize' | 'calendarOpen' | 'overlayToggle'
-  defaultView: DatepickerOptions['defaultView']
+  defaultView: ViewType
   isOverlayShowing?: InternalPickerData['isOverlayShowing']
 }
 export function getOverlayClassName({

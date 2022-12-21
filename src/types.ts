@@ -73,7 +73,7 @@ export type DatepickerOptions = {
    *
    * Default - 'calendar'
    */
-  defaultView?: 'calendar' | 'overlay'
+  defaultView?: ViewType
 
   /**
    * Custom text for the year overlay submit button.
@@ -324,6 +324,8 @@ export type Sides = {
 
 export type PickerType = 'picker' | 'rangepicker'
 
+export type ViewType = 'calendar' | 'overlay'
+
 export type InternalPickerData = {
   /**
    * All the existing DOM elements associated with the calendar.
@@ -356,8 +358,8 @@ export type InternalPickerData = {
   events: Set<number>
   startDay: number // Start day of the week.
   overlayMonths: string[] // Will also be sliced to 1st 3 characters.
-  overlayPlaceholder: string // Default - '4-digit year'
-  overlayButtonText: string // Default - 'Submit'
+  overlayPlaceholder: string
+  overlayButtonText: string
   disableOverlay: boolean
   disabledMobile: boolean // Disable the datepicker on mobile devices. Allows the use of native datepicker if the input type is 'date'.
   isMobile: boolean // 'ontouchstart' in window
@@ -387,7 +389,7 @@ export type InternalPickerData = {
 
   isCalendarShowing: boolean
   isOverlayShowing: boolean
-  defaultView: 'calendar' | 'overlay'
+  defaultView: ViewType
 }
 
 type SetMinMaxInputType = {

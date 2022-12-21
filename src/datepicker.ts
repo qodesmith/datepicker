@@ -51,6 +51,7 @@ export default function datepicker(
       options?.overlayButton ?? defaultOptions.overlayButtonText,
     overlayPlaceholder:
       options?.overlayPlaceholder ?? defaultOptions.overlayPlaceholder,
+    selectedDate: options?.selectedDate,
   })
 
   // CREATE INTERNAL PICKER DATA

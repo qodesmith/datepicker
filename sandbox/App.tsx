@@ -18,6 +18,8 @@ function App() {
     setIsShowing(v => !v)
   }
 
+  window.x = picker
+
   // Instantiate Datepicker.
   useEffect(() => {
     const pickerObj = datepicker('.dp-test', {alwaysShow: true})

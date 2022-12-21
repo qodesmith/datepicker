@@ -101,25 +101,30 @@ export function createWeekdayElements(
 export function createCalendarDayElements(date: Date): HTMLDivElement[] {
   const elements: HTMLDivElement[] = []
   const daysInMonth = getDaysInMonth(date)
+  const todaysDate = date.getDate()
 
   /**
    * We use 31 since it's the maximum number of days in a month. Any number that
    * exceeds the maximum days in the current month will be hidden.
    */
   for (let i = 1; i <= 31; i++) {
-    const el = document.createElement('div')
-    el.className = 'dp-day'
-    el.textContent = `${i}`
+    const day = document.createElement('div')
+    day.className = 'dp-day'
+    day.textContent = `${i}`
 
     // This will be used by event handlers to know which date was clicked.
-    el.dataset.num = `${i}`
+    day.dataset.num = `${i}`
 
     if (i > daysInMonth) {
       // Days that aren't in the month should still be created but not shown.
-      el.classList.add('dp-dn')
+      day.classList.add('dp-dn')
     }
 
-    elements.push(el)
+    if (i === todaysDate) {
+      day.classList.add('dp-today')
+    }
+
+    elements.push(day)
   }
 
   return elements

@@ -12,7 +12,7 @@
   user-select: none;
   border: 1px solid currentColor;
   border-radius: var(--dp-radius);
-  line-height: 1.6;
+  line-height: 1.7;
 
   * {
     box-sizing: border-box;
@@ -94,6 +94,11 @@
 .dp-day {
   &.dp-dn {
     display: none;
+  }
+
+  &.dp-today {
+    font-weight: bold;
+    text-decoration: underline;
   }
 }
 

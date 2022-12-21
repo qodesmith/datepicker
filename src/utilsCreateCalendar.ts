@@ -182,6 +182,8 @@ export function createCalendarOverlay(
   overlayMonthsContainer.className = 'dp-overlay-months-container'
   overlaySubmitButton.className = 'dp-overlay-submit'
   overlaySubmitButton.textContent = overlayButtonText
+  // TODO - disable this upon year input
+  overlaySubmitButton.disabled = true
   overlayContainer.className = getOverlayClassName({
     action: 'initialize',
     defaultView,

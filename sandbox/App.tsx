@@ -1,4 +1,4 @@
-import {useEffect, useLayoutEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import datepicker from '../src/datepicker'
 import QodesmithElement from './QodesmithElement'
 // @ts-expect-error - this module loads fine.

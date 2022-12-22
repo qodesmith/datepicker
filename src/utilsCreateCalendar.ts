@@ -103,6 +103,8 @@ export function createWeekdayElements(
 type CreateCalendarDaysInput = {
   date: Date
   selectedDate: DatepickerOptions['selectedDate']
+  // TODO - formalize where all these types come from - DatepickerOptions, CreateCalendarInput, InternalPickerData?
+  disabledDates: CreateCalendarInput['disabledDates']
 }
 /**
  * Creates an array of divs representing the days in a given month. These
@@ -111,6 +113,7 @@ type CreateCalendarDaysInput = {
 export function createCalendarDayElements({
   date,
   selectedDate,
+  disabledDates,
 }: CreateCalendarDaysInput): HTMLDivElement[] {
   const elements: HTMLDivElement[] = []
   const daysInMonth = getDaysInMonth(date)
@@ -119,14 +122,13 @@ export function createCalendarDayElements({
   const year = date.getFullYear()
   const month = date.getMonth()
   const selectedDateNum = selectedDate ? +stripTime(selectedDate) : undefined
+  const isSelectedDateDisabled = disabledDates.has(selectedDateNum ?? Infinity)
 
-  /**
-   * We use 31 since it's the maximum number of days in a month. Any number that
-   * exceeds the maximum days in the current month will be hidden.
-   */
   for (let i = 1; i <= 31; i++) {
     const currentDate = new Date(year, month, i)
-    const isSelected = +currentDate === selectedDateNum
+    const isSelected =
+      +currentDate === selectedDateNum && !isSelectedDateDisabled
+    const isDisabled = disabledDates.has(+currentDate)
     const day = document.createElement('div')
     day.className = 'dp-day'
     day.textContent = `${i}`
@@ -150,6 +152,10 @@ export function createCalendarDayElements({
 
     if (isSelected) {
       day.classList.add('dp-selected-date')
+    }
+
+    if (isDisabled) {
+      day.classList.add('dp-disabled-date')
     }
 
     elements.push(day)
@@ -240,6 +246,7 @@ type CreateCalendarInput = {
   overlayButtonText: InternalPickerData['overlayButtonText']
   overlayPlaceholder: InternalPickerData['overlayPlaceholder']
   selectedDate: DatepickerOptions['selectedDate']
+  disabledDates: InternalPickerData['disabledDates']
 }
 export function createCalendarHTML({
   date,
@@ -249,12 +256,17 @@ export function createCalendarHTML({
   overlayButtonText,
   overlayPlaceholder,
   selectedDate,
+  disabledDates,
 }: CreateCalendarInput): PickerElements {
   const calendarContainer = document.createElement('div')
   const controls = createCalendarControlElements({date, customMonths})
   const weekdaysArray = createWeekdayElements(customDays)
   const weekdaysContainer = document.createElement('div')
-  const calendarDaysArray = createCalendarDayElements({date, selectedDate})
+  const calendarDaysArray = createCalendarDayElements({
+    date,
+    selectedDate,
+    disabledDates,
+  })
   const daysContainer = document.createElement('div')
   const overlay = createCalendarOverlay(
     customMonths,

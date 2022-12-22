@@ -10,7 +10,7 @@
   --dp-transition-time: 0.3s;
 
   // Theme variables.
-  --dp-color: rgba(255, 255, 255, 0.92); // All colors other than the overlay.
+  --dp-color: rgba(255, 255, 255, 0.92);
   --dp-bg: #242424;
   --dp-controls-color: #242424;
   --dp-controls-bg: rgba(255, 255, 255, 0.5);
@@ -18,7 +18,7 @@
   --dp-day-hover-bg: rgba(255, 255, 255, 0.3);
   // --dp-day-selected-color: ???
   // --dp-day-selected-bg: ???
-  // --dp-day-disabled-color: ???
+  --dp-day-disabled-color: rgba(127, 127, 127, 0.92);
   // --dp-day-disabled-bg: ???
   // --dp-day-event-color: ??? // The little dot
   --dp-overlay-color: var(--dp-color);
@@ -145,7 +145,7 @@
   border-radius: var(--dp-radius);
   cursor: pointer;
 
-  &:hover {
+  &:hover:not(.dp-disabled-date):not(.dp-selected-date) {
     background: var(--dp-day-hover-bg);
   }
 
@@ -161,6 +161,11 @@
   &.dp-today {
     font-weight: bold;
     text-decoration: underline;
+  }
+
+  &.dp-disabled-date {
+    cursor: not-allowed;
+    color: var(--dp-day-disabled-color);
   }
 }
 

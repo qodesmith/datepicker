@@ -29,9 +29,14 @@ function App() {
 
   // Instantiate Datepicker.
   useEffect(() => {
+    const today = new Date()
     const pickerObj = datepicker('.dp-test', {
       alwaysShow: true,
-      selectedDate: new Date(),
+      selectedDate: today,
+      disabledDates: [
+        new Date(today.getFullYear(), today.getMonth(), 1),
+        new Date(today.getFullYear(), today.getMonth(), 3),
+      ],
     })
     setPicker(pickerObj)
     const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})

@@ -42,6 +42,11 @@ export default function datepicker(
 
   // CREATE CALENDAR HTML
   const startDate = stripTime(options?.startDate ?? new Date())
+  const disabledDates = new Set(
+    (options?.disabledDates ?? []).map(disabledDate => {
+      return +stripTime(disabledDate)
+    })
+  )
   const pickerElements = createCalendarHTML({
     date: startDate,
     customMonths: (options?.customMonths ?? defaultOptions.months).slice(),
@@ -51,7 +56,9 @@ export default function datepicker(
       options?.overlayButton ?? defaultOptions.overlayButtonText,
     overlayPlaceholder:
       options?.overlayPlaceholder ?? defaultOptions.overlayPlaceholder,
+    // TODO - handle the clash between selectedDate also being a disabledDate.
     selectedDate: options?.selectedDate,
+    disabledDates,
   })
 
   // CREATE INTERNAL PICKER DATA
@@ -59,11 +66,7 @@ export default function datepicker(
     selectorData,
     pickerElements,
     months: options?.customMonths ?? defaultOptions.months,
-    disabledDates: new Set(
-      (options?.disabledDates ?? []).map(disabledDate => {
-        return +stripTime(disabledDate)
-      })
-    ),
+    disabledDates,
     currentDate: startDate,
     selectedDate: options?.selectedDate
       ? stripTime(options.selectedDate)

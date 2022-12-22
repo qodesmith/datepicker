@@ -31,15 +31,18 @@
   // Theme variables.
   --dp-color: rgba(255, 255, 255, 0.92);
   --dp-bg: #242424;
-  --dp-controls-color: #242424;
+  --dp-controls-color: var(--dp-color);
+  --dp-control-arrows-color: #555;
+  --dp-control-arrows-color-hover: #000;
+  --dp-control-arrows-bg-hover: rgba(255, 255, 255, 0.25);
   --dp-controls-bg: rgba(255, 255, 255, 0.5);
   // --dp-weekdays-color: ???
-  --dp-day-hover-bg: rgba(255, 255, 255, 0.3);
-  // --dp-day-selected-color: ???
-  // --dp-day-selected-bg: ???
-  --dp-day-disabled-color: rgba(127, 127, 127, 0.92);
-  // --dp-day-disabled-bg: ???
-  // --dp-day-event-color: ??? // The little dot
+  --dp-day-hover-bg: #fa0;
+  --dp-selected-date-color: #add8e6;
+  // --dp-selected-date-bg: ???
+  --dp-disabled-date-color: rgba(127, 127, 127, 0.92);
+  // --dp-disabled-date-bg: ???
+  // --dp-day-event-color: ??? // The little dot - namne this the same as the class name.
   --dp-overlay-color: var(--dp-color);
   --dp-overlay-bg: rgba(0, 0, 0, 0.5);
 
@@ -133,9 +136,30 @@
 .dp-arrow {
   display: flex;
   align-items: center;
+  cursor: pointer;
+  padding: 0 0.2em;
+  transition: background-color calc(var(--dp-transition-time) / 2);
 
-  &.dp-arrow-right svg {
-    transform: rotate(180deg);
+  &:hover {
+    background-color: var(--dp-control-arrows-bg-hover);
+
+    svg path {
+      fill: var(--dp-control-arrows-color-hover);
+    }
+  }
+
+  &.dp-arrow-left {
+    border-top-right-radius: var(--dp-radius);
+    border-bottom-right-radius: var(--dp-radius);
+  }
+
+  &.dp-arrow-right {
+    border-top-left-radius: var(--dp-radius);
+    border-bottom-left-radius: var(--dp-radius);
+
+    svg {
+      transform: rotate(180deg);
+    }
   }
 
   // https://stackoverflow.com/a/24626986/2525633
@@ -144,9 +168,10 @@
     display: block;
     width: var(--dp-arrow-size);
     height: var(--dp-arrow-size);
+    transform: color calc(var(--dp-transition-time) / 3);
 
     path {
-      fill: var(--dp-controls-color);
+      fill: var(--dp-control-arrows-color);
     }
   }
 }
@@ -164,13 +189,15 @@
 .dp-day {
   border-radius: var(--dp-radius);
   cursor: pointer;
+  transition: background-color calc(var(--dp-transition-time) / 3);
 
   &:hover:not(.dp-disabled-date):not(.dp-selected-date) {
+    color: var(--dp-bg);
     background: var(--dp-day-hover-bg);
   }
 
   &.dp-selected-date {
-    background: var(--dp-color);
+    background: var(--dp-selected-date-color);
     color: var(--dp-bg);
   }
 
@@ -185,7 +212,7 @@
 
   &.dp-disabled-date {
     cursor: not-allowed;
-    color: var(--dp-day-disabled-color);
+    color: var(--dp-disabled-date-color);
   }
 }
 

@@ -214,7 +214,11 @@ function App() {
           </div>
           <div
             className="dp-test"
-            style={{display: 'flex', justifyContent: 'center'}}
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              margin: '0 3em 3em',
+            }}
             dangerouslySetInnerHTML={{
               __html: '',
             }}

@@ -77,13 +77,6 @@ function App() {
           {Boolean('ontouchstart' in document.documentElement).toString()}
         </code>
       </div>
-      <div
-        className="old-dp-test"
-        dangerouslySetInnerHTML={{
-          __html:
-            '<input type="text" class="old-dp-input" placeholder="old-dp-input" />',
-        }}
-      />
       <div style={{display: 'flex', gap: '2em'}}>
         {/* DATA */}
         <section
@@ -221,6 +214,17 @@ function App() {
             }}
             dangerouslySetInnerHTML={{
               __html: '',
+            }}
+          />
+        </section>
+
+        {/* OLD DATEPICKER */}
+        <section>
+          <div
+            className="old-dp-test"
+            dangerouslySetInnerHTML={{
+              __html:
+                '<input type="text" class="old-dp-input" placeholder="old-dp-input" />',
             }}
           />
         </section>

@@ -1,6 +1,25 @@
 // TODO - ensure there's variables for everything a theme would want to control
 // TODO - implement light / dark theme
 
+/*
+  A note about sizing the calendar...
+  The intention is for the user to scale the calendar proportionally simply by
+  controlling the `--dp-size` variable. As you can see, it is a relative size
+  unit. This scales larger with no problem. Scaling super small is a different
+  matter. If there is no absolute font-size (px, rem, etc.) declared somewhere
+  higher in the DOM, the calendar will only scale down proportionally up to the 
+  point where the font size hits 9px. Below 9px, the height of the calendar and
+  the text size of the elements will no longer shrink. This shouldn't be a real-
+  world problem through - who's looking to display the calendar scaled down to
+  the point of incomprehension? In any case, if that's what you want to do, then
+  simply declare an absolute font-size somewhere in the DOM tree above where the
+  calendar is attached. A good choice would be something like the following
+  which would set the styles of the entire document:
+
+  :root {
+    font-size: 16px;
+  }
+*/
 .dp-calendar-container {
   // Non-theme variables.
   --dp-size: 1em;

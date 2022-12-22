@@ -93,7 +93,7 @@ function App() {
           </div>
           <div>
             <code>.dp-calendar-container</code> font size:{' '}
-            <code style={{color: 'lime'}}>{fontSize ?? 'null'}</code>
+            <code style={{color: 'blue'}}>{fontSize ?? 'null'}</code>
           </div>
           <br />
           <div>
@@ -103,9 +103,11 @@ function App() {
           </div>
           <div>
             <code>.dp-calendar-container</code> width:{' '}
-            <code style={{color: 'lime'}}>{width ?? 'null'}</code>
+            <code style={{color: 'blue'}}>{width ?? 'null'}</code>
           </div>
+
           <hr />
+
           <div>
             Change font size (em) of the calendar{' '}
             <strong>
@@ -113,22 +115,24 @@ function App() {
             </strong>
             :
             <br />
-            <input
-              type="range"
-              step=".01"
-              min=".3"
-              max="4"
-              value={parentElementFontSize}
-              onChange={e => setParentElementFontSize(+e.target.value)}
-            />{' '}
-            <code style={{color: 'lime'}}>
-              {parentElementFontSize.toFixed(2)}em,{' '}
-              {parentElementFontSizeComputed
-                ? Number(
-                    parentElementFontSizeComputed.replace('px', '')
-                  ).toFixed(2) + 'px'
-                : 'null'}
-            </code>
+            <div style={{display: 'grid', gridTemplateColumns: '1fr auto'}}>
+              <input
+                type="range"
+                step=".01"
+                min=".3"
+                max="4"
+                value={parentElementFontSize}
+                onChange={e => setParentElementFontSize(+e.target.value)}
+              />{' '}
+              <code style={{color: 'blue'}}>
+                {parentElementFontSize.toFixed(2)}em,{' '}
+                {parentElementFontSizeComputed
+                  ? Number(
+                      parentElementFontSizeComputed.replace('px', '')
+                    ).toFixed(2) + 'px'
+                  : 'null'}
+              </code>
+            </div>
             <div style={{display: 'flex', gap: '.5em'}}>
               <button onClick={() => setParentElementFontSize(0.5)}>
                 .5em
@@ -139,7 +143,9 @@ function App() {
               <button onClick={() => setParentElementFontSize(4)}>4em</button>
             </div>
           </div>
+
           <hr />
+
           <div>
             Change the <code>--dp-size</code> value on{' '}
             <code>
@@ -149,15 +155,17 @@ function App() {
             </code>
             :
             <br />
-            <input
-              type="range"
-              step=".01"
-              min=".1"
-              max="3"
-              value={size}
-              onChange={e => setSize(+e.target.value)}
-            />
-            <code style={{color: 'lime'}}>{size.toFixed(3) + 'em'}</code>
+            <div style={{display: 'grid', gridTemplateColumns: '1fr auto'}}>
+              <input
+                type="range"
+                step=".01"
+                min=".1"
+                max="3"
+                value={size}
+                onChange={e => setSize(+e.target.value)}
+              />
+              <code style={{color: 'blue'}}>{size.toFixed(3) + 'em'}</code>
+            </div>
             <div style={{display: 'flex', gap: '.5em'}}>
               <button onClick={() => setSize(0.5)}>.5em</button>
               <button onClick={() => setSize(0.75)}>.75em</button>

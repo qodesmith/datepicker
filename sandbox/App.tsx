@@ -12,6 +12,7 @@ function App() {
   const [picker, setPicker] = useState<DatepickerInstance>()
   const [parentElementFontSize, setParentElementFontSize] = useState(1)
   const [size, setSize] = useState(1)
+  const [dpWidth, setDpWidth] = useState(15.625)
   const [isShowing, setIsShowing] = useState(true)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const handleToggleCalendar = () => {
@@ -57,6 +58,7 @@ function App() {
     }
 
     picker.calendarContainer.style.setProperty('--dp-size', `${size}em`)
+    picker.calendarContainer.style.setProperty('--dp-width', `${dpWidth}em`)
   }
 
   const fontSize = picker
@@ -173,6 +175,34 @@ function App() {
               <button onClick={() => setSize(2)}>2em</button>
               <button onClick={() => setSize(3)}>3em</button>
             </div>
+          </div>
+
+          <hr />
+
+          <div>
+            Change the <code>--dp-width</code> value on{' '}
+            <code>
+              <em>.dp-calendar-container</em>
+            </code>
+            :
+          </div>
+          <div style={{display: 'grid', gridTemplateColumns: '1fr auto'}}>
+            <input
+              type="range"
+              step=".1"
+              min="10"
+              max="50"
+              value={dpWidth}
+              onChange={e => setDpWidth(+e.target.value)}
+            />
+            <code style={{color: 'blue'}}>{dpWidth.toFixed(3) + 'em'}</code>
+          </div>
+          <div style={{display: 'flex', gap: '.5em'}}>
+            <button onClick={() => setDpWidth(10)}>10em</button>
+            <button onClick={() => setDpWidth(15.625)}>15.625em</button>
+            <button onClick={() => setDpWidth(30)}>30em</button>
+            <button onClick={() => setDpWidth(40)}>40em</button>
+            <button onClick={() => setDpWidth(50)}>50em</button>
           </div>
         </section>
 

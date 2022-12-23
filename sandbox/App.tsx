@@ -71,7 +71,7 @@ function App() {
       : null
 
   return (
-    <>
+    <div className="app">
       <div>
         'ontouchstart' in window:{' '}
         <code>
@@ -81,13 +81,19 @@ function App() {
       </div>
       <div style={{display: 'flex', gap: '2em'}}>
         {/* DATA */}
-        <section
-          style={{
-            border: '1px solid',
-            padding: '.5em',
-            margin: '.5em',
-          }}>
-          <h2 style={{margin: 0}}>Data</h2>
+        <section style={{border: '1px solid', padding: '.5em', margin: '.5em'}}>
+          <div style={{display: 'flex', alignItems: 'center'}}>
+            <h2 style={{margin: 0}}>Data</h2>
+            <button
+              style={{marginLeft: '3em', height: '50%'}}
+              onClick={() => {
+                setParentElementFontSize(1)
+                setSize(1)
+                setDpWidth(15.625)
+              }}>
+              🔄 Reset All
+            </button>
+          </div>
           <div>
             <code style={{fontSize: '.75em', color: 'gray'}}>
               getComputedStyle(picker.calendarContainer).fontSize
@@ -139,7 +145,11 @@ function App() {
               <button onClick={() => setParentElementFontSize(0.5)}>
                 .5em
               </button>
-              <button onClick={() => setParentElementFontSize(1)}>1em</button>
+              <button
+                className="default-btn"
+                onClick={() => setParentElementFontSize(1)}>
+                1em
+              </button>
               <button onClick={() => setParentElementFontSize(2)}>2em</button>
               <button onClick={() => setParentElementFontSize(3)}>3em</button>
               <button onClick={() => setParentElementFontSize(4)}>4em</button>
@@ -171,7 +181,9 @@ function App() {
             <div style={{display: 'flex', gap: '.5em'}}>
               <button onClick={() => setSize(0.5)}>.5em</button>
               <button onClick={() => setSize(0.75)}>.75em</button>
-              <button onClick={() => setSize(1)}>1em</button>
+              <button className="default-btn" onClick={() => setSize(1)}>
+                1em
+              </button>
               <button onClick={() => setSize(2)}>2em</button>
               <button onClick={() => setSize(3)}>3em</button>
             </div>
@@ -182,7 +194,9 @@ function App() {
           <div>
             Change the <code>--dp-width</code> value on{' '}
             <code>
-              <em>.dp-calendar-container</em>
+              <strong>
+                <em>.dp-calendar-container</em>
+              </strong>
             </code>
             :
           </div>
@@ -199,7 +213,9 @@ function App() {
           </div>
           <div style={{display: 'flex', gap: '.5em'}}>
             <button onClick={() => setDpWidth(10)}>10em</button>
-            <button onClick={() => setDpWidth(15.625)}>15.625em</button>
+            <button className="default-btn" onClick={() => setDpWidth(15.625)}>
+              15.625em
+            </button>
             <button onClick={() => setDpWidth(30)}>30em</button>
             <button onClick={() => setDpWidth(40)}>40em</button>
             <button onClick={() => setDpWidth(50)}>50em</button>
@@ -263,7 +279,7 @@ function App() {
           __html: '<qodesmith-element></qodesmith-element>',
         }}
       />
-    </>
+    </div>
   )
 }
 

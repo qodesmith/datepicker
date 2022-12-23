@@ -24,7 +24,8 @@
   // Non-theme variables.
   --dp-size: 1em;
   --dp-width: 15.625em; // 15.625em = 250px wide @ 16px/1rem
-  --dp-radius: calc(var(--dp-width) * 0.02083);
+  --dp-radius: calc(var(--dp-width) * 0.02083); // 5.2px
+  --dp-radius: 0.325em;
   --dp-arrow-size: 1.2em;
   --dp-transition-time: 0.3s;
 
@@ -92,7 +93,7 @@
 }
 
 .dp-calendar-container {
-  grid-template-rows: repeat(3, min-content);
+  grid-template-rows: min-content min-content 1fr;
 }
 
 .dp-weekdays-container,
@@ -100,6 +101,7 @@
   font-size: 1em;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  align-items: center;
 }
 
 .dp-controls-container {
@@ -187,7 +189,7 @@
 }
 
 .dp-days-container:not(.dp-disable-transition) .dp-day {
-  transition: background-color calc(var(--dp-transition-time) * 3);
+  transition: background-color calc(var(--dp-transition-time) / 3);
 }
 
 .dp-day {

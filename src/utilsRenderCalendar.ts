@@ -16,6 +16,14 @@ export function renderCalendar(picker: InternalPickerData): void {
   const today = stripTime(new Date())
 
   /**
+   * This class prevents a ghost background fade effect from happening because
+   * we have transition on the background and the DOM elements are reused.
+   * To disable that transition when switching months, we add this class to
+   * switch off the CSS transition styles.
+   */
+  picker.pickerElements.daysContainer.classList.add('dp-disable-transition')
+
+  /**
    * Iterate through the calendar days and hide any days that are beyond the
    * number of days in the current month.
    */
@@ -67,4 +75,17 @@ export function renderCalendar(picker: InternalPickerData): void {
   // Adjust the month name and year in the calendar controls.
   picker.pickerElements.controls.monthName.textContent = currentMonthName
   picker.pickerElements.controls.year.textContent = `${currentYear}`
+
+  /**
+   * Removing the class inside requestAnimationFrame gives the DOM time to paint
+   * (1 tick) first and then it is safe to remove the class. Otherwise, the
+   * addition of this class won't take effect because there was no time between
+   * adding and removing. Also, using setTimeout requires an arbitrary time and
+   * requestAnimationFrame is guaranteed to execute on the next paint cycle.
+   */
+  requestAnimationFrame(() => {
+    picker.pickerElements.daysContainer.classList.remove(
+      'dp-disable-transition'
+    )
+  })
 }

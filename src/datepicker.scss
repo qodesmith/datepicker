@@ -32,8 +32,8 @@
   --dp-color: rgba(255, 255, 255, 0.92);
   --dp-bg: #242424;
   --dp-controls-color: var(--dp-color);
-  --dp-control-arrows-color: #555;
-  --dp-control-arrows-color-hover: #000;
+  --dp-control-arrows-color: rgba(255, 255, 255, 0.5);
+  --dp-control-arrows-color-hover: #808080;
   --dp-control-arrows-bg-hover: rgba(255, 255, 255, 0.25);
   --dp-controls-bg: rgba(255, 255, 255, 0.5);
   // --dp-weekdays-color: ???
@@ -186,10 +186,13 @@
   text-align: center;
 }
 
+.dp-days-container:not(.dp-disable-transition) .dp-day {
+  transition: background-color calc(var(--dp-transition-time) * 3);
+}
+
 .dp-day {
   border-radius: var(--dp-radius);
   cursor: pointer;
-  transition: background-color calc(var(--dp-transition-time) / 3);
 
   &:hover:not(.dp-disabled-date):not(.dp-selected-date) {
     color: var(--dp-bg);

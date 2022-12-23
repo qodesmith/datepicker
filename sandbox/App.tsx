@@ -71,7 +71,7 @@ function App() {
       : null
 
   return (
-    <div className="app">
+    <>
       <div>
         'ontouchstart' in window:{' '}
         <code>
@@ -81,7 +81,9 @@ function App() {
       </div>
       <div style={{display: 'flex', gap: '2em'}}>
         {/* DATA */}
-        <section style={{border: '1px solid', padding: '.5em', margin: '.5em'}}>
+        <section
+          className="data"
+          style={{border: '1px solid', padding: '.5em', margin: '.5em'}}>
           <div style={{display: 'flex', alignItems: 'center'}}>
             <h2 style={{margin: 0}}>Data</h2>
             <button
@@ -279,7 +281,7 @@ function App() {
           __html: '<qodesmith-element></qodesmith-element>',
         }}
       />
-    </div>
+    </>
   )
 }
 

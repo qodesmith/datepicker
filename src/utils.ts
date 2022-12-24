@@ -64,6 +64,7 @@ export function getSelectorData(selector: Selector): SelectorData {
   const rootNodeType = getType(rootNode)
   const parentElement = element.parentElement
 
+  // Inputs are the only elements that can't have multiple datepickers.
   checkForExistingPickerOnElement(element)
 
   /**
@@ -202,7 +203,9 @@ export function getOffsetNumber(date: Date): number {
  * Checks if a picker already exists on a given element. If so, it throws.
  */
 export function checkForExistingPickerOnElement(el: HTMLElement): void {
-  if (datepickersMap.has(el)) {
+  const isInput = getType(el) === 'HTMLInputElement'
+
+  if (isInput && datepickersMap.has(el)) {
     throwError('A datepicker already exists on that element.')
   }
 }
@@ -213,14 +216,45 @@ export function checkForExistingPickerOnElement(el: HTMLElement): void {
 export function checkForExistingRangepickerPair(id: any): void {
   let rangepickersFound = 0
 
-  datepickersMap.forEach(picker => {
-    if (picker.type === 'rangepicker' && picker.id === id) {
-      rangepickersFound++
-    }
+  datepickersMap.forEach(pickerSet => {
+    pickerSet.forEach(picker => {
+      // TODO - do we need to do Object.hasOwnProperty('id')?
+      if (picker.type === 'rangepicker' && picker.id === id) {
+        rangepickersFound++
+      }
+    })
   })
 
   if (rangepickersFound > 1) {
     throwError(`There is already a set of rangepickers for this id: "${id}"`)
+  }
+}
+
+export function addPickerToMap(
+  el: HTMLElement,
+  internalPickerItem: InternalPickerData
+): void {
+  const pickerSet = datepickersMap.get(el)
+
+  if (pickerSet) {
+    pickerSet.add(internalPickerItem)
+  } else {
+    datepickersMap.set(el, new Set([internalPickerItem]))
+  }
+}
+
+export function removePickerFromMap(
+  el: HTMLElement,
+  internalPickerItem: InternalPickerData
+): void {
+  const pickerSet = datepickersMap.get(el)
+
+  if (!pickerSet) return
+
+  if (pickerSet.size === 1) {
+    datepickersMap.delete(el)
+  } else {
+    pickerSet.delete(internalPickerItem)
   }
 }
 

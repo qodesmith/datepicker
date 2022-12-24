@@ -21,9 +21,11 @@ export function noop() {}
 /**
  * This map will contain all the created datepickers that haven't been removed.
  * It maps the datepicker element (not the calendar HTML, but the DOM element
- * that the calendar is initialized with) to the internal picker item.
+ * that the calendar is initialized with) to a set of internal picker items. We
+ * use a set because multiple datepickers can be attached to the same element
+ * except in case of inputs. Inputs have a 1:1 relationship with datepickers.
  */
-export const datepickersMap = new Map<HTMLElement, InternalPickerData>()
+export const datepickersMap = new Map<HTMLElement, Set<InternalPickerData>>()
 
 export const overlayContainerCls = 'dp-overlay-container'
 

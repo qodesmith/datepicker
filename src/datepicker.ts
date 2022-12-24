@@ -13,6 +13,7 @@ import {datepickersMap, defaultOptions, noop} from './constants'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
   addEventListeners,
+  addPickerToMap,
   checkForExistingRangepickerPair,
   getOverlayClassName,
   getSelectorData,
@@ -20,6 +21,7 @@ import {
   hasMonthChanged,
   isDateWithinRange,
   removeEventListeners,
+  removePickerFromMap,
   stripTime,
 } from './utils'
 
@@ -224,7 +226,7 @@ export default function datepicker(
       isRemoved = true
 
       // Remove the picker from our tracking Map.
-      datepickersMap.delete(selectorData.el)
+      removePickerFromMap(selectorData.el, internalPickerItem)
 
       // Remove the picker from the DOM.
       pickerElements.calendarContainer.remove()
@@ -388,7 +390,7 @@ export default function datepicker(
   }
 
   // STORE THE NEWLY CREATED PICKER ITEM
-  datepickersMap.set(selectorData.el, internalPickerItem)
+  addPickerToMap(selectorData.el, internalPickerItem)
 
   // ADJUST DATES FOR RANGE PICKERS
 

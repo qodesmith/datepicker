@@ -138,9 +138,6 @@ export function createCalendarDayElements({
       day.style.setProperty('grid-column-start', `${offset}`)
     }
 
-    // This will be used by event handlers to know which date was clicked.
-    day.dataset.num = `${i}`
-
     if (i > daysInMonth) {
       // Days that aren't in the month should still be created but not shown.
       day.classList.add('dp-dn')

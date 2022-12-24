@@ -10,6 +10,7 @@ window.QodesmithElement = QodesmithElement
 
 function App() {
   const [picker, setPicker] = useState<DatepickerInstance>()
+  const [picker2, setPicker2] = useState<DatepickerInstance>()
   const [parentElementFontSize, setParentElementFontSize] = useState(1)
   const [size, setSize] = useState(1)
   const [dpWidth, setDpWidth] = useState(15.625)
@@ -21,6 +22,7 @@ function App() {
   }
 
   window.x = picker
+  window.y = picker2
 
   if (theme === 'light') {
     picker?.calendarContainer.classList.add('light')
@@ -31,6 +33,7 @@ function App() {
   // Instantiate Datepicker.
   useEffect(() => {
     const today = new Date()
+    const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
     const pickerObj = datepicker('.dp-test', {
       alwaysShow: true,
       selectedDate: today,
@@ -39,12 +42,15 @@ function App() {
         new Date(today.getFullYear(), today.getMonth(), 3),
       ],
     })
+    const pickerObj2 = datepicker('.dp-test-input')
+
     setPicker(pickerObj)
-    const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
+    setPicker2(pickerObj2)
 
     return () => {
       oldPicker.remove()
       pickerObj.remove()
+      pickerObj2.remove()
     }
   }, [])
 
@@ -262,6 +268,13 @@ function App() {
             </select>
           </div>
           <div className="dp-test" dangerouslySetInnerHTML={{__html: ''}} />
+          <hr />
+          <div>
+            <div style={{color: 'white'}}>
+              ⬇⬇⬇A Datepicker attached to an input field.{' '}
+            </div>
+            <input type="text" className="dp-test-input" />
+          </div>
         </section>
 
         {/* OLD DATEPICKER */}

@@ -1,5 +1,11 @@
 import {datepickersMap, overlayContainerCls} from './constants'
-import {InternalPickerData, Selector, SelectorData, ViewType} from './types'
+import {
+  DatepickerInstance,
+  InternalPickerData,
+  Selector,
+  SelectorData,
+  ViewType,
+} from './types'
 
 /**
  * Returns the type of an item.
@@ -216,4 +222,114 @@ export function checkForExistingRangepickerPair(id: any): void {
   if (rangepickersFound > 1) {
     throwError(`There is already a set of rangepickers for this id: "${id}"`)
   }
+}
+
+export function addEventListeners(
+  internalPickerItem: InternalPickerData,
+  publicPicker: DatepickerInstance
+) {
+  const {listenersMap, pickerElements} = internalPickerItem
+  const {controls, overlay} = pickerElements
+
+  // ARROWS
+  const {leftArrow, rightArrow} = controls
+  const arrowListener = (e: Event) => {
+    const isLeft = (e.currentTarget as HTMLDivElement).classList.contains(
+      'dp-arrow-left'
+    )
+    const {currentDate, navigate} = publicPicker
+    const newDate = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + (isLeft ? -1 : 1),
+      1
+    )
+
+    navigate({date: newDate, triggerOnMonthChange: true})
+  }
+  leftArrow.addEventListener('click', arrowListener)
+  rightArrow.addEventListener('click', arrowListener)
+  listenersMap.set(leftArrow, {type: 'click', listener: arrowListener})
+  listenersMap.set(rightArrow, {type: 'click', listener: arrowListener})
+
+  // MONTH/YEAR
+  const {monthYearContainer} = controls
+  monthYearContainer.addEventListener('click', publicPicker.toggleOverlay)
+  listenersMap.set(monthYearContainer, {
+    type: 'click',
+    listener: publicPicker.toggleOverlay,
+  })
+
+  // DAYS
+  const {daysContainer} = pickerElements
+  const daysContainerListener = (e: Event) => {
+    const {target} = e
+    const currentTarget = e.currentTarget as HTMLDivElement
+    const {classList, textContent} = target as HTMLDivElement
+
+    // Do nothing for clicks on empty or disabled days.
+    if (currentTarget === e.target || classList.contains('dp-disabled-date')) {
+      return
+    }
+
+    // Select / de-select a day.
+    const dayNum = Number(textContent as string)
+    if (classList.contains('dp-selected-date')) {
+      // De-select.
+      publicPicker.selectDate({triggerOnSelect: true})
+    } else {
+      // Select.
+      const {currentDate} = publicPicker
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        dayNum
+      )
+
+      publicPicker.selectDate({date, triggerOnSelect: true})
+    }
+  }
+  daysContainer.addEventListener('click', daysContainerListener)
+  listenersMap.set(daysContainer, {
+    type: 'click',
+    listener: daysContainerListener,
+  })
+
+  // OVERLAY MONTH
+  const {overlayMonthsContainer} = overlay
+  const monthsContainerListener = (e: Event) => {
+    const {isOverlayShowing} = internalPickerItem
+
+    /*
+      Disallow clicks while the overlay is closing, avoid clicks that aren't on
+      the month.
+    */
+    if (!isOverlayShowing || e.target === e.currentTarget) {
+      return
+    }
+
+    const monthNum = +((e.target as HTMLDivElement).dataset.num as string)
+    const {currentDate} = publicPicker
+    const currentMonth = currentDate.getMonth()
+
+    // Only navigate if a different month has been clicked.
+    if (monthNum !== currentMonth) {
+      const date = new Date(currentDate.getFullYear(), monthNum, 1)
+      publicPicker.navigate({date, triggerOnMonthChange: true})
+    }
+
+    // Close overlay.
+    publicPicker.toggleOverlay()
+  }
+  overlayMonthsContainer.addEventListener('click', monthsContainerListener)
+  listenersMap.set(overlayMonthsContainer, {
+    type: 'click',
+    listener: monthsContainerListener,
+  })
+}
+
+export function removeEventListeners(internalPickerItem: InternalPickerData) {
+  const {listenersMap} = internalPickerItem
+  listenersMap.forEach(({type, listener}, element) => {
+    element.removeEventListener(type, listener)
+  })
 }

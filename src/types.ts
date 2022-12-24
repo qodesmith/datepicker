@@ -390,6 +390,7 @@ export type InternalPickerData = {
   isCalendarShowing: boolean
   isOverlayShowing: boolean
   defaultView: ViewType
+  listenersMap: Map<HTMLElement, {type: string; listener: (e: Event) => void}>
 }
 
 type SetMinMaxInputType = {

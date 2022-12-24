@@ -12,12 +12,14 @@ import {createCalendarHTML} from './utilsCreateCalendar'
 import {datepickersMap, defaultOptions, noop} from './constants'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
+  addEventListeners,
   checkForExistingRangepickerPair,
   getOverlayClassName,
   getSelectorData,
   getSiblingDateForNavigate,
   hasMonthChanged,
   isDateWithinRange,
+  removeEventListeners,
   stripTime,
 } from './utils'
 
@@ -198,6 +200,7 @@ export default function datepicker(
     isCalendarShowing: !!options?.alwaysShow,
     defaultView: options?.defaultView ?? defaultOptions.defaultView,
     isOverlayShowing: options?.defaultView === 'overlay',
+    listenersMap: new Map(),
   }
 
   // Flags for the public picker.
@@ -253,8 +256,12 @@ export default function datepicker(
         }
       }
 
+      // Remove picker-specific listeners.
+      removeEventListeners(internalPickerItem)
+      // TODO - ^^^ move as many private & public picker methods to importable functions like this one.
+
       if (datepickersMap.size === 0) {
-        // TODO - remove event listeners.
+        // TODO - remove top-level listener.
         listnerAttached = false
       }
     },
@@ -385,7 +392,8 @@ export default function datepicker(
 
   // ADJUST DATES FOR RANGE PICKERS
 
-  // ADD EVENT LISTENERS - ONLY ADD THEM ONCE
+  // ADD EVENT LISTENERS
+  addEventListeners(internalPickerItem, publicPicker)
 
   // RENDER CALENDAR
 

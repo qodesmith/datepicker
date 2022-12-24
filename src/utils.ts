@@ -230,7 +230,12 @@ export function addEventListeners(
 ) {
   const {listenersMap, pickerElements} = internalPickerItem
   const {controls, overlay} = pickerElements
-  const {overlayMonthsContainer} = overlay
+  const {
+    overlayMonthsContainer,
+    overlayClose,
+    overlaySubmitButton,
+    input: overlayInput,
+  } = overlay
 
   // ARROWS
   const {leftArrow, rightArrow} = controls
@@ -321,6 +326,38 @@ export function addEventListeners(
   listenersMap.set(
     {type: 'click', el: overlayMonthsContainer},
     monthsContainerListener
+  )
+
+  // OVERLAY CLOSE
+  const overlayCloseListner = () => {
+    if (internalPickerItem.isOverlayShowing) {
+      publicPicker.toggleOverlay()
+    }
+  }
+  overlayClose.addEventListener('click', overlayCloseListner)
+  listenersMap.set({type: 'click', el: overlayClose}, overlayCloseListner)
+
+  // OVERLAY SUBMIT
+  const overlaySubmitListener = (e: Event) => {
+    const {disabled} = e.currentTarget as HTMLButtonElement
+    const {currentDate} = internalPickerItem
+
+    if (!disabled) {
+      const year = Number(overlayInput.value)
+
+      // If the same year is entered, simply close the overlay.
+      if (year !== currentDate.getFullYear()) {
+        const newDate = new Date(year, currentDate.getMonth(), 1)
+        publicPicker.navigate({date: newDate, triggerOnMonthChange: true})
+      }
+
+      publicPicker.toggleOverlay()
+    }
+  }
+  overlaySubmitButton.addEventListener('click', overlaySubmitListener)
+  listenersMap.set(
+    {type: 'click', el: overlaySubmitButton},
+    overlaySubmitListener
   )
 }
 

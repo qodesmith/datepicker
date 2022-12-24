@@ -230,6 +230,7 @@ export function addEventListeners(
 ) {
   const {listenersMap, pickerElements} = internalPickerItem
   const {controls, overlay} = pickerElements
+  const {overlayMonthsContainer} = overlay
 
   // ARROWS
   const {leftArrow, rightArrow} = controls
@@ -248,16 +249,16 @@ export function addEventListeners(
   }
   leftArrow.addEventListener('click', arrowListener)
   rightArrow.addEventListener('click', arrowListener)
-  listenersMap.set(leftArrow, {type: 'click', listener: arrowListener})
-  listenersMap.set(rightArrow, {type: 'click', listener: arrowListener})
+  listenersMap.set({type: 'click', el: leftArrow}, arrowListener)
+  listenersMap.set({type: 'click', el: rightArrow}, arrowListener)
 
   // MONTH/YEAR
   const {monthYearContainer} = controls
   monthYearContainer.addEventListener('click', publicPicker.toggleOverlay)
-  listenersMap.set(monthYearContainer, {
-    type: 'click',
-    listener: publicPicker.toggleOverlay,
-  })
+  listenersMap.set(
+    {type: 'click', el: monthYearContainer},
+    publicPicker.toggleOverlay
+  )
 
   // DAYS
   const {daysContainer} = pickerElements
@@ -289,13 +290,9 @@ export function addEventListeners(
     }
   }
   daysContainer.addEventListener('click', daysContainerListener)
-  listenersMap.set(daysContainer, {
-    type: 'click',
-    listener: daysContainerListener,
-  })
+  listenersMap.set({type: 'click', el: daysContainer}, daysContainerListener)
 
   // OVERLAY MONTH
-  const {overlayMonthsContainer} = overlay
   const monthsContainerListener = (e: Event) => {
     const {isOverlayShowing} = internalPickerItem
 
@@ -321,15 +318,15 @@ export function addEventListeners(
     publicPicker.toggleOverlay()
   }
   overlayMonthsContainer.addEventListener('click', monthsContainerListener)
-  listenersMap.set(overlayMonthsContainer, {
-    type: 'click',
-    listener: monthsContainerListener,
-  })
+  listenersMap.set(
+    {type: 'click', el: overlayMonthsContainer},
+    monthsContainerListener
+  )
 }
 
 export function removeEventListeners(internalPickerItem: InternalPickerData) {
   const {listenersMap} = internalPickerItem
-  listenersMap.forEach(({type, listener}, element) => {
-    element.removeEventListener(type, listener)
+  listenersMap.forEach((listener, {type, el}) => {
+    el.removeEventListener(type, listener)
   })
 }

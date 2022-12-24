@@ -352,30 +352,30 @@ export default function datepicker(
       internalPickerItem.isCalendarShowing = false
     },
     toggleOverlay(): void {
-      const {
-        isCalendarShowing,
-        isOverlayShowing: oldIsOverlayShowing,
-        defaultView,
-      } = internalPickerItem
+      const {isCalendarShowing, isOverlayShowing, defaultView} =
+        internalPickerItem
       const {overlay, calendarContainer} = pickerElements
+      const {input, overlaySubmitButton} = overlay
 
       if (!isCalendarShowing) return
 
       const overlayCls = getOverlayClassName({
         action: 'overlayToggle',
         defaultView,
-        isOverlayShowing: oldIsOverlayShowing,
+        isOverlayShowing,
       })
 
-      if (oldIsOverlayShowing) {
+      if (isOverlayShowing) {
         calendarContainer.classList.remove('dp-blur')
+        input.blur()
       } else {
         calendarContainer.classList.add('dp-blur')
-        pickerElements.overlay.input.value = ''
-        pickerElements.overlay.input.focus()
+        overlaySubmitButton.disabled = true
+        input.value = ''
+        input.focus()
       }
 
-      internalPickerItem.isOverlayShowing = !oldIsOverlayShowing
+      internalPickerItem.isOverlayShowing = !isOverlayShowing
       overlay.overlayContainer.className = overlayCls
     },
   }

@@ -239,7 +239,7 @@ export function addEventListeners(
 
   // ARROWS
   const {leftArrow, rightArrow} = controls
-  const arrowListener = (e: Event) => {
+  const arrowListener = (e: MouseEvent) => {
     const isLeft = (e.currentTarget as HTMLDivElement).classList.contains(
       'dp-arrow-left'
     )
@@ -267,7 +267,7 @@ export function addEventListeners(
 
   // DAYS
   const {daysContainer} = pickerElements
-  const daysContainerListener = (e: Event) => {
+  const daysContainerListener = (e: MouseEvent) => {
     const {target} = e
     const currentTarget = e.currentTarget as HTMLDivElement
     const {classList, textContent} = target as HTMLDivElement
@@ -298,7 +298,7 @@ export function addEventListeners(
   listenersMap.set({type: 'click', el: daysContainer}, daysContainerListener)
 
   // OVERLAY MONTH
-  const monthsContainerListener = (e: Event) => {
+  const monthsContainerListener = (e: MouseEvent) => {
     const {isOverlayShowing} = internalPickerItem
 
     /*
@@ -338,20 +338,11 @@ export function addEventListeners(
   listenersMap.set({type: 'click', el: overlayClose}, overlayCloseListner)
 
   // OVERLAY SUBMIT
-  const overlaySubmitListener = (e: Event) => {
+  const overlaySubmitListener = (e: MouseEvent) => {
     const {disabled} = e.currentTarget as HTMLButtonElement
-    const {currentDate} = internalPickerItem
 
     if (!disabled) {
-      const year = Number(overlayInput.value)
-
-      // If the same year is entered, simply close the overlay.
-      if (year !== currentDate.getFullYear()) {
-        const newDate = new Date(year, currentDate.getMonth(), 1)
-        publicPicker.navigate({date: newDate, triggerOnMonthChange: true})
-      }
-
-      publicPicker.toggleOverlay()
+      submitOverlayYear(internalPickerItem, publicPicker)
     }
   }
   overlaySubmitButton.addEventListener('click', overlaySubmitListener)
@@ -359,6 +350,70 @@ export function addEventListeners(
     {type: 'click', el: overlaySubmitButton},
     overlaySubmitListener
   )
+
+  // OVERLAY INPUT
+  const overlayInputOnInputListener = (e: InputEvent) => {
+    const {overlaySubmitButton} = internalPickerItem.pickerElements.overlay
+    const target = e.target as HTMLInputElement
+    const {selectionStart} = target
+    const newValue = target.value
+      .split('')
+      // Prevent leading 0's.
+      .reduce((acc, char) => {
+        if (!acc && char === '0') return ''
+        return acc + (char.match(/[0-9]/) ? char : '')
+      }, '')
+      .slice(0, 4)
+
+    target.value = newValue
+    overlaySubmitButton.disabled = !newValue
+
+    // https://stackoverflow.com/a/70549192/2525633 - maintain cursor position.
+    target.setSelectionRange(selectionStart, selectionStart)
+  }
+  const overlayInputKeydownListener = (e: KeyboardEvent) => {
+    // Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
+    // Also this - https://bit.ly/3Q5BsEF
+    if (e.key === 'Enter') {
+      submitOverlayYear(internalPickerItem, publicPicker)
+    } else if (e.key === 'Escape') {
+      publicPicker.toggleOverlay()
+    }
+  }
+  // @ts-ignore - the event type *is* InputEvent - https://mzl.la/3jmtjzb
+  overlayInput.addEventListener('input', overlayInputOnInputListener)
+  overlayInput.addEventListener('keydown', overlayInputKeydownListener)
+  listenersMap.set(
+    {type: 'input', el: overlayInput},
+    overlayInputOnInputListener
+  )
+  listenersMap.set(
+    {type: 'keydown', el: overlayInput},
+    overlayInputKeydownListener
+  )
+}
+
+function submitOverlayYear(
+  internalPickerItem: InternalPickerData,
+  publicPicker: DatepickerInstance
+) {
+  const {overlay} = internalPickerItem.pickerElements
+  const overlayInput = overlay.input
+  const {currentDate} = publicPicker
+
+  if (!overlayInput.value) {
+    return
+  }
+
+  const year = Number(overlayInput.value)
+
+  // If the same year is entered, simply close the overlay.
+  if (year !== currentDate.getFullYear()) {
+    const newDate = new Date(year, currentDate.getMonth(), 1)
+    publicPicker.navigate({date: newDate, triggerOnMonthChange: true})
+  }
+
+  publicPicker.toggleOverlay()
 }
 
 export function removeEventListeners(internalPickerItem: InternalPickerData) {

@@ -428,6 +428,7 @@ export type DatepickerInstance = {
   }
   readonly show: () => void
   readonly hide: () => void
+  readonly toggleCalendar: () => void
   readonly toggleOverlay: () => void
 }
 

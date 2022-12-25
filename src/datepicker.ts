@@ -18,6 +18,7 @@ import {
   getOverlayClassName,
   getSelectorData,
   getSiblingDateForNavigate,
+  getType,
   hasMonthChanged,
   isDateWithinRange,
   removeEventListeners,
@@ -35,6 +36,7 @@ export default function datepicker(
   options?: DatepickerOptions | DaterangePickerOptions
 ) /*: DatepickerInstance | DaterangePickerInstance*/ {
   const selectorData = getSelectorData(selector)
+  const isInput = getType(selectorData.el) === 'HTMLInputElement'
   const pickerType: PickerType =
     options?.hasOwnProperty('id') === true ? 'rangepicker' : 'picker'
 
@@ -63,6 +65,8 @@ export default function datepicker(
     // TODO - handle the clash between selectedDate also being a disabledDate.
     selectedDate: options?.selectedDate,
     disabledDates,
+    selectorEl: selectorData.el, // For inputs, the calendar will default to no show.
+    alwaysShow: !!options?.alwaysShow,
   })
 
   // CREATE INTERNAL PICKER DATA
@@ -199,10 +203,11 @@ export default function datepicker(
         sibling._setMinOrMax(false, minOrMax, {date, triggerOnSelect})
       }
     },
-    isCalendarShowing: !!options?.alwaysShow,
+    isCalendarShowing: options?.alwaysShow ?? !isInput,
     defaultView: options?.defaultView ?? defaultOptions.defaultView,
     isOverlayShowing: options?.defaultView === 'overlay',
     listenersMap: new Map(),
+    alwaysShow: !!options?.alwaysShow,
   }
 
   // Flags for the public picker.
@@ -332,26 +337,51 @@ export default function datepicker(
       https://github.com/qodesmith/datepicker#show--hide-gotcha
     */
     show(): void {
-      const {defaultView} = internalPickerItem
-      const isOverlayShowing = defaultView === 'overlay'
+      if (internalPickerItem.isCalendarShowing) {
+        return
+      }
 
-      internalPickerItem.isOverlayShowing = isOverlayShowing
+      const {defaultView} = internalPickerItem
+      const shouldOverlayShow = defaultView === 'overlay'
+
+      internalPickerItem.isOverlayShowing = shouldOverlayShow
+      if (shouldOverlayShow) {
+        pickerElements.calendarContainer.classList.add('dp-blur')
+      }
       pickerElements.calendarContainer.classList.remove('dp-dn')
       pickerElements.overlay.overlayContainer.className = getOverlayClassName({
         action: 'calendarOpen',
         defaultView,
       })
-      internalPickerItem.isCalendarShowing = true
 
-      if (isOverlayShowing) {
+      if (shouldOverlayShow) {
         pickerElements.overlay.input.focus()
       }
+
+      internalPickerItem.isCalendarShowing = true
     },
     hide(): void {
+      if (
+        internalPickerItem.alwaysShow ||
+        !internalPickerItem.isCalendarShowing
+      ) {
+        return
+      }
+
       pickerElements.calendarContainer.classList.add('dp-dn')
-      pickerElements.calendarContainer.classList.remove('dp-blur')
+
+      if (internalPickerItem.defaultView === 'calendar') {
+        pickerElements.calendarContainer.classList.remove('dp-blur')
+      }
       pickerElements.overlay.input.value = ''
       internalPickerItem.isCalendarShowing = false
+    },
+    toggleCalendar(): void {
+      if (internalPickerItem.isCalendarShowing) {
+        publicPicker.hide()
+      } else {
+        publicPicker.show()
+      }
     },
     toggleOverlay(): void {
       const {isCalendarShowing, isOverlayShowing, defaultView} =
@@ -399,8 +429,9 @@ export default function datepicker(
 
   // RENDER CALENDAR
 
-  // TODO - remove this. Just temporary for testing. Appending the calendar is actually more complex than this.
-  selectorData.el.append(pickerElements.calendarContainer)
+  // ADD THE CALENDAR TO THE DOM
+  const container = isInput ? selectorData.el.parentElement : selectorData.el
+  container?.append(pickerElements.calendarContainer)
 
   return publicPicker
 }

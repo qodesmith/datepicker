@@ -262,7 +262,7 @@ export function addEventListeners(
   internalPickerItem: InternalPickerData,
   publicPicker: DatepickerInstance
 ) {
-  const {listenersMap, pickerElements} = internalPickerItem
+  const {listenersMap, pickerElements, selectorData} = internalPickerItem
   const {controls, overlay} = pickerElements
   const {
     overlayMonthsContainer,
@@ -270,6 +270,26 @@ export function addEventListeners(
     overlaySubmitButton,
     input: overlayInput,
   } = overlay
+  const isInput = getType(selectorData.el) === 'HTMLInputElement'
+
+  // INPUT ELEMENT
+  if (isInput) {
+    const focusInListener = (e: FocusEvent) => {
+      // Show this calendar.
+      publicPicker.show()
+
+      // Hide all other calendars.
+      datepickersMap.forEach(pickerSet => {
+        pickerSet.forEach(picker => {
+          if (picker !== internalPickerItem && !picker.alwaysShow) {
+            picker.publicPicker.hide()
+          }
+        })
+      })
+    }
+    selectorData.el.addEventListener('focusin', focusInListener)
+    listenersMap.set({type: 'focusin', el: selectorData.el}, focusInListener)
+  }
 
   // ARROWS
   const {leftArrow, rightArrow} = controls

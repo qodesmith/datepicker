@@ -5,8 +5,14 @@ import {
   getOverlayClassName,
   getDaysInMonth,
   stripTime,
+  getType,
 } from './utils'
-import {DatepickerOptions, InternalPickerData, ViewType} from './types'
+import {
+  DatepickerOptions,
+  InternalPickerData,
+  SelectorData,
+  ViewType,
+} from './types'
 
 type ControlElementsReturnType = {
   controlsContainer: HTMLDivElement
@@ -244,6 +250,8 @@ type CreateCalendarInput = {
   overlayPlaceholder: InternalPickerData['overlayPlaceholder']
   selectedDate: DatepickerOptions['selectedDate']
   disabledDates: InternalPickerData['disabledDates']
+  selectorEl: SelectorData['el']
+  alwaysShow: InternalPickerData['alwaysShow']
 }
 export function createCalendarHTML({
   date,
@@ -254,7 +262,10 @@ export function createCalendarHTML({
   overlayPlaceholder,
   selectedDate,
   disabledDates,
+  selectorEl,
+  alwaysShow,
 }: CreateCalendarInput): PickerElements {
+  const isInput = getType(selectorEl) === 'HTMLInputElement'
   const calendarContainer = document.createElement('div')
   const controls = createCalendarControlElements({date, customMonths})
   const weekdaysArray = createWeekdayElements(customDays)
@@ -282,6 +293,15 @@ export function createCalendarHTML({
   calendarContainer.append(overlay.overlayContainer)
   weekdaysArray.forEach(weekday => weekdaysContainer.append(weekday))
   calendarDaysArray.forEach(day => daysContainer.append(day))
+
+  // Default to a hidden calendar for input datepickers.
+  if (isInput && !alwaysShow) {
+    calendarContainer.classList.add('dp-dn')
+  }
+
+  if (defaultView === 'overlay') {
+    calendarContainer.classList.add('dp-blur')
+  }
 
   return {
     calendarContainer,

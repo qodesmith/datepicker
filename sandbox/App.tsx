@@ -14,12 +14,7 @@ function App() {
   const [parentElementFontSize, setParentElementFontSize] = useState(1)
   const [size, setSize] = useState(1)
   const [dpWidth, setDpWidth] = useState(15.625)
-  const [isShowing, setIsShowing] = useState(true)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
-  const handleToggleCalendar = () => {
-    isShowing ? picker?.hide() : picker?.show()
-    setIsShowing(v => !v)
-  }
 
   window.x = picker
   window.y = picker2
@@ -35,7 +30,8 @@ function App() {
     const today = new Date()
     const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
     const pickerObj = datepicker('.dp-test', {
-      alwaysShow: true,
+      // alwaysShow: true,
+      defaultView: 'overlay',
       selectedDate: today,
       disabledDates: [
         new Date(today.getFullYear(), today.getMonth(), 1),
@@ -255,7 +251,11 @@ function App() {
               }}>
               &rang;
             </button>
-            <button onClick={handleToggleCalendar}>Show / Hide</button>
+            <button onClick={() => picker?.show()}>🐵 Show</button>
+            <button onClick={() => picker?.hide()}>🙈 Hide</button>
+            <button onClick={() => picker?.toggleCalendar()}>
+              📆 Toggle Calendar
+            </button>
             <button onClick={() => picker?.toggleOverlay()}>
               Toggle Overlay
             </button>

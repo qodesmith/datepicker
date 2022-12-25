@@ -15,6 +15,7 @@ function App() {
   const [size, setSize] = useState(1)
   const [dpWidth, setDpWidth] = useState(15.625)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const textColor = theme === 'dark' ? 'white' : 'black'
 
   window.x = picker
   window.y = picker2
@@ -267,13 +268,21 @@ function App() {
               <option value="light">Light</option>
             </select>
           </div>
+          <div style={{color: textColor}}>
+            ⬇⬇⬇A Datepicker attached to a <code>&lt;div&gt;</code>.{' '}
+          </div>
           <div className="dp-test" dangerouslySetInnerHTML={{__html: ''}} />
           <hr />
           <div>
-            <div style={{color: 'white'}}>
+            <div style={{color: textColor}}>
               ⬇⬇⬇A Datepicker attached to an input field.{' '}
             </div>
             <input type="text" className="dp-test-input" />
+          </div>
+          <hr />
+          <div style={{color: textColor}}>
+            <div>An input field to test closing all other pickers.</div>
+            <input type="text" />
           </div>
         </section>
 

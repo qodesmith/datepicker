@@ -5,7 +5,7 @@ import {
   getOverlayClassName,
   getDaysInMonth,
   stripTime,
-  getType,
+  getIsInput,
 } from './utils'
 import {
   DatepickerOptions,
@@ -265,7 +265,7 @@ export function createCalendarHTML({
   selectorEl,
   alwaysShow,
 }: CreateCalendarInput): PickerElements {
-  const isInput = getType(selectorEl) === 'HTMLInputElement'
+  const isInput = getIsInput(selectorEl)
   const calendarContainer = document.createElement('div')
   const controls = createCalendarControlElements({date, customMonths})
   const weekdaysArray = createWeekdayElements(customDays)

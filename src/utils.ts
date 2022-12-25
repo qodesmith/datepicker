@@ -203,7 +203,7 @@ export function getOffsetNumber(date: Date): number {
  * Checks if a picker already exists on a given element. If so, it throws.
  */
 export function checkForExistingPickerOnElement(el: HTMLElement): void {
-  const isInput = getType(el) === 'HTMLInputElement'
+  const isInput = getIsInput(el)
 
   if (isInput && datepickersMap.has(el)) {
     throwError('A datepicker already exists on that element.')
@@ -270,10 +270,11 @@ export function addEventListeners(
     overlaySubmitButton,
     input: overlayInput,
   } = overlay
-  const isInput = getType(selectorData.el) === 'HTMLInputElement'
+  const isInput = getIsInput(selectorData.el)
 
   // INPUT ELEMENT
   if (isInput) {
+    // `focusin` bubbles, `focus` does not.
     const focusInListener = (e: FocusEvent) => {
       // Show this calendar.
       publicPicker.show()
@@ -475,4 +476,30 @@ export function removeEventListeners(internalPickerItem: InternalPickerData) {
   listenersMap.forEach((listener, {type, el}) => {
     el.removeEventListener(type, listener)
   })
+}
+
+export function globalInputFocusInListener(e: FocusEvent): void {
+  // Only listen to input focusin events.
+  if (!getIsInput(e.target)) return
+
+  let found = false
+
+  datepickersMap.forEach((pickerSet, el) => {
+    if (el.contains(e.target as HTMLInputElement)) {
+      found = true
+    }
+  })
+
+  // Hide all other calendars.
+  if (!found) {
+    datepickersMap.forEach(pickerSet => {
+      pickerSet.forEach(picker => {
+        picker.publicPicker.hide()
+      })
+    })
+  }
+}
+
+export function getIsInput(el: any): boolean {
+  return getType(el) === 'HTMLInputElement'
 }

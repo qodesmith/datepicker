@@ -15,10 +15,11 @@ import {
   addEventListeners,
   addPickerToMap,
   checkForExistingRangepickerPair,
+  getIsInput,
   getOverlayClassName,
   getSelectorData,
   getSiblingDateForNavigate,
-  getType,
+  globalInputFocusInListener,
   hasMonthChanged,
   isDateWithinRange,
   removeEventListeners,
@@ -26,7 +27,7 @@ import {
   stripTime,
 } from './utils'
 
-let listnerAttached = false
+let globalListenerAttached = false
 
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - throw error when trying to attach Datepicker to a void element.
@@ -36,7 +37,7 @@ export default function datepicker(
   options?: DatepickerOptions | DaterangePickerOptions
 ) /*: DatepickerInstance | DaterangePickerInstance*/ {
   const selectorData = getSelectorData(selector)
-  const isInput = getType(selectorData.el) === 'HTMLInputElement'
+  const isInput = getIsInput(selectorData.el)
   const pickerType: PickerType =
     options?.hasOwnProperty('id') === true ? 'rangepicker' : 'picker'
 
@@ -268,8 +269,8 @@ export default function datepicker(
       // TODO - ^^^ move as many private & public picker methods to importable functions like this one.
 
       if (datepickersMap.size === 0) {
-        // TODO - remove top-level listener.
-        listnerAttached = false
+        document.removeEventListener('focusin', globalInputFocusInListener)
+        globalListenerAttached = false
       }
     },
 
@@ -422,12 +423,14 @@ export default function datepicker(
   // STORE THE NEWLY CREATED PICKER ITEM
   addPickerToMap(selectorData.el, internalPickerItem)
 
-  // ADJUST DATES FOR RANGE PICKERS
+  // TODO - ADJUST DATES FOR RANGE PICKERS
 
   // ADD EVENT LISTENERS
   addEventListeners(internalPickerItem, publicPicker)
-
-  // RENDER CALENDAR
+  if (!globalListenerAttached) {
+    document.addEventListener('focusin', globalInputFocusInListener)
+    globalListenerAttached = true
+  }
 
   // ADD THE CALENDAR TO THE DOM
   const container = isInput ? selectorData.el.parentElement : selectorData.el

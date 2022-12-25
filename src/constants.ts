@@ -52,3 +52,5 @@ export const defaultOptions = {
     'December',
   ],
 } as const
+
+export const globalListenerData = {attached: false}

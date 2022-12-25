@@ -1,4 +1,8 @@
-import {datepickersMap, overlayContainerCls} from './constants'
+import {
+  datepickersMap,
+  globalListenerData,
+  overlayContainerCls,
+} from './constants'
 import {
   DatepickerInstance,
   InternalPickerData,
@@ -272,6 +276,12 @@ export function addEventListeners(
   } = overlay
   const isInput = getIsInput(selectorData.el)
 
+  // GLOBAL LISTENERS
+  if (!globalListenerData.attached) {
+    document.addEventListener('focusin', globalInputFocusInListener)
+    globalListenerData.attached = true
+  }
+
   // INPUT ELEMENT
   if (isInput) {
     // `focusin` bubbles, `focus` does not.
@@ -473,6 +483,12 @@ function submitOverlayYear(
 
 export function removeEventListeners(internalPickerItem: InternalPickerData) {
   const {listenersMap} = internalPickerItem
+
+  if (datepickersMap.size === 0) {
+    document.removeEventListener('focusin', globalInputFocusInListener)
+    globalListenerData.attached = false
+  }
+
   listenersMap.forEach((listener, {type, el}) => {
     el.removeEventListener(type, listener)
   })

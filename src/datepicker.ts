@@ -9,7 +9,7 @@ import type {
 
 import './datepicker.scss'
 import {createCalendarHTML} from './utilsCreateCalendar'
-import {datepickersMap, defaultOptions, noop} from './constants'
+import {defaultOptions, noop} from './constants'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
   addEventListeners,
@@ -19,15 +19,12 @@ import {
   getOverlayClassName,
   getSelectorData,
   getSiblingDateForNavigate,
-  globalInputFocusInListener,
   hasMonthChanged,
   isDateWithinRange,
   removeEventListeners,
   removePickerFromMap,
   stripTime,
 } from './utils'
-
-let globalListenerAttached = false
 
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - throw error when trying to attach Datepicker to a void element.
@@ -264,14 +261,9 @@ export default function datepicker(
         }
       }
 
-      // Remove picker-specific listeners.
+      // Remove listeners.
       removeEventListeners(internalPickerItem)
       // TODO - ^^^ move as many private & public picker methods to importable functions like this one.
-
-      if (datepickersMap.size === 0) {
-        document.removeEventListener('focusin', globalInputFocusInListener)
-        globalListenerAttached = false
-      }
     },
 
     /**
@@ -427,10 +419,6 @@ export default function datepicker(
 
   // ADD EVENT LISTENERS
   addEventListeners(internalPickerItem, publicPicker)
-  if (!globalListenerAttached) {
-    document.addEventListener('focusin', globalInputFocusInListener)
-    globalListenerAttached = true
-  }
 
   // ADD THE CALENDAR TO THE DOM
   const container = isInput ? selectorData.el.parentElement : selectorData.el

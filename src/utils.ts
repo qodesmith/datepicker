@@ -206,7 +206,7 @@ export function getOffsetNumber(date: Date): number {
 /**
  * Checks if a picker already exists on a given element. If so, it throws.
  */
-export function checkForExistingPickerOnElement(el: HTMLElement): void {
+function checkForExistingPickerOnElement(el: HTMLElement): void {
   const isInput = getIsInput(el)
 
   if (isInput && datepickersMap.has(el)) {
@@ -279,6 +279,7 @@ export function addEventListeners(
   // GLOBAL LISTENERS
   if (!globalListenerData.attached) {
     document.addEventListener('focusin', globalInputFocusInListener)
+    document.addEventListener('click', globalListener)
     globalListenerData.attached = true
   }
 
@@ -486,6 +487,7 @@ export function removeEventListeners(internalPickerItem: InternalPickerData) {
 
   if (datepickersMap.size === 0) {
     document.removeEventListener('focusin', globalInputFocusInListener)
+    document.removeEventListener('click', globalListener)
     globalListenerData.attached = false
   }
 
@@ -494,10 +496,7 @@ export function removeEventListeners(internalPickerItem: InternalPickerData) {
   })
 }
 
-export function globalInputFocusInListener(e: FocusEvent): void {
-  // Only listen to input focusin events.
-  if (!getIsInput(e.target)) return
-
+function globalListener(e: Event) {
   let found = false
 
   datepickersMap.forEach((pickerSet, el) => {
@@ -514,6 +513,13 @@ export function globalInputFocusInListener(e: FocusEvent): void {
       })
     })
   }
+}
+
+function globalInputFocusInListener(e: FocusEvent): void {
+  // Only listen to input focusin events.
+  if (!getIsInput(e.target)) return
+
+  globalListener(e)
 }
 
 export function getIsInput(el: any): boolean {

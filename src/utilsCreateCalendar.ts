@@ -27,7 +27,7 @@ type CreateControlElementsInputType = {
   date: Date
   customMonths: CreateCalendarInput['customMonths']
 }
-export function createCalendarControlElements({
+function createCalendarControlElements({
   date,
   customMonths,
 }: CreateControlElementsInputType): ControlElementsReturnType {
@@ -88,7 +88,7 @@ function createArrowSVG(): string {
  * `customDays` option was used, the 1st 3 characters will be used for each day.
  * These elements are created once and are intended to be reused for each month
  */
-export function createWeekdayElements(
+function createWeekdayElements(
   weekDays: CreateCalendarInput['customDays']
 ): HTMLDivElement[] {
   const weekdayElements: HTMLDivElement[] = []
@@ -116,7 +116,7 @@ type CreateCalendarDaysInput = {
  * Creates an array of divs representing the days in a given month. These
  * elements will created once and are intended to be reused for each month.
  */
-export function createCalendarDayElements({
+function createCalendarDayElements({
   date,
   selectedDate,
   disabledDates,
@@ -176,7 +176,7 @@ type OverlayReturnType = {
   overlaySubmitButton: HTMLButtonElement
 }
 
-export function createCalendarOverlay(
+function createCalendarOverlay(
   customMonths: CreateCalendarInput['customMonths'],
   defaultView: ViewType,
   overlayButtonText: CreateCalendarInput['overlayButtonText'],

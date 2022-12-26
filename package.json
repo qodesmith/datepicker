@@ -6,6 +6,7 @@
   "style": "./src/datepicker.scss",
   "scripts": {
     "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --env.prod",
+    "build-new": "vite build",
     "dev": "vite",
     "test": "start-server-and-test start http-get://localhost:9001 start-cypress-test",
     "start": "NODE_OPTIONS=-'-openssl-legacy-provider' webpack-dev-server --mode development --env.dev --progress",

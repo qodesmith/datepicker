@@ -1,5 +1,7 @@
 import {PickerElements} from './utilsCreateCalendar'
 
+// TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
+
 export type DatepickerOptions = {
   /**
    * Callback function after a date has been selected. The 2nd argument is the selected date when a date is being selected and `undefined` when a date is being unselected. You unselect a date by clicking it again.

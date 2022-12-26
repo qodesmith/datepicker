@@ -32,9 +32,10 @@ function App() {
     const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
     const pickerObj = datepicker('.dp-test', {
       // alwaysShow: true,
-      defaultView: 'overlay',
+      // defaultView: 'overlay',
       selectedDate: today,
       disabledDates: [
+        new Date(),
         new Date(today.getFullYear(), today.getMonth(), 1),
         new Date(today.getFullYear(), today.getMonth(), 3),
       ],
@@ -231,7 +232,8 @@ function App() {
         <section style={{background: theme === 'dark' ? '#242424' : '#fff'}}>
           <div style={{marginBottom: '.5em', display: 'flex', gap: '.5em'}}>
             <button
-              onClick={() => {
+              onClick={e => {
+                e.stopPropagation()
                 const {currentDate} = picker!
                 const date = new Date(
                   currentDate.getFullYear(),
@@ -242,7 +244,8 @@ function App() {
               &lang;
             </button>
             <button
-              onClick={() => {
+              onClick={e => {
+                e.stopPropagation()
                 const {currentDate} = picker!
                 const date = new Date(
                   currentDate.getFullYear(),
@@ -252,18 +255,42 @@ function App() {
               }}>
               &rang;
             </button>
-            <button onClick={() => picker?.show()}>🐵 Show</button>
-            <button onClick={() => picker?.hide()}>🙈 Hide</button>
-            <button onClick={() => picker?.toggleCalendar()}>
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                picker?.show()
+              }}>
+              🐵 Show
+            </button>
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                picker?.hide()
+              }}>
+              🙈 Hide
+            </button>
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                picker?.toggleCalendar()
+              }}>
               📆 Toggle Calendar
             </button>
-            <button onClick={() => picker?.toggleOverlay()}>
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                picker?.toggleOverlay()
+              }}>
               Toggle Overlay
             </button>
             <select
               name="background"
               value={theme}
-              onChange={e => setTheme(e.target.value as 'light' | 'dark')}>
+              onClick={e => e.stopPropagation()}
+              onChange={e => {
+                e.stopPropagation()
+                setTheme(e.target.value as 'light' | 'dark')
+              }}>
               <option value="dark">Dark</option>
               <option value="light">Light</option>
             </select>

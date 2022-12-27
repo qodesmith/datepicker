@@ -4,9 +4,12 @@ import {PickerElements} from './utilsCreateCalendar'
 
 export type DatepickerOptions = {
   /**
-   * Callback function after a date has been selected. The 2nd argument is the selected date when a date is being selected and `undefined` when a date is being unselected. You unselect a date by clicking it again.
+   * Callback function after a date has been selected. It will receive the previous and newly selected date.
    */
-  onSelect?(onSelectOptions: {prevDate: Date; newDate: Date | undefined}): void
+  onSelect?(onSelectOptions: {
+    prevDate: Date | undefined
+    newDate: Date | undefined
+  }): void
 
   /**
    * Callback function when the calendar is shown.

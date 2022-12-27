@@ -110,8 +110,14 @@ export default function datepicker(
       isFirstRun,
       {date, changeCalendar, triggerOnMonthChange, triggerOnSelect} = {}
     ) {
-      const {currentDate, onMonthChange, onSelect, isFirst, sibling} =
-        internalPickerItem
+      const {
+        currentDate,
+        onMonthChange,
+        onSelect,
+        isFirst,
+        sibling,
+        selectedDate: prevSelectedDate,
+      } = internalPickerItem
 
       // Do nothing if the date is out of range.
       if (
@@ -144,7 +150,7 @@ export default function datepicker(
 
       if (triggerOnSelect) {
         onSelect({
-          prevDate: stripTime(currentDate),
+          prevDate: prevSelectedDate ? stripTime(prevSelectedDate) : undefined,
           newDate: date ? stripTime(date) : undefined,
         })
       }

@@ -39,6 +39,9 @@ function App() {
         new Date(today.getFullYear(), today.getMonth(), 1),
         new Date(today.getFullYear(), today.getMonth(), 3),
       ],
+      onSelect(data) {
+        console.log(data)
+      },
     })
     const pickerObj2 = datepicker('.dp-test-input')
 

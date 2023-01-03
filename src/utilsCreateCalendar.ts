@@ -139,7 +139,7 @@ function createCalendarDayElements({
     day.className = 'dp-day'
     day.textContent = `${i}`
 
-    // Adjsut the starting offest of the calendar.
+    // Adjust the starting offest of the calendar.
     if (i === 1) {
       day.style.setProperty('grid-column-start', `${offset}`)
     }

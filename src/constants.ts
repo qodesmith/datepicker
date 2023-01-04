@@ -55,6 +55,11 @@ export const defaultOptions = {
 
 export const globalListenerData = {attached: false}
 
-export const imperativeMethods = ['selectDate', 'setMin', 'setMax'] as const
+export const imperativeMethods = [
+  'selectDate',
+  'setMin',
+  'setMax',
+  'navigate',
+] as const
 
 export const userEvents = ['click'] as const

@@ -48,7 +48,9 @@ export type DatepickerOptions = {
   /**
    * Callback function when the month has changed.
    */
-  onMonthChange?(onMonthChangeOptions: {prevDate: Date; newDate: Date}): void
+  onMonthChange?(
+    onMonthChangeOptions: CallbackData & {prevDate: Date; newDate: Date}
+  ): void
 
   /**
    * Using an input field with your datepicker? Want to customize its value anytime a date is selected? Provide a function that manually sets the provided input's value with your own formatting.
@@ -404,7 +406,8 @@ export type InternalPickerData = {
   onSelect: NonNullable<DatepickerOptions['onSelect']>
   _navigate(
     isFirstRun: boolean,
-    data: Parameters<DatepickerInstance['navigate']>[0]
+    data: Parameters<DatepickerInstance['navigate']>[0] &
+      Pick<CallbackData, 'triggerType'>
   ): void
   _selectDate(
     isFirstRun: boolean,
@@ -433,15 +436,9 @@ export type DatepickerInstance = {
   readonly selectedDate: Date | undefined
   readonly remove: () => void
   readonly removePair: () => void
-  readonly navigate: ({
-    date,
-    triggerOnMonthChange,
-  }: {
-    date: Date
-    triggerOnMonthChange?: boolean
-  }) => void
+  readonly navigate: ({date}: {date: Date}) => void
   /**
-   * `changeCalendar` only runs if `date` was provided.
+   * `changeCalendar` is only recognized if `date` was provided.
    */
   readonly selectDate: (data?: {date?: Date; changeCalendar?: boolean}) => void
   readonly setMin: (data?: SetMinMaxInputType) => void

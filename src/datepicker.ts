@@ -85,17 +85,20 @@ export default function datepicker(
      * navigate more than once on either instance in the pair. It conditionally
      * calls the sibling's navigate only if `isFirstRun` is true.
      */
-    _navigate(isFirstRun: boolean, {date, triggerOnMonthChange}) {
+    _navigate(isFirstRun: boolean, {date, triggerType}) {
       const {currentDate, onMonthChange, isFirst, sibling} = internalPickerItem
 
       internalPickerItem.currentDate = stripTime(date)
       renderCalendar(internalPickerItem)
 
       // Only trigger `onMonthChange` if the month has actually changed.
-      if (triggerOnMonthChange && hasMonthChanged(currentDate, date)) {
+      if (hasMonthChanged(currentDate, date)) {
         onMonthChange({
           prevDate: stripTime(currentDate),
           newDate: stripTime(date),
+          instance: publicPicker,
+          trigger: 'navigate',
+          triggerType,
         })
       }
 
@@ -103,7 +106,7 @@ export default function datepicker(
       if (sibling && isFirstRun) {
         const siblingDate = getSiblingDateForNavigate(isFirst, date)
 
-        sibling._navigate(false, {date: siblingDate, triggerOnMonthChange})
+        sibling._navigate(false, {date: siblingDate, triggerType})
       }
     },
     _selectDate(isFirstRun, {date, changeCalendar, triggerType}) {
@@ -138,10 +141,13 @@ export default function datepicker(
         renderCalendar(internalPickerItem)
       }
 
-      if (date && hasMonthChanged(currentDate, date)) {
+      if (changeCalendar && date && hasMonthChanged(currentDate, date)) {
         onMonthChange({
           prevDate: stripTime(currentDate),
           newDate: stripTime(date),
+          instance: publicPicker,
+          trigger: 'selectDate',
+          triggerType,
         })
       }
 
@@ -295,7 +301,7 @@ export default function datepicker(
       }
     },
     navigate(data): void {
-      internalPickerItem._navigate(true, data)
+      internalPickerItem._navigate(true, {...data, triggerType: 'imperative'})
     },
 
     /**

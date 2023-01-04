@@ -1,13 +1,17 @@
 import {
   datepickersMap,
   globalListenerData,
+  imperativeMethods,
   overlayContainerCls,
+  userEvents,
 } from './constants'
 import {
   DatepickerInstance,
   InternalPickerData,
   Selector,
   SelectorData,
+  Trigger,
+  TriggerType,
   ViewType,
 } from './types'
 
@@ -524,4 +528,15 @@ function globalInputFocusInListener(e: FocusEvent): void {
 
 export function getIsInput(el: any): boolean {
   return getType(el) === 'HTMLInputElement'
+}
+
+export function getTriggerType(trigger: Trigger): TriggerType {
+  // @ts-expect-error We know these arrays don't include all trigger types.
+  if (userEvents.includes(trigger)) return 'user'
+
+  // @ts-expect-error We know these arrays don't include all trigger types.
+  if (imperativeMethods.includes(trigger)) return 'imperative'
+
+  // This should never happen.
+  throwError(`Unexpected trigger type: ${trigger}`)
 }

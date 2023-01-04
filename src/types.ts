@@ -1,15 +1,39 @@
 import {PickerElements} from './utilsCreateCalendar'
+import {imperativeMethods, userEvents} from './constants'
 
 // TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
+
+export type TriggerType = 'user' | 'imperative'
+export type Trigger =
+  | typeof imperativeMethods[number]
+  | typeof userEvents[number]
+type CallbackData = {
+  /**
+   * The explicit source of what triggered the callback. This can be imperative methods, such as `selectDate` and `show` or user interactions with the DOM, such as `click`.
+   */
+  trigger: Trigger
+
+  /**
+   * The category source of what triggered the callback. `user` for user interactions with the DOM, such as `click`, or `imperative` for imperative methods, such as `selectDate` or `show`.
+   */
+  triggerType: TriggerType
+
+  /**
+   * Providing the datepicker instance as a convenience. This allows the user to avoid having to import the instance from wherever it was created.
+   */
+  instance: DatepickerInstance
+}
 
 export type DatepickerOptions = {
   /**
    * Callback function after a date has been selected. It will receive the previous and newly selected dates. If `newDate` is `undefined`, that means the calendar date has been de-selected.
    */
-  onSelect?(onSelectOptions: {
-    prevDate: Date | undefined
-    newDate: Date | undefined
-  }): void
+  onSelect?(
+    onSelectOptions: CallbackData & {
+      prevDate: Date | undefined
+      newDate: Date | undefined
+    }
+  ): void
 
   /**
    * Callback function when the calendar is shown.
@@ -384,12 +408,13 @@ export type InternalPickerData = {
   ): void
   _selectDate(
     isFirstRun: boolean,
-    data?: Parameters<DatepickerInstance['selectDate']>[0]
+    data: Parameters<DatepickerInstance['selectDate']>[0] &
+      Pick<CallbackData, 'triggerType'>
   ): void
   _setMinOrMax(
     isFirstRun: boolean,
     minOrMax: 'min' | 'max',
-    data?: SetMinMaxInputType
+    data: {date?: Date} & Omit<CallbackData, 'instance'>
   ): void
 
   isCalendarShowing: boolean
@@ -400,7 +425,6 @@ export type InternalPickerData = {
 
 type SetMinMaxInputType = {
   date?: Date
-  triggerOnSelect?: boolean
 }
 
 export type DatepickerInstance = {
@@ -419,12 +443,7 @@ export type DatepickerInstance = {
   /**
    * `changeCalendar` only runs if `date` was provided.
    */
-  readonly selectDate: (data?: {
-    date?: Date
-    changeCalendar?: boolean
-    triggerOnMonthChange?: boolean
-    triggerOnSelect?: boolean
-  }) => void
+  readonly selectDate: (data?: {date?: Date; changeCalendar?: boolean}) => void
   readonly setMin: (data?: SetMinMaxInputType) => void
   readonly setMax: (data?: SetMinMaxInputType) => void
   readonly getSelectedRange: () => void | {

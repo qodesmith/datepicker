@@ -1,17 +1,13 @@
 import {
   datepickersMap,
   globalListenerData,
-  imperativeMethods,
   overlayContainerCls,
-  userEvents,
 } from './constants'
 import {
   DatepickerInstance,
   InternalPickerData,
   Selector,
   SelectorData,
-  Trigger,
-  TriggerType,
   ViewType,
 } from './types'
 

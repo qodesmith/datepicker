@@ -60,6 +60,8 @@ export const imperativeMethods = [
   'setMin',
   'setMax',
   'navigate',
+  'show',
+  'hide',
 ] as const
 
 export const userEvents = ['click'] as const

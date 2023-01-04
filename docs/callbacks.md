@@ -76,9 +76,61 @@ onMonthChange({
 
 **Default value:** `undefined`
 
+**Example**:
+
 ```typescript
 const picker = datepicker(selector, {
   onMonthChange({prevDate, nextDate, instance, trigger, triggerType}) {
+    // Your logic here...
+  },
+})
+```
+
+## onShow
+
+Callback function triggered every time the calendar goes from hidden to shown.
+
+```typescript
+onShow({
+  // Common arguments.
+  instance: DatepickerInstance
+  trigger: Trigger
+  triggerType: TriggerType
+}): void
+```
+
+**Default value:** `undefined`
+
+**Example**:
+
+```typescript
+const picker = datepicker(selector, {
+  onShow({instance, trigger, triggerType}) {
+    // Your logic here...
+  },
+})
+```
+
+## onHide
+
+Callback function triggered every time the calendar goes from shown to hidden.
+
+```typescript
+onHide({
+  // Common arguments.
+  instance: DatepickerInstance
+  trigger: Trigger
+  triggerType: TriggerType
+}): void
+```
+
+**Default value:** `undefined`
+
+**Example**:
+
+```typescript
+const picker = datepicker(selector, {
+  onHide({instance, trigger, triggerType}) {
     // Your logic here...
   },
 })

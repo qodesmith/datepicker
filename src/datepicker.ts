@@ -225,6 +225,9 @@ export default function datepicker(
   let isRemoved = false
   let isPairRemoved = false
 
+  const onShow = options?.onShow ?? noop
+  const onHide = options?.onHide ?? noop
+
   // CREATE PUBLIC PICKER DATA
   const publicPicker: DatepickerInstance = {
     calendarContainer: pickerElements.calendarContainer,
@@ -350,10 +353,11 @@ export default function datepicker(
       }
     },
 
-    /*
-      TODO - check for the "gotcha" scenario with show / hide.
-      https://github.com/qodesmith/datepicker#show--hide-gotcha
-    */
+    /**
+     * Imparative method.
+     * TODO - check for the "gotcha" scenario with show / hide.
+     * https://github.com/qodesmith/datepicker#show--hide-gotcha
+     */
     show(): void {
       if (internalPickerItem.isCalendarShowing) {
         return
@@ -377,7 +381,17 @@ export default function datepicker(
       }
 
       internalPickerItem.isCalendarShowing = true
+
+      onShow({
+        trigger: 'show',
+        triggerType: 'imperative',
+        instance: publicPicker,
+      })
     },
+
+    /**
+     * Imperative method.
+     */
     hide(): void {
       if (
         internalPickerItem.alwaysShow ||
@@ -393,6 +407,12 @@ export default function datepicker(
       }
       pickerElements.overlay.input.value = ''
       internalPickerItem.isCalendarShowing = false
+
+      onHide({
+        trigger: 'hide',
+        triggerType: 'imperative',
+        instance: publicPicker,
+      })
     },
     toggleCalendar(): void {
       if (internalPickerItem.isCalendarShowing) {

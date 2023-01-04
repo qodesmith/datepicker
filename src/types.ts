@@ -38,12 +38,12 @@ export type DatepickerOptions = {
   /**
    * Callback function when the calendar is shown.
    */
-  onShow?(instance: DatepickerInstance): void
+  onShow?(data: CallbackData): void
 
   /**
    * Callback function when the calendar is hidden.
    */
-  onHide?(instance: DatepickerInstance): void
+  onHide?(data: CallbackData): void
 
   /**
    * Callback function when the month has changed.

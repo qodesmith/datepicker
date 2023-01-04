@@ -1,13 +1,15 @@
 # Callback Options
 
-Along with relevant data per callback, all callback functions receive a single object that includes 3 common values:
+Callback functions are triggered both by the user interacting with the calendar in the DOM _and_ the developer using the imperative instance methods.
+
+Each callback function receives a single object with relevant data to the type of callback it is, along with 3 common values:
 
 1. `instance` - the datepicker instance. This is mostly just for convenience.
 2. `trigger` - the source of what triggered the callback. This can be imperative methods, such as `selectDate` and `show` or user interactions with the DOM, such as `click`.
 3. `triggerType` - the category of what triggered the callback - `user` or `imperative`.
 <!-- TODO - list out all possible values for trigger. -->
 
-`trigger` and `triggerType` give you the ability to have finer control over your callback logic. These values let you filter for specific scenarios if you want. Example
+`trigger` and `triggerType` give you the ability to have finer control over your callback logic. These values let you filter for specific scenarios if you want. Example:
 
 ```typescript
 onSelect({prevDate, nextDate, trigger, triggerType}) {
@@ -18,13 +20,13 @@ onSelect({prevDate, nextDate, trigger, triggerType}) {
     // Only respond to when the `setMin` method is called.
   }
 
-  // Do other stuff here...
+  // Your logic here...
 }
 ```
 
 ## onSelect
 
-Callback function after a date has been selected. It will receive the previous and newly selected dates. If `newDate` is `undefined`, that means the calendar date has been de-selected.
+Callback function triggered after a date has been selected. It will receive the previous and newly selected dates. If `newDate` is `undefined`, that means the calendar date has been de-selected.
 
 ```typescript
 onSelect({
@@ -52,6 +54,32 @@ const picker = datepicker(selector, {
     if (nextDate) {
       // The date is being selected.
     }
+  },
+})
+```
+
+## onMonthChange
+
+Callback function triggered after the month has changed visually on the calendar.
+
+```typescript
+onMonthChange({
+  prevDate: Date | undefined
+  newDate: Date | undefined
+
+  // Common arguments.
+  instance: DatepickerInstance
+  trigger: Trigger
+  triggerType: TriggerType
+}): void
+```
+
+**Default value:** `undefined`
+
+```typescript
+const picker = datepicker(selector, {
+  onMonthChange({prevDate, nextDate, instance, trigger, triggerType}) {
+    // Your logic here...
   },
 })
 ```

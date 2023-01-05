@@ -12,7 +12,6 @@ import {createCalendarHTML} from './utilsCreateCalendar'
 import {defaultOptions, noop} from './constants'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
-  addEventListeners,
   addPickerToMap,
   checkForExistingRangepickerPair,
   getIsInput,
@@ -21,10 +20,10 @@ import {
   getSiblingDateForNavigate,
   hasMonthChanged,
   isDateWithinRange,
-  removeEventListeners,
   removePickerFromMap,
   stripTime,
 } from './utils'
+import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - throw error when trying to attach Datepicker to a void element.

@@ -4,8 +4,8 @@ import {imperativeMethods, userEvents} from './constants'
 // TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
 
 export type TriggerType = 'user' | 'imperative'
-type ImperativeMethod = typeof imperativeMethods[number]
-type UserEvent = typeof userEvents[number]
+export type ImperativeMethod = typeof imperativeMethods[number]
+export type UserEvent = typeof userEvents[number]
 export type Trigger = ImperativeMethod | UserEvent
 type CallbackData = {
   /**

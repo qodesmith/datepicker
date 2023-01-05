@@ -392,8 +392,6 @@ export type InternalPickerData = {
   isFirst?: boolean // Indicates this is the 1st instance in a daterange pair.
   sibling?: InternalPickerData // Just a reference to the other internal object in the daterange pair.
 
-  onMonthChange: NonNullable<DatepickerOptions['onMonthChange']>
-  onSelect: NonNullable<DatepickerOptions['onSelect']>
   _navigate(
     isFirstRun: boolean,
     data: Parameters<DatepickerInstance['navigate']>[0] &

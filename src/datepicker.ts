@@ -39,12 +39,12 @@ function datepicker(
   const isInput = getIsInput(selectorData.el)
   const onShow = options?.onShow ?? noop
   const onHide = options?.onHide ?? noop
+  const onMonthChange = options?.onMonthChange ?? noop
+  const onSelect = options?.onSelect ?? noop
 
   if (isRangePicker) {
     checkForExistingRangepickerPair(options.id)
   }
-
-  // HANDLE POSITIONING OF CONTAINING ELEMENT.
 
   // CREATE CALENDAR HTML
   const startDate = stripTime(options?.startDate ?? new Date())
@@ -79,8 +79,6 @@ function datepicker(
     selectedDate: options?.selectedDate
       ? stripTime(options.selectedDate)
       : undefined,
-    onMonthChange: options?.onMonthChange ?? noop,
-    onSelect: options?.onSelect ?? noop,
 
     /**
      * An internal function that is aware of a daterange pair and won't call
@@ -88,7 +86,7 @@ function datepicker(
      * calls the sibling's navigate only if `isFirstRun` is true.
      */
     _navigate(isFirstRun: boolean, {date, trigger, triggerType}) {
-      const {currentDate, onMonthChange, isFirst, sibling} = internalPickerItem
+      const {currentDate, isFirst, sibling} = internalPickerItem
 
       internalPickerItem.currentDate = stripTime(date)
       renderCalendar(internalPickerItem)
@@ -114,8 +112,6 @@ function datepicker(
     _selectDate(isFirstRun, {date, changeCalendar, trigger, triggerType}) {
       const {
         currentDate,
-        onMonthChange,
-        onSelect,
         isFirst,
         sibling,
         selectedDate: prevSelectedDate,
@@ -181,7 +177,7 @@ function datepicker(
       }
     },
     _setMinOrMax(isFirstRun, minOrMax, {date, trigger, triggerType}): void {
-      const {minDate, maxDate, sibling, onSelect} = internalPickerItem
+      const {minDate, maxDate, sibling} = internalPickerItem
       const dateType = minOrMax === 'min' ? 'minDate' : 'maxDate'
 
       /*
@@ -284,7 +280,9 @@ function datepicker(
 
   // CREATE PUBLIC PICKER DATA
   const publicPicker: DatepickerInstance = {
-    calendarContainer: pickerElements.calendarContainer,
+    get calendarContainer() {
+      return pickerElements.calendarContainer
+    },
     get currentDate() {
       return new Date(internalPickerItem.currentDate)
     },
@@ -340,6 +338,8 @@ function datepicker(
      * This method exists because it's possible to individually remove one of
      * the instances in a daterange pair. For convenience, you can call this
      * method and remove them both at once.
+     *
+     *
      */
     removePair(): void {
       // Ensure the logic below is only executed once for daterange pairs.

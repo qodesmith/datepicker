@@ -407,17 +407,20 @@ export type InternalPickerData = {
   _navigate(
     isFirstRun: boolean,
     data: Parameters<DatepickerInstance['navigate']>[0] &
-      Pick<CallbackData, 'triggerType'>
+      Pick<CallbackData, 'triggerType'> & {trigger: 'navigate' | UserEvent}
   ): void
   _selectDate(
     isFirstRun: boolean,
     data: Parameters<DatepickerInstance['selectDate']>[0] &
-      Pick<CallbackData, 'triggerType'>
+      Pick<CallbackData, 'triggerType'> & {trigger: 'selectDate' | UserEvent}
   ): void
   _setMinOrMax(
     isFirstRun: boolean,
     minOrMax: 'min' | 'max',
-    data: {date?: Date} & Omit<CallbackData, 'instance'>
+    data: Omit<CallbackData, 'instance'> & {
+      date?: Date
+      trigger: 'setMin' | 'setMax' | UserEvent
+    }
   ): void
   _show(
     data: Omit<CallbackData, 'instance'> & {trigger: 'show' | UserEvent}

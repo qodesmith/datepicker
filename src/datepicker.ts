@@ -86,7 +86,7 @@ export default function datepicker(
      * navigate more than once on either instance in the pair. It conditionally
      * calls the sibling's navigate only if `isFirstRun` is true.
      */
-    _navigate(isFirstRun: boolean, {date, triggerType}) {
+    _navigate(isFirstRun: boolean, {date, trigger, triggerType}) {
       const {currentDate, onMonthChange, isFirst, sibling} = internalPickerItem
 
       internalPickerItem.currentDate = stripTime(date)
@@ -98,7 +98,7 @@ export default function datepicker(
           prevDate: stripTime(currentDate),
           newDate: stripTime(date),
           instance: publicPicker,
-          trigger: 'navigate',
+          trigger,
           triggerType,
         })
       }
@@ -107,10 +107,10 @@ export default function datepicker(
       if (sibling && isFirstRun) {
         const siblingDate = getSiblingDateForNavigate(isFirst, date)
 
-        sibling._navigate(false, {date: siblingDate, triggerType})
+        sibling._navigate(false, {date: siblingDate, trigger, triggerType})
       }
     },
-    _selectDate(isFirstRun, {date, changeCalendar, triggerType}) {
+    _selectDate(isFirstRun, {date, changeCalendar, trigger, triggerType}) {
       const {
         currentDate,
         onMonthChange,
@@ -119,15 +119,17 @@ export default function datepicker(
         sibling,
         selectedDate: prevSelectedDate,
       } = internalPickerItem
+      const isDateDisabled = date ? disabledDates.has(+stripTime(date)) : false
 
-      // Do nothing if the date is out of range.
+      // Do nothing if the date is disabled or out of range.
       if (
         date &&
-        !isDateWithinRange({
-          date,
-          minDate: internalPickerItem.minDate,
-          maxDate: internalPickerItem.maxDate,
-        })
+        (isDateDisabled ||
+          !isDateWithinRange({
+            date,
+            minDate: internalPickerItem.minDate,
+            maxDate: internalPickerItem.maxDate,
+          }))
       ) {
         return
       }
@@ -147,7 +149,7 @@ export default function datepicker(
           prevDate: stripTime(currentDate),
           newDate: stripTime(date),
           instance: publicPicker,
-          trigger: 'selectDate',
+          trigger,
           triggerType,
         })
       }
@@ -156,7 +158,7 @@ export default function datepicker(
         prevDate: prevSelectedDate ? stripTime(prevSelectedDate) : undefined,
         newDate: date ? stripTime(date) : undefined,
         instance: publicPicker,
-        trigger: 'selectDate',
+        trigger,
         triggerType,
       })
 
@@ -172,6 +174,7 @@ export default function datepicker(
         sibling._selectDate(false, {
           date: siblingDate,
           changeCalendar,
+          trigger,
           triggerType,
         })
       }
@@ -354,7 +357,11 @@ export default function datepicker(
       }
     },
     navigate(data): void {
-      internalPickerItem._navigate(true, {...data, triggerType: 'imperative'})
+      internalPickerItem._navigate(true, {
+        ...data,
+        trigger: 'navigate',
+        triggerType: 'imperative',
+      })
     },
 
     /**
@@ -363,7 +370,11 @@ export default function datepicker(
     selectDate(data): void {
       // TODO - for event listener, don't use the public instance method,
       // use internalPickerItem._selectDate with `isImperative: false`.
-      internalPickerItem._selectDate(true, {...data, triggerType: 'imperative'})
+      internalPickerItem._selectDate(true, {
+        ...data,
+        trigger: 'selectDate',
+        triggerType: 'imperative',
+      })
     },
 
     /**
@@ -372,8 +383,8 @@ export default function datepicker(
     setMin(data): void {
       internalPickerItem._setMinOrMax(true, 'min', {
         ...data,
-        triggerType: 'imperative',
         trigger: 'setMin',
+        triggerType: 'imperative',
       })
     },
 
@@ -383,8 +394,8 @@ export default function datepicker(
     setMax(data): void {
       internalPickerItem._setMinOrMax(true, 'max', {
         ...data,
-        triggerType: 'imperative',
         trigger: 'setMax',
+        triggerType: 'imperative',
       })
     },
     getSelectedRange() {
@@ -467,7 +478,7 @@ export default function datepicker(
   // TODO - ADJUST DATES FOR RANGE PICKERS
 
   // ADD EVENT LISTENERS
-  addEventListeners(internalPickerItem, publicPicker)
+  addEventListeners(internalPickerItem)
 
   // ADD THE CALENDAR TO THE DOM
   const container = isInput ? selectorData.el.parentElement : selectorData.el

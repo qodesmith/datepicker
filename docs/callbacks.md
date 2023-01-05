@@ -4,7 +4,8 @@ Callback functions are triggered both by the user interacting with the calendar 
 
 Each callback function receives a single object with relevant data to the type of callback it is, along with 3 common values:
 
-1. `instance` - the datepicker instance. This is mostly just for convenience.
+1. `instance` - the datepicker instance. This is mostly just for convenience. It can be helpful for daterange pickers because you can check which instance is being triggered with the `instance.isFirst` property.
+<!-- TODO - figure out if we're using the isFirst property to distinguish range pickers. -->
 2. `trigger` - the source of what triggered the callback. This can be imperative methods, such as `selectDate` and `show` or user interactions with the DOM, such as `click`.
 3. `triggerType` - the category of what triggered the callback - `user` or `imperative`.
 <!-- TODO - list out all possible values for trigger. -->

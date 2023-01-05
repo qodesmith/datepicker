@@ -212,8 +212,7 @@ export function checkForExistingRangepickerPair(id: any): void {
 
   datepickersMap.forEach(pickerSet => {
     pickerSet.forEach(picker => {
-      // TODO - do we need to do Object.hasOwnProperty('id')?
-      if (picker.type === 'rangepicker' && picker.id === id) {
+      if ('id' in picker && Object.is(picker.id, id)) {
         rangepickersFound++
       }
     })

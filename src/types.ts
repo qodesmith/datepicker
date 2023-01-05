@@ -349,7 +349,11 @@ export type InternalPickerData = {
    * All the existing DOM elements associated with the calendar.
    */
   selectorData: SelectorData
-  // id?: any
+
+  /**
+   * This property will only be present on rangepickers.
+   */
+  id?: any
 
   /**
    * All the DOM elements created for the calendar.

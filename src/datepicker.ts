@@ -37,6 +37,8 @@ export default function datepicker(
   const isInput = getIsInput(selectorData.el)
   const pickerType: PickerType =
     options?.hasOwnProperty('id') === true ? 'rangepicker' : 'picker'
+  const onShow = options?.onShow ?? noop
+  const onHide = options?.onHide ?? noop
 
   if (pickerType === 'rangepicker') {
     checkForExistingRangepickerPair(options?.id)
@@ -219,14 +221,63 @@ export default function datepicker(
     isOverlayShowing: options?.defaultView === 'overlay',
     listenersMap: new Map(),
     alwaysShow: !!options?.alwaysShow,
+    _show({trigger, triggerType}) {
+      if (internalPickerItem.isCalendarShowing) {
+        return
+      }
+
+      const {defaultView} = internalPickerItem
+      const shouldOverlayShow = defaultView === 'overlay'
+
+      internalPickerItem.isOverlayShowing = shouldOverlayShow
+      if (shouldOverlayShow) {
+        pickerElements.calendarContainer.classList.add('dp-blur')
+      }
+      pickerElements.calendarContainer.classList.remove('dp-dn')
+      pickerElements.overlay.overlayContainer.className = getOverlayClassName({
+        action: 'calendarOpen',
+        defaultView,
+      })
+
+      if (shouldOverlayShow) {
+        pickerElements.overlay.input.focus()
+      }
+
+      internalPickerItem.isCalendarShowing = true
+
+      onShow({
+        trigger,
+        triggerType,
+        instance: publicPicker,
+      })
+    },
+    _hide({trigger, triggerType}) {
+      if (
+        internalPickerItem.alwaysShow ||
+        !internalPickerItem.isCalendarShowing
+      ) {
+        return
+      }
+
+      pickerElements.calendarContainer.classList.add('dp-dn')
+
+      if (internalPickerItem.defaultView === 'calendar') {
+        pickerElements.calendarContainer.classList.remove('dp-blur')
+      }
+      pickerElements.overlay.input.value = ''
+      internalPickerItem.isCalendarShowing = false
+
+      onHide({
+        trigger,
+        triggerType,
+        instance: publicPicker,
+      })
+    },
   }
 
   // Flags for the public picker.
   let isRemoved = false
   let isPairRemoved = false
-
-  const onShow = options?.onShow ?? noop
-  const onHide = options?.onHide ?? noop
 
   // CREATE PUBLIC PICKER DATA
   const publicPicker: DatepickerInstance = {
@@ -359,60 +410,14 @@ export default function datepicker(
      * https://github.com/qodesmith/datepicker#show--hide-gotcha
      */
     show(): void {
-      if (internalPickerItem.isCalendarShowing) {
-        return
-      }
-
-      const {defaultView} = internalPickerItem
-      const shouldOverlayShow = defaultView === 'overlay'
-
-      internalPickerItem.isOverlayShowing = shouldOverlayShow
-      if (shouldOverlayShow) {
-        pickerElements.calendarContainer.classList.add('dp-blur')
-      }
-      pickerElements.calendarContainer.classList.remove('dp-dn')
-      pickerElements.overlay.overlayContainer.className = getOverlayClassName({
-        action: 'calendarOpen',
-        defaultView,
-      })
-
-      if (shouldOverlayShow) {
-        pickerElements.overlay.input.focus()
-      }
-
-      internalPickerItem.isCalendarShowing = true
-
-      onShow({
-        trigger: 'show',
-        triggerType: 'imperative',
-        instance: publicPicker,
-      })
+      internalPickerItem._show({trigger: 'show', triggerType: 'imperative'})
     },
 
     /**
      * Imperative method.
      */
     hide(): void {
-      if (
-        internalPickerItem.alwaysShow ||
-        !internalPickerItem.isCalendarShowing
-      ) {
-        return
-      }
-
-      pickerElements.calendarContainer.classList.add('dp-dn')
-
-      if (internalPickerItem.defaultView === 'calendar') {
-        pickerElements.calendarContainer.classList.remove('dp-blur')
-      }
-      pickerElements.overlay.input.value = ''
-      internalPickerItem.isCalendarShowing = false
-
-      onHide({
-        trigger: 'hide',
-        triggerType: 'imperative',
-        instance: publicPicker,
-      })
+      internalPickerItem._hide({trigger: 'hide', triggerType: 'imperative'})
     },
     toggleCalendar(): void {
       if (internalPickerItem.isCalendarShowing) {

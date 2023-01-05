@@ -64,4 +64,4 @@ export const imperativeMethods = [
   'hide',
 ] as const
 
-export const userEvents = ['click'] as const
+export const userEvents = ['click', 'focusin', 'keydown', 'input'] as const

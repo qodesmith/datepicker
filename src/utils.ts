@@ -2,6 +2,7 @@ import {
   datepickersMap,
   globalListenerData,
   overlayContainerCls,
+  userEvents,
 } from './constants'
 import {
   DatepickerInstance,
@@ -316,7 +317,7 @@ export function addEventListeners(
       1
     )
 
-    navigate({date: newDate, triggerOnMonthChange: true})
+    navigate({date: newDate})
   }
   leftArrow.addEventListener('click', arrowListener)
   rightArrow.addEventListener('click', arrowListener)
@@ -347,7 +348,7 @@ export function addEventListeners(
     const dayNum = Number(textContent as string)
     if (classList.contains('dp-selected-date')) {
       // De-select.
-      publicPicker.selectDate({triggerOnSelect: true})
+      publicPicker.selectDate()
     } else {
       // Select.
       const {currentDate} = publicPicker
@@ -357,7 +358,7 @@ export function addEventListeners(
         dayNum
       )
 
-      publicPicker.selectDate({date, triggerOnSelect: true})
+      publicPicker.selectDate()
     }
   }
   daysContainer.addEventListener('click', daysContainerListener)
@@ -382,7 +383,7 @@ export function addEventListeners(
     // Only navigate if a different month has been clicked.
     if (monthNum !== currentMonth) {
       const date = new Date(currentDate.getFullYear(), monthNum, 1)
-      publicPicker.navigate({date, triggerOnMonthChange: true})
+      publicPicker.navigate({date})
     }
 
     // Close overlay.
@@ -476,7 +477,7 @@ function submitOverlayYear(
   // If the same year is entered, simply close the overlay.
   if (year !== currentDate.getFullYear()) {
     const newDate = new Date(year, currentDate.getMonth(), 1)
-    publicPicker.navigate({date: newDate, triggerOnMonthChange: true})
+    publicPicker.navigate({date: newDate})
   }
 
   publicPicker.toggleOverlay()
@@ -507,9 +508,11 @@ function globalListener(e: Event) {
 
   // Hide all other calendars.
   if (!found) {
+    const type = e.type as typeof userEvents[number]
+
     datepickersMap.forEach(pickerSet => {
       pickerSet.forEach(picker => {
-        picker.publicPicker.hide()
+        picker._hide({trigger: type, triggerType: 'user'})
       })
     })
   }

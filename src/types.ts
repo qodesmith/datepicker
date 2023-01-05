@@ -4,9 +4,9 @@ import {imperativeMethods, userEvents} from './constants'
 // TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
 
 export type TriggerType = 'user' | 'imperative'
-export type Trigger =
-  | typeof imperativeMethods[number]
-  | typeof userEvents[number]
+type ImperativeMethod = typeof imperativeMethods[number]
+type UserEvent = typeof userEvents[number]
+export type Trigger = ImperativeMethod | UserEvent
 type CallbackData = {
   /**
    * The explicit source of what triggered the callback. This can be imperative methods, such as `selectDate` and `show` or user interactions with the DOM, such as `click`.
@@ -418,6 +418,12 @@ export type InternalPickerData = {
     isFirstRun: boolean,
     minOrMax: 'min' | 'max',
     data: {date?: Date} & Omit<CallbackData, 'instance'>
+  ): void
+  _show(
+    data: Omit<CallbackData, 'instance'> & {trigger: 'show' | UserEvent}
+  ): void
+  _hide(
+    data: Omit<CallbackData, 'instance'> & {trigger: 'hide' | UserEvent}
   ): void
 
   isCalendarShowing: boolean

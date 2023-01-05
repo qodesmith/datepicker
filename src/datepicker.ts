@@ -4,6 +4,7 @@ import type {
   DaterangePickerOptions,
   Selector,
   DatepickerInstance,
+  DaterangePickerInstance,
 } from './types'
 
 import './datepicker.scss'
@@ -28,12 +29,18 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - throw error when trying to attach Datepicker to a void element.
 
 function datepicker(selector: Selector): void
-function datepicker(selector: Selector, options: DatepickerOptions): void
-function datepicker(selector: Selector, options: DaterangePickerOptions): void
+function datepicker(
+  selector: Selector,
+  options: DatepickerOptions
+): DatepickerInstance
+function datepicker(
+  selector: Selector,
+  options: DaterangePickerOptions
+): DaterangePickerInstance
 function datepicker(
   selector: Selector,
   options?: DatepickerOptions | DaterangePickerOptions
-) /*: DatepickerInstance | DaterangePickerInstance*/ {
+): DatepickerInstance | DaterangePickerInstance {
   const isRangePicker = options && 'id' in options
   const selectorData = getSelectorData(selector)
   const isInput = getIsInput(selectorData.el)

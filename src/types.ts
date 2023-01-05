@@ -328,17 +328,6 @@ export type DaterangePickerInstance = DatepickerInstance_REFERENCE & {
   sibling: DaterangePickerInstance
 }
 
-declare function datepicker(
-  selector: Selector,
-  options?: DatepickerOptions
-): void
-declare function datepicker(
-  selector: Selector,
-  options: DaterangePickerOptions
-): void
-
-export type Datepicker = typeof datepicker
-
 export type Selector = string | HTMLElement
 
 /**
@@ -353,8 +342,6 @@ export type Sides = {
   c: 'c'
 }
 
-export type PickerType = 'picker' | 'rangepicker'
-
 export type ViewType = 'calendar' | 'overlay'
 
 export type InternalPickerData = {
@@ -362,8 +349,7 @@ export type InternalPickerData = {
    * All the existing DOM elements associated with the calendar.
    */
   selectorData: SelectorData
-  type: PickerType
-  id?: any
+  // id?: any
 
   /**
    * All the DOM elements created for the calendar.

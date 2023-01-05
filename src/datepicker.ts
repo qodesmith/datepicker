@@ -2,7 +2,6 @@ import type {
   DatepickerOptions,
   InternalPickerData,
   DaterangePickerOptions,
-  PickerType,
   Selector,
   DatepickerInstance,
 } from './types'
@@ -28,19 +27,21 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - throw error when trying to attach Datepicker to a void element.
 
-export default function datepicker(
+function datepicker(selector: Selector): void
+function datepicker(selector: Selector, options: DatepickerOptions): void
+function datepicker(selector: Selector, options: DaterangePickerOptions): void
+function datepicker(
   selector: Selector,
   options?: DatepickerOptions | DaterangePickerOptions
 ) /*: DatepickerInstance | DaterangePickerInstance*/ {
+  const isRangePicker = options && 'id' in options
   const selectorData = getSelectorData(selector)
   const isInput = getIsInput(selectorData.el)
-  const pickerType: PickerType =
-    options?.hasOwnProperty('id') === true ? 'rangepicker' : 'picker'
   const onShow = options?.onShow ?? noop
   const onHide = options?.onHide ?? noop
 
-  if (pickerType === 'rangepicker') {
-    checkForExistingRangepickerPair(options?.id)
+  if (isRangePicker) {
+    checkForExistingRangepickerPair(options.id)
   }
 
   // HANDLE POSITIONING OF CONTAINING ELEMENT.
@@ -467,9 +468,9 @@ export default function datepicker(
 
   internalPickerItem.publicPicker = publicPicker
 
-  if (pickerType === 'rangepicker') {
+  if (isRangePicker) {
     // TODO - are we even storing these on the internalPickerItem?
-    internalPickerItem.id = options?.id
+    internalPickerItem.id = options.id
   }
 
   // STORE THE NEWLY CREATED PICKER ITEM
@@ -486,3 +487,5 @@ export default function datepicker(
 
   return publicPicker
 }
+
+export default datepicker

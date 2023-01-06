@@ -206,21 +206,38 @@ function checkForExistingPickerOnElement(el: HTMLElement): void {
 
 /**
  * Throws an error if a set of rangepickers already exists for a given id.
+ * This should be called before the picker has been added to the datepickersMap.
  */
 export function checkForExistingRangepickerPair(id: any): void {
-  let rangepickersFound = 0
+  if (getRangepickers(id).length > 1) {
+    throwError(`There is already a set of rangepickers for this id: "${id}"`)
+  }
+}
+
+/**
+ * Checks if this is the 1st picker in a rangepicker pair.
+ * This should be called before the picker has been added to the datepickersMap.
+ */
+export function getIsFirstRangepicker(id: any): boolean {
+  return getRangepickers(id).length === 0
+}
+
+/**
+ * Returns an array of InternalPickerData objects that are rangepickers for a
+ * given id.
+ */
+export function getRangepickers(id: any): InternalPickerData[] {
+  const rangepickers: InternalPickerData[] = []
 
   datepickersMap.forEach(pickerSet => {
     pickerSet.forEach(picker => {
       if ('id' in picker && Object.is(picker.id, id)) {
-        rangepickersFound++
+        rangepickers.push(picker)
       }
     })
   })
 
-  if (rangepickersFound > 1) {
-    throwError(`There is already a set of rangepickers for this id: "${id}"`)
-  }
+  return rangepickers
 }
 
 export function addPickerToMap(

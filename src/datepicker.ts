@@ -14,8 +14,10 @@ import {renderCalendar} from './utilsRenderCalendar'
 import {
   addPickerToMap,
   checkForExistingRangepickerPair,
+  getIsFirstRangepicker,
   getIsInput,
   getOverlayClassName,
+  getRangepickers,
   getSelectorData,
   getSiblingDateForNavigate,
   hasMonthChanged,
@@ -48,18 +50,16 @@ function datepicker(
   const onHide = options?.onHide ?? noop
   const onMonthChange = options?.onMonthChange ?? noop
   const onSelect = options?.onSelect ?? noop
-
-  if (isRangePicker) {
-    checkForExistingRangepickerPair(options.id)
-  }
-
-  // CREATE CALENDAR HTML
   const startDate = stripTime(options?.startDate ?? new Date())
   const disabledDates = new Set(
     (options?.disabledDates ?? []).map(disabledDate => {
       return +stripTime(disabledDate)
     })
   )
+  let isRemoved = false
+  let isPairRemoved = false
+
+  // CREATE CALENDAR HTML
   const pickerElements = createCalendarHTML({
     date: startDate,
     customMonths: (options?.customMonths ?? defaultOptions.months).slice(),
@@ -281,10 +281,6 @@ function datepicker(
     },
   }
 
-  // Flags for the public picker.
-  let isRemoved = false
-  let isPairRemoved = false
-
   // CREATE PUBLIC PICKER DATA
   const publicPicker: DatepickerInstance = {
     get calendarContainer() {
@@ -345,8 +341,6 @@ function datepicker(
      * This method exists because it's possible to individually remove one of
      * the instances in a daterange pair. For convenience, you can call this
      * method and remove them both at once.
-     *
-     *
      */
     removePair(): void {
       // Ensure the logic below is only executed once for daterange pairs.
@@ -476,8 +470,23 @@ function datepicker(
   internalPickerItem.publicPicker = publicPicker
 
   if (isRangePicker) {
-    // TODO - are we even storing these on the internalPickerItem?
-    internalPickerItem.id = options.id
+    const {id} = options
+    checkForExistingRangepickerPair(id)
+    const isFirst = getIsFirstRangepicker(id)
+
+    internalPickerItem.id = id
+    internalPickerItem.isFirst = isFirst
+
+    if (!isFirst) {
+      const [sibling] = getRangepickers(id)
+      // Add a reference to the 1st picker on this one.
+      internalPickerItem.sibling = sibling
+
+      // Add a reference to this picker on the 1st one.
+      sibling.sibling = internalPickerItem
+    }
+
+    return publicPicker
   }
 
   // STORE THE NEWLY CREATED PICKER ITEM

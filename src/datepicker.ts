@@ -30,7 +30,7 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - throw error when trying to attach Datepicker to a void element.
 
-function datepicker(selector: Selector): void
+function datepicker(selector: Selector): DatepickerInstance
 function datepicker(
   selector: Selector,
   options: DatepickerOptions
@@ -337,27 +337,6 @@ function datepicker(
       // TODO - ^^^ move as many private & public picker methods to importable functions like this one.
     },
 
-    /**
-     * This method exists because it's possible to individually remove one of
-     * the instances in a daterange pair. For convenience, you can call this
-     * method and remove them both at once.
-     */
-    removePair(): void {
-      // Ensure the logic below is only executed once for daterange pairs.
-      if (isPairRemoved || !internalPickerItem.sibling) return
-      isPairRemoved = true
-
-      publicPicker.remove()
-
-      /*
-        Conditionally call this because sibling.remove() may have already been
-        called which means the reference here won't exist. Or, this might just
-        be a regular datepicker with no sibling at all.
-      */
-      if (internalPickerItem.sibling) {
-        internalPickerItem.sibling.publicPicker.remove()
-      }
-    },
     navigate(data): void {
       internalPickerItem._navigate(true, {
         ...data,
@@ -399,21 +378,6 @@ function datepicker(
         trigger: 'setMax',
         triggerType: 'imperative',
       })
-    },
-    getSelectedRange() {
-      if (internalPickerItem.sibling) {
-        const {isFirst} = internalPickerItem
-
-        // Ensure the dates are taken from the public picker getters.
-        const {selectedDate} = publicPicker
-        const {selectedDate: siblingSelectedDate} =
-          internalPickerItem.sibling.publicPicker
-
-        return {
-          start: isFirst ? selectedDate : siblingSelectedDate,
-          end: !isFirst ? selectedDate : siblingSelectedDate,
-        }
-      }
     },
 
     /**
@@ -467,8 +431,6 @@ function datepicker(
     },
   }
 
-  internalPickerItem.publicPicker = publicPicker
-
   if (isRangePicker) {
     const {id} = options
     checkForExistingRangepickerPair(id)
@@ -486,13 +448,53 @@ function datepicker(
       sibling.sibling = internalPickerItem
     }
 
-    return publicPicker
+    const rangepicker = {
+      ...publicPicker,
+      get id() {
+        return id
+      },
+      getRange() {
+        // Ensure the dates are taken from the public picker getters.
+        const {selectedDate} = publicPicker
+        const {selectedDate: siblingSelectedDate} =
+          internalPickerItem.sibling?.publicPicker ?? {}
+
+        return {
+          start: isFirst ? selectedDate : siblingSelectedDate,
+          end: !isFirst ? selectedDate : siblingSelectedDate,
+        }
+      },
+      removePair(): void {
+        // Ensure the logic below is only executed once for daterange pairs.
+        if (isPairRemoved || !internalPickerItem.sibling) return
+        isPairRemoved = true
+
+        publicPicker.remove()
+
+        /*
+          Conditionally call this because sibling.remove() may have already been
+          called which means the reference here won't exist. Or, this might just
+          be a regular datepicker with no sibling at all.
+        */
+        if (internalPickerItem.sibling) {
+          internalPickerItem.sibling.publicPicker.remove()
+        }
+      },
+    }
+
+    internalPickerItem.publicPicker = rangepicker
+    addPickerToMap(selectorData.el, internalPickerItem)
+    addEventListeners(internalPickerItem)
+
+    const container = isInput ? selectorData.el.parentElement : selectorData.el
+    container?.append(pickerElements.calendarContainer)
+
+    return rangepicker
   }
 
   // STORE THE NEWLY CREATED PICKER ITEM
+  internalPickerItem.publicPicker = publicPicker
   addPickerToMap(selectorData.el, internalPickerItem)
-
-  // TODO - ADJUST DATES FOR RANGE PICKERS
 
   // ADD EVENT LISTENERS
   addEventListeners(internalPickerItem)

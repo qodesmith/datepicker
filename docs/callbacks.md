@@ -29,13 +29,27 @@ onSelect({prevDate, nextDate, trigger, triggerType}) {
 
 Callback function triggered after a date has been selected. It will receive the previous and newly selected dates. If `newDate` is `undefined`, that means the calendar date has been de-selected.
 
+### Type Declaration
+
 ```typescript
-onSelect({
+// Regular datepicker.
+onSelect(data: {
   prevDate: Date | undefined
   newDate: Date | undefined
 
   // Common arguments.
-  instance: DatepickerInstance
+  instance: DatepickerInstance // 👀
+  trigger: Trigger
+  triggerType: TriggerType
+}): void
+
+// Daterange picker.
+onSelect(data: {
+  prevDate: Date | undefined
+  newDate: Date | undefined
+
+  // Common arguments.
+  instance: DaterangePickerInstance // 👀
   trigger: Trigger
   triggerType: TriggerType
 }): void
@@ -43,7 +57,7 @@ onSelect({
 
 **Default value:** `undefined`
 
-**Example**:
+### Example
 
 ```typescript
 const picker = datepicker(selector, {
@@ -63,8 +77,10 @@ const picker = datepicker(selector, {
 
 Callback function triggered after the month has changed visually on the calendar.
 
+### Type Declaration
+
 ```typescript
-onMonthChange({
+onMonthChange(data: {
   prevDate: Date | undefined
   newDate: Date | undefined
 
@@ -77,7 +93,7 @@ onMonthChange({
 
 **Default value:** `undefined`
 
-**Example**:
+### Example
 
 ```typescript
 const picker = datepicker(selector, {
@@ -91,8 +107,10 @@ const picker = datepicker(selector, {
 
 Callback function triggered every time the calendar goes from hidden to shown.
 
+### Type Declaration
+
 ```typescript
-onShow({
+onShow(data: {
   // Common arguments.
   instance: DatepickerInstance
   trigger: Trigger
@@ -102,7 +120,7 @@ onShow({
 
 **Default value:** `undefined`
 
-**Example**:
+### Example
 
 ```typescript
 const picker = datepicker(selector, {
@@ -116,8 +134,10 @@ const picker = datepicker(selector, {
 
 Callback function triggered every time the calendar goes from shown to hidden.
 
+### Type Declaration
+
 ```typescript
-onHide({
+onHide(data: {
   // Common arguments.
   instance: DatepickerInstance
   trigger: Trigger
@@ -127,7 +147,7 @@ onHide({
 
 **Default value:** `undefined`
 
-**Example**:
+### Example
 
 ```typescript
 const picker = datepicker(selector, {

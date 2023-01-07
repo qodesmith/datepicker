@@ -19,6 +19,10 @@ export const sides: Sides = {
 // TODO - do we actually need this noop?
 export function noop() {}
 
+export function defaultFormatter(date: Date): string {
+  return date.toDateString()
+}
+
 /**
  * This map will contain all the created datepickers that haven't been removed.
  * It maps the datepicker element (not the calendar HTML, but the DOM element

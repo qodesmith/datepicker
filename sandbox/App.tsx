@@ -35,7 +35,7 @@ function App() {
       // defaultView: 'overlay',
       selectedDate: today,
       disabledDates: [
-        new Date(),
+        new Date(+today - 1000 * 60 * 60 * 24),
         new Date(today.getFullYear(), today.getMonth(), 1),
         new Date(today.getFullYear(), today.getMonth(), 3),
       ],

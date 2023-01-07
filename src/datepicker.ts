@@ -9,7 +9,7 @@ import type {
 
 import './datepicker.scss'
 import {createCalendarHTML} from './utilsCreateCalendar'
-import {defaultOptions, noop} from './constants'
+import {defaultFormatter, defaultOptions, noop} from './constants'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
   addPickerToMap,
@@ -50,6 +50,7 @@ function datepicker(
   const onHide = options?.onHide ?? noop
   const onMonthChange = options?.onMonthChange ?? noop
   const onSelect = options?.onSelect ?? noop
+  const formatter = options?.formatter ?? defaultFormatter
   const startDate = stripTime(options?.startDate ?? new Date())
   const disabledDates = new Set(
     (options?.disabledDates ?? []).map(disabledDate => {
@@ -58,6 +59,12 @@ function datepicker(
   )
   let isRemoved = false
   let isPairRemoved = false
+
+  function safeUpdateInput(value: string) {
+    if (isInput) {
+      ;(selectorData.el as HTMLInputElement).value = value
+    }
+  }
 
   // CREATE CALENDAR HTML
   const pickerElements = createCalendarHTML({
@@ -148,15 +155,11 @@ function datepicker(
         renderCalendar(internalPickerItem)
       }
 
-      if (changeCalendar && date && hasMonthChanged(currentDate, date)) {
-        onMonthChange({
-          prevDate: stripTime(currentDate),
-          newDate: stripTime(date),
-          instance: publicPicker,
-          trigger,
-          triggerType,
-        })
-      }
+      // Update the DOM with these changes.
+      renderCalendar(internalPickerItem)
+
+      // Change input.
+      safeUpdateInput(date ? formatter(date) : '')
 
       onSelect({
         prevDate: prevSelectedDate ? stripTime(prevSelectedDate) : undefined,
@@ -166,8 +169,15 @@ function datepicker(
         triggerType,
       })
 
-      // Update the DOM with these changes.
-      renderCalendar(internalPickerItem)
+      if (changeCalendar && date && hasMonthChanged(currentDate, date)) {
+        onMonthChange({
+          prevDate: stripTime(currentDate),
+          newDate: stripTime(date),
+          instance: publicPicker,
+          trigger,
+          triggerType,
+        })
+      }
 
       // Prevent an infinite loop of sibling methods calling eachother.
       if (sibling && isFirstRun) {
@@ -204,6 +214,8 @@ function datepicker(
         !isDateWithinRange({date, minDate, maxDate})
       ) {
         internalPickerItem.selectedDate = undefined
+
+        safeUpdateInput('')
 
         onSelect({
           prevDate: selectedDate,

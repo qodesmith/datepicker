@@ -316,18 +316,6 @@ export type DatepickerInstance_REFERENCE = {
   maxDate: Date | undefined
 }
 
-export type DaterangePickerInstance = DatepickerInstance_REFERENCE & {
-  /**
-   * This method is only available on daterange pickers. It will return an object with `start` and `end` properties whose values are JavaScript date objects representing what the user selected on both calendars.
-   */
-  getRange(): {start: Date | undefined; end: Date | undefined}
-
-  /**
-   * If two datepickers have the same `id` option then this property will be available and refer to the other instance.
-   */
-  sibling: DaterangePickerInstance
-}
-
 export type Selector = string | HTMLElement
 
 /**
@@ -428,11 +416,10 @@ type SetMinMaxInputType = {
 }
 
 export type DatepickerInstance = {
-  calendarContainer: HTMLDivElement
+  readonly calendarContainer: HTMLDivElement
   readonly currentDate: Date
   readonly selectedDate: Date | undefined
   readonly remove: () => void
-  readonly removePair: () => void
   readonly navigate: ({date}: {date: Date}) => void
   /**
    * `changeCalendar` is only recognized if `date` was provided.
@@ -440,14 +427,29 @@ export type DatepickerInstance = {
   readonly selectDate: (data?: {date?: Date; changeCalendar?: boolean}) => void
   readonly setMin: (data?: SetMinMaxInputType) => void
   readonly setMax: (data?: SetMinMaxInputType) => void
-  readonly getSelectedRange: () => void | {
-    start: Date | undefined
-    end: Date | undefined
-  }
   readonly show: () => void
   readonly hide: () => void
   readonly toggleCalendar: () => void
   readonly toggleOverlay: () => void
+}
+
+export type DaterangePickerInstance = DatepickerInstance & {
+  /**
+   * This method is only available on daterange pickers. It will return an object with `start` and `end` properties whose values are JavaScript date objects representing what the user selected on both calendars.
+   */
+  readonly getRange: () => {start: Date | undefined; end: Date | undefined}
+
+  /**
+   * If two datepickers have the same `id` option then this property will be available and refer to the other instance.
+   */
+  // TODO - do we need a public reference to sibling?
+  // sibling?: DaterangePickerInstance
+
+  /**
+   * This method exists because it's possible to individually remove one of the instances in a daterange pair. For convenience, you can call this method and remove them both at once.
+   */
+  readonly removePair: () => void
+  readonly id: any
 }
 
 export type SelectorData = {

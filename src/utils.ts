@@ -1,5 +1,11 @@
 import {datepickersMap, overlayContainerCls} from './constants'
-import {InternalPickerData, Selector, SelectorData, ViewType} from './types'
+import {
+  InternalPickerData,
+  Position,
+  Selector,
+  SelectorData,
+  ViewType,
+} from './types'
 
 /**
  * Returns the type of an item.
@@ -59,6 +65,7 @@ export function getSelectorData(selector: Selector): SelectorData {
   const parentElement = element.parentElement
 
   // Inputs are the only elements that can't have multiple datepickers.
+  // TODO - remove/adjust this once allowing multiple pickers per same element.
   checkForExistingPickerOnElement(element)
 
   /**
@@ -118,6 +125,61 @@ export function getSelectorData(selector: Selector): SelectorData {
 
   // We should never get here.
   throwError(`Invalid root node found for selector: ${rootNodeType}`)
+}
+
+/**
+ * For datepickers associated with an input, this function positions the picker relative to that input.
+ *
+ * https://stackoverflow.com/q/8628005/2525633
+ * This should run AFTER the calendar is rendered to the DOM! Otherwise, you'll get 'auto' as a value for height.
+ */
+export function positionCalendar(
+  internalPickerItem: InternalPickerData,
+  position: Position
+) {
+  const {selectorData, pickerElements} = internalPickerItem
+  const {calendarContainer} = pickerElements
+  const isInput = getIsInput(selectorData.el)
+
+  if (isInput) {
+    if (position === 'mc') {
+      return calendarContainer.classList.add('dp-centered')
+    }
+
+    const [calendarWidth, calendarHeight] = (() => {
+      const {width, height} = getComputedStyle(calendarContainer)
+
+      // '250px' => 250
+      return [width, height].map(v => +v.slice(0, -2))
+    })()
+    const {top: parentTop, left: parentLeft} =
+      selectorData.elementForPositioning.getBoundingClientRect()
+    const {
+      top: inputTop,
+      left: inputLeft,
+      width: inputWidth,
+      height: inputHeight,
+    } = selectorData.el.getBoundingClientRect()
+    const relativeTop = inputTop - parentTop
+    const relativeLeft = inputLeft - parentLeft
+    const [vertical, horizontal] = position.split('')
+    const top =
+      vertical === 't'
+        ? px(relativeTop - calendarHeight) // 't'
+        : px(relativeTop + inputHeight) // 'b'
+    const bottom =
+      horizontal === 'l'
+        ? px(relativeLeft) // 'l'
+        : px(relativeLeft + inputWidth - calendarWidth) // 'r'
+
+    calendarContainer.style.setProperty('position', 'absolute')
+    calendarContainer.style.setProperty('top', top)
+    calendarContainer.style.setProperty('bottom', bottom)
+  }
+}
+
+function px(val: number) {
+  return `${val}px`
 }
 
 export function getDaysInMonth(date: Date): number {

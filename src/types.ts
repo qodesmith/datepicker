@@ -65,7 +65,7 @@ export type DatepickerOptions = {
    *
    * Default - undefined
    */
-  position?: 'tr' | 'tl' | 'br' | 'bl' | 'c'
+  position?: Position
 
   /**
    * Specify the day of the week your calendar starts on. 0 = Sunday, 1 = Monday, etc. Plays nice with the `customDays` option.
@@ -220,6 +220,18 @@ export type Sides = {
   l: 'left'
   c: 'c'
 }
+
+/**
+ * The position of the calendar relative to its associated input field. This option will have no effect if the picker isn't associated with an input field.
+ * The `mc` option is special in that it will center the calendar in the middle of the screen. This can be useful for mobile devices.
+ *
+ * `tl` - top left
+ * `tr` - top right
+ * `bl` - bottom left
+ * `br` - bottom right
+ * `mc` - mobile centered (centered in the middle of the screen for mobile devices)
+ */
+export type Position = 'tl' | 'tr' | 'bl' | 'br' | 'mc'
 
 export type ViewType = 'calendar' | 'overlay'
 

@@ -17,6 +17,7 @@ formatter({date: Date, instance: DaterangePickerInstance}): string
 ```
 
 **Default value:** `undefined`
+
 _NOTE: The default input value will be `date.toDateString()`._
 
 ### Example
@@ -28,3 +29,27 @@ const picker = datepicker(selector, {
   },
 })
 ```
+
+## position
+
+The position of the calendar relative to its associated input field. This option will have **no effect** if the picker isn't associated with an input field.
+
+The `mc` option is special in that it will center the calendar in the middle of the screen. This can be useful for mobile devices.
+
+### Type Declaration
+
+```typescript
+type Position = 'tl' | 'tr' | 'bl' | 'br' | 'mc'
+```
+
+**Default value:** `'tl'`
+
+| Value  | Description   |
+| ------ | ------------- |
+| `'tl'` | top left      |
+| `'tr'` | top right     |
+| `'bl'` | bottom left   |
+| `'br'` | bottom right  |
+| `'mc'` | mobile center |
+
+<!-- TODO - add some screenshots -->

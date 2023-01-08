@@ -24,7 +24,6 @@
   // Non-theme variables.
   --dp-size: 1em;
   --dp-width: 15.625em; // 15.625em = 250px wide @ 16px/1rem
-  --dp-radius: calc(var(--dp-width) * 0.02083); // 5.2px
   --dp-radius: 0.325em;
   --dp-arrow-size: 1.2em;
   --dp-transition-time: 0.3s;
@@ -84,6 +83,13 @@
     .dp-days-container {
       filter: blur(6px);
     }
+  }
+
+  &.dp-centered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 

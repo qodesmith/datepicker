@@ -22,6 +22,7 @@ import {
   getSiblingDateForNavigate,
   hasMonthChanged,
   isDateWithinRange,
+  positionCalendar,
   removePickerFromMap,
   stripTime,
 } from './utils'
@@ -52,6 +53,7 @@ function datepicker(
   const onSelect = options?.onSelect ?? noop
   const formatter = options?.formatter ?? defaultFormatter
   const startDate = stripTime(options?.startDate ?? new Date())
+  const position = options?.position ?? 'tl'
   const disabledDates = new Set(
     (options?.disabledDates ?? []).map(disabledDate => {
       return +stripTime(disabledDate)
@@ -252,6 +254,7 @@ function datepicker(
         pickerElements.calendarContainer.classList.add('dp-blur')
       }
       pickerElements.calendarContainer.classList.remove('dp-dn')
+      positionCalendar(internalPickerItem, position)
       pickerElements.overlay.overlayContainer.className = getOverlayClassName({
         action: 'calendarOpen',
         defaultView,
@@ -443,6 +446,21 @@ function datepicker(
     },
   }
 
+  function finalSteps() {
+    // STORE PICKER IN MAP
+    addPickerToMap(selectorData.el, internalPickerItem)
+
+    // ADD EVENT LISTENERS
+    addEventListeners(internalPickerItem)
+
+    // ADD THE CALENDAR TO THE DOM
+    const container = isInput ? selectorData.el.parentElement : selectorData.el
+    container?.append(pickerElements.calendarContainer)
+
+    // UPDATE CALENDAR POSITION
+    positionCalendar(internalPickerItem, position)
+  }
+
   if (isRangePicker) {
     const {id} = options
     checkForExistingRangepickerPair(id)
@@ -495,25 +513,16 @@ function datepicker(
     }
 
     internalPickerItem.publicPicker = rangepicker
-    addPickerToMap(selectorData.el, internalPickerItem)
-    addEventListeners(internalPickerItem)
 
-    const container = isInput ? selectorData.el.parentElement : selectorData.el
-    container?.append(pickerElements.calendarContainer)
+    finalSteps()
 
     return rangepicker
   }
 
-  // STORE THE NEWLY CREATED PICKER ITEM
+  // STORE THE PUBLIC PICKER ITEM
   internalPickerItem.publicPicker = publicPicker
-  addPickerToMap(selectorData.el, internalPickerItem)
 
-  // ADD EVENT LISTENERS
-  addEventListeners(internalPickerItem)
-
-  // ADD THE CALENDAR TO THE DOM
-  const container = isInput ? selectorData.el.parentElement : selectorData.el
-  container?.append(pickerElements.calendarContainer)
+  finalSteps()
 
   return publicPicker
 }

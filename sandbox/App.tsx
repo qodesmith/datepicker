@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import datepicker from '../src/datepicker'
 import QodesmithElement from './QodesmithElement'
 // @ts-expect-error - this module loads fine.
@@ -16,6 +16,10 @@ function App() {
   const [dpWidth, setDpWidth] = useState(15.625)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const textColor = theme === 'dark' ? 'white' : 'black'
+  const dpInputRef = useRef<HTMLInputElement>(null)
+  const dpInputParentRef = useRef<HTMLDivElement>(null)
+  const inputRectsRef = useRef<HTMLDivElement>(null)
+  const parentRectsRef = useRef<HTMLDivElement>(null)
 
   window.x = picker
   window.y = picker2
@@ -31,7 +35,6 @@ function App() {
     const today = new Date()
     const oldPicker = oldDatepicker('.old-dp-input', {alwaysShow: true})
     const pickerObj = datepicker('.dp-test', {
-      // alwaysShow: true,
       // defaultView: 'overlay',
       selectedDate: today,
       disabledDates: [
@@ -43,7 +46,7 @@ function App() {
         console.log('onSelect:', data)
       },
     })
-    const pickerObj2 = datepicker('.dp-test-input')
+    const pickerObj2 = datepicker('.dp-test-input', {position: 'br'})
 
     setPicker(pickerObj)
     setPicker2(pickerObj2)
@@ -53,6 +56,41 @@ function App() {
       pickerObj.remove()
       pickerObj2.remove()
     }
+  }, [])
+
+  // input.getBoundingClientRect()
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // The elements we want to measure.
+      const parentBoundingRect =
+        dpInputParentRef.current?.getBoundingClientRect()
+      const inputBoundingRect = dpInputRef.current?.getBoundingClientRect()
+
+      // The elements we want to add textContent to.
+      const inputParentInfoDiv = parentRectsRef.current
+      const inputInfoDiv = inputRectsRef.current
+
+      if (
+        inputParentInfoDiv &&
+        parentBoundingRect &&
+        inputInfoDiv &&
+        inputBoundingRect
+      ) {
+        const {top: inputParentTop, left: inputParentLeft} = parentBoundingRect
+        inputParentInfoDiv.textContent = JSON.stringify({
+          top: inputParentTop.toFixed(2),
+          left: inputParentLeft.toFixed(2),
+        })
+
+        const {top: inputTop, left: inputLeft} = inputBoundingRect
+        inputInfoDiv.textContent = JSON.stringify({
+          top: inputTop.toFixed(2),
+          left: inputLeft.toFixed(2),
+        })
+      }
+    }, 250)
+
+    return () => clearInterval(interval)
   }, [])
 
   // Set sizing properties on calendar DOM elements.
@@ -303,11 +341,27 @@ function App() {
           </div>
           <div className="dp-test" dangerouslySetInnerHTML={{__html: ''}} />
           <hr />
-          <div>
+          <div ref={dpInputParentRef}>
             <div style={{color: textColor}}>
               ⬇⬇⬇A Datepicker attached to an input field.{' '}
             </div>
-            <input type="text" className="dp-test-input" />
+            <input type="text" className="dp-test-input" ref={dpInputRef} />
+            <code style={{color: textColor}}>
+              <div style={{display: 'flex', gap: '1em'}}>
+                <span>Parent:</span>
+                <div
+                  dangerouslySetInnerHTML={{__html: ''}}
+                  ref={parentRectsRef}
+                />
+              </div>
+              <div style={{display: 'flex', gap: '1em'}}>
+                <span>Input:</span>
+                <div
+                  dangerouslySetInnerHTML={{__html: ''}}
+                  ref={inputRectsRef}
+                />
+              </div>
+            </code>
           </div>
           <hr />
           <div style={{color: textColor}}>

@@ -167,14 +167,14 @@ export function positionCalendar(
       vertical === 't'
         ? px(relativeTop - calendarHeight) // 't'
         : px(relativeTop + inputHeight) // 'b'
-    const bottom =
+    const left =
       horizontal === 'l'
         ? px(relativeLeft) // 'l'
         : px(relativeLeft + inputWidth - calendarWidth) // 'r'
 
     calendarContainer.style.setProperty('position', 'absolute')
     calendarContainer.style.setProperty('top', top)
-    calendarContainer.style.setProperty('bottom', bottom)
+    calendarContainer.style.setProperty('left', left)
   }
 }
 

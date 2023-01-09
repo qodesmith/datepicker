@@ -1,0 +1,13 @@
+.daterange-pickers-section {
+  grid-column: span 2;
+
+  h3 {
+    text-align: center;
+  }
+}
+
+.daterange-pickers-container {
+  display: flex;
+  justify-content: center;
+  gap: 3em;
+}

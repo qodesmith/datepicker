@@ -2,6 +2,7 @@ import Data from './Data'
 import DatepickerAttachedToDiv from './DatepickerAttachedToDiv'
 import DatepickerAttachedToInput from './DatepickerAttachedToInput'
 import DatepickerOLDAttachedToInput from './DatepickerOLDAttachedToInput'
+import DaterangePickers from './DaterangePickers'
 
 export default function NewApp() {
   return (
@@ -12,6 +13,7 @@ export default function NewApp() {
         <DatepickerAttachedToDiv />
         <DatepickerAttachedToInput />
         <DatepickerOLDAttachedToInput />
+        <DaterangePickers />
       </div>
     </>
   )

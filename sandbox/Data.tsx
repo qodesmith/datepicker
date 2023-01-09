@@ -48,7 +48,7 @@ export default function Data() {
               <em>calendar container</em>:
             </div>
           }
-          initialValue={1}
+          initialValue={15.625}
           buttonConfig={[10, 15.625, 30, 40, 50].map(value => {
             return {value, display: `${value}em`}
           })}

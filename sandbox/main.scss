@@ -1,0 +1,34 @@
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  padding: 0.5em;
+  font-family: sans-serif;
+  --gap: 0.5em;
+}
+
+section {
+  border: 1px solid;
+  padding: var(--gap);
+}
+
+hr {
+  margin: 0.125em 0;
+}
+
+.horizontal-gap {
+  height: var(--gap);
+}
+
+.datepickers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+h3 {
+  margin: 0;
+}

@@ -1,0 +1,11 @@
+.data-container {
+  .vertical-line {
+    width: 1px;
+    background: currentColor;
+  }
+}
+
+.data-sliders-container {
+  display: flex;
+  gap: 1em;
+}

@@ -1,0 +1,22 @@
+.slider-container {
+  width: 100%;
+}
+
+.slider-input-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  input {
+    width: 100%;
+  }
+}
+
+.slider-button-container {
+  display: flex;
+  gap: 0.5em;
+}
+
+.slider-value {
+  color: blue;
+}

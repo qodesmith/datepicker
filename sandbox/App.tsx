@@ -1,7 +1,6 @@
 import {useEffect, useRef, useState} from 'react'
 import datepicker from '../src/datepicker'
 import QodesmithElement from './QodesmithElement'
-// @ts-expect-error - this module loads fine.
 import oldDatepicker from '../src/old-datepicker'
 import {DatepickerInstance} from '../src/types'
 
@@ -117,13 +116,6 @@ function App() {
 
   return (
     <>
-      <div>
-        'ontouchstart' in window:{' '}
-        <code>
-          {/* https://bit.ly/3Y9gtnJ */}
-          {Boolean('ontouchstart' in document.documentElement).toString()}
-        </code>
-      </div>
       <div style={{display: 'flex', gap: '2em'}}>
         {/* DATA */}
         <section

@@ -9,7 +9,7 @@ import datepicker from '../src/datepicker'
 import {useRecoilState, useResetRecoilState} from 'recoil'
 import {datepickerAtomFamily} from './state'
 
-type Props = {
+type UseDatepickerProps = {
   pickerKey: string
   type: 'div' | 'input'
   options?: DatepickerOptions | DaterangePickerOptions
@@ -19,7 +19,7 @@ export function useDatepicker({
   pickerKey,
   type,
   options,
-}: Props): [JSX.Element, DatepickerInstance | null] {
+}: UseDatepickerProps): [JSX.Element, DatepickerInstance | null] {
   const ref = useRef()
   const element = createElement(type, {
     ref,
@@ -46,9 +46,21 @@ export function useDatepicker({
   return [element, picker as DatepickerInstance | null]
 }
 
-export function useDaterangePicker(
-  props: Props
-): [JSX.Element, DaterangePickerInstance | null] {
-  const [element, picker] = useDatepicker(props)
+type UseDaterangePickerProps = {
+  pickerKey: string
+  type: 'div' | 'input'
+  options: DaterangePickerOptions
+}
+
+export function useDaterangePicker({
+  pickerKey,
+  type,
+  options,
+}: UseDaterangePickerProps): [JSX.Element, DaterangePickerInstance | null] {
+  if (!('id' in options)) {
+    throw new Error('No id found for daterange picker.')
+  }
+
+  const [element, picker] = useDatepicker({pickerKey, type, options})
   return [element, picker as DaterangePickerInstance | null]
 }

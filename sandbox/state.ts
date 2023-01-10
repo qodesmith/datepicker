@@ -9,6 +9,11 @@ export const sliderAtomFamily = atomFamily<
   key: 'sliderAtomFamily',
   default: ({initialValue}) => initialValue,
 })
+export const initialSliderValues = [
+  {sliderKey: 'calendar container parent', initialValue: 1},
+  {sliderKey: 'calendar container --dp-size', initialValue: 1},
+  {sliderKey: 'calendar container --dp-width', initialValue: 15.625},
+]
 
 /**
  * Possible to have atomFamily with generic data types?

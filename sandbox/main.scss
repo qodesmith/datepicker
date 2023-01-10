@@ -8,11 +8,12 @@ body {
   --gap: 0.5em;
   --border-color: #ccc;
 
-  padding: 0.5em;
+  padding: var(--gap);
   font-family: sans-serif;
 }
 
 section {
+  position: relative;
   border: 1px solid var(--border-color);
   padding: var(--gap);
   border-radius: 0.25em;
@@ -26,4 +27,17 @@ section {
 
 h3 {
   margin: 0;
+}
+
+.checkbox-container {
+  position: absolute;
+  right: calc(var(--gap) / 3);
+  top: calc(var(--gap) / 3);
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-text {
+  font-size: 0.65em;
+  color: gray;
 }

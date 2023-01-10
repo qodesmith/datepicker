@@ -1,6 +1,7 @@
 import DatepickerImperativeControls from './DatepickerImperativeControls'
 import {useDatepicker} from './useDatepicker'
 import {DatepickerOptions} from '../src/types'
+import useSliderValuesCheckbox from './useSliderValuesCheckbox'
 
 export default function DatepickerAttachedToDiv() {
   const options: DatepickerOptions = {
@@ -12,8 +13,11 @@ export default function DatepickerAttachedToDiv() {
     options,
   })
 
+  const checkbox = useSliderValuesCheckbox(picker)
+
   return (
     <section>
+      {checkbox}
       <h3>
         Datepicker attached to a <code>&lt;div&gt;</code>
       </h3>

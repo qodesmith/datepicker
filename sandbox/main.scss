@@ -5,25 +5,20 @@ body {
 }
 
 body {
+  --gap: 0.5em;
+  --border-color: #ccc;
+
   padding: 0.5em;
   font-family: sans-serif;
-  --gap: 0.5em;
 }
 
 section {
-  border: 1px solid;
+  border: 1px solid var(--border-color);
   padding: var(--gap);
+  border-radius: 0.25em;
 }
 
-hr {
-  margin: 0.125em 0;
-}
-
-.horizontal-gap {
-  height: var(--gap);
-}
-
-.datepickers {
+.main-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--gap);

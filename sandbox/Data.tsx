@@ -4,8 +4,6 @@ import './data.scss'
 export default function Data() {
   return (
     <section className="data-container">
-      {/* <div>Info here</div>
-      <hr /> */}
       <div className="data-sliders-container">
         <Slider
           sliderKey="calendar container parent"

@@ -17,7 +17,7 @@ export default function DaterangePickers() {
   return (
     <section className="daterange-pickers-section">
       <h3>
-        Daterange Pickers attached to <code>&lt;div&gt;'s</code>
+        Date<em>range</em> Pickers attached to <code>&lt;div&gt;'s</code>
       </h3>
       <div className="daterange-pickers-container">
         {jsx1}

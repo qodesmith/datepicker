@@ -1,7 +1,9 @@
 .data-container {
+  grid-column: span 3;
+
   .vertical-line {
     width: 1px;
-    background: currentColor;
+    background: var(--border-color);
   }
 }
 

@@ -24,8 +24,14 @@ function globalListener(e: Event) {
 }
 
 function globalInputFocusInListener(e: FocusEvent): void {
-  // Only listen to focusin events on input elements.
-  if (!getIsInput(e.target)) return
+  /**
+   * Only listen to focusin events on input elements.
+   * Don't trigger listener for events on the overlay input.
+   */
+  // @ts-expect-error Target isn't typed with className 🤷‍♂️
+  if (!getIsInput(e.target) || e.target?.className === 'dp-overlay-input') {
+    return
+  }
 
   globalListener(e)
 }

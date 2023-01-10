@@ -476,6 +476,15 @@ function datepicker(
 
       // Add a reference to this picker on the 1st one.
       sibling.sibling = internalPickerItem
+
+      // Update the date for the 2nd range picker.
+      internalPickerItem.currentDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth() + 1
+      )
+
+      // Render the 2nd range picker so the calendar reflects the updated date.
+      renderCalendar(internalPickerItem)
     }
 
     const rangepicker = {

@@ -27,8 +27,11 @@ export const datepickerAtomFamily = atomFamily<
   default: null,
 })
 
-export const oldDatepickerAtom = atom<ReturnType<typeof oldDatepicker> | null>({
-  key: 'oldDatepickerAtom',
+export const oldDatepickerAtomFamily = atomFamily<
+  ReturnType<typeof oldDatepicker> | null,
+  string
+>({
+  key: 'oldDatepickerAtomFamily',
   default: null,
 
   /**

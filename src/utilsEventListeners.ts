@@ -87,7 +87,9 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     const showHideData = {trigger: 'focusin', triggerType: 'user'} as const
 
     // `focusin` bubbles, `focus` does not.
-    const focusInListener = (e: FocusEvent) => {
+    selectorData.el.addEventListener('focusin', focusInListener)
+    listenersMap.set({type: 'focusin', el: selectorData.el}, focusInListener)
+    function focusInListener(e: FocusEvent) {
       // Show this calendar.
       internalPickerItem._show(showHideData)
 
@@ -101,13 +103,15 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
         })
       })
     }
-    selectorData.el.addEventListener('focusin', focusInListener)
-    listenersMap.set({type: 'focusin', el: selectorData.el}, focusInListener)
   }
 
   // ARROWS
   const {leftArrow, rightArrow} = controls
-  const arrowListener = (e: MouseEvent) => {
+  leftArrow.addEventListener('click', arrowListener)
+  rightArrow.addEventListener('click', arrowListener)
+  listenersMap.set({type: 'click', el: leftArrow}, arrowListener)
+  listenersMap.set({type: 'click', el: rightArrow}, arrowListener)
+  function arrowListener(e: MouseEvent) {
     const isLeft = (e.currentTarget as HTMLDivElement).classList.contains(
       'dp-arrow-left'
     )
@@ -124,10 +128,6 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       triggerType: 'user',
     })
   }
-  leftArrow.addEventListener('click', arrowListener)
-  rightArrow.addEventListener('click', arrowListener)
-  listenersMap.set({type: 'click', el: leftArrow}, arrowListener)
-  listenersMap.set({type: 'click', el: rightArrow}, arrowListener)
 
   // MONTH/YEAR
   const {monthYearContainer} = controls
@@ -139,7 +139,9 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
 
   // DAYS
   const {daysContainer} = pickerElements
-  const daysContainerListener = (e: MouseEvent) => {
+  daysContainer.addEventListener('click', daysContainerListener)
+  listenersMap.set({type: 'click', el: daysContainer}, daysContainerListener)
+  function daysContainerListener(e: MouseEvent) {
     const {target} = e
     const currentTarget = e.currentTarget as HTMLDivElement
     const {classList, textContent} = target as HTMLDivElement
@@ -163,11 +165,14 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       triggerType: 'user',
     })
   }
-  daysContainer.addEventListener('click', daysContainerListener)
-  listenersMap.set({type: 'click', el: daysContainer}, daysContainerListener)
 
   // OVERLAY MONTH
-  const monthsContainerListener = (e: MouseEvent) => {
+  overlayMonthsContainer.addEventListener('click', monthsContainerListener)
+  listenersMap.set(
+    {type: 'click', el: overlayMonthsContainer},
+    monthsContainerListener
+  )
+  function monthsContainerListener(e: MouseEvent) {
     const {isOverlayShowing} = internalPickerItem
 
     /*
@@ -195,37 +200,38 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     // Close overlay.
     publicPicker.toggleOverlay()
   }
-  overlayMonthsContainer.addEventListener('click', monthsContainerListener)
-  listenersMap.set(
-    {type: 'click', el: overlayMonthsContainer},
-    monthsContainerListener
-  )
 
   // OVERLAY CLOSE
-  const overlayCloseListner = () => {
+  overlayClose.addEventListener('click', overlayCloseListner)
+  listenersMap.set({type: 'click', el: overlayClose}, overlayCloseListner)
+  function overlayCloseListner() {
     if (internalPickerItem.isOverlayShowing) {
       publicPicker.toggleOverlay()
     }
   }
-  overlayClose.addEventListener('click', overlayCloseListner)
-  listenersMap.set({type: 'click', el: overlayClose}, overlayCloseListner)
 
   // OVERLAY SUBMIT
-  const overlaySubmitListener = (e: MouseEvent) => {
+  overlaySubmitButton.addEventListener('click', overlaySubmitListener)
+  listenersMap.set(
+    {type: 'click', el: overlaySubmitButton},
+    overlaySubmitListener
+  )
+  function overlaySubmitListener(e: MouseEvent) {
     const {disabled} = e.currentTarget as HTMLButtonElement
 
     if (!disabled) {
       submitOverlayYear(internalPickerItem, 'click')
     }
   }
-  overlaySubmitButton.addEventListener('click', overlaySubmitListener)
-  listenersMap.set(
-    {type: 'click', el: overlaySubmitButton},
-    overlaySubmitListener
-  )
 
   // OVERLAY INPUT
-  const overlayInputOnInputListener = (e: InputEvent) => {
+  // @ts-ignore - the event type *is* InputEvent - https://mzl.la/3jmtjzb
+  overlayInput.addEventListener('input', overlayInputOnInputListener)
+  listenersMap.set(
+    {type: 'input', el: overlayInput},
+    overlayInputOnInputListener
+  )
+  function overlayInputOnInputListener(e: InputEvent) {
     const {overlaySubmitButton} = internalPickerItem.pickerElements.overlay
     const target = e.target as HTMLInputElement
     const {selectionStart} = target
@@ -244,7 +250,12 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     // https://stackoverflow.com/a/70549192/2525633 - maintain cursor position.
     target.setSelectionRange(selectionStart, selectionStart)
   }
-  const overlayInputKeydownListener = (e: KeyboardEvent) => {
+  overlayInput.addEventListener('keydown', overlayInputKeydownListener)
+  listenersMap.set(
+    {type: 'keydown', el: overlayInput},
+    overlayInputKeydownListener
+  )
+  function overlayInputKeydownListener(e: KeyboardEvent) {
     // Fun fact: 275760 is the largest year for a JavaScript date. #TrialAndError
     // Also this - https://bit.ly/3Q5BsEF
     if (e.key === 'Enter') {
@@ -253,17 +264,6 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       publicPicker.toggleOverlay()
     }
   }
-  // @ts-ignore - the event type *is* InputEvent - https://mzl.la/3jmtjzb
-  overlayInput.addEventListener('input', overlayInputOnInputListener)
-  overlayInput.addEventListener('keydown', overlayInputKeydownListener)
-  listenersMap.set(
-    {type: 'input', el: overlayInput},
-    overlayInputOnInputListener
-  )
-  listenersMap.set(
-    {type: 'keydown', el: overlayInput},
-    overlayInputKeydownListener
-  )
 }
 
 export function removeEventListeners(internalPickerItem: InternalPickerData) {

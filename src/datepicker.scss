@@ -39,6 +39,7 @@
   // --dp-weekdays-color: ???
   --dp-day-hover-bg: #fa0;
   --dp-selected-date-color: #add8e6;
+  --dp-range-date-color: #d4ebf2;
   // --dp-selected-date-bg: ???
   --dp-disabled-date-color: rgba(127, 127, 127, 0.92);
   // --dp-disabled-date-bg: ???
@@ -208,9 +209,27 @@
     background: var(--dp-day-hover-bg);
   }
 
-  &.dp-selected-date {
+  &.dp-selected-date,
+  &.dp-range-start,
+  &.dp-range-end {
     background: var(--dp-selected-date-color);
     color: var(--dp-bg);
+  }
+
+  &.dp-range-date {
+    background: var(--dp-range-date-color);
+    color: var(--dp-bg);
+    border-radius: 0;
+  }
+
+  &.dp-range-start {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  &.dp-range-end {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
 
   &.dp-dn {

@@ -206,6 +206,10 @@ type IsDateWithinRangeInputType = {
   minDate: Date | undefined
   maxDate: Date | undefined
 }
+
+/**
+ * Inclusive of `minDate` and `maxDate`.
+ */
 export function isDateWithinRange({
   date,
   minDate,
@@ -215,7 +219,7 @@ export function isDateWithinRange({
   const min = minDate ? +stripTime(minDate) : -Infinity
   const max = maxDate ? +stripTime(maxDate) : Infinity
 
-  return num > min && num < max
+  return num >= min && num <= max
 }
 
 export function getSiblingDateForNavigate(

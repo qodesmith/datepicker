@@ -63,6 +63,12 @@ function submitOverlayYear(
   publicPicker.toggleOverlay()
 }
 
+/**
+ * The event listener callback functions do NOT mutate the picker objects. All
+ * they do is call the appropriate picker methods with relevant data.
+ *
+ * `overlayInputOnInputListener` updates the overlay input field's value.
+ */
 export function addEventListeners(internalPickerItem: InternalPickerData) {
   const {listenersMap, pickerElements, selectorData, publicPicker} =
     internalPickerItem
@@ -183,12 +189,12 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       return
     }
 
+    // TODO - consistent code - Number(...) or +(...)
     const monthNum = +((e.target as HTMLDivElement).dataset.num as string)
     const {currentDate} = publicPicker
-    const currentMonth = currentDate.getMonth()
 
     // Only navigate if a different month has been clicked.
-    if (monthNum !== currentMonth) {
+    if (monthNum !== currentDate.getMonth()) {
       const date = new Date(currentDate.getFullYear(), monthNum, 1)
       internalPickerItem._navigate(true, {
         date,
@@ -233,9 +239,8 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
   )
   function overlayInputOnInputListener(e: InputEvent) {
     const {overlaySubmitButton} = internalPickerItem.pickerElements.overlay
-    const target = e.target as HTMLInputElement
-    const {selectionStart} = target
-    const newValue = target.value
+    const {selectionStart} = overlayInput
+    const newValue = overlayInput.value
       .split('')
       // Prevent leading 0's.
       .reduce((acc, char) => {
@@ -244,11 +249,11 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       }, '')
       .slice(0, 4)
 
-    target.value = newValue
+    overlayInput.value = newValue
     overlaySubmitButton.disabled = !newValue
 
     // https://stackoverflow.com/a/70549192/2525633 - maintain cursor position.
-    target.setSelectionRange(selectionStart, selectionStart)
+    overlayInput.setSelectionRange(selectionStart, selectionStart)
   }
   overlayInput.addEventListener('keydown', overlayInputKeydownListener)
   listenersMap.set(

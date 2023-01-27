@@ -169,6 +169,8 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       date,
       trigger: 'click',
       triggerType: 'user',
+      // No navigation needed when the user is clicking a date on the current calendar.
+      // changeCalendar: false,
     })
   }
 

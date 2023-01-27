@@ -13,13 +13,13 @@ import {defaultFormatter, defaultOptions, noop} from './constants'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
   addPickerToMap,
+  adjustMinMaxDates,
   checkForExistingRangepickerPair,
   getIsFirstRangepicker,
   getIsInput,
   getOverlayClassName,
   getRangepickers,
   getSelectorData,
-  getSiblingDateForNavigate,
   hasMonthChanged,
   isDateWithinRange,
   positionCalendar,
@@ -54,12 +54,13 @@ function datepicker(
   const formatter = options?.formatter ?? defaultFormatter
   const startDate = stripTime(options?.startDate ?? new Date())
   const position = options?.position ?? 'tl'
+  const {minDate, maxDate} = options ?? {}
   const disabledDates = new Set(
     (options?.disabledDates ?? []).map(disabledDate => {
       return +stripTime(disabledDate)
     })
   )
-  let isRemoved = false
+  let isRemoved = false // TODO - ensure all methods check this first.
   let isPairRemoved = false
 
   function safeUpdateInput(value: string) {
@@ -95,13 +96,18 @@ function datepicker(
     selectedDate: options?.selectedDate
       ? stripTime(options.selectedDate)
       : undefined,
+    minDate,
+    maxDate,
+    minMaxDates: null,
+
+    // TODO - check min/max dates don't clash for range pickers.
 
     /**
      * An internal function that is aware of a daterange pair and won't call
      * navigate more than once on either instance in the pair. It conditionally
      * calls the sibling's navigate only if `isFirstRun` is true.
      */
-    _navigate(isFirstRun: boolean, {date, trigger, triggerType}) {
+    _navigate(isFirstRun, {date, trigger, triggerType}) {
       const {currentDate, isFirst, sibling} = internalPickerItem
 
       internalPickerItem.currentDate = stripTime(date)
@@ -117,18 +123,13 @@ function datepicker(
           triggerType,
         })
       }
-
-      // Prevent an infinite loop of sibling methods calling eachother.
-      if (sibling && isFirstRun) {
-        const siblingDate = getSiblingDateForNavigate(isFirst, date)
-
-        sibling._navigate(false, {date: siblingDate, trigger, triggerType})
-      }
     },
+
+    // TODO - double check if isFirstRun is needed in any of these methods.
+    // TODO - does _selectDate need a `isFirstRun` param?
     _selectDate(isFirstRun, {date, changeCalendar, trigger, triggerType}) {
       const {
         currentDate,
-        isFirst,
         sibling,
         selectedDate: prevSelectedDate,
       } = internalPickerItem
@@ -138,6 +139,11 @@ function datepicker(
       if (
         date &&
         (isDateDisabled ||
+          /**
+           * For daterange pickers, this within-range check should happen before
+           * we update the min/max values which only happens on daterange
+           * pickers as a result of clicking a day.
+           */
           !isDateWithinRange({
             date,
             minDate: internalPickerItem.minDate,
@@ -150,18 +156,24 @@ function datepicker(
       // Update the selected date.
       internalPickerItem.selectedDate = date ? stripTime(date) : undefined
 
-      // Re-render the calendar.
+      // Update the month/year the calendar is visually at.
       if (changeCalendar && date) {
-        // Update the month/year the calendar is visually at.
         internalPickerItem.currentDate = stripTime(date)
-        renderCalendar(internalPickerItem)
+      }
+
+      // Update min/max dates only for rangepickers.
+      if (sibling) {
+        adjustMinMaxDates({picker: internalPickerItem, date})
       }
 
       // Update the DOM with these changes.
       renderCalendar(internalPickerItem)
+      if (sibling) {
+        renderCalendar(sibling)
+      }
 
       // Change input.
-      safeUpdateInput(date ? formatter(date) : '')
+      safeUpdateInput(date ? formatter(stripTime(date)) : '')
 
       onSelect({
         prevDate: prevSelectedDate ? stripTime(prevSelectedDate) : undefined,
@@ -176,20 +188,6 @@ function datepicker(
           prevDate: stripTime(currentDate),
           newDate: stripTime(date),
           instance: publicPicker,
-          trigger,
-          triggerType,
-        })
-      }
-
-      // Prevent an infinite loop of sibling methods calling eachother.
-      if (sibling && isFirstRun) {
-        const siblingDate = date
-          ? getSiblingDateForNavigate(isFirst, date)
-          : undefined
-
-        sibling._selectDate(false, {
-          date: siblingDate,
-          changeCalendar,
           trigger,
           triggerType,
         })
@@ -219,13 +217,16 @@ function datepicker(
 
         safeUpdateInput('')
 
-        onSelect({
-          prevDate: selectedDate,
-          newDate: undefined,
-          instance: publicPicker,
-          trigger,
-          triggerType,
-        })
+        // TODO - does the '_setMinOrMax' trigger ever get set anywhere?
+        if (trigger !== '_setMinOrMax') {
+          onSelect({
+            prevDate: selectedDate,
+            newDate: undefined,
+            instance: publicPicker,
+            trigger,
+            triggerType,
+          })
+        }
       }
 
       // Update the DOM with these changes.
@@ -294,6 +295,17 @@ function datepicker(
         instance: publicPicker,
       })
     },
+    _getRange() {
+      const selectedDate1 = publicPicker.selectedDate
+      const selectedDate2 = internalPickerItem.sibling?.selectedDate
+        ? new Date(internalPickerItem.sibling.selectedDate)
+        : undefined
+
+      return {
+        start: internalPickerItem.isFirst ? selectedDate1 : selectedDate2,
+        end: internalPickerItem.isFirst ? selectedDate2 : selectedDate1,
+      }
+    },
   }
 
   // CREATE PUBLIC PICKER DATA
@@ -332,6 +344,10 @@ function datepicker(
 
         // Delete sibling.id
         delete sibling.id
+
+        // TODO - mutating the picker object given to the user may cause
+        // issues upstream. For example, storing the picker in Recoil.js where
+        // Object.freeze has already been run on it.
       }
 
       // Remove styles added to the parent element.
@@ -476,15 +492,6 @@ function datepicker(
 
       // Add a reference to this picker on the 1st one.
       sibling.sibling = internalPickerItem
-
-      // Update the date for the 2nd range picker.
-      internalPickerItem.currentDate = new Date(
-        startDate.getFullYear(),
-        startDate.getMonth() + 1
-      )
-
-      // Render the 2nd range picker so the calendar reflects the updated date.
-      renderCalendar(internalPickerItem)
     }
 
     const rangepicker = {
@@ -493,15 +500,7 @@ function datepicker(
         return id
       },
       getRange() {
-        // Ensure the dates are taken from the public picker getters.
-        const {selectedDate} = publicPicker
-        const {selectedDate: siblingSelectedDate} =
-          internalPickerItem.sibling?.publicPicker ?? {}
-
-        return {
-          start: isFirst ? selectedDate : siblingSelectedDate,
-          end: !isFirst ? selectedDate : siblingSelectedDate,
-        }
+        return internalPickerItem._getRange()
       },
       removePair(): void {
         // Ensure the logic below is only executed once for daterange pairs.

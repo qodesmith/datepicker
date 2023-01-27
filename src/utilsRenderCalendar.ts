@@ -7,13 +7,15 @@ import {
 import {InternalPickerData} from './types'
 
 export function renderCalendar(picker: InternalPickerData): void {
-  const currentYear = picker.currentDate.getFullYear()
-  const currentMonthNum = picker.currentDate.getMonth()
+  const {currentDate, sibling, selectedDate, minDate, maxDate, disabledDates} =
+    picker
+  const currentYear = currentDate.getFullYear()
+  const currentMonthNum = currentDate.getMonth()
   const currentMonthName = picker.months[currentMonthNum]
-  const daysInMonth = getDaysInMonth(picker.currentDate)
-  const {selectedDate, minDate, maxDate, disabledDates} = picker
+  const daysInMonth = getDaysInMonth(currentDate)
   const selectedDateNum = selectedDate ? +stripTime(selectedDate) : null
   const today = stripTime(new Date())
+  const {start: rangeStart, end: rangeEnd} = picker._getRange()
 
   /**
    * This class prevents a ghost background fade effect from happening because
@@ -36,8 +38,30 @@ export function renderCalendar(picker: InternalPickerData): void {
       minDate,
       maxDate,
     })
+    const isRangeSelected = Boolean(selectedDate && sibling?.selectedDate)
+    const isSelectedDate =
+      selectedDateNum === dateNumForComparison && dateInRange
+    const isRangeDatesEqual = Boolean(
+      rangeStart && rangeEnd && +rangeStart === +rangeEnd
+    )
+    const isRangeDate =
+      rangeStart &&
+      rangeEnd &&
+      isDateWithinRange({
+        date: dateForComparison,
+        minDate: new Date(
+          rangeStart.getFullYear(),
+          rangeStart.getMonth(),
+          rangeStart.getDate() + 1
+        ),
+        maxDate: new Date(
+          rangeEnd.getFullYear(),
+          rangeEnd.getMonth(),
+          rangeEnd.getDate() - 1
+        ),
+      })
 
-    // Adjsut the starting offest of the calendar.
+    // Adjust the starting offest of the calendar.
     if (i === 0) {
       const offset = getOffsetNumber(dateForComparison)
       day.style.setProperty('grid-column-start', `${offset}`)
@@ -50,21 +74,52 @@ export function renderCalendar(picker: InternalPickerData): void {
       day.classList.remove('dp-today')
     }
 
-    // Apply / remove displayed date styles.
+    // Display / display none.
     if (num <= daysInMonth) {
       day.classList.remove('dp-dn')
     } else {
       day.classList.add('dp-dn')
     }
 
-    // Apply / remove selected date styles.
-    if (selectedDateNum === dateNumForComparison && dateInRange) {
+    // Selected date.
+    if (isSelectedDate) {
       day.classList.add('dp-selected-date')
     } else {
       day.classList.remove('dp-selected-date')
     }
 
-    // Apple / remove disabled date styles.
+    // Range start.
+    if (
+      isRangeSelected &&
+      rangeStart &&
+      +rangeStart === dateNumForComparison &&
+      !isRangeDatesEqual
+    ) {
+      day.classList.add('dp-range-start')
+    } else {
+      day.classList.remove('dp-range-start')
+    }
+
+    // Range end.
+    if (
+      isRangeSelected &&
+      rangeEnd &&
+      +rangeEnd === dateNumForComparison &&
+      !isRangeDatesEqual
+    ) {
+      day.classList.add('dp-range-end')
+    } else {
+      day.classList.remove('dp-range-end')
+    }
+
+    // Daterange dates.
+    if (isRangeDate) {
+      day.classList.add('dp-range-date')
+    } else {
+      day.classList.remove('dp-range-date')
+    }
+
+    // Disabled dates.
     if (!dateInRange || disabledDates.has(dateNumForComparison)) {
       day.classList.add('dp-disabled-date')
     } else {

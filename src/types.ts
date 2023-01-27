@@ -285,12 +285,10 @@ export type InternalPickerData = {
   sibling?: InternalPickerData // Just a reference to the other internal object in the daterange pair.
 
   _navigate(
-    isFirstRun: boolean,
     data: Parameters<DatepickerInstance['navigate']>[0] &
       Pick<CallbackData, 'triggerType'> & {trigger: 'navigate' | UserEvent}
   ): void
   _selectDate(
-    isFirstRun: boolean,
     data: Parameters<DatepickerInstance['selectDate']>[0] &
       Pick<CallbackData, 'triggerType'> & {trigger: 'selectDate' | UserEvent}
   ): void

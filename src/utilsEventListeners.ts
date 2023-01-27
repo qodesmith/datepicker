@@ -53,7 +53,7 @@ function submitOverlayYear(
 
   // If the same year is entered, simply close the overlay.
   if (year !== currentDate.getFullYear()) {
-    internalPickerItem._navigate(true, {
+    internalPickerItem._navigate({
       date: new Date(year, currentDate.getMonth(), 1),
       trigger: eventType,
       triggerType: 'user',
@@ -128,7 +128,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       1
     )
 
-    internalPickerItem._navigate(true, {
+    internalPickerItem._navigate({
       date: newDate,
       trigger: 'click',
       triggerType: 'user',
@@ -165,7 +165,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       date = new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNum)
     }
 
-    internalPickerItem._selectDate(true, {
+    internalPickerItem._selectDate({
       date,
       trigger: 'click',
       triggerType: 'user',
@@ -198,7 +198,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     // Only navigate if a different month has been clicked.
     if (monthNum !== currentDate.getMonth()) {
       const date = new Date(currentDate.getFullYear(), monthNum, 1)
-      internalPickerItem._navigate(true, {
+      internalPickerItem._navigate({
         date,
         trigger: 'click',
         triggerType: 'user',

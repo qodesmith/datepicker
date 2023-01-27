@@ -87,6 +87,7 @@ function datepicker(
   })
 
   // CREATE INTERNAL PICKER DATA
+  // TODO - should this be called `privatePicker` to keep in line with `publicPicker`?
   const internalPickerItem: InternalPickerData = {
     selectorData,
     pickerElements,
@@ -107,7 +108,7 @@ function datepicker(
      * navigate more than once on either instance in the pair. It conditionally
      * calls the sibling's navigate only if `isFirstRun` is true.
      */
-    _navigate(isFirstRun, {date, trigger, triggerType}) {
+    _navigate({date, trigger, triggerType}) {
       const {currentDate, isFirst, sibling} = internalPickerItem
 
       internalPickerItem.currentDate = stripTime(date)
@@ -127,7 +128,7 @@ function datepicker(
 
     // TODO - double check if isFirstRun is needed in any of these methods.
     // TODO - does _selectDate need a `isFirstRun` param?
-    _selectDate(isFirstRun, {date, changeCalendar, trigger, triggerType}) {
+    _selectDate({date, changeCalendar, trigger, triggerType}) {
       const {
         currentDate,
         sibling,
@@ -369,7 +370,7 @@ function datepicker(
     },
 
     navigate(data): void {
-      internalPickerItem._navigate(true, {
+      internalPickerItem._navigate({
         ...data,
         trigger: 'navigate',
         triggerType: 'imperative',
@@ -382,7 +383,7 @@ function datepicker(
     selectDate(data): void {
       // TODO - for event listener, don't use the public instance method,
       // use internalPickerItem._selectDate with `isImperative: false`.
-      internalPickerItem._selectDate(true, {
+      internalPickerItem._selectDate({
         ...data,
         trigger: 'selectDate',
         triggerType: 'imperative',

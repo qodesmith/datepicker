@@ -101,13 +101,6 @@ function datepicker(
     maxDate,
     minMaxDates: null,
 
-    // TODO - check min/max dates don't clash for range pickers.
-
-    /**
-     * An internal function that is aware of a daterange pair and won't call
-     * navigate more than once on either instance in the pair. It conditionally
-     * calls the sibling's navigate only if `isFirstRun` is true.
-     */
     _navigate({date, trigger, triggerType}) {
       const {currentDate, isFirst, sibling} = internalPickerItem
 
@@ -125,9 +118,7 @@ function datepicker(
         })
       }
     },
-
-    // TODO - double check if isFirstRun is needed in any of these methods.
-    // TODO - does _selectDate need a `isFirstRun` param?
+    // TODO add intellisense comments to all these internal methods.
     _selectDate({date, changeCalendar, trigger, triggerType}) {
       const {
         currentDate,
@@ -198,11 +189,12 @@ function datepicker(
       const {minDate, maxDate, sibling} = internalPickerItem
       const dateType = minOrMax === 'min' ? 'minDate' : 'maxDate'
 
-      /*
-        This needs to come from the publicPicker because the field is a getter
-        which returns a new Date object with the correct values. This avoids
-        issues stemming from the user potentially mutating the date object.
-      */
+      // TODO - ensure all comments are consistently styled.
+      /**
+       * This needs to come from the publicPicker because the field is a getter
+       * which returns a new Date object with the correct values. This avoids
+       * issues stemming from the user potentially mutating the date object.
+       */
       const {selectedDate} = publicPicker
 
       // Update the min/max date.

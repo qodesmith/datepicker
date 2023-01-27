@@ -266,6 +266,7 @@ export type InternalPickerData = {
   disabledDates: Set<number>
   minDate: Date | undefined
   maxDate: Date | undefined
+  minMaxDates: null | {min: Date | undefined; max: Date | undefined}
   noWeekends: boolean
   events: Set<number>
   startDay: number // Start day of the week.
@@ -279,7 +280,7 @@ export type InternalPickerData = {
   showAllDates: boolean // Shows a date in every square rendered on the calendar (preceding and trailing month days).
   respectDisabledReadOnly: boolean // Prevents Datepicker from selecting dates when attached to inputs that are `disabled` or `readonly`.
 
-  publicPicker: DatepickerInstance // The object returned to the user.
+  publicPicker: DatepickerInstance | DaterangePickerInstance // The object returned to the user.
   isFirst?: boolean // Indicates this is the 1st instance in a daterange pair.
   sibling?: InternalPickerData // Just a reference to the other internal object in the daterange pair.
 
@@ -296,9 +297,9 @@ export type InternalPickerData = {
   _setMinOrMax(
     isFirstRun: boolean,
     minOrMax: 'min' | 'max',
-    data: Omit<CallbackData, 'instance'> & {
+    data: Pick<CallbackData, 'triggerType'> & {
       date?: Date
-      trigger: 'setMin' | 'setMax' | UserEvent
+      trigger: 'setMin' | 'setMax' | '_setMinOrMax' | UserEvent
     }
   ): void
   _show(
@@ -307,6 +308,7 @@ export type InternalPickerData = {
   _hide(
     data: Omit<CallbackData, 'instance'> & {trigger: 'hide' | UserEvent}
   ): void
+  _getRange(): {start: Date | undefined; end: Date | undefined}
 
   isCalendarShowing: boolean
   isOverlayShowing: boolean
@@ -340,7 +342,7 @@ export type DaterangePickerInstance = DatepickerInstance & {
   /**
    * This method is only available on daterange pickers. It will return an object with `start` and `end` properties whose values are JavaScript date objects representing what the user selected on both calendars.
    */
-  readonly getRange: () => {start: Date | undefined; end: Date | undefined}
+  readonly getRange: () => ReturnType<InternalPickerData['_getRange']>
 
   /**
    * If two datepickers have the same `id` option then this property will be available and refer to the other instance.

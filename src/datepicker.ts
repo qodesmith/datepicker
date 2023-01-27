@@ -30,6 +30,7 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - throw error when trying to attach Datepicker to a void element.
+// TODO - should the public instance for rangepickers include `isFirst`?
 
 function datepicker(selector: Selector): DatepickerInstance
 function datepicker(
@@ -226,6 +227,7 @@ function datepicker(
       renderCalendar(internalPickerItem)
 
       // Prevent an infinite loop of sibling methods calling eachother.
+      // TODO - does this need to happen? Why are we updating the sibling?
       if (sibling && isFirstRun) {
         sibling._setMinOrMax(false, minOrMax, {date, trigger, triggerType})
       }
@@ -386,6 +388,7 @@ function datepicker(
      * Imperative method.
      */
     setMin(data): void {
+      // TODO - handle scenario when a date is already selected on a rangepicker pair.
       internalPickerItem._setMinOrMax(true, 'min', {
         ...data,
         trigger: 'setMin',
@@ -397,6 +400,7 @@ function datepicker(
      * Imperative method.
      */
     setMax(data): void {
+      // TODO - handle scenario when a date is already selected on a rangepicker pair.
       internalPickerItem._setMinOrMax(true, 'max', {
         ...data,
         trigger: 'setMax',

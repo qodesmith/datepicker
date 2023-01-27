@@ -314,10 +314,6 @@ export type InternalPickerData = {
   listenersMap: Map<{type: string; el: HTMLElement}, (e: any) => void>
 }
 
-type SetMinMaxInputType = {
-  date?: Date
-}
-
 export type DatepickerInstance = {
   readonly calendarContainer: HTMLDivElement
   readonly currentDate: Date
@@ -328,8 +324,8 @@ export type DatepickerInstance = {
    * `changeCalendar` is only recognized if `date` was provided.
    */
   readonly selectDate: (data?: {date?: Date; changeCalendar?: boolean}) => void
-  readonly setMin: (data?: SetMinMaxInputType) => void
-  readonly setMax: (data?: SetMinMaxInputType) => void
+  readonly setMin: (data?: {date?: Date}) => void
+  readonly setMax: (data?: {date?: Date}) => void
   readonly show: () => void
   readonly hide: () => void
   readonly toggleCalendar: () => void

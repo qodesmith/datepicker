@@ -222,13 +222,6 @@ export function isDateWithinRange({
   return num >= min && num <= max
 }
 
-export function getSiblingDateForNavigate(
-  isFirst: boolean | undefined,
-  date: Date
-): Date {
-  return new Date(date.getFullYear(), date.getMonth() + (isFirst ? 1 : -1))
-}
-
 type GetOverlayClassInputType = {
   action: 'initialize' | 'calendarOpen' | 'overlayToggle'
   defaultView: ViewType
@@ -336,4 +329,40 @@ export function removePickerFromMap(
 
 export function getIsInput(el: any): boolean {
   return getType(el) === 'HTMLInputElement'
+}
+
+type AdjustMinMxDatesInputType = {
+  picker: InternalPickerData
+  date: Date | undefined
+}
+
+/**
+ * Clicking a date on a range pair will always adjust the sibling calendar's
+ * min/max date.
+ */
+export function adjustMinMaxDates({
+  picker,
+  date,
+}: AdjustMinMxDatesInputType): void {
+  if (!picker.sibling) return
+
+  const {isFirst, sibling} = picker
+
+  if (date) {
+    /**
+     * Avoid setting minMaxDates more than once, which can happen if you have
+     * selected dates on both calendars and are just changing the selected date
+     * from one day to another.
+     */
+    if (!sibling.minMaxDates) {
+      sibling.minMaxDates = {min: sibling.minDate, max: sibling.maxDate}
+    }
+
+    sibling[isFirst ? 'minDate' : 'maxDate'] = date
+  } else {
+    // Restore the other picker's min/max.
+    sibling.minDate = sibling.minMaxDates?.min
+    sibling.maxDate = sibling.minMaxDates?.max
+    sibling.minMaxDates = null
+  }
 }

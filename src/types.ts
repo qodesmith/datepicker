@@ -202,9 +202,15 @@ export type DatepickerOptions = {
 
 export type DaterangePickerOptions = DatepickerOptions & {
   /**
-   * Now we're getting fancy! If you want to link two instances together to help form a daterange picker, this is your option. Only two picker instances can share an `id`. The datepicker instance declared first will be considered the "start" picker in the range. There's a fancy `getRange` method for you to use as well.
+   * This can be any value aside from `undefined`.
+   *
+   * Now we're getting fancy! If you want to link two instances together to help
+   * form a daterange picker, this is your option. Only two picker instances can
+   * share an `id`. The datepicker instance declared first will be considered
+   * the "start" picker in the range. There's a fancy `getRange` method for you
+   * to use as well.
    */
-  id: any
+  id: unknown
 }
 
 export type Selector = string | HTMLElement

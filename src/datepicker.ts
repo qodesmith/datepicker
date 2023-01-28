@@ -330,21 +330,21 @@ function datepicker(
       pickerElements.calendarContainer.remove()
 
       /**
-       * For daterange pickers, turn the sibling into a regular datepicker.
+       * For daterange pickers, turn the sibling into a regular datepicker since
+       * this picker is being removed from the daterange pair. Ideally it would
+       * be great to do this by removing any rangepicker-specific properties,
+       * but that could cause errors if the user froze the picker.
        *
-       * Deleting properties from the user-facing picker object has the
-       * potential to cause problems if the object was frozen. For example,
-       * if the user were to save the public picker object in a state management
-       * library such as Recoil.js, the object is frozen and trying to delete
-       * a property will cause Recoil to throw an error.
+       * When an object is frozen with Object.freeze, JavaScript will throw
+       * errors in strict mode when trying to delete properties or update
+       * property values. This library doesn't freeze any objects but the object
+       * might get frozen once in the user's hands.
        *
-       * It is safe to delete properties of the internal picker objects because
-       * they are never in danger of being frozen.
+       * It is safe to delete properties on internal picker objects because they
+       * aren't frozen and aren't publically accessible.
        */
       if (internalPickerItem.sibling) {
         const {sibling} = internalPickerItem
-        const publicPicker =
-          internalPickerItem.publicPicker as DaterangePickerInstance
 
         /////////////////////
         // INTERNAL OBJECT //
@@ -363,18 +363,7 @@ function datepicker(
         // PUBLIC OBJECT //
         ///////////////////
 
-        /**
-         * There are 2 properties to process on the public picker object:
-         * 1. id
-         * 2. isFirst
-         *
-         * These 2 properties will be set to `undefined`.
-         * All methods on public pickers throw an error if removed.
-         */
-        // @ts-expect-error - we're intentionally setting a readonly property.
-        publicPicker.id = undefined
-        // @ts-expect-error - we're intentionally setting a readonly property.
-        publicPicker.isFirst = undefined
+        // Nothing to do here. See the comment where the rangepicker is created.
       }
 
       // Remove styles added to the parent element.
@@ -415,6 +404,9 @@ function datepicker(
     },
     setMin(data): void {
       if (isRemoved) throwAlreadyRemovedError()
+
+      // TODO - handle scenario where we're in the middle of picking a range.
+      // i.e. internalPickerItem.minMaxDates is truthy.
 
       // TODO - handle scenario when a date is already selected on a rangepicker pair.
       internalPickerItem._setMinOrMax(true, 'min', {
@@ -524,8 +516,25 @@ function datepicker(
 
     const rangepicker: DaterangePickerInstance = {
       ...publicPicker,
-      id,
-      isFirst,
+
+      /**
+       * When an object is frozen with Object.freeze, JavaScript will throw
+       * errors in strict mode when trying to delete properties or update
+       * property values. This library doesn't freeze any objects but the object
+       * might get frozen once in the user's hands.
+       *
+       * When a rangepicker is removed, ideally it would be great to turn its
+       * sibling into a regular picker by removing any rangepicker-specific
+       * properties. Since we want to avoid potential errors with Object.freeze,
+       * we use getters to return `undefined` if the picker has been removed.
+       */
+      get id() {
+        return isRemoved || isPairRemoved ? undefined : options.id
+      },
+      get isFirst() {
+        return isRemoved || isPairRemoved ? undefined : isFirst
+      },
+
       getRange() {
         if (isRemoved) throwAlreadyRemovedError()
 

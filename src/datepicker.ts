@@ -25,6 +25,8 @@ import {
   positionCalendar,
   removePickerFromMap,
   stripTime,
+  throwAlreadyRemovedError,
+  throwError,
 } from './utils'
 import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 
@@ -250,7 +252,7 @@ function datepicker(
         pickerElements.calendarContainer.classList.add('dp-blur')
       }
       pickerElements.calendarContainer.classList.remove('dp-dn')
-      positionCalendar(internalPickerItem, position)
+      positionCalendar(internalPickerItem, position, isInput)
       pickerElements.overlay.overlayContainer.className = getOverlayClassName({
         action: 'calendarOpen',
         defaultView,
@@ -318,18 +320,35 @@ function datepicker(
     },
     remove(): void {
       // Ensure the logic below is only executed once.
-      if (isRemoved) return
+      if (isRemoved) throwAlreadyRemovedError()
       isRemoved = true
 
       // Remove the picker from our tracking Map.
-      removePickerFromMap(selectorData.el, internalPickerItem)
+      removePickerFromMap(internalPickerItem)
 
       // Remove the picker from the DOM.
       pickerElements.calendarContainer.remove()
 
-      // For daterange pickers, turn the sibling into a regular datepicker.
+      /**
+       * For daterange pickers, turn the sibling into a regular datepicker.
+       *
+       * Deleting properties from the user-facing picker object has the
+       * potential to cause problems if the object was frozen. For example,
+       * if the user were to save the public picker object in a state management
+       * library such as Recoil.js, the object is frozen and trying to delete
+       * a property will cause Recoil to throw an error.
+       *
+       * It is safe to delete properties of the internal picker objects because
+       * they are never in danger of being frozen.
+       */
       if (internalPickerItem.sibling) {
         const {sibling} = internalPickerItem
+        const publicPicker =
+          internalPickerItem.publicPicker as DaterangePickerInstance
+
+        /////////////////////
+        // INTERNAL OBJECT //
+        /////////////////////
 
         // Delete the sibling reference to this picker that is being removed.
         delete sibling.sibling
@@ -340,9 +359,22 @@ function datepicker(
         // Delete sibling.id
         delete sibling.id
 
-        // TODO - mutating the picker object given to the user may cause
-        // issues upstream. For example, storing the picker in Recoil.js where
-        // Object.freeze has already been run on it.
+        ///////////////////
+        // PUBLIC OBJECT //
+        ///////////////////
+
+        /**
+         * There are 2 properties to process on the public picker object:
+         * 1. id
+         * 2. isFirst
+         *
+         * These 2 properties will be set to `undefined`.
+         * All methods on public pickers throw an error if removed.
+         */
+        // @ts-expect-error - we're intentionally setting a readonly property.
+        publicPicker.id = undefined
+        // @ts-expect-error - we're intentionally setting a readonly property.
+        publicPicker.isFirst = undefined
       }
 
       // Remove styles added to the parent element.
@@ -364,30 +396,26 @@ function datepicker(
     },
 
     navigate(data): void {
+      if (isRemoved) throwAlreadyRemovedError()
+
       internalPickerItem._navigate({
         ...data,
         trigger: 'navigate',
         triggerType: 'imperative',
       })
     },
-
-    /**
-     * Imperative method.
-     */
     selectDate(data): void {
-      // TODO - for event listener, don't use the public instance method,
-      // use internalPickerItem._selectDate with `isImperative: false`.
+      if (isRemoved) throwAlreadyRemovedError()
+
       internalPickerItem._selectDate({
         ...data,
         trigger: 'selectDate',
         triggerType: 'imperative',
       })
     },
-
-    /**
-     * Imperative method.
-     */
     setMin(data): void {
+      if (isRemoved) throwAlreadyRemovedError()
+
       // TODO - handle scenario when a date is already selected on a rangepicker pair.
       internalPickerItem._setMinOrMax(true, 'min', {
         ...data,
@@ -395,11 +423,9 @@ function datepicker(
         triggerType: 'imperative',
       })
     },
-
-    /**
-     * Imperative method.
-     */
     setMax(data): void {
+      if (isRemoved) throwAlreadyRemovedError()
+
       // TODO - handle scenario when a date is already selected on a rangepicker pair.
       internalPickerItem._setMinOrMax(true, 'max', {
         ...data,
@@ -409,21 +435,22 @@ function datepicker(
     },
 
     /**
-     * Imparative method.
      * TODO - check for the "gotcha" scenario with show / hide.
      * https://github.com/qodesmith/datepicker#show--hide-gotcha
      */
     show(): void {
+      if (isRemoved) throwAlreadyRemovedError()
+
       internalPickerItem._show({trigger: 'show', triggerType: 'imperative'})
     },
-
-    /**
-     * Imperative method.
-     */
     hide(): void {
+      if (isRemoved) throwAlreadyRemovedError()
+
       internalPickerItem._hide({trigger: 'hide', triggerType: 'imperative'})
     },
     toggleCalendar(): void {
+      if (isRemoved) throwAlreadyRemovedError()
+
       if (internalPickerItem.isCalendarShowing) {
         publicPicker.hide()
       } else {
@@ -431,6 +458,8 @@ function datepicker(
       }
     },
     toggleOverlay(): void {
+      if (isRemoved) throwAlreadyRemovedError()
+
       const {isCalendarShowing, isOverlayShowing, defaultView} =
         internalPickerItem
       const {overlay, calendarContainer} = pickerElements
@@ -461,7 +490,7 @@ function datepicker(
 
   function finalSteps() {
     // STORE PICKER IN MAP
-    addPickerToMap(selectorData.el, internalPickerItem)
+    addPickerToMap(internalPickerItem)
 
     // ADD EVENT LISTENERS
     addEventListeners(internalPickerItem)
@@ -471,11 +500,13 @@ function datepicker(
     container?.append(pickerElements.calendarContainer)
 
     // UPDATE CALENDAR POSITION
-    positionCalendar(internalPickerItem, position)
+    positionCalendar(internalPickerItem, position, isInput)
   }
 
   if (isRangePicker) {
     const {id} = options
+    if (id === undefined) throwError('`options.id` cannot be `undefined`.')
+
     checkForExistingRangepickerPair(id)
     const isFirst = getIsFirstRangepicker(id)
 
@@ -491,32 +522,32 @@ function datepicker(
       sibling.sibling = internalPickerItem
     }
 
-    const rangepicker = {
+    const rangepicker: DaterangePickerInstance = {
       ...publicPicker,
-      get id() {
-        return id
-      },
+      id,
+      isFirst,
       getRange() {
+        if (isRemoved) throwAlreadyRemovedError()
+
         return internalPickerItem._getRange()
       },
       removePair(): void {
-        // Ensure the logic below is only executed once for daterange pairs.
-        if (isPairRemoved || !internalPickerItem.sibling) return
-        isPairRemoved = true
+        if (isPairRemoved || isRemoved) throwAlreadyRemovedError()
 
+        isPairRemoved = true
         publicPicker.remove()
 
-        /*
-          Conditionally call this because sibling.remove() may have already been
-          called which means the reference here won't exist. Or, this might just
-          be a regular datepicker with no sibling at all.
-        */
+        /**
+         * Conditionally call this because sibling.remove() may have already
+         * been called which means the reference here won't exist.
+         */
         if (internalPickerItem.sibling) {
           internalPickerItem.sibling.publicPicker.remove()
         }
       },
     }
 
+    // STORE THE PUBLIC PICKER ITEM
     internalPickerItem.publicPicker = rangepicker
 
     finalSteps()

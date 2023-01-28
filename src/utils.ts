@@ -23,6 +23,10 @@ export function throwError(message: string): never {
   throw new Error(message)
 }
 
+export function throwAlreadyRemovedError(): never {
+  throwError("Unable to run a function from a picker that's already removed.")
+}
+
 export function getSelectorData(selector: Selector): SelectorData {
   let element: HTMLElement | null = null
   const type = getType(selector)
@@ -135,11 +139,11 @@ export function getSelectorData(selector: Selector): SelectorData {
  */
 export function positionCalendar(
   internalPickerItem: InternalPickerData,
-  position: Position
+  position: Position,
+  isInput: Boolean
 ) {
   const {selectorData, pickerElements} = internalPickerItem
   const {calendarContainer} = pickerElements
-  const isInput = getIsInput(selectorData.el)
 
   if (isInput) {
     if (position === 'mc') {
@@ -299,10 +303,8 @@ export function getRangepickers(id: any): InternalPickerData[] {
   return rangepickers
 }
 
-export function addPickerToMap(
-  el: HTMLElement,
-  internalPickerItem: InternalPickerData
-): void {
+export function addPickerToMap(internalPickerItem: InternalPickerData): void {
+  const {el} = internalPickerItem.selectorData
   const pickerSet = datepickersMap.get(el)
 
   if (pickerSet) {
@@ -313,9 +315,9 @@ export function addPickerToMap(
 }
 
 export function removePickerFromMap(
-  el: HTMLElement,
   internalPickerItem: InternalPickerData
 ): void {
+  const {el} = internalPickerItem.selectorData
   const pickerSet = datepickersMap.get(el)
 
   if (!pickerSet) return

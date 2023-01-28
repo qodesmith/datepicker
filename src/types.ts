@@ -332,24 +332,54 @@ export type DatepickerInstance = {
   readonly toggleOverlay: () => void
 }
 
-export type DaterangePickerInstance = DatepickerInstance & {
+type DaterangePickerInstanceOnlyProps = {
   /**
-   * This method is only available on daterange pickers. It will return an object with `start` and `end` properties whose values are JavaScript date objects representing what the user selected on both calendars.
+   * This method is only available on daterange pickers. It will return an
+   * object with `start` and `end` properties whose values are JavaScript date
+   * objects representing what the user selected on both calendars.
    */
   readonly getRange: () => ReturnType<InternalPickerData['_getRange']>
 
   /**
-   * If two datepickers have the same `id` option then this property will be available and refer to the other instance.
+   * If two datepickers have the same `id` option then this property will be
+   * available and refer to the other instance.
    */
   // TODO - do we need a public reference to sibling?
   // sibling?: DaterangePickerInstance
 
   /**
-   * This method exists because it's possible to individually remove one of the instances in a daterange pair. For convenience, you can call this method and remove them both at once.
+   * This method exists because it's possible to individually remove one of the
+   * instances in a daterange pair. For convenience, you can call this method
+   * and remove them both at once.
+   *
    */
   readonly removePair: () => void
-  readonly id: any
+
+  /**
+   * Daterange pickers are "connected" via the `id` property. This can be any
+   * value except `undefined`. Datepicker will use `Object.is(...)` to check for
+   * value equality across instances.
+   *
+   * This property will be set to `undefined` when one of the pickers in the
+   * pair is removed.
+   *
+   * https://github.com/microsoft/TypeScript/issues/7648
+   * Unfortunately, there is now way to express the type "any value but
+   * undefined" so we prevent `undefined` by throwing an error in JavaScript.
+   */
+  readonly id: unknown
+
+  /**
+   * Indicates if this is the first instance in a daterange picker pair.
+   *
+   * This property will be set to `undefined` when one of the pickers in the
+   * pair is removed.
+   */
+  readonly isFirst: boolean | undefined
 }
+
+export type DaterangePickerInstance = DatepickerInstance &
+  DaterangePickerInstanceOnlyProps
 
 export type SelectorData = {
   el: HTMLElement

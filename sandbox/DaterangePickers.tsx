@@ -14,6 +14,9 @@ export default function DaterangePickers() {
     options,
   })
 
+  // window.x = picker1
+  // window.y = picker2
+
   return (
     <section className="daterange-pickers-section">
       <h3>

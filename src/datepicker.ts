@@ -73,21 +73,7 @@ function datepicker(
   }
 
   // CREATE CALENDAR HTML
-  const pickerElements = createCalendarHTML({
-    date: startDate,
-    customMonths: (options?.customMonths ?? defaultOptions.months).slice(),
-    customDays: (options?.customDays ?? defaultOptions.days).slice(),
-    defaultView: options?.defaultView ?? defaultOptions.defaultView,
-    overlayButtonText:
-      options?.overlayButton ?? defaultOptions.overlayButtonText,
-    overlayPlaceholder:
-      options?.overlayPlaceholder ?? defaultOptions.overlayPlaceholder,
-    // TODO - handle the clash between selectedDate also being a disabledDate.
-    selectedDate: options?.selectedDate,
-    disabledDates,
-    selectorEl: selectorData.el, // For inputs, the calendar will default to no show.
-    alwaysShow: !!options?.alwaysShow,
-  })
+  const pickerElements = createCalendarHTML(selectorData.el, options)
 
   // CREATE INTERNAL PICKER DATA
   // TODO - should this be called `privatePicker` to keep in line with `publicPicker`?
@@ -485,6 +471,7 @@ function datepicker(
     addEventListeners(internalPickerItem)
 
     // ADD THE CALENDAR TO THE DOM
+    renderCalendar(internalPickerItem)
     const container = isInput ? selectorData.el.parentElement : selectorData.el
     container?.append(pickerElements.calendarContainer)
 

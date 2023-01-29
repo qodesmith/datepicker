@@ -1,18 +1,14 @@
 // TODO - don't export any functions that aren't consumed anywhere.
 
-import {
-  getOffsetNumber,
-  getOverlayClassName,
-  getDaysInMonth,
-  stripTime,
-  getIsInput,
-} from './utils'
+import {getOverlayClassName, stripTime, getIsInput} from './utils'
 import {
   DatepickerOptions,
+  DaterangePickerOptions,
   InternalPickerData,
   SelectorData,
   ViewType,
 } from './types'
+import {defaultOptions} from './constants'
 
 type ControlElementsReturnType = {
   controlsContainer: HTMLDivElement
@@ -106,65 +102,17 @@ function createWeekdayElements(
   return weekdayElements
 }
 
-type CreateCalendarDaysInput = {
-  date: Date
-  selectedDate: DatepickerOptions['selectedDate']
-  // TODO - formalize where all these types come from - DatepickerOptions, CreateCalendarInput, InternalPickerData?
-  disabledDates: CreateCalendarInput['disabledDates']
-}
 /**
  * Creates an array of divs representing the days in a given month. These
- * elements will created once and are intended to be reused for each month.
+ * elements will be created once and are intended to be reused for each month.
  */
-function createCalendarDayElements({
-  date,
-  selectedDate,
-  disabledDates,
-}: CreateCalendarDaysInput): HTMLDivElement[] {
-  const elements: HTMLDivElement[] = []
-  const daysInMonth = getDaysInMonth(date)
-  const todaysDate = date.getDate()
-  const offset = getOffsetNumber(date)
-  const year = date.getFullYear()
-  const month = date.getMonth()
-  const selectedDateNum = selectedDate ? +stripTime(selectedDate) : undefined
-  const isSelectedDateDisabled = disabledDates.has(selectedDateNum ?? Infinity)
-
-  for (let i = 1; i <= 31; i++) {
-    const currentDate = new Date(year, month, i)
-    const isSelected =
-      +currentDate === selectedDateNum && !isSelectedDateDisabled
-    const isDisabled = disabledDates.has(+currentDate)
+function createCalendarDayElements(): HTMLDivElement[] {
+  return Array.from({length: 31}).map((_, i) => {
     const day = document.createElement('div')
     day.className = 'dp-day'
-    day.textContent = `${i}`
-
-    // Adjust the starting offest of the calendar.
-    if (i === 1) {
-      day.style.setProperty('grid-column-start', `${offset}`)
-    }
-
-    if (i > daysInMonth) {
-      // Days that aren't in the month should still be created but not shown.
-      day.classList.add('dp-dn')
-    }
-
-    if (i === todaysDate) {
-      day.classList.add('dp-today')
-    }
-
-    if (isSelected) {
-      day.classList.add('dp-selected-date')
-    }
-
-    if (isDisabled) {
-      day.classList.add('dp-disabled-date')
-    }
-
-    elements.push(day)
-  }
-
-  return elements
+    day.textContent = `${i + 1}`
+    return day
+  })
 }
 
 type OverlayReturnType = {
@@ -248,33 +196,33 @@ type CreateCalendarInput = {
   defaultView: ViewType
   overlayButtonText: InternalPickerData['overlayButtonText']
   overlayPlaceholder: InternalPickerData['overlayPlaceholder']
-  selectedDate: DatepickerOptions['selectedDate']
-  disabledDates: InternalPickerData['disabledDates']
   selectorEl: SelectorData['el']
   alwaysShow: InternalPickerData['alwaysShow']
 }
-export function createCalendarHTML({
-  date,
-  customMonths,
-  customDays,
-  defaultView,
-  overlayButtonText,
-  overlayPlaceholder,
-  selectedDate,
-  disabledDates,
-  selectorEl,
-  alwaysShow,
-}: CreateCalendarInput): PickerElements {
+/**
+ * This function creates the calendar HTML but doesn't add all the necessary
+ * classes for calendar days (i.e. selected date, disabled dates, etc.).
+ * Calendar days are fully processed in `renderCalendar`.
+ */
+export function createCalendarHTML(
+  selectorEl: SelectorData['el'],
+  options: DatepickerOptions | DaterangePickerOptions | undefined
+): PickerElements {
+  const date = stripTime(options?.startDate ?? new Date())
+  const customMonths = (options?.customMonths ?? defaultOptions.months).slice()
+  const customDays = (options?.customDays ?? defaultOptions.days).slice()
+  const defaultView = options?.defaultView ?? defaultOptions.defaultView
+  const overlayButtonText =
+    options?.overlayButton ?? defaultOptions.overlayButtonText
+  const overlayPlaceholder =
+    options?.overlayPlaceholder ?? defaultOptions.overlayPlaceholder
+  const alwaysShow = !!options?.alwaysShow
   const isInput = getIsInput(selectorEl)
   const calendarContainer = document.createElement('div')
   const controls = createCalendarControlElements({date, customMonths})
   const weekdaysArray = createWeekdayElements(customDays)
   const weekdaysContainer = document.createElement('div')
-  const calendarDaysArray = createCalendarDayElements({
-    date,
-    selectedDate,
-    disabledDates,
-  })
+  const calendarDaysArray = createCalendarDayElements()
   const daysContainer = document.createElement('div')
   const overlay = createCalendarOverlay(
     customMonths,

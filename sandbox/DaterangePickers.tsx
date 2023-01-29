@@ -6,12 +6,19 @@ export default function DaterangePickers() {
   const [jsx1, picker1] = useDaterangePicker({
     pickerKey: 'DaterangePickers1',
     type: 'div',
-    options,
+    options: {
+      ...options,
+      startDate: new Date(2023, 1, 1),
+    },
   })
   const [jsx2, picker2] = useDaterangePicker({
     pickerKey: 'DaterangePickers2',
     type: 'div',
-    options,
+    options: {
+      ...options,
+      minDate: new Date(),
+      selectedDate: new Date(2023, 0, 30),
+    },
   })
 
   // window.x = picker1

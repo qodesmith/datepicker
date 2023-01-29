@@ -1,21 +1,24 @@
-import {
-  getOffsetNumber,
-  isDateWithinRange,
-  stripTime,
-  getDaysInMonth,
-} from './utils'
+import {isDateWithinRange, stripTime} from './utils'
 import {InternalPickerData} from './types'
 
-export function renderCalendar(picker: InternalPickerData): void {
+/**
+ * Updates classes to all the calendar DOM elements according to the current
+ * calendar data (i.e. selected date, min/max dates, current month, etc.).
+ */
+export function renderCalendar(internalPicker: InternalPickerData): void {
   const {currentDate, sibling, selectedDate, minDate, maxDate, disabledDates} =
-    picker
+    internalPicker
   const currentYear = currentDate.getFullYear()
   const currentMonthNum = currentDate.getMonth()
-  const currentMonthName = picker.months[currentMonthNum]
-  const daysInMonth = getDaysInMonth(currentDate)
+  const currentMonthName = internalPicker.months[currentMonthNum]
+  const daysInMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    0
+  ).getDate()
   const selectedDateNum = selectedDate ? +stripTime(selectedDate) : null
   const today = stripTime(new Date())
-  const {start: rangeStart, end: rangeEnd} = picker._getRange()
+  const {start: rangeStart, end: rangeEnd} = internalPicker._getRange()
 
   /**
    * This class prevents a ghost background fade effect from happening because
@@ -23,13 +26,15 @@ export function renderCalendar(picker: InternalPickerData): void {
    * To disable that transition when switching months, we add this class to
    * switch off the CSS transition styles.
    */
-  picker.pickerElements.daysContainer.classList.add('dp-disable-transition')
+  internalPicker.pickerElements.daysContainer.classList.add(
+    'dp-disable-transition'
+  )
 
   /**
    * Iterate through the calendar days and hide any days that are beyond the
    * number of days in the current month.
    */
-  picker.pickerElements.calendarDaysArray.forEach((day, i) => {
+  internalPicker.pickerElements.calendarDaysArray.forEach((day, i) => {
     const num = i + 1
     const dateForComparison = new Date(currentYear, currentMonthNum, num)
     const dateNumForComparison = +dateForComparison
@@ -63,7 +68,12 @@ export function renderCalendar(picker: InternalPickerData): void {
 
     // Adjust the starting offest of the calendar.
     if (i === 0) {
-      const offset = getOffsetNumber(dateForComparison)
+      const offset =
+        new Date(
+          dateForComparison.getFullYear(),
+          dateForComparison.getMonth(),
+          1
+        ).getDay() + 1
       day.style.setProperty('grid-column-start', `${offset}`)
     }
 
@@ -128,18 +138,20 @@ export function renderCalendar(picker: InternalPickerData): void {
   })
 
   // Adjust the month name and year in the calendar controls.
-  picker.pickerElements.controls.monthName.textContent = currentMonthName
-  picker.pickerElements.controls.year.textContent = `${currentYear}`
+  internalPicker.pickerElements.controls.monthName.textContent =
+    currentMonthName
+  internalPicker.pickerElements.controls.year.textContent = `${currentYear}`
 
   /**
    * Removing the class inside requestAnimationFrame gives the DOM time to paint
-   * (1 tick) first and then it is safe to remove the class. Otherwise, the
+   * first (1 tick) and then it is safe to remove the class. Otherwise, the
    * addition of this class won't take effect because there was no time between
    * adding and removing. Also, using setTimeout requires an arbitrary time and
    * requestAnimationFrame is guaranteed to execute on the next paint cycle.
    */
   requestAnimationFrame(() => {
-    picker.pickerElements.daysContainer.classList.remove(
+    internalPicker.pickerElements.daysContainer.classList.remove(
+      // TODO - extract strings used more than once into variables to lower byte size.
       'dp-disable-transition'
     )
   })

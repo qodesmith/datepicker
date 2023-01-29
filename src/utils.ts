@@ -186,11 +186,6 @@ function px(val: number) {
   return `${val}px`
 }
 
-export function getDaysInMonth(date: Date): number {
-  const newDate = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-  return newDate.getDate()
-}
-
 export function hasMonthChanged(prevDate: Date, newDate: Date): boolean {
   const prevYear = prevDate.getFullYear()
   const prevMonth = prevDate.getMonth()
@@ -250,10 +245,6 @@ export function getOverlayClassName({
   }
 
   return `${overlayContainerCls} ${otherCls}`.trim()
-}
-
-export function getOffsetNumber(date: Date): number {
-  return new Date(date.getFullYear(), date.getMonth(), 1).getDay() + 1
 }
 
 /**
@@ -368,3 +359,6 @@ export function adjustMinMaxDates({
     sibling.minMaxDates = null
   }
 }
+
+// TODO - Should we have a `checkOptions` function to check for things like
+// the selectedDate also being a disabledDate, etc.?

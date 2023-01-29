@@ -33,6 +33,12 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - throw error when trying to attach Datepicker to a void element.
 // TODO - should the public instance for rangepickers include `isFirst`?
+/**
+ * TODO - daterange scenarios to handle:
+ * - starting with selected date on one of the calendars should adjust min/max dates accordingly
+ * - initial min/max date of the 2nd picker should override the first and set both accordingly
+ * - handle setting min/max after a single selected date and after a fully selected range
+ */
 
 function datepicker(selector: Selector): DatepickerInstance
 function datepicker(
@@ -91,7 +97,7 @@ function datepicker(
     minMaxDates: null,
 
     _navigate({date, trigger, triggerType}) {
-      const {currentDate, isFirst, sibling} = internalPickerItem
+      const {currentDate} = internalPickerItem
 
       internalPickerItem.currentDate = stripTime(date)
       renderCalendar(internalPickerItem)
@@ -511,14 +517,14 @@ function datepicker(
        * we use getters to return `undefined` if the picker has been removed.
        */
       get id() {
-        return isRemoved || isPairRemoved ? undefined : options.id
+        return isPairRemoved || isRemoved ? undefined : options.id
       },
       get isFirst() {
-        return isRemoved || isPairRemoved ? undefined : isFirst
+        return isPairRemoved || isRemoved ? undefined : isFirst
       },
 
       getRange() {
-        if (isRemoved) throwAlreadyRemovedError()
+        if (isPairRemoved || isRemoved) throwAlreadyRemovedError()
 
         return internalPickerItem._getRange()
       },

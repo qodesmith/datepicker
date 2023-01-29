@@ -514,9 +514,7 @@ function datepicker(
       sibling.sibling = internalPickerItem
     }
 
-    const rangepicker: DaterangePickerInstance = {
-      ...publicPicker,
-
+    const rangepickerProps = {
       /**
        * When an object is frozen with Object.freeze, JavaScript will throw
        * errors in strict mode when trying to delete properties or update
@@ -556,8 +554,25 @@ function datepicker(
       },
     }
 
+    /**
+     * https://stackoverflow.com/a/34481052/2525633
+     *
+     * {...publicPicker, ...rangepickerProps} - Spreading fails because only the
+     * values of getters and setters are copied over, not the actual getters and
+     * setters themselves. So we do the following instead:
+     */
+    const rangepicker: DaterangePickerInstance = Object.create(
+      Object.getPrototypeOf(publicPicker),
+      {
+        ...Object.getOwnPropertyDescriptors(publicPicker),
+        ...Object.getOwnPropertyDescriptors(rangepickerProps),
+      }
+    )
+
     // STORE THE PUBLIC PICKER ITEM
     internalPickerItem.publicPicker = rangepicker
+
+    window.z = internalPickerItem
 
     finalSteps()
 

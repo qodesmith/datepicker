@@ -213,16 +213,13 @@ function datepicker(
 
         safeUpdateInput('')
 
-        // TODO - does the '_setMinOrMax' trigger ever get set anywhere?
-        if (trigger !== '_setMinOrMax') {
-          onSelect({
-            prevDate: selectedDate,
-            newDate: undefined,
-            instance: publicPicker,
-            trigger,
-            triggerType,
-          })
-        }
+        onSelect({
+          prevDate: selectedDate,
+          newDate: undefined,
+          instance: publicPicker,
+          trigger,
+          triggerType,
+        })
       }
 
       // Update the DOM with these changes.
@@ -571,8 +568,6 @@ function datepicker(
 
     // STORE THE PUBLIC PICKER ITEM
     internalPickerItem.publicPicker = rangepicker
-
-    window.z = internalPickerItem
 
     finalSteps()
 

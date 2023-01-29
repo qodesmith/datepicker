@@ -303,7 +303,7 @@ export type InternalPickerData = {
     minOrMax: 'min' | 'max',
     data: Pick<CallbackData, 'triggerType'> & {
       date?: Date
-      trigger: 'setMin' | 'setMax' | '_setMinOrMax' | UserEvent
+      trigger: 'setMin' | 'setMax' | UserEvent
     }
   ): void
   _show(

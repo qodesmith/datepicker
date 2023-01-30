@@ -250,7 +250,7 @@ export type InternalPickerData = {
   /**
    * This property will only be present on rangepickers.
    */
-  id?: any
+  id?: unknown
 
   /**
    * All the DOM elements created for the calendar.
@@ -317,7 +317,7 @@ export type InternalPickerData = {
   isCalendarShowing: boolean
   isOverlayShowing: boolean
   defaultView: ViewType
-  listenersMap: Map<{type: string; el: HTMLElement}, (e: any) => void>
+  listenersMap: Map<{type: string; el: HTMLElement}, (e: unknown) => void>
 }
 
 export type DatepickerInstance = {

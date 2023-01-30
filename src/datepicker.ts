@@ -14,8 +14,6 @@ import {renderCalendar} from './utilsRenderCalendar'
 import {
   addPickerToMap,
   adjustMinMaxDates,
-  checkForExistingRangepickerPair,
-  getIsFirstRangepicker,
   getIsInput,
   getOverlayClassName,
   getRangepickers,
@@ -476,8 +474,10 @@ function datepicker(
     // ADD EVENT LISTENERS
     addEventListeners(internalPickerItem)
 
-    // ADD THE CALENDAR TO THE DOM
+    // VISUALLY UPDATE THE CALENDAR (month name, days, year)
     renderCalendar(internalPickerItem)
+
+    // ADD THE CALENDAR TO THE DOM
     const container = isInput ? selectorData.el.parentElement : selectorData.el
     container?.append(pickerElements.calendarContainer)
 
@@ -489,14 +489,22 @@ function datepicker(
     const {id} = options
     if (id === undefined) throwError('`options.id` cannot be `undefined`.')
 
-    checkForExistingRangepickerPair(id)
-    const isFirst = getIsFirstRangepicker(id)
+    const rangepickers = getRangepickers(id)
 
-    internalPickerItem.id = id
+    if (rangepickers.length > 1) {
+      throwError(`There is already a set of rangepickers for this id: "${id}"`)
+    }
+
+    const isFirst = !rangepickers.length
     internalPickerItem.isFirst = isFirst
 
     if (!isFirst) {
-      const [sibling] = getRangepickers(id)
+      /**
+       * There will only be 1 picker in the array because we haven't added the
+       * one that we're creating here yet.
+       */
+      const [sibling] = rangepickers
+
       // Add a reference to the 1st picker on this one.
       internalPickerItem.sibling = sibling
 
@@ -562,6 +570,13 @@ function datepicker(
     // STORE THE PUBLIC PICKER ITEM
     internalPickerItem.publicPicker = rangepicker
 
+    /**
+     * addPickerToMap
+     * addEventListeners
+     * renderCalendar
+     * Append the calendar to the DOM
+     * positionCalendar
+     */
     finalSteps()
 
     return rangepicker
@@ -570,6 +585,13 @@ function datepicker(
   // STORE THE PUBLIC PICKER ITEM
   internalPickerItem.publicPicker = publicPicker
 
+  /**
+   * addPickerToMap
+   * addEventListeners
+   * renderCalendar
+   * Append the calendar to the DOM
+   * positionCalendar
+   */
   finalSteps()
 
   return publicPicker

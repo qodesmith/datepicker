@@ -14,7 +14,7 @@ import {
  *    * [object Object] => Object
  *    * [object Array] => Array
  */
-export function getType(item: any): string {
+export function getType(item: unknown): string {
   const type = {}.toString.call(item) as string
   return type.slice(8, -1)
 }
@@ -259,34 +259,20 @@ function checkForExistingPickerOnElement(el: HTMLElement): void {
 }
 
 /**
- * Throws an error if a set of rangepickers already exists for a given id.
- * This should be called before the picker has been added to the datepickersMap.
+ * Returns an ordered array of InternalPickerData objects that are rangepickers
+ * for a given id.
  */
-export function checkForExistingRangepickerPair(id: any): void {
-  if (getRangepickers(id).length > 1) {
-    throwError(`There is already a set of rangepickers for this id: "${id}"`)
-  }
-}
-
-/**
- * Checks if this is the 1st picker in a rangepicker pair.
- * This should be called before the picker has been added to the datepickersMap.
- */
-export function getIsFirstRangepicker(id: any): boolean {
-  return getRangepickers(id).length === 0
-}
-
-/**
- * Returns an array of InternalPickerData objects that are rangepickers for a
- * given id.
- */
-export function getRangepickers(id: any): InternalPickerData[] {
+export function getRangepickers(id: unknown): InternalPickerData[] {
   const rangepickers: InternalPickerData[] = []
 
   datepickersMap.forEach(pickerSet => {
     pickerSet.forEach(picker => {
       if ('id' in picker && Object.is(picker.id, id)) {
-        rangepickers.push(picker)
+        /**
+         * unshift - add to the beginning of the array
+         * push - add to the end of the array
+         */
+        rangepickers[picker.isFirst ? 'unshift' : 'push'](picker)
       }
     })
   })
@@ -320,7 +306,7 @@ export function removePickerFromMap(
   }
 }
 
-export function getIsInput(el: any): boolean {
+export function getIsInput(el: unknown): boolean {
   return getType(el) === 'HTMLInputElement'
 }
 

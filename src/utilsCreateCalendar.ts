@@ -1,14 +1,13 @@
 // TODO - don't export any functions that aren't consumed anywhere.
 
-import {getOverlayClassName, stripTime, getIsInput} from './utils'
+import {getOverlayClassName, getIsInput} from './utils'
 import {
   DatepickerOptions,
-  DaterangePickerOptions,
   InternalPickerData,
+  SanitizedOptions,
   SelectorData,
   ViewType,
 } from './types'
-import {defaultOptions} from './constants'
 
 type ControlElementsReturnType = {
   controlsContainer: HTMLDivElement
@@ -206,16 +205,16 @@ type CreateCalendarInput = {
  */
 export function createCalendarHTML(
   selectorEl: SelectorData['el'],
-  options: DatepickerOptions | DaterangePickerOptions | undefined
+  options: SanitizedOptions
 ): PickerElements {
-  const date = stripTime(options?.startDate ?? new Date())
-  const customMonths = (options?.customMonths ?? defaultOptions.months).slice()
-  const customDays = (options?.customDays ?? defaultOptions.days).slice()
-  const defaultView = options?.defaultView ?? defaultOptions.defaultView
-  const overlayButtonText =
-    options?.overlayButton ?? defaultOptions.overlayButtonText
-  const overlayPlaceholder =
-    options?.overlayPlaceholder ?? defaultOptions.overlayPlaceholder
+  const {
+    startDate: date,
+    months: customMonths,
+    customDays,
+    defaultView,
+    overlayButton: overlayButtonText,
+    overlayPlaceholder,
+  } = options
   const alwaysShow = !!options?.alwaysShow
   const isInput = getIsInput(selectorEl)
   const calendarContainer = document.createElement('div')

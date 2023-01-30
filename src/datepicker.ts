@@ -9,7 +9,6 @@ import type {
 
 import './datepicker.scss'
 import {createCalendarHTML} from './utilsCreateCalendar'
-import {defaultFormatter, defaultOptions, noop} from './constants'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
   addPickerToMap,
@@ -22,6 +21,7 @@ import {
   isDateWithinRange,
   positionCalendar,
   removePickerFromMap,
+  sanitizeAndCheckOptions,
   stripTime,
   throwAlreadyRemovedError,
   throwError,
@@ -41,33 +41,32 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 function datepicker(selector: Selector): DatepickerInstance
 function datepicker(
   selector: Selector,
-  options: DatepickerOptions
+  rawOptions: DatepickerOptions
 ): DatepickerInstance
 function datepicker(
   selector: Selector,
-  options: DaterangePickerOptions
+  rawOptions: DaterangePickerOptions
 ): DaterangePickerInstance
 function datepicker(
   selector: Selector,
-  options?: DatepickerOptions | DaterangePickerOptions
+  rawOptions?: DatepickerOptions | DaterangePickerOptions
 ): DatepickerInstance | DaterangePickerInstance {
-  const isRangePicker = options && 'id' in options
+  const options = sanitizeAndCheckOptions(rawOptions)
   const selectorData = getSelectorData(selector)
   const isInput = getIsInput(selectorData.el)
-  const onShow = options?.onShow ?? noop
-  const onHide = options?.onHide ?? noop
-  const onMonthChange = options?.onMonthChange ?? noop
-  const onSelect = options?.onSelect ?? noop
-  const formatter = options?.formatter ?? defaultFormatter
-  const startDate = stripTime(options?.startDate ?? new Date())
-  const position = options?.position ?? 'tl'
-  const {minDate, maxDate} = options ?? {}
-  const disabledDates = new Set(
-    (options?.disabledDates ?? []).map(disabledDate => {
-      return +stripTime(disabledDate)
-    })
-  )
-  let isRemoved = false // TODO - ensure all methods check this first.
+  const {
+    startDate,
+    minDate,
+    maxDate,
+    disabledDates,
+    position,
+    onShow,
+    onHide,
+    onMonthChange,
+    onSelect,
+    formatter,
+  } = options
+  let isRemoved = false
   let isPairRemoved = false
 
   function safeUpdateInput(value: string) {
@@ -84,16 +83,19 @@ function datepicker(
   const internalPickerItem: InternalPickerData = {
     selectorData,
     pickerElements,
-    months: options?.customMonths ?? defaultOptions.months,
+    // TODO - is it safe to destructure these values instead?
+    months: options.months,
     disabledDates,
     currentDate: startDate,
-    selectedDate: options?.selectedDate
-      ? stripTime(options.selectedDate)
-      : undefined,
+    selectedDate: options.selectedDate,
     minDate,
     maxDate,
     minMaxDates: null,
-
+    isCalendarShowing: options?.alwaysShow ?? !isInput,
+    defaultView: options.defaultView,
+    isOverlayShowing: options.isOverlayShowing,
+    listenersMap: new Map(),
+    alwaysShow: !!options?.alwaysShow,
     _navigate({date, trigger, triggerType}) {
       const {currentDate} = internalPickerItem
 
@@ -221,11 +223,6 @@ function datepicker(
         sibling._setMinOrMax(false, minOrMax, {date, trigger, triggerType})
       }
     },
-    isCalendarShowing: options?.alwaysShow ?? !isInput,
-    defaultView: options?.defaultView ?? defaultOptions.defaultView,
-    isOverlayShowing: options?.defaultView === 'overlay',
-    listenersMap: new Map(),
-    alwaysShow: !!options?.alwaysShow,
     _show({trigger, triggerType}) {
       if (internalPickerItem.isCalendarShowing) {
         return
@@ -485,10 +482,9 @@ function datepicker(
     positionCalendar(internalPickerItem, position, isInput)
   }
 
-  if (isRangePicker) {
+  // Rangepicker.
+  if ('id' in options) {
     const {id} = options
-    if (id === undefined) throwError('`options.id` cannot be `undefined`.')
-
     const rangepickers = getRangepickers(id)
 
     if (rangepickers.length > 1) {
@@ -498,6 +494,7 @@ function datepicker(
     const isFirst = !rangepickers.length
     internalPickerItem.isFirst = isFirst
 
+    // Update sibling references.
     if (!isFirst) {
       /**
        * There will only be 1 picker in the array because we haven't added the

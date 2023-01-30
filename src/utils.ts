@@ -1,7 +1,16 @@
-import {datepickersMap, overlayContainerCls} from './constants'
 import {
+  datepickersMap,
+  defaultFormatter,
+  defaultOptions,
+  noop,
+  overlayContainerCls,
+} from './constants'
+import {
+  DatepickerOptions,
+  DaterangePickerOptions,
   InternalPickerData,
   Position,
+  SanitizedOptions,
   Selector,
   SelectorData,
   ViewType,
@@ -346,5 +355,77 @@ export function adjustMinMaxDates({
   }
 }
 
-// TODO - Should we have a `checkOptions` function to check for things like
-// the selectedDate also being a disabledDate, etc.?
+/**
+ * Throws an error if there are clashes between option dates. Provides default
+ * options for values.
+ */
+export function sanitizeAndCheckOptions(
+  options: DatepickerOptions | DaterangePickerOptions | undefined
+): SanitizedOptions {
+  const selectedDate = options?.selectedDate
+    ? stripTime(options?.selectedDate)
+    : undefined
+  const minDate = options?.minDate ? stripTime(options?.minDate) : undefined
+  const maxDate = options?.maxDate ? stripTime(options?.maxDate) : undefined
+  const disabledDates = new Set(
+    (options?.disabledDates ?? []).map(disabledDate => {
+      return +stripTime(disabledDate)
+    })
+  )
+
+  if (minDate && maxDate) {
+    if (minDate > maxDate) {
+      throwError('`options.minDate` cannot be greater than `options.maxDate`')
+    }
+    if (maxDate < minDate) {
+      throwError('`options.maxDate` cannot be less than `options.minDate`')
+    }
+  }
+
+  if (selectedDate) {
+    if (minDate && selectedDate < minDate) {
+      throwError('`options.selectedDate` cannot be less than `options.minDate`')
+    }
+
+    if (maxDate && selectedDate > maxDate) {
+      throwError(
+        '`options.selectedDate` cannot be greater than `options.maxDate`'
+      )
+    }
+
+    if (disabledDates.has(+selectedDate)) {
+      throwError(
+        '`options.selectedDate` cannot be a date found in `options.disabledDates`'
+      )
+    }
+  }
+
+  if (options && 'id' in options && options.id === undefined) {
+    throwError('`options.id` cannot be `undefined`.')
+  }
+
+  const defaultView = options?.defaultView ?? defaultOptions.defaultView
+
+  return {
+    ...options,
+    selectedDate,
+    minDate,
+    maxDate,
+    disabledDates,
+    startDate: stripTime(options?.startDate ?? new Date()),
+    position: options?.position ?? 'tl',
+    customDays: (options?.customDays ?? defaultOptions.days).slice(),
+    months: options?.customMonths ?? defaultOptions.months,
+    defaultView,
+    isOverlayShowing: defaultView === 'overlay',
+    overlayButton: options?.overlayButton ?? defaultOptions.overlayButtonText,
+    overlayPlaceholder:
+      options?.overlayPlaceholder ?? defaultOptions.overlayPlaceholder,
+    // TODO - do we need to default these function values to noop?
+    onShow: options?.onShow ?? noop,
+    onHide: options?.onHide ?? noop,
+    onMonthChange: options?.onMonthChange ?? noop,
+    onSelect: options?.onSelect ?? noop,
+    formatter: options?.formatter ?? defaultFormatter,
+  }
+}

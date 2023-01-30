@@ -213,6 +213,31 @@ export type DaterangePickerOptions = DatepickerOptions & {
   id: unknown
 }
 
+export type SanitizedOptions = (
+  | Omit<DatepickerOptions, 'disabledDates'>
+  | Omit<DaterangePickerOptions, 'disabledDates'>
+) & {
+  disabledDates: Set<number>
+  startDate: Date
+  months: readonly string[]
+  isOverlayShowing: boolean
+} & Required<
+    Pick<
+      DatepickerOptions,
+      | 'position'
+      | 'onShow'
+      | 'onHide'
+      | 'onMonthChange'
+      | 'onSelect'
+      | 'formatter'
+      | 'defaultView'
+      | 'customDays'
+      | 'overlayButton'
+      | 'overlayPlaceholder'
+      // | 'alwaysShow' // Do NOT include this.
+    >
+  >
+
 export type Selector = string | HTMLElement
 
 /**

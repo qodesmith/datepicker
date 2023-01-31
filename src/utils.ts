@@ -375,33 +375,69 @@ export function sanitizeAndCheckOptions(
 
   if (minDate && maxDate) {
     if (minDate > maxDate) {
-      throwError('`options.minDate` cannot be greater than `options.maxDate`')
+      throwError('"options.minDate" cannot be greater than "options.maxDate"')
     }
     if (maxDate < minDate) {
-      throwError('`options.maxDate` cannot be less than `options.minDate`')
+      throwError('"options.maxDate" cannot be less than "options.minDate"')
     }
   }
 
   if (selectedDate) {
     if (minDate && selectedDate < minDate) {
-      throwError('`options.selectedDate` cannot be less than `options.minDate`')
+      throwError('"options.selectedDate" cannot be less than "options.minDate"')
     }
 
     if (maxDate && selectedDate > maxDate) {
       throwError(
-        '`options.selectedDate` cannot be greater than `options.maxDate`'
+        '"options.selectedDate" cannot be greater than "options.maxDate"'
       )
     }
 
     if (disabledDates.has(+selectedDate)) {
       throwError(
-        '`options.selectedDate` cannot be a date found in `options.disabledDates`'
+        '"options.selectedDate" cannot be a date found in "options.disabledDates"'
       )
     }
   }
 
-  if (options && 'id' in options && options.id === undefined) {
-    throwError('`options.id` cannot be `undefined`.')
+  // Daterange picker.
+  let minMaxDates = null
+  if (options && 'id' in options) {
+    const {id} = options
+
+    /**
+     * If we get 2 values back here, we already have a range pair.
+     * If we only get the 1st value back (picker1), that means we're currently
+     * working on the 2nd picker which hasn't been added to the map yet.
+     */
+    const [picker1, picker2] = getRangepickers(id)
+
+    if (id === undefined) {
+      throwError('"options.id" cannot be assigned the value of undefined.')
+    }
+
+    if (picker2) {
+      throwError(`There is already a set of rangepickers for this id: "${id}"`)
+    }
+
+    /**
+     * All the single-calendar scenario's have been handled already. Option
+     * values should not clash with eachother, so we can check that certain
+     * values are equal to eachother for safety.
+     */
+    if (picker1) {
+      if (areValuesPresentAndDifferent(minDate, picker1.minDate)) {
+        throwRangeProperyDifferenceError('minDate')
+      }
+
+      if (areValuesPresentAndDifferent(maxDate, picker1.maxDate)) {
+        throwRangeProperyDifferenceError('maxDate')
+      }
+
+      if (areValuesPresentAndDifferent(disabledDates, picker1.disabledDates)) {
+        throwRangeProperyDifferenceError('disabledDates')
+      }
+    }
   }
 
   const defaultView = options?.defaultView ?? defaultOptions.defaultView
@@ -411,6 +447,7 @@ export function sanitizeAndCheckOptions(
     selectedDate,
     minDate,
     maxDate,
+    minMaxDates,
     disabledDates,
     startDate: stripTime(options?.startDate ?? new Date()),
     position: options?.position ?? 'tl',
@@ -428,4 +465,34 @@ export function sanitizeAndCheckOptions(
     onSelect: options?.onSelect ?? noop,
     formatter: options?.formatter ?? defaultFormatter,
   }
+}
+
+function areValuesPresentAndDifferent<T>(
+  val1: T | undefined,
+  val2: T | undefined
+): boolean {
+  if (!val1 || !val2) return false
+
+  if (val1 instanceof Date && val2 instanceof Date) {
+    return +stripTime(val1) !== +stripTime(val2)
+  }
+
+  if (val1 instanceof Set && val2 instanceof Set) {
+    const sameSize = val1.size === val2.size
+    let hasSameItems = Array.from(val1.values()).some(val => !val2.has(val))
+
+    if (!sameSize || !hasSameItems) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function throwRangeProperyDifferenceError(
+  property: keyof SanitizedOptions
+): never {
+  throwError(
+    `"options.${property}" cannot have different values for range pickers.`
+  )
 }

@@ -34,7 +34,7 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 /**
  * TODO - daterange scenarios to handle:
  * - starting with selected date on one of the calendars should adjust min/max dates accordingly
- * - initial min/max date of the 2nd picker should override the first and set both accordingly
+ * - certain picker options should not be different
  * - handle setting min/max after a single selected date and after a fully selected range
  */
 
@@ -58,6 +58,7 @@ function datepicker(
     startDate,
     minDate,
     maxDate,
+    minMaxDates,
     disabledDates,
     position,
     onShow,
@@ -90,7 +91,7 @@ function datepicker(
     selectedDate: options.selectedDate,
     minDate,
     maxDate,
-    minMaxDates: null,
+    minMaxDates,
     isCalendarShowing: options?.alwaysShow ?? !isInput,
     defaultView: options.defaultView,
     isOverlayShowing: options.isOverlayShowing,
@@ -486,11 +487,6 @@ function datepicker(
   if ('id' in options) {
     const {id} = options
     const rangepickers = getRangepickers(id)
-
-    if (rangepickers.length > 1) {
-      throwError(`There is already a set of rangepickers for this id: "${id}"`)
-    }
-
     const isFirst = !rangepickers.length
     internalPickerItem.isFirst = isFirst
 
@@ -522,7 +518,7 @@ function datepicker(
        * we use getters to return `undefined` if the picker has been removed.
        */
       get id() {
-        return isPairRemoved || isRemoved ? undefined : options.id
+        return isPairRemoved || isRemoved ? undefined : id
       },
       get isFirst() {
         return isPairRemoved || isRemoved ? undefined : isFirst

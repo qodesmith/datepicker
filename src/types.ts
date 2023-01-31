@@ -221,6 +221,7 @@ export type SanitizedOptions = (
   startDate: Date
   months: readonly string[]
   isOverlayShowing: boolean
+  minMaxDates: InternalPickerData['minMaxDates']
 } & Required<
     Pick<
       DatepickerOptions,

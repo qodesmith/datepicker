@@ -464,6 +464,13 @@ function datepicker(
     },
   }
 
+  /**
+   * addPickerToMap
+   * addEventListeners
+   * renderCalendar
+   * Append the calendar to the DOM
+   * positionCalendar
+   */
   function finalSteps() {
     // STORE PICKER IN MAP
     addPickerToMap(internalPickerItem)
@@ -563,13 +570,6 @@ function datepicker(
     // STORE THE PUBLIC PICKER ITEM
     internalPickerItem.publicPicker = rangepicker
 
-    /**
-     * addPickerToMap
-     * addEventListeners
-     * renderCalendar
-     * Append the calendar to the DOM
-     * positionCalendar
-     */
     finalSteps()
 
     return rangepicker
@@ -578,13 +578,6 @@ function datepicker(
   // STORE THE PUBLIC PICKER ITEM
   internalPickerItem.publicPicker = publicPicker
 
-  /**
-   * addPickerToMap
-   * addEventListeners
-   * renderCalendar
-   * Append the calendar to the DOM
-   * positionCalendar
-   */
   finalSteps()
 
   return publicPicker

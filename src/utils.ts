@@ -439,6 +439,18 @@ export function sanitizeAndCheckOptions(
       }
 
       if (picker1.selectedDate) {
+        if (minDate && minDate > picker1.selectedDate) {
+          throwError(
+            '"options.selectedDate" from the 1st calendar cannot be less than "options.minDate" from the 2nd calendar.'
+          )
+        }
+
+        if (maxDate && maxDate < picker1.selectedDate) {
+          throwError(
+            '"options.selectedDate" from the 1st calendar cannot be greater than "options.maxDate" from the 2nd calendar.'
+          )
+        }
+
         minMaxDates = {min: minDate, max: undefined}
         minDate = picker1.selectedDate
       }

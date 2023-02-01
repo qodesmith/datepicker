@@ -16,7 +16,6 @@ export default function DaterangePickers() {
     type: 'div',
     options: {
       ...options,
-      minDate: new Date(2023, 0, 12),
     },
   })
 

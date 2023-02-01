@@ -343,7 +343,21 @@ export type InternalPickerData = {
   isCalendarShowing: boolean
   isOverlayShowing: boolean
   defaultView: ViewType
-  listenersMap: Map<{type: string; el: HTMLElement}, (e: unknown) => void>
+  listenersMap: Map<
+    {type: keyof HTMLElementEventMap; el: HTMLElement},
+    (e: any) => void // Using `any` until we know hot to strongly type this.
+    /*
+      TODO - how do we strongly type this? 
+      (e: HTMLElementEventMap[keyof HTMLElementEventMap]) => void doesn't work.
+
+      Inspiration from `addEventListener`:
+      HTMLElement.addEventListener<K extends keyof HTMLElementEventMap>(
+        type: K,
+        listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+        options?: boolean | AddEventListenerOptions | undefined
+      ): void (+1 overload)
+    */
+  >
 }
 
 export type DatepickerInstance = {

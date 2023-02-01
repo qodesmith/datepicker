@@ -8,7 +8,7 @@ export default function DaterangePickers() {
     type: 'div',
     options: {
       ...options,
-      startDate: new Date(2023, 1, 1),
+      selectedDate: new Date(),
     },
   })
   const [jsx2, picker2] = useDaterangePicker({
@@ -16,7 +16,7 @@ export default function DaterangePickers() {
     type: 'div',
     options: {
       ...options,
-      minDate: new Date(),
+      minDate: new Date(2023, 0, 12),
     },
   })
 

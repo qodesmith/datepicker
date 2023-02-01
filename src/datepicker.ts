@@ -24,7 +24,6 @@ import {
   sanitizeAndCheckOptions,
   stripTime,
   throwAlreadyRemovedError,
-  throwError,
 } from './utils'
 import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 
@@ -489,6 +488,7 @@ function datepicker(
     const rangepickers = getRangepickers(id)
     const isFirst = !rangepickers.length
     internalPickerItem.isFirst = isFirst
+    internalPickerItem.id = id
 
     // Update sibling references.
     if (!isFirst) {

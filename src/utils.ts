@@ -365,7 +365,7 @@ export function sanitizeAndCheckOptions(
   const selectedDate = options?.selectedDate
     ? stripTime(options?.selectedDate)
     : undefined
-  const minDate = options?.minDate ? stripTime(options?.minDate) : undefined
+  let minDate = options?.minDate ? stripTime(options?.minDate) : undefined
   const maxDate = options?.maxDate ? stripTime(options?.maxDate) : undefined
   const disabledDates = new Set(
     (options?.disabledDates ?? []).map(disabledDate => {
@@ -401,7 +401,7 @@ export function sanitizeAndCheckOptions(
   }
 
   // Daterange picker.
-  let minMaxDates = null
+  let minMaxDates: SanitizedOptions['minMaxDates'] = null
   if (options && 'id' in options) {
     const {id} = options
 
@@ -436,6 +436,11 @@ export function sanitizeAndCheckOptions(
 
       if (areValuesPresentAndDifferent(disabledDates, picker1.disabledDates)) {
         throwRangeProperyDifferenceError('disabledDates')
+      }
+
+      if (picker1.selectedDate) {
+        minMaxDates = {min: minDate, max: undefined}
+        minDate = picker1.selectedDate
       }
     }
   }
@@ -481,7 +486,7 @@ function areValuesPresentAndDifferent<T>(
     const sameSize = val1.size === val2.size
     let hasSameItems = Array.from(val1.values()).some(val => !val2.has(val))
 
-    if (!sameSize || !hasSameItems) {
+    if (!sameSize || (val1.size && val2.size && !hasSameItems)) {
       return true
     }
   }
@@ -496,3 +501,14 @@ function throwRangeProperyDifferenceError(
     `"options.${property}" cannot have different values for range pickers.`
   )
 }
+
+/**
+ * TODO - implement this
+ * When options with date values are passed to the 2nd picker in a range but not
+ * the first, this function will sync those values back to the 1st picker.
+ *
+ * TODO - implement checks for date clashes  when the 2nd picker has settings
+ * that clash with the first. i.e. the 1st has a selected date and the 2nd has a
+ * minDate that's after the selected date. Implement this in sanitizeAndCheckOptions.
+ */
+export function alignDaterangeDates() {}

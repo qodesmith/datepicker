@@ -36,6 +36,21 @@ export function throwAlreadyRemovedError(): never {
   throwError("Unable to run a function from a picker that's already removed.")
 }
 
+function throwRangeProperyDifferenceError(
+  property: keyof SanitizedOptions
+): never {
+  throwError(
+    `"options.${property}" cannot have different values for range pickers.`
+  )
+}
+
+function throwSelectedDateMinMaxError(type: 'minDate' | 'maxDate'): never {
+  const lessOrMore = type === 'minDate' ? 'less' : 'more'
+  throwError(
+    `"options.selectedDate" from the 1st calendar cannot be ${lessOrMore} than "options.${type}" from the 2nd calendar.`
+  )
+}
+
 export function getSelectorData(selector: Selector): SelectorData {
   let element: HTMLElement | null = null
   const type = getType(selector)
@@ -440,15 +455,11 @@ export function sanitizeAndCheckOptions(
 
       if (picker1.selectedDate) {
         if (minDate && minDate > picker1.selectedDate) {
-          throwError(
-            '"options.selectedDate" from the 1st calendar cannot be less than "options.minDate" from the 2nd calendar.'
-          )
+          throwSelectedDateMinMaxError('minDate')
         }
 
         if (maxDate && maxDate < picker1.selectedDate) {
-          throwError(
-            '"options.selectedDate" from the 1st calendar cannot be greater than "options.maxDate" from the 2nd calendar.'
-          )
+          throwSelectedDateMinMaxError('maxDate')
         }
 
         minMaxDates = {min: minDate, max: undefined}
@@ -506,21 +517,30 @@ function areValuesPresentAndDifferent<T>(
   return false
 }
 
-function throwRangeProperyDifferenceError(
-  property: keyof SanitizedOptions
-): never {
-  throwError(
-    `"options.${property}" cannot have different values for range pickers.`
-  )
-}
-
 /**
- * TODO - implement this
  * When options with date values are passed to the 2nd picker in a range but not
  * the first, this function will sync those values back to the 1st picker.
- *
- * TODO - implement checks for date clashes  when the 2nd picker has settings
- * that clash with the first. i.e. the 1st has a selected date and the 2nd has a
- * minDate that's after the selected date. Implement this in sanitizeAndCheckOptions.
  */
-export function alignDaterangeDates() {}
+export function alignDaterangeDates(secondPicker: InternalPickerData): void {
+  const {
+    sibling: firstPicker,
+    isFirst,
+    minDate,
+    maxDate,
+    minMaxDates,
+  } = secondPicker
+  const secondMin = minMaxDates?.min ?? minDate
+
+  // Only process when we have a pair.
+  if (isFirst || !firstPicker) return
+
+  const {
+    minDate: firstMinDate,
+    maxDate: firstMaxDate,
+    minMaxDates: firstMinMaxDates,
+  } = firstPicker
+
+  if (!firstMinDate && secondMin) {
+    firstPicker.minDate = stripTime(secondMin)
+  }
+}

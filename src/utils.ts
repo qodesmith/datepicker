@@ -44,8 +44,11 @@ function throwRangeProperyDifferenceError(
   )
 }
 
-function throwSelectedDateMinMaxError(type: 'minDate' | 'maxDate'): never {
-  const lessOrMore = type === 'minDate' ? 'less' : 'more'
+function throwSelectedDateMinMaxError(
+  type: 'minDate' | 'maxDate' | 'selectedDate'
+): never {
+  const lessOrMore = type === 'maxDate' ? 'more' : 'less'
+
   throwError(
     `"options.selectedDate" from the 1st calendar cannot be ${lessOrMore} than "options.${type}" from the 2nd calendar.`
   )
@@ -330,23 +333,18 @@ export function removePickerFromMap(
   }
 }
 
-export function getIsInput(el: unknown): boolean {
+export function getIsInput(el: unknown): el is HTMLInputElement {
   return getType(el) === 'HTMLInputElement'
-}
-
-type AdjustMinMxDatesInputType = {
-  picker: InternalPickerData
-  date: Date | undefined
 }
 
 /**
  * Clicking a date on a range pair will always adjust the sibling calendar's
  * min/max date.
  */
-export function adjustMinMaxDates({
-  picker,
-  date,
-}: AdjustMinMxDatesInputType): void {
+export function adjustMinMaxDates(
+  picker: InternalPickerData,
+  date: Date | undefined
+): void {
   if (!picker.sibling) return
 
   const {isFirst, sibling} = picker
@@ -371,22 +369,22 @@ export function adjustMinMaxDates({
 }
 
 /**
- * Throws an error if there are clashes between option dates. Provides default
- * options for values.
+ * Runs a number of checks against various date values and throws errors if
+ * there is a conflict. Does this for daterange pickers as well.
+ *
+ *
  */
-export function sanitizeAndCheckOptions(
+export function sanitizeAndCheckAndSyncOptions(
   options: DatepickerOptions | DaterangePickerOptions | undefined
 ): SanitizedOptions {
   const selectedDate = options?.selectedDate
     ? stripTime(options?.selectedDate)
     : undefined
   let minDate = options?.minDate ? stripTime(options?.minDate) : undefined
-  const maxDate = options?.maxDate ? stripTime(options?.maxDate) : undefined
-  const disabledDates = new Set(
-    (options?.disabledDates ?? []).map(disabledDate => {
-      return +stripTime(disabledDate)
-    })
-  )
+  let maxDate = options?.maxDate ? stripTime(options?.maxDate) : undefined
+  const dateToNum = (date: Date) => +stripTime(date)
+  let disabledDates = new Set((options?.disabledDates ?? []).map(dateToNum))
+  let events = new Set((options?.events ?? []).map(dateToNum))
 
   if (minDate && maxDate) {
     if (minDate > maxDate) {
@@ -397,6 +395,7 @@ export function sanitizeAndCheckOptions(
     }
   }
 
+  // Only check for conflicts here, not daterange scenarios.
   if (selectedDate) {
     if (minDate && selectedDate < minDate) {
       throwError('"options.selectedDate" cannot be less than "options.minDate"')
@@ -453,6 +452,39 @@ export function sanitizeAndCheckOptions(
         throwRangeProperyDifferenceError('disabledDates')
       }
 
+      /**
+       * At this point we need to sync disabledDates, events, minDate, & maxDate
+       * if only 1 picker has them set. We've already handled potential clashes.
+       */
+
+      // Sync disabledDates if only 1 picker explicitly has set it.
+      if (!picker1.disabledDates.size && disabledDates.size) {
+        picker1.disabledDates = new Set(disabledDates)
+      } else if (!disabledDates.size && picker1.disabledDates.size) {
+        disabledDates = new Set(picker1.disabledDates)
+      }
+
+      // Sync events if only 1 picker explicitly has set it.
+      if (!picker1.events.size && events.size) {
+        picker1.events = new Set(events)
+      } else if (!events.size && picker1.events.size) {
+        events = new Set(picker1.events)
+      }
+
+      // Sync minDate if only 1 picker explicitly has set it.
+      if (!picker1.minDate && minDate) {
+        picker1.minDate = stripTime(minDate)
+      } else if (!minDate && picker1.minDate) {
+        minDate = stripTime(picker1.minDate)
+      }
+
+      // Sync maxDate if only 1 picker explicitly has set it.
+      if (!picker1.maxDate && maxDate) {
+        picker1.maxDate = stripTime(maxDate)
+      } else if (!maxDate && picker1.maxDate) {
+        maxDate = stripTime(picker1.maxDate)
+      }
+
       if (picker1.selectedDate) {
         if (minDate && minDate > picker1.selectedDate) {
           throwSelectedDateMinMaxError('minDate')
@@ -462,8 +494,18 @@ export function sanitizeAndCheckOptions(
           throwSelectedDateMinMaxError('maxDate')
         }
 
-        minMaxDates = {min: minDate, max: undefined}
+        // Both calendars have selected dates - a daterange is selected.
+        if (selectedDate && selectedDate < picker1.selectedDate) {
+          throwSelectedDateMinMaxError('selectedDate')
+        }
+
+        minMaxDates = {min: minDate, max: maxDate}
         minDate = picker1.selectedDate
+      }
+
+      if (selectedDate) {
+        picker1.minMaxDates = {min: picker1.minDate, max: picker1.maxDate}
+        picker1.maxDate = selectedDate
       }
     }
   }
@@ -477,6 +519,7 @@ export function sanitizeAndCheckOptions(
     maxDate,
     minMaxDates,
     disabledDates,
+    events,
     startDate: stripTime(options?.startDate ?? new Date()),
     position: options?.position ?? 'tl',
     customDays: (options?.customDays ?? defaultOptions.days).slice(),
@@ -515,32 +558,4 @@ function areValuesPresentAndDifferent<T>(
   }
 
   return false
-}
-
-/**
- * When options with date values are passed to the 2nd picker in a range but not
- * the first, this function will sync those values back to the 1st picker.
- */
-export function alignDaterangeDates(secondPicker: InternalPickerData): void {
-  const {
-    sibling: firstPicker,
-    isFirst,
-    minDate,
-    maxDate,
-    minMaxDates,
-  } = secondPicker
-  const secondMin = minMaxDates?.min ?? minDate
-
-  // Only process when we have a pair.
-  if (isFirst || !firstPicker) return
-
-  const {
-    minDate: firstMinDate,
-    maxDate: firstMaxDate,
-    minMaxDates: firstMinMaxDates,
-  } = firstPicker
-
-  if (!firstMinDate && secondMin) {
-    firstPicker.minDate = stripTime(secondMin)
-  }
 }

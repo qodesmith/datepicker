@@ -21,7 +21,7 @@ import {
   isDateWithinRange,
   positionCalendar,
   removePickerFromMap,
-  sanitizeAndCheckOptions,
+  sanitizeAndCheckAndSyncOptions,
   stripTime,
   throwAlreadyRemovedError,
 } from './utils'
@@ -30,6 +30,7 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - throw error when trying to attach Datepicker to a void element.
 // TODO - should the public instance for rangepickers include `isFirst`?
+// TODO - for internal fxns, see which ones take a single object arg that can be converted to explicit args.
 /**
  * TODO - daterange scenarios to handle:
  * - starting with selected date on one of the calendars should adjust min/max dates accordingly
@@ -50,7 +51,7 @@ function datepicker(
   selector: Selector,
   rawOptions?: DatepickerOptions | DaterangePickerOptions
 ): DatepickerInstance | DaterangePickerInstance {
-  const options = sanitizeAndCheckOptions(rawOptions)
+  const options = sanitizeAndCheckAndSyncOptions(rawOptions)
   const selectorData = getSelectorData(selector)
   const isInput = getIsInput(selectorData.el)
   const {
@@ -59,6 +60,7 @@ function datepicker(
     maxDate,
     minMaxDates,
     disabledDates,
+    events,
     position,
     onShow,
     onHide,
@@ -70,8 +72,8 @@ function datepicker(
   let isPairRemoved = false
 
   function safeUpdateInput(value: string) {
-    if (isInput) {
-      ;(selectorData.el as HTMLInputElement).value = value
+    if (getIsInput(selectorData.el)) {
+      selectorData.el.value = value
     }
   }
 
@@ -86,6 +88,7 @@ function datepicker(
     // TODO - is it safe to destructure these values instead?
     months: options.months,
     disabledDates,
+    events,
     currentDate: startDate,
     selectedDate: options.selectedDate,
     minDate,
@@ -150,7 +153,7 @@ function datepicker(
 
       // Update min/max dates only for rangepickers.
       if (sibling) {
-        adjustMinMaxDates({picker: internalPickerItem, date})
+        adjustMinMaxDates(internalPickerItem, date)
       }
 
       // Update the DOM with these changes.
@@ -367,7 +370,6 @@ function datepicker(
       removeEventListeners(internalPickerItem)
       // TODO - ^^^ move as many private & public picker methods to importable functions like this one.
     },
-
     navigate(data): void {
       if (isRemoved) throwAlreadyRemovedError()
 
@@ -478,6 +480,11 @@ function datepicker(
     // ADD EVENT LISTENERS
     addEventListeners(internalPickerItem)
 
+    // RENDER DATERANGE SIBLING (may have been updated by sanitizeAndCheckAndSyncOptions)
+    if (internalPickerItem.sibling) {
+      renderCalendar(internalPickerItem.sibling)
+    }
+
     // VISUALLY UPDATE THE CALENDAR (month name, days, year)
     renderCalendar(internalPickerItem)
 
@@ -530,7 +537,6 @@ function datepicker(
       get isFirst() {
         return isPairRemoved || isRemoved ? undefined : isFirst
       },
-
       getRange() {
         if (isPairRemoved || isRemoved) throwAlreadyRemovedError()
 

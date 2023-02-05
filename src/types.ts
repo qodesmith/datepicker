@@ -214,10 +214,11 @@ export type DaterangePickerOptions = DatepickerOptions & {
 }
 
 export type SanitizedOptions = (
-  | Omit<DatepickerOptions, 'disabledDates'>
-  | Omit<DaterangePickerOptions, 'disabledDates'>
+  | Omit<DatepickerOptions, 'disabledDates' | 'events'>
+  | Omit<DaterangePickerOptions, 'disabledDates' | 'events'>
 ) & {
-  disabledDates: Set<number>
+  disabledDates: InternalPickerData['disabledDates']
+  events: InternalPickerData['events']
   startDate: Date
   months: readonly string[]
   isOverlayShowing: boolean

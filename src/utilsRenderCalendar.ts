@@ -2,6 +2,8 @@ import {isDateWithinRange, stripTime} from './utils'
 import {InternalPickerData} from './types'
 
 /**
+ * TODO - make function accept undefined and move conditional logic here.
+ *
  * Updates classes to all the calendar DOM elements according to the current
  * calendar data (i.e. selected date, min/max dates, current month, etc.).
  */

@@ -7,7 +7,11 @@ import {InternalPickerData} from './types'
  * Updates classes to all the calendar DOM elements according to the current
  * calendar data (i.e. selected date, min/max dates, current month, etc.).
  */
-export function renderCalendar(internalPicker: InternalPickerData): void {
+export function renderCalendar(
+  internalPicker: InternalPickerData | undefined
+): void {
+  if (!internalPicker) return
+
   const {currentDate, sibling, selectedDate, minDate, maxDate, disabledDates} =
     internalPicker
   const currentYear = currentDate.getFullYear()

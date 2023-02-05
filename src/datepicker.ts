@@ -151,16 +151,12 @@ function datepicker(
         internalPickerItem.currentDate = stripTime(date)
       }
 
-      // Update min/max dates only for rangepickers.
-      if (sibling) {
-        adjustMinMaxDates(internalPickerItem, date)
-      }
+      // Update min/max dates (it will only apply for rangepickers).
+      adjustMinMaxDates(internalPickerItem, date)
 
       // Update the DOM with these changes.
       renderCalendar(internalPickerItem)
-      if (sibling) {
-        renderCalendar(sibling)
-      }
+      renderCalendar(sibling)
 
       // Change input.
       safeUpdateInput(date ? formatter(stripTime(date)) : '')
@@ -481,9 +477,7 @@ function datepicker(
     addEventListeners(internalPickerItem)
 
     // RENDER DATERANGE SIBLING (may have been updated by sanitizeAndCheckAndSyncOptions)
-    if (internalPickerItem.sibling) {
-      renderCalendar(internalPickerItem.sibling)
-    }
+    renderCalendar(internalPickerItem.sibling)
 
     // VISUALLY UPDATE THE CALENDAR (month name, days, year)
     renderCalendar(internalPickerItem)

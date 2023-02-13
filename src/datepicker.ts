@@ -476,6 +476,14 @@ function datepicker(
     // ADD EVENT LISTENERS
     addEventListeners(internalPickerItem)
 
+    /**
+     * UPDATE CALENDAR POSITION
+     *
+     * This should come before rendering so the calendar's size doesn't affect
+     * the DOM layout when calculating input location, width, etc.
+     */
+    positionCalendar(internalPickerItem, position, isInput)
+
     // RENDER DATERANGE SIBLING (may have been updated by sanitizeAndCheckAndSyncOptions)
     renderCalendar(internalPickerItem.sibling)
 
@@ -485,9 +493,6 @@ function datepicker(
     // ADD THE CALENDAR TO THE DOM
     const container = isInput ? selectorData.el.parentElement : selectorData.el
     container?.append(pickerElements.calendarContainer)
-
-    // UPDATE CALENDAR POSITION
-    positionCalendar(internalPickerItem, position, isInput)
   }
 
   // Rangepicker.

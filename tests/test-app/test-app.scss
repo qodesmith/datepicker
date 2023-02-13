@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+  padding: 1em 1em 10em;
+  font-family: sans-serif;
+}
+
+section {
+  padding: 1em;
+  border: 1px solid;
+  margin-bottom: 2em;
+}
+
+h2 {
+  margin: 0.25em 0;
+}
+
+#range-inputs-container {
+  width: 30em;
+  display: flex;
+  justify-content: space-between;
+}

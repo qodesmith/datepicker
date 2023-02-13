@@ -1,7 +1,7 @@
 import {defineConfig} from 'vite'
 import react from '@vitejs/plugin-react'
 import {resolve} from 'path'
-import './loadCommonEnv'
+import './commonEnv.js'
 
 export default defineConfig(({mode}) => {
   const isTest = mode === 'test'

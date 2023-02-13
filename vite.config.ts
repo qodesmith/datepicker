@@ -4,7 +4,6 @@ import {resolve} from 'path'
 import './commonEnv.js'
 
 export default defineConfig(({mode}) => {
-  console.log('MODE:', mode)
   const isTest = mode === 'test'
   const envPortKey = isTest ? 'TEST_DEV_PORT' : 'DEV_PORT'
   const plugins = isTest ? [] : [react()]
@@ -24,6 +23,6 @@ export default defineConfig(({mode}) => {
         fileName: 'dp',
       },
     },
-    clearScreen: false,
+    clearScreen: !isTest,
   }
 })

@@ -7,4 +7,5 @@ export default defineConfig({
     },
   },
   env: require('./commonEnv.js'),
+  video: false,
 })

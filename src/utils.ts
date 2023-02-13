@@ -172,11 +172,20 @@ export function positionCalendar(
   const {selectorData, pickerElements} = internalPickerItem
   const {calendarContainer} = pickerElements
 
-  // TODO - only 'bl' is currently working correctly.
   if (isInput) {
     if (position === 'mc') {
       return calendarContainer.classList.add('dp-centered')
     }
+
+    /**
+     * Position the calendar absolutely, taking it out of the layout flow so we
+     * can get accurate measurements of both the calendar itself and the input.
+     *
+     * For example, if the input field is rendered in a flexbox container, the
+     * size of the calendar could alter the input field's size prior to us
+     * taking measurements. Absolute positioning prior to measuring avoids this.
+     */
+    calendarContainer.style.setProperty('position', 'absolute')
 
     const [calendarWidth, calendarHeight] = (() => {
       const {width, height} = getComputedStyle(calendarContainer)
@@ -204,7 +213,6 @@ export function positionCalendar(
         ? px(relativeLeft) // 'l'
         : px(relativeLeft + inputWidth - calendarWidth) // 'r'
 
-    calendarContainer.style.setProperty('position', 'absolute')
     calendarContainer.style.setProperty('top', top)
     calendarContainer.style.setProperty('left', left)
   }

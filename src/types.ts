@@ -3,6 +3,24 @@ import {imperativeMethods, userEvents} from './constants'
 
 // TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
 
+type PrettyFxn<T> = T extends (...args: infer A) => infer R
+  ? (...args: PrettifyNonRecursive<A>) => PrettifyNonRecursive<R>
+  : never
+type PrettifyNonRecursive<T> = T extends Function
+  ? PrettyFxn<T>
+  : unknown extends T
+  ? T
+  : {
+      [K in keyof T]: T[K]
+    } & {}
+type Prettify<T> = T extends Function
+  ? PrettyFxn<T>
+  : unknown extends T
+  ? T
+  : {
+      [K in keyof T]: Prettify<T[K]>
+    } & {}
+
 export type TriggerType = 'user' | 'imperative'
 export type ImperativeMethod = typeof imperativeMethods[number]
 export type UserEvent = typeof userEvents[number]
@@ -200,7 +218,7 @@ export type DatepickerOptions = {
   disableYearOverlay?: boolean
 }
 
-export type DaterangePickerOptions = DatepickerOptions & {
+export type DaterangePickerOptions = {
   /**
    * This can be any value aside from `undefined`.
    *
@@ -211,7 +229,7 @@ export type DaterangePickerOptions = DatepickerOptions & {
    * to use as well.
    */
   id: unknown
-}
+} & DatepickerOptions
 
 export type SanitizedOptions = (
   | Omit<DatepickerOptions, 'disabledDates' | 'events'>

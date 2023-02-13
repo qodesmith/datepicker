@@ -172,6 +172,7 @@ export function positionCalendar(
   const {selectorData, pickerElements} = internalPickerItem
   const {calendarContainer} = pickerElements
 
+  // TODO - only 'bl' is currently working correctly.
   if (isInput) {
     if (position === 'mc') {
       return calendarContainer.classList.add('dp-centered')

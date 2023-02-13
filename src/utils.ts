@@ -380,8 +380,6 @@ export function adjustMinMaxDates(
 /**
  * Runs a number of checks against various date values and throws errors if
  * there is a conflict. Does this for daterange pickers as well.
- *
- *
  */
 export function sanitizeAndCheckAndSyncOptions(
   options: DatepickerOptions | DaterangePickerOptions | undefined

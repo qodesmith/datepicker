@@ -1,7 +1,5 @@
 import '../../src/datepicker.scss'
 import './test-app.scss'
-import datepicker from '../../src/datepicker'
-import {DaterangePickerOptions} from '../../src/types'
 
 document.querySelector<HTMLDivElement>('#root')!.innerHTML = `
   <div>
@@ -29,11 +27,3 @@ document.querySelector<HTMLDivElement>('#root')!.innerHTML = `
     </section>
   </div>
 `
-
-const options: DaterangePickerOptions = {
-  alwaysShow: true,
-  id: 1,
-  position: 'tr',
-}
-datepicker('#range-input-start', options)
-datepicker('#range-input-end', options)

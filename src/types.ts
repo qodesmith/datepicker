@@ -286,6 +286,7 @@ export type Position = 'tl' | 'tr' | 'bl' | 'br' | 'mc'
 
 export type ViewType = 'calendar' | 'overlay'
 
+// TODO - remove properties not needed.
 export type InternalPickerData = {
   /**
    * All the existing DOM elements associated with the calendar.

@@ -5,6 +5,4 @@ package-lock.json
 
 # Folders
 node_modules
-/test-results/
-/playwright-report/
-/playwright/.cache/
+/cypress/videos

@@ -1,49 +1,74 @@
-export const containers = {
-  calendarContainer: '.dp-calendar-container',
-  controlsContainer: '.dp-controls-container',
-  weekdaysContainer: '.dp-weekdays-container',
-  monthYearContainer: '.dp-month-year-container',
-  daysContainer: '.dp-days-container',
-  overlayContainer: '.dp-overlay-container',
-  overlayInputContainer: '.dp-overlay-input-container',
-  overlayMonthsContainer: '.dp-overlay-months-container',
+import {Prettify} from '../src/types'
+
+type SelectorsObj<T extends Record<any, string>> = {
+  [K in keyof T]: `.${T[K]}`
+}
+
+function clsToSelector<T extends Record<any, string>>(
+  obj: T
+): Prettify<SelectorsObj<T>> {
+  return Object.keys(obj).reduce((acc, key: keyof T) => {
+    acc[key] = `.${obj[key]}`
+    return acc
+  }, {} as SelectorsObj<T>) as Prettify<SelectorsObj<T>>
+}
+
+export const containersCls = {
+  calendarContainer: 'dp-calendar-container',
+  controlsContainer: 'dp-controls-container',
+  weekdaysContainer: 'dp-weekdays-container',
+  monthYearContainer: 'dp-month-year-container',
+  daysContainer: 'dp-days-container',
+  overlayContainer: 'dp-overlay-container',
+  overlayInputContainer: 'dp-overlay-input-container',
+  overlayMonthsContainer: 'dp-overlay-months-container',
 } as const
 
-export const controls = {
-  leftArrow: '.dp-left-arrow',
-  rightArrow: '.dp-right-arrow',
-  monthName: '.dp-month-name',
-  year: '.dp-year',
+export const containers = clsToSelector(containersCls)
+
+export const controlsCls = {
+  leftArrow: 'dp-arrow-left',
+  rightArrow: 'dp-arrow-right',
+  monthName: 'dp-month-name',
+  year: 'dp-year',
 } as const
 
-export const days = {
-  day: '.dp-day',
-  disabledDate: '.dp-disabled-date',
-  selectedDate: '.dp-selected-date',
-  rangeStart: '.dp-range-start',
-  rangeEnd: '.dp-range-end',
-  rangeDate: '.dp-range-date',
-  today: '.dp-today',
+export const controls = clsToSelector(controlsCls)
+
+export const daysCls = {
+  day: 'dp-day',
+  disabledDate: 'dp-disabled-date',
+  selectedDate: 'dp-selected-date',
+  rangeStart: 'dp-range-start',
+  rangeEnd: 'dp-range-end',
+  rangeDate: 'dp-range-date',
+  today: 'dp-today',
 } as const
 
-export const overlay = {
-  input: '.dp-overlay-input',
-  close: '.dp-overlay-close',
-  submit: '.dp-overlay-submit',
-  month: '.dp-overlay-month',
+export const days = clsToSelector(daysCls)
+
+export const overlayCls = {
+  input: 'dp-overlay-input',
+  close: 'dp-overlay-close',
+  submit: 'dp-overlay-submit',
+  month: 'dp-overlay-month',
 } as const
 
-export const other = {
-  none: '.dp-dn',
-  overlayIn: '.dp-overlay-in',
-  overlayOut: '.dp-overlay-out',
-  overlayShown: '.dp-overlay-shown',
-  overlayHidden: '.dp-overlay-hidden',
-  blur: '.dp-blur',
-  centered: '.dp-centered',
-  arrow: '.dp-arrow',
-  disableTransition: '.dp-disable-transition',
+export const overlay = clsToSelector(overlayCls)
+
+export const otherCls = {
+  none: 'dp-dn',
+  overlayIn: 'dp-overlay-in',
+  overlayOut: 'dp-overlay-out',
+  overlayShown: 'dp-overlay-shown',
+  overlayHidden: 'dp-overlay-hidden',
+  blur: 'dp-blur',
+  centered: 'dp-centered',
+  arrow: 'dp-arrow',
+  disableTransition: 'dp-disable-transition',
 } as const
+
+export const other = clsToSelector(otherCls)
 
 export const testElements = {
   // Input Section

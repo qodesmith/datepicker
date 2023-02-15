@@ -14,7 +14,7 @@ type PrettifyNonRecursive<T> = T extends Function
   : {
       [K in keyof T]: T[K]
     } & {}
-type Prettify<T> = T extends Function
+export type Prettify<T> = T extends Function
   ? PrettyFxn<T>
   : unknown extends T
   ? T

@@ -6,10 +6,12 @@
   "style": "./src/datepicker.scss",
   "scripts": {
     "build-new": "vite build",
-    "cy:open": "cypress open  --e2e -b chrome",
+    "cy:open": "cypress open --e2e -b chrome",
+    "cy:run": "cypress run",
     "dev": "vite",
     "dev-test": "vite --mode test",
-    "test": "node runTests.js"
+    "test": "node runTests.js --type run",
+    "test:open": "node runTests.js --type open"
   },
   "keywords": [
     "datepicker",

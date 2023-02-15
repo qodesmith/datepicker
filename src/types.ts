@@ -1,5 +1,6 @@
 import {PickerElements} from './utilsCreateCalendar'
 import {imperativeMethods, userEvents} from './constants'
+import datepicker from './datepicker'
 
 // TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
 
@@ -21,6 +22,7 @@ type Prettify<T> = T extends Function
       [K in keyof T]: Prettify<T[K]>
     } & {}
 
+export type Datepicker = typeof datepicker
 export type TriggerType = 'user' | 'imperative'
 export type ImperativeMethod = typeof imperativeMethods[number]
 export type UserEvent = typeof userEvents[number]

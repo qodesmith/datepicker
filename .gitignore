@@ -6,3 +6,4 @@ package-lock.json
 # Folders
 node_modules
 /cypress/videos
+/cypress/screenshots

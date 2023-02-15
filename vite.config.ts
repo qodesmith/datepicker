@@ -7,7 +7,7 @@ export default defineConfig(({mode}) => {
   const isTest = mode === 'test'
   const envPortKey = isTest ? 'TEST_DEV_PORT' : 'DEV_PORT'
   const plugins = isTest ? [] : [react()]
-  const root = isTest ? './tests/test-app' : './'
+  const root = isTest ? './cypress/test-app' : './'
 
   return {
     plugins,

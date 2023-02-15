@@ -10,6 +10,6 @@ const envVariables = require('./commonEnv.js')
 const {TEST_DEV_LOCALHOST} = envVariables
 
 execSync(
-  `./node_modules/.bin/start-server-and-test dev-test ${TEST_DEV_LOCALHOST} cy:run`,
+  `./node_modules/.bin/start-server-and-test dev-test ${TEST_DEV_LOCALHOST} cy:open`,
   {stdio: 'inherit'}
 )

@@ -20,8 +20,11 @@ describe('Callbacks', () => {
       startDate,
     }
 
-    it('should be called after a date has been selected (and also after deselecting)', () => {
+    beforeEach(() => {
       cy.spy(options, 'onSelect').as('onSelect')
+    })
+
+    it('should be called after a date has been selected (and also after deselecting)', () => {
       const picker = datepicker(testElements.singleInput, options)
 
       expect(options.onSelect).not.to.be.called
@@ -50,7 +53,6 @@ describe('Callbacks', () => {
     })
 
     it('should be called after deselecting a date', () => {
-      cy.spy(options, 'onSelect').as('onSelect')
       const picker = datepicker(testElements.singleInput, {
         ...options,
         selectedDate: startDate,
@@ -71,7 +73,6 @@ describe('Callbacks', () => {
     })
 
     it('should be called after running the `selectDate` method', () => {
-      cy.spy(options, 'onSelect').as('onSelect')
       const picker = datepicker(testElements.singleInput, options)
 
       expect(options.onSelect).not.to.be.called
@@ -89,7 +90,6 @@ describe('Callbacks', () => {
     })
 
     it('should be called after running the `setMin` method (if dates conflict)', () => {
-      cy.spy(options, 'onSelect').as('onSelect')
       const picker = datepicker(testElements.singleInput, {
         ...options,
         selectedDate: startDate,
@@ -121,7 +121,6 @@ describe('Callbacks', () => {
     })
 
     it('should be called after running the `setMax` method (if dates conflict)', () => {
-      cy.spy(options, 'onSelect').as('onSelect')
       const picker = datepicker(testElements.singleInput, {
         ...options,
         selectedDate: startDate,

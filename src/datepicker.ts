@@ -198,7 +198,11 @@ function datepicker(
       if (
         selectedDate &&
         date &&
-        !isDateWithinRange({date, minDate, maxDate})
+        !isDateWithinRange({
+          date: selectedDate,
+          minDate: dateType === 'minDate' ? date : minDate,
+          maxDate: dateType === 'maxDate' ? date : maxDate,
+        })
       ) {
         internalPickerItem.selectedDate = undefined
 

@@ -42,8 +42,8 @@ function createCalendarControlElements({
   year.textContent = `${fullYear}`
 
   // Arrows
-  leftArrow.innerHTML = createArrowSVG()
-  rightArrow.innerHTML = createArrowSVG()
+  leftArrow.innerHTML = arrowSVG
+  rightArrow.innerHTML = arrowSVG
 
   // Assign class names.
   controlsContainer.className = 'dp-controls-container'
@@ -70,13 +70,11 @@ function createCalendarControlElements({
   }
 }
 
-function createArrowSVG(): string {
-  return `
-    <svg viewBox="0 0 24 24">
-      <path d="M15 17.898C15 18.972 13.7351 19.546 12.9268 18.8388L6.61617 13.3169C5.81935 12.6197 5.81935 11.3801 6.61617 10.6829L12.9268 5.16108C13.7351 4.45388 15 5.02785 15 6.1018L15 17.898Z" fill="#212121"/>
-    </svg>
-  `
-}
+const arrowSVG = `
+  <svg viewBox="0 0 24 24">
+    <path d="M15 17.898C15 18.972 13.7351 19.546 12.9268 18.8388L6.61617 13.3169C5.81935 12.6197 5.81935 11.3801 6.61617 10.6829L12.9268 5.16108C13.7351 4.45388 15 5.02785 15 6.1018L15 17.898Z" fill="#212121"/>
+  </svg>
+`
 
 /**
  * Creates an array of divs representing the 7 days of the week. If the

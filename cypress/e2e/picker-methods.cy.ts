@@ -1,5 +1,5 @@
 import {Datepicker} from '../../src/types'
-import {containers, testElements} from '../selectors'
+import {containers, controls, testElements} from '../selectors'
 
 describe('Picker Methods', () => {
   let datepicker: Datepicker
@@ -71,6 +71,45 @@ describe('Picker Methods', () => {
           picker2.remove()
         })
         .should('have.been.calledTwice')
+    })
+  })
+
+  describe('navigate', () => {
+    it('should navigate the calendar to a new date (not select it)', () => {
+      const startDate = new Date(2023, 1)
+      const picker = datepicker(testElements.singleInput, {
+        alwaysShow: true,
+        startDate,
+      })
+
+      cy.get(controls.monthName).should('have.text', 'February')
+      cy.get(controls.year)
+        .should('have.text', '2023')
+        .then(() => {
+          picker.navigate({date: new Date(2024, 0)})
+        })
+      cy.get(controls.monthName).should('have.text', 'January')
+      cy.get(controls.year)
+        .should('have.text', '2024')
+        .then(() => {
+          expect(picker.selectedDate).to.be.undefined
+        })
+    })
+
+    it('should throw an error if called on an already removed instance', () => {
+      const picker = datepicker(testElements.singleInput)
+
+      cy.get(containers.calendarContainer)
+        .should('have.length', 1)
+        .then(() => {
+          picker.remove()
+        })
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.navigate).to.throw(
+            "Unable to run a function from a picker that's already removed."
+          )
+        })
     })
   })
 })

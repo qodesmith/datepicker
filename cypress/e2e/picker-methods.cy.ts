@@ -269,10 +269,169 @@ describe('Picker Methods', () => {
       cy.get(controls.year).should('have.text', '2022')
       cy.get(days.selectedDate).should('have.length', 1)
     })
+
+    it('should throw an error if called on an already removed instance', () => {
+      const picker = datepicker(testElements.singleInput)
+
+      cy.get(containers.calendarContainer)
+        .should('have.length', 1)
+        .then(() => {
+          picker.remove()
+        })
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.selectDate).to.throw(
+            "Unable to run a function from a picker that's already removed."
+          )
+        })
+    })
   })
 
-  describe('setMin', () => {})
-  describe('setMax', () => {})
+  describe('setMin', () => {
+    const startDate = new Date(2023, 1)
+    const minDate = new Date(startDate)
+    minDate.setMonth(minDate.getMonth() + 1)
+    const daysInMonth = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth() + 1,
+      0
+    ).getDate()
+    const options = {startDate, alwaysShow: true}
+
+    it('should set a minimum selectable date on the calendar', () => {
+      const picker = datepicker(testElements.singleInput, options)
+
+      cy.get(days.disabledDate)
+        .should('have.length', 0)
+        .then(() => {
+          picker.setMin({date: minDate})
+        })
+
+      cy.get(days.disabledDate).should('have.length', daysInMonth)
+    })
+
+    it('should unset a minimum selectable date', () => {
+      const picker = datepicker(testElements.singleInput, {...options, minDate})
+
+      cy.get(days.disabledDate)
+        .should('have.length', daysInMonth)
+        .then(() => {
+          picker.setMin()
+        })
+
+      cy.get(days.disabledDate).should('have.length', 0)
+    })
+
+    it('should deselect a date if it is out of range', () => {
+      const picker = datepicker(testElements.singleInput, {
+        ...options,
+        selectedDate: startDate,
+      })
+
+      expect(picker.selectedDate).to.deep.equal(startDate)
+
+      cy.get(days.selectedDate)
+        .should('have.length', 1)
+        .then(() => {
+          picker.setMin({date: minDate})
+        })
+
+      cy.get(days.selectedDate)
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.selectedDate).to.be.undefined
+        })
+    })
+
+    it('should throw an error if called on an already removed instance', () => {
+      const picker = datepicker(testElements.singleInput)
+
+      cy.get(containers.calendarContainer)
+        .should('have.length', 1)
+        .then(() => {
+          picker.remove()
+        })
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.setMin).to.throw(
+            "Unable to run a function from a picker that's already removed."
+          )
+        })
+    })
+  })
+
+  describe('setMax', () => {
+    const startDate = new Date(2023, 1)
+    const maxDateDay = 5
+    const maxDate = new Date(startDate)
+    maxDate.setDate(maxDateDay)
+    const options = {startDate, alwaysShow: true}
+
+    it('should set a maximum selectable date on the calendar', () => {
+      const picker = datepicker(testElements.singleInput, options)
+
+      cy.get(days.disabledDate)
+        .should('have.length', 0)
+        .then(() => {
+          picker.setMax({date: maxDate})
+        })
+
+      cy.get(`${days.day}:not(${days.disabledDate})`).should(
+        'have.length',
+        maxDateDay
+      )
+    })
+
+    it('should unset a maximum selectable date', () => {
+      const picker = datepicker(testElements.singleInput, {...options, maxDate})
+
+      cy.get(`${days.day}:not(${days.disabledDate})`)
+        .should('have.length', maxDateDay)
+        .then(() => {
+          picker.setMax()
+        })
+
+      cy.get(days.disabledDate).should('have.length', 0)
+    })
+
+    it('should deselect a date if it is out of range', () => {
+      const picker = datepicker(testElements.singleInput, {
+        ...options,
+        selectedDate: maxDate,
+      })
+
+      expect(picker.selectedDate).to.deep.equal(maxDate)
+
+      cy.get(days.selectedDate)
+        .should('have.length', 1)
+        .then(() => {
+          picker.setMax({date: startDate})
+        })
+
+      cy.get(days.selectedDate)
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.selectedDate).to.be.undefined
+        })
+    })
+
+    it('should throw an error if called on an already removed instance', () => {
+      const picker = datepicker(testElements.singleInput)
+
+      cy.get(containers.calendarContainer)
+        .should('have.length', 1)
+        .then(() => {
+          picker.remove()
+        })
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.setMax).to.throw(
+            "Unable to run a function from a picker that's already removed."
+          )
+        })
+    })
+  })
+
   describe('show', () => {})
   describe('hide', () => {})
   describe('toggleCalendar', () => {})

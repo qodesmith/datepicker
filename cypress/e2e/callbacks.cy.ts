@@ -1,5 +1,5 @@
 import {Datepicker, DatepickerOptions} from '../../src/types'
-import {days, testElements, controls} from '../selectors'
+import {days, testElements, controls, containers} from '../selectors'
 
 describe('Callbacks', () => {
   let datepicker: Datepicker
@@ -27,8 +27,7 @@ describe('Callbacks', () => {
     it('should be called after a date has been selected (and also after deselecting)', () => {
       const picker = datepicker(testElements.singleInput, options)
 
-      expect(options.onSelect).not.to.be.called
-
+      cy.get('@onSelect').should('not.have.been.called')
       cy.get(days.day).first().click()
       cy.get('@onSelect')
         .should('have.been.calledOnce')
@@ -58,8 +57,7 @@ describe('Callbacks', () => {
         selectedDate: startDate,
       })
 
-      expect(options.onSelect).not.to.be.called
-
+      cy.get('@onSelect').should('not.have.been.called')
       cy.get(days.day).first().click()
       cy.get('@onSelect')
         .should('have.been.calledOnce')
@@ -72,12 +70,14 @@ describe('Callbacks', () => {
         })
     })
 
-    it('should be called after running the `selectDate` method', () => {
+    it('should be called after calling the `selectDate` method', () => {
       const picker = datepicker(testElements.singleInput, options)
 
-      expect(options.onSelect).not.to.be.called
-
-      picker.selectDate({date: startDate})
+      cy.get('@onSelect')
+        .should('not.have.been.called')
+        .then(() => {
+          picker.selectDate({date: startDate})
+        })
       cy.get('@onSelect')
         .should('have.been.calledOnce')
         .should('have.been.calledWith', {
@@ -89,23 +89,25 @@ describe('Callbacks', () => {
         })
     })
 
-    it('should be called after running the `setMin` method (if dates conflict)', () => {
+    it('should be called after calling the `setMin` method (if dates conflict)', () => {
       const picker = datepicker(testElements.singleInput, {
         ...options,
         selectedDate: startDate,
       })
 
-      expect(options.onSelect).not.to.be.called
-
-      const unaffectedMinDate = new Date(startDate)
-      unaffectedMinDate.setDate(unaffectedMinDate.getDate() - 1)
-      const minDate = new Date(startDate)
-      minDate.setDate(minDate.getDate() + 1)
-
-      picker.setMin({date: unaffectedMinDate})
       cy.get('@onSelect')
         .should('not.have.been.called')
         .then(() => {
+          const unaffectedMinDate = new Date(startDate)
+          unaffectedMinDate.setDate(unaffectedMinDate.getDate() - 1)
+          picker.setMin({date: unaffectedMinDate})
+        })
+
+      cy.get('@onSelect')
+        .should('not.have.been.called')
+        .then(() => {
+          const minDate = new Date(startDate)
+          minDate.setDate(minDate.getDate() + 1)
           picker.setMin({date: minDate})
         })
 
@@ -120,23 +122,25 @@ describe('Callbacks', () => {
         })
     })
 
-    it('should be called after running the `setMax` method (if dates conflict)', () => {
+    it('should be called after calling the `setMax` method (if dates conflict)', () => {
       const picker = datepicker(testElements.singleInput, {
         ...options,
         selectedDate: startDate,
       })
 
-      expect(options.onSelect).not.to.be.called
-
-      const unaffectedMaxDate = new Date(startDate)
-      unaffectedMaxDate.setDate(unaffectedMaxDate.getDate() + 1)
-      const maxDate = new Date(startDate)
-      maxDate.setDate(maxDate.getDate() - 1)
-
-      picker.setMax({date: unaffectedMaxDate})
       cy.get('@onSelect')
         .should('not.have.been.called')
         .then(() => {
+          const unaffectedMaxDate = new Date(startDate)
+          unaffectedMaxDate.setDate(unaffectedMaxDate.getDate() + 1)
+          picker.setMax({date: unaffectedMaxDate})
+        })
+
+      cy.get('@onSelect')
+        .should('not.have.been.called')
+        .then(() => {
+          const maxDate = new Date(startDate)
+          maxDate.setDate(maxDate.getDate() - 1)
           picker.setMax({date: maxDate})
         })
 
@@ -166,11 +170,10 @@ describe('Callbacks', () => {
 
     it('should be called when clicking the arrow buttons', () => {
       const picker = datepicker(testElements.singleInput, options)
-
-      expect(options.onMonthChange).not.to.be.called
       const newDate = new Date(startDate)
       newDate.setMonth(newDate.getMonth() - 1)
 
+      cy.get('@onMonthChange').should('not.have.been.called')
       cy.get(controls.leftArrow).click()
       cy.get('@onMonthChange')
         .should('have.been.calledOnce')
@@ -196,12 +199,15 @@ describe('Callbacks', () => {
 
     it('should be called after running the `navigate` method', () => {
       const picker = datepicker(testElements.singleInput, options)
-
-      expect(options.onMonthChange).not.to.be.called
       const newDate = new Date(startDate)
       newDate.setFullYear(newDate.getFullYear() + 1)
 
-      picker.navigate({date: newDate})
+      cy.get('@onMonthChange')
+        .should('not.have.been.called')
+        .then(() => {
+          picker.navigate({date: newDate})
+        })
+
       cy.get('@onMonthChange')
         .should('have.been.calledOnce')
         .should('have.been.calledWith', {
@@ -215,12 +221,15 @@ describe('Callbacks', () => {
 
     it('should be called after running `selectDate` with `changeCalendar: true`', () => {
       const picker = datepicker(testElements.singleInput, options)
-
-      expect(options.onMonthChange).not.to.be.called
       const newDate = new Date(startDate)
       newDate.setFullYear(newDate.getFullYear() + 1)
 
-      picker.selectDate({date: newDate, changeCalendar: true})
+      cy.get('@onMonthChange')
+        .should('not.have.been.called')
+        .then(() => {
+          picker.selectDate({date: newDate, changeCalendar: true})
+        })
+
       cy.get('@onMonthChange')
         .should('have.been.calledOnce')
         .should('have.been.calledWith', {
@@ -234,12 +243,15 @@ describe('Callbacks', () => {
 
     it('should not be called after running `selectDate` with `changeCalendar: false`', () => {
       const picker = datepicker(testElements.singleInput, options)
-
-      expect(options.onMonthChange).not.to.be.called
       const newDate = new Date(startDate)
       newDate.setFullYear(newDate.getFullYear() + 1)
 
-      picker.selectDate({date: newDate, changeCalendar: false})
+      cy.get('@onMonthChange')
+        .should('not.have.been.called')
+        .then(() => {
+          picker.selectDate({date: newDate, changeCalendar: false})
+        })
+
       cy.get('@onMonthChange').should('not.have.been.called')
     })
 
@@ -249,10 +261,96 @@ describe('Callbacks', () => {
         selectedDate: startDate,
       })
 
-      expect(options.onMonthChange).not.to.be.called
-
       picker.selectDate({changeCalendar: true})
       cy.get('@onMonthChange').should('not.have.been.called')
+    })
+  })
+
+  describe('onShow', () => {
+    const options: DatepickerOptions = {onShow() {}}
+
+    beforeEach(() => {
+      cy.spy(options, 'onShow').as('onShow')
+    })
+
+    it('should be called when the input is focused', () => {
+      const picker = datepicker(testElements.singleInput, options)
+
+      cy.get('@onShow').should('not.have.been.called')
+      cy.get(containers.calendarContainer).should('not.be.visible')
+      cy.get(testElements.singleInput).click()
+      cy.get('@onShow')
+        .should('have.been.calledOnce')
+        .should('have.been.calledWith', {
+          instance: picker,
+          trigger: 'focusin',
+          triggerType: 'user',
+        })
+    })
+
+    it('should be called when the `show` method is called', () => {
+      const picker = datepicker(testElements.singleInput, options)
+
+      cy.get('@onShow').should('not.have.been.called')
+      cy.get(containers.calendarContainer)
+        .should('not.be.visible')
+        .then(() => {
+          picker.show()
+        })
+
+      cy.get('@onShow')
+        .should('have.been.calledOnce')
+        .should('have.been.calledWith', {
+          instance: picker,
+          trigger: 'show',
+          triggerType: 'imperative',
+        })
+    })
+  })
+
+  describe('onHide', () => {
+    const options: DatepickerOptions = {onHide() {}}
+
+    beforeEach(() => {
+      cy.spy(options, 'onHide').as('onHide')
+    })
+
+    it('should be called when a click happens outside the input', () => {
+      const picker = datepicker(testElements.singleInput, options)
+
+      cy.get('@onHide').should('not.have.been.called')
+      cy.get(containers.calendarContainer).should('not.be.visible')
+      cy.get(testElements.singleInput).click()
+      cy.get(containers.calendarContainer).should('be.visible')
+      cy.get(testElements.unfocus).click()
+      cy.get(containers.calendarContainer).should('not.be.visible')
+      cy.get('@onHide')
+        .should('have.been.calledOnce')
+        .should('have.been.calledWith', {
+          instance: picker,
+          trigger: 'click',
+          triggerType: 'user',
+        })
+    })
+
+    it('should be called when the `hide` method is called', () => {
+      const picker = datepicker(testElements.singleInput, options)
+
+      cy.get('@onHide').should('not.have.been.called')
+      cy.get(testElements.singleInput).click()
+      cy.get(containers.calendarContainer)
+        .should('be.visible')
+        .then(() => {
+          picker.hide()
+        })
+
+      cy.get('@onHide')
+        .should('have.been.calledOnce')
+        .should('have.been.calledWith', {
+          instance: picker,
+          trigger: 'hide',
+          triggerType: 'imperative',
+        })
     })
   })
 })

@@ -270,4 +270,11 @@ describe('Picker Methods', () => {
       cy.get(days.selectedDate).should('have.length', 1)
     })
   })
+
+  describe('setMin', () => {})
+  describe('setMax', () => {})
+  describe('show', () => {})
+  describe('hide', () => {})
+  describe('toggleCalendar', () => {})
+  describe('toggleOverlay', () => {})
 })

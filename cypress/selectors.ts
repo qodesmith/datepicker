@@ -71,6 +71,9 @@ export const otherCls = {
 export const other = clsToSelector(otherCls)
 
 export const testElements = {
+  // Header
+  unfocus: '#unfocus',
+
   // Input Section
   inputSection: '#input-section',
   singleInput: '#single-input',

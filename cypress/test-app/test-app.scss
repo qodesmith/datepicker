@@ -7,6 +7,12 @@ body {
   font-family: sans-serif;
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 section {
   padding: 1em;
   border: 1px solid;

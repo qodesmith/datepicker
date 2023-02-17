@@ -12,7 +12,10 @@ window.datepicker = datepicker
 
 document.querySelector<HTMLDivElement>('#root')!.innerHTML = `
   <div>
-    <h1>Datepicker Test App</h1>
+    <header>
+      <h1>Datepicker Test App</h1>
+      <div id="unfocus">Click me to unfocus...</div>
+    </header>
     
     <section id="input-section">
       <h2>Single Input</h2>

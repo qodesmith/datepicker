@@ -12,7 +12,7 @@ import {createCalendarHTML} from './utilsCreateCalendar'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
   addPickerToMap,
-  adjustMinMaxDates,
+  adjustRangepickerMinMaxDates,
   getIsInput,
   getOverlayClassName,
   getRangepickers,
@@ -151,8 +151,8 @@ function datepicker(
         internalPickerItem.currentDate = stripTime(date)
       }
 
-      // Update min/max dates (it will only apply for rangepickers).
-      adjustMinMaxDates(internalPickerItem, date)
+      // Update min/max dates if this is a rangepicker.
+      adjustRangepickerMinMaxDates(internalPickerItem, date)
 
       // Update the DOM with these changes.
       renderCalendar(internalPickerItem)

@@ -350,7 +350,7 @@ export function getIsInput(el: unknown): el is HTMLInputElement {
  * Clicking a date on a range pair will always adjust the sibling calendar's
  * min/max date.
  */
-export function adjustMinMaxDates(
+export function adjustRangepickerMinMaxDates(
   picker: InternalPickerData,
   date: Date | undefined
 ): void {

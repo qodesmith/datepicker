@@ -22,8 +22,8 @@ export function useDatepicker({
 }: UseDatepickerProps): [JSX.Element, DatepickerInstance | null] {
   const ref = useRef()
   const element = createElement(type, {
-    ref,
     ...(type === 'div' ? {dangerouslySetInnerHTML: {__html: ''}} : {}),
+    ref,
   })
 
   // Using Recoil in case we want access to the picker anywhere else in the app.

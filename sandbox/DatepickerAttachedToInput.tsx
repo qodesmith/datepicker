@@ -2,6 +2,7 @@ import {DatepickerOptions} from '../src/types'
 import DatepickerImperativeControls from './DatepickerImperativeControls'
 import {useDatepicker} from './useDatepicker'
 import useSliderValuesCheckbox from './useSliderValuesCheckbox'
+import './datepickerAttachedToInput.scss'
 
 export default function DatepickerAttachedToInput() {
   const options: DatepickerOptions = {
@@ -22,8 +23,11 @@ export default function DatepickerAttachedToInput() {
       </h3>
       <DatepickerImperativeControls picker={picker} options={options} />
 
-      {/* Datepicker is attached to this div. */}
-      {jsx}
+      <div className="dual-input-container">
+        {/* Datepicker is attached to div in `jsx`. */}
+        {jsx}
+        <input type="text" placeholder="nothing attached..." />
+      </div>
     </section>
   )
 }

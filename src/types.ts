@@ -288,6 +288,20 @@ export type Position = 'tl' | 'tr' | 'bl' | 'br' | 'mc'
 
 export type ViewType = 'calendar' | 'overlay'
 
+/*
+  TODO - how do we strongly type this? 
+  (e: HTMLElementEventMap[keyof HTMLElementEventMap]) => void doesn't work.
+
+  Inspiration from `addEventListener`:
+  HTMLElement.addEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
+    options?: boolean | AddEventListenerOptions | undefined
+  ): void (+1 overload)
+*/
+export type ListenersMapValue = (e: any) => void
+export type ListenersMapKey = {type: keyof HTMLElementEventMap; el: HTMLElement}
+
 // TODO - remove properties not needed.
 export type InternalPickerData = {
   /**
@@ -366,19 +380,8 @@ export type InternalPickerData = {
   isOverlayShowing: boolean
   defaultView: ViewType
   listenersMap: Map<
-    {type: keyof HTMLElementEventMap; el: HTMLElement},
-    (e: any) => void // Using `any` until we know hot to strongly type this.
-    /*
-      TODO - how do we strongly type this? 
-      (e: HTMLElementEventMap[keyof HTMLElementEventMap]) => void doesn't work.
-
-      Inspiration from `addEventListener`:
-      HTMLElement.addEventListener<K extends keyof HTMLElementEventMap>(
-        type: K,
-        listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any,
-        options?: boolean | AddEventListenerOptions | undefined
-      ): void (+1 overload)
-    */
+    PrettifyNonRecursive<ListenersMapKey>,
+    PrettifyNonRecursive<ListenersMapValue>
   >
 }
 

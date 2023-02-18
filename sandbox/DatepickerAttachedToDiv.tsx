@@ -5,7 +5,7 @@ import useSliderValuesCheckbox from './useSliderValuesCheckbox'
 
 export default function DatepickerAttachedToDiv() {
   const options: DatepickerOptions = {
-    alwaysShow: true,
+    // alwaysShow: true,
   }
   const [jsx, picker] = useDatepicker({
     pickerKey: 'DatepickerAttachedToDiv',

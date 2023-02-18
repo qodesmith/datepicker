@@ -22,6 +22,8 @@ section {
 .main-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto; // Ensures the 1st row is content height.
+  grid-auto-rows: 17.5em; // All other rows get this height.
   gap: var(--gap);
 }
 

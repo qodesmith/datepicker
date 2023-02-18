@@ -57,8 +57,6 @@ export const defaultOptions = {
   ],
 } as const
 
-export const globalListenerData = {attached: false}
-
 export const imperativeMethods = [
   'selectDate',
   'setMin',

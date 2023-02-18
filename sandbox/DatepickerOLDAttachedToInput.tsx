@@ -3,7 +3,7 @@ import {useOldDatepicker} from './useOldDatepicker'
 export default function DatepickerOLDAttachedToInput() {
   const [jsx, picker] = useOldDatepicker({
     pickerKey: 'DatepickerOLDAttachedToInput',
-    type: 'div',
+    type: 'input',
   })
 
   return (

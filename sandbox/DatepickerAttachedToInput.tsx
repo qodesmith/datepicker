@@ -7,6 +7,7 @@ import './datepickerAttachedToInput.scss'
 export default function DatepickerAttachedToInput() {
   const options: DatepickerOptions = {
     position: 'bl',
+    minDate: new Date(),
   }
   const [jsx, picker] = useDatepicker({
     pickerKey: 'DatepickerAttachedToInput',
@@ -26,7 +27,10 @@ export default function DatepickerAttachedToInput() {
       <div className="dual-input-container">
         {/* Datepicker is attached to div in `jsx`. */}
         {jsx}
-        <input type="text" placeholder="nothing attached..." />
+        <div>
+          <input type="date" placeholder="nothing attached..." />
+          <input type="text" placeholder="nothing attached..." />
+        </div>
       </div>
     </section>
   )

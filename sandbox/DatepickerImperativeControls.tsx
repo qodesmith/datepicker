@@ -9,7 +9,7 @@ import './datepickerImperativeControls.scss'
 
 type Props = {
   picker: DatepickerInstance | DaterangePickerInstance | null
-  options: DatepickerOptions | DaterangePickerOptions | undefined
+  options?: DatepickerOptions | DaterangePickerOptions
 }
 
 export default function DatepickerImperativeControls({
@@ -80,7 +80,6 @@ function useCreateControls(
 
     return {
       handleLeftArrowClick(e) {
-        e.stopPropagation()
         const {currentDate} = picker
         picker.navigate({
           date: new Date(
@@ -91,7 +90,6 @@ function useCreateControls(
         })
       },
       handleRightArrowClick(e) {
-        e.stopPropagation()
         const {currentDate} = picker
         picker.navigate({
           date: new Date(
@@ -102,19 +100,15 @@ function useCreateControls(
         })
       },
       handleShow(e) {
-        e.stopPropagation()
         picker.show()
       },
       handleHide(e) {
-        e.stopPropagation()
         picker.hide()
       },
       handleToggleCalendar(e) {
-        e.stopPropagation()
         picker.toggleCalendar()
       },
       handleToggleOverlay(e) {
-        e.stopPropagation()
         picker.toggleOverlay()
       },
     }

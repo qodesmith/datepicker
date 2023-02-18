@@ -24,6 +24,8 @@ export default function useSliderValuesCheckbox(
     []
   )
 
+  // TODO - this conditional logic is buggy. The `DatepickerAttachedToDiv` is
+  // initially showing even with `alwaysShow: false`.
   if (isChecked) {
     picker?.calendarContainer.parentElement?.style.setProperty(
       'font-size',

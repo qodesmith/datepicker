@@ -1,5 +1,7 @@
-import {datepickersMap, globalListenerData} from './constants'
+import {datepickersMap} from './constants'
 import {
+  DatepickerInstance,
+  DaterangePickerInstance,
   InternalPickerData,
   ListenersMapKey,
   ListenersMapValue,
@@ -7,38 +9,49 @@ import {
 } from './types'
 import {getIsInput} from './utils'
 
+let globalListenerDataAttached = false
+const globalListenerEvents = ['click']
+
+// TODO - add documentation for e.__exemptPicker__ property
+// TODO - add documentation for React e.nativeEvent.__exemptPicker__ property
+/**
+ * TODO - ^^^ ACTUALLY, add new `exemptIds` prop & use [data-exempt-id=...] attr.
+ * It would work like:
+ * - datepicker(selector, {exemptIds: ['abc', '123']})
+ * - Add a `data-exempt-id` prop to an
+ */
+
 function globalListener(e: Event) {
-  let found = false
-
+  // @ts-expect-error This property is potentially added by the user.
+  const exemptPicker = e.__exemptPicker__ as
+    | DatepickerInstance
+    | DaterangePickerInstance
+    | undefined
   datepickersMap.forEach((pickerSet, el) => {
-    if (el.contains(e.target as HTMLInputElement)) {
-      found = true
-    }
-  })
+    const target = e.target as HTMLInputElement
+    const targetIsDay = target.classList.contains('dp-day')
+    const targetIsDisabledDay = target.classList.contains('dp-disabled-date')
 
-  // Hide all other calendars.
-  if (!found) {
-    const type = e.type as UserEvent
+    // `el` here is the associated input, div, etc., for the picker.
+    const triggeredOnInput = getIsInput(el) && el === target
 
-    datepickersMap.forEach(pickerSet => {
-      pickerSet.forEach(picker => {
-        picker._hide({trigger: type, triggerType: 'user'})
-      })
+    pickerSet.forEach(picker => {
+      const {calendarContainer} = picker.publicPicker
+      const calContainerHasTarget = calendarContainer.contains(target)
+      const enabledCalDayClicked =
+        calContainerHasTarget && targetIsDay && !targetIsDisabledDay
+      const eventNotAssociatedWithPicker =
+        !calContainerHasTarget && !triggeredOnInput
+      const isPickerExemptFromClosing = picker.publicPicker !== exemptPicker
+
+      if (
+        enabledCalDayClicked ||
+        (eventNotAssociatedWithPicker && isPickerExemptFromClosing)
+      ) {
+        picker._hide({trigger: e.type as UserEvent, triggerType: 'user'})
+      }
     })
-  }
-}
-
-function globalInputFocusInListener(e: FocusEvent): void {
-  /**
-   * Only listen to focusin events on input elements.
-   * Don't trigger listener for events on the overlay input.
-   */
-  if (!getIsInput(e.target) || e.target.className === 'dp-overlay-input') {
-    return
-  }
-
-  // TODO - why do we pass a focus event to a click event listener?
-  globalListener(e)
+  })
 }
 
 function submitOverlayYear(
@@ -95,19 +108,22 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
   }
 
   // GLOBAL LISTENERS
-  if (!globalListenerData.attached) {
-    document.addEventListener('focusin', globalInputFocusInListener)
-    document.addEventListener('click', globalListener)
-    globalListenerData.attached = true
+  if (!globalListenerDataAttached) {
+    globalListenerEvents.forEach(eventName => {
+      document.addEventListener(eventName, globalListener)
+    })
+    globalListenerDataAttached = true
   }
 
   // INPUT ELEMENT
   if (isInput) {
-    const showHideData = {trigger: 'focusin', triggerType: 'user'} as const
+    const showHideData = {trigger: 'click', triggerType: 'user'} as const
 
-    // `focusin` bubbles, `focus` does not.
-    setListenersMapItem({type: 'focusin', el: selectorData.el}, focusInListener)
-    function focusInListener(e: FocusEvent) {
+    setListenersMapItem(
+      {type: 'click', el: selectorData.el},
+      inputClickListener
+    )
+    function inputClickListener() {
       // Show this calendar.
       internalPickerItem._show(showHideData)
 
@@ -279,9 +295,10 @@ export function removeEventListeners(internalPickerItem: InternalPickerData) {
   const {listenersMap} = internalPickerItem
 
   if (datepickersMap.size === 0) {
-    document.removeEventListener('focusin', globalInputFocusInListener)
-    document.removeEventListener('click', globalListener)
-    globalListenerData.attached = false
+    globalListenerEvents.forEach(eventName => {
+      document.removeEventListener(eventName, globalListener)
+    })
+    globalListenerDataAttached = false
   }
 
   listenersMap.forEach((listener, {type, el}) => {

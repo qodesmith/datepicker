@@ -89,6 +89,7 @@ function datepicker(
     months: options.months,
     disabledDates,
     events,
+    exemptIds: options.exemptIds,
     currentDate: startDate,
     selectedDate: options.selectedDate,
     minDate,

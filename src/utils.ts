@@ -527,6 +527,7 @@ export function sanitizeAndCheckAndSyncOptions(
     minMaxDates,
     disabledDates,
     events,
+    exemptIds: new Set(options?.exemptIds ?? []),
     startDate: stripTime(options?.startDate ?? new Date()),
     position: options?.position ?? 'tl',
     customDays: (options?.customDays ?? defaultOptions.days).slice(),

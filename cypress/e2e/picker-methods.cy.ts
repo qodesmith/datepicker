@@ -1,5 +1,5 @@
 import {Datepicker} from '../../src/types'
-import {containers, controls, days, testElements} from '../selectors'
+import {containers, controls, days, overlay, testElements} from '../selectors'
 
 describe('Picker Methods', () => {
   let datepicker: Datepicker
@@ -40,21 +40,72 @@ describe('Picker Methods', () => {
         })
     })
 
-    it('should call `removeEventListener` on the provided element`', () => {
+    it('should call `removeEventListener` on a number of elements', () => {
       const picker = datepicker(testElements.singleInput)
 
-      cy.get(testElements.singleInput).then(el => {
-        cy.spy(el[0], 'removeEventListener').as('removeEventListener')
+      cy.document().then(doc => {
+        cy.spy(doc, 'removeEventListener').as('globalListener')
       })
-      cy.get('@removeEventListener')
-        .should('not.have.been.called')
+      cy.get(testElements.singleInput).then(el => {
+        cy.spy(el[0], 'removeEventListener').as('inputClickListener')
+      })
+      cy.get(controls.leftArrow).then(el => {
+        cy.spy(el[0], 'removeEventListener').as('leftArrowListener')
+      })
+      cy.get(controls.rightArrow).then(el => {
+        cy.spy(el[0], 'removeEventListener').as('rightArrowListener')
+      })
+      cy.get(containers.monthYearContainer).then(el => {
+        cy.spy(el[0], 'removeEventListener').as('monthYearListener')
+      })
+      cy.get(containers.daysContainer).then(el => {
+        cy.spy(el[0], 'removeEventListener').as('daysContainerListener')
+      })
+      cy.get(containers.overlayMonthsContainer).then(el => {
+        cy.spy(el[0], 'removeEventListener').as('monthsContainerListener')
+      })
+      cy.get(overlay.close).then(el => {
+        cy.spy(el[0], 'removeEventListener').as('overlayCloseListner')
+      })
+      cy.get(overlay.submit).then(el => {
+        cy.spy(el[0], 'removeEventListener').as('overlaySubmitListener')
+      })
+      cy.get(overlay.input)
+        .then(el => {
+          cy.spy(el[0], 'removeEventListener').as('overlayInputOnInputListener')
+        })
         .then(() => {
           picker.remove()
         })
-        .should('have.been.called')
+
+      cy.get('@globalListener').should('have.been.calledOnce')
+      cy.get('@inputClickListener').should('have.been.calledOnce')
+      cy.get('@leftArrowListener').should('have.been.calledOnce')
+      cy.get('@rightArrowListener').should('have.been.calledOnce')
+      cy.get('@monthYearListener').should('have.been.calledOnce')
+      cy.get('@daysContainerListener').should('have.been.calledOnce')
+      cy.get('@monthsContainerListener').should('have.been.calledOnce')
+      cy.get('@overlayCloseListner').should('have.been.calledOnce')
+      cy.get('@overlaySubmitListener').should('have.been.calledOnce')
+      cy.get('@overlayInputOnInputListener').should('have.been.calledTwice')
     })
 
-    it('should call `document.removeEventListener` twice after removing the last picker', () => {
+    it('should not call `removeEventListener` on the document if more pickers are left', () => {
+      datepicker(testElements.singleStandalone)
+      const picker = datepicker(testElements.singleInput)
+
+      cy.document()
+        .then(doc => {
+          cy.spy(doc, 'removeEventListener').as('globalListener')
+        })
+        .then(() => {
+          picker.remove()
+        })
+
+      cy.get('@globalListener').should('not.have.been.called')
+    })
+
+    it('should call `document.removeEventListener` after removing the last picker', () => {
       const picker1 = datepicker(testElements.singleInput)
       const picker2 = datepicker(testElements.singleStandalone)
 
@@ -70,7 +121,7 @@ describe('Picker Methods', () => {
         .then(() => {
           picker2.remove()
         })
-        .should('have.been.calledTwice')
+        .should('have.been.calledOnce')
     })
   })
 
@@ -432,8 +483,100 @@ describe('Picker Methods', () => {
     })
   })
 
-  describe('show', () => {})
-  describe('hide', () => {})
+  describe('show', () => {
+    it('shows the calendar when called (default calendar view)', () => {
+      const picker = datepicker(testElements.singleInput)
+
+      cy.get(containers.calendarContainer)
+        .should('not.be.visible')
+        .then(() => {
+          picker.show()
+        })
+
+      cy.get(containers.calendarContainer).should('be.visible')
+      cy.get(containers.overlayContainer).should('not.be.visible')
+    })
+
+    it('shows the calendar when called (default overlay view)', () => {
+      const picker = datepicker(testElements.singleInput, {
+        defaultView: 'overlay',
+      })
+
+      cy.get(containers.calendarContainer)
+        .should('not.be.visible')
+        .then(() => {
+          picker.show()
+        })
+
+      cy.get(containers.calendarContainer).should('be.visible')
+      cy.get(containers.overlayContainer).should('be.visible')
+
+      cy.get(overlay.close).click()
+      cy.get(containers.calendarContainer).should('be.visible')
+      cy.get(containers.overlayContainer).should('not.be.visible')
+    })
+
+    it('should throw an error if called on an already removed instance', () => {
+      const picker = datepicker(testElements.singleInput)
+
+      cy.get(containers.calendarContainer)
+        .should('have.length', 1)
+        .then(() => {
+          picker.remove()
+        })
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.show).to.throw(
+            "Unable to run a function from a picker that's already removed."
+          )
+        })
+    })
+  })
+
+  describe('hide', () => {
+    it('hides the calendar when called', () => {
+      const picker = datepicker(testElements.singleInput)
+
+      cy.get(containers.calendarContainer).should('not.be.visible')
+      cy.get(testElements.singleInput).click()
+      cy.get(containers.calendarContainer)
+        .should('be.visible')
+        .then(() => {
+          picker.hide()
+        })
+
+      cy.get(containers.calendarContainer).should('not.be.visible')
+    })
+
+    it('has no effect when `alwayShow: true` is set', () => {
+      const picker = datepicker(testElements.singleInput, {alwaysShow: true})
+
+      cy.get(containers.calendarContainer)
+        .should('be.visible')
+        .then(() => {
+          picker.hide()
+        })
+
+      cy.get(containers.calendarContainer).should('be.visible')
+    })
+
+    it('should throw an error if called on an already removed instance', () => {
+      const picker = datepicker(testElements.singleInput)
+
+      cy.get(containers.calendarContainer)
+        .should('have.length', 1)
+        .then(() => {
+          picker.remove()
+        })
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.hide).to.throw(
+            "Unable to run a function from a picker that's already removed."
+          )
+        })
+    })
+  })
+
   describe('toggleCalendar', () => {})
   describe('toggleOverlay', () => {})
 })

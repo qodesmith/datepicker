@@ -12,23 +12,16 @@ import {getIsInput} from './utils'
 let globalListenerDataAttached = false
 const globalListenerEvents = ['click']
 
-// TODO - add documentation for e.__exemptPicker__ property
-// TODO - add documentation for React e.nativeEvent.__exemptPicker__ property
-/**
- * TODO - ^^^ ACTUALLY, add new `exemptIds` prop & use [data-exempt-id=...] attr.
- * It would work like:
- * - datepicker(selector, {exemptIds: ['abc', '123']})
- * - Add a `data-exempt-id` prop to an
- */
-
 function globalListener(e: Event) {
   // @ts-expect-error This property is potentially added by the user.
   const exemptPicker = e.__exemptPicker__ as
     | DatepickerInstance
     | DaterangePickerInstance
     | undefined
+  const target = e.target as HTMLElement
+  const {exemptId} = target.dataset
+
   datepickersMap.forEach((pickerSet, el) => {
-    const target = e.target as HTMLInputElement
     const targetIsDay = target.classList.contains('dp-day')
     const targetIsDisabledDay = target.classList.contains('dp-disabled-date')
 
@@ -42,11 +35,12 @@ function globalListener(e: Event) {
         calContainerHasTarget && targetIsDay && !targetIsDisabledDay
       const eventNotAssociatedWithPicker =
         !calContainerHasTarget && !triggeredOnInput
-      const isPickerExemptFromClosing = picker.publicPicker !== exemptPicker
+      const isPickerExemptFromClosing =
+        exemptId && picker.exemptIds.has(exemptId)
 
       if (
         enabledCalDayClicked ||
-        (eventNotAssociatedWithPicker && isPickerExemptFromClosing)
+        (eventNotAssociatedWithPicker && !isPickerExemptFromClosing)
       ) {
         picker._hide({trigger: e.type as UserEvent, triggerType: 'user'})
       }

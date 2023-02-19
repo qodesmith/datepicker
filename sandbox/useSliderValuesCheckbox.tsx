@@ -33,7 +33,6 @@ export default function useSliderValuesCheckbox(
 
   useLayoutEffect(() => {
     if (!isChecked) {
-      console.log('resetting calendar container styles')
       picker?.calendarContainer.parentElement?.style.setProperty(
         'font-size',
         `${initialSliderValues[0].initialValue}em`

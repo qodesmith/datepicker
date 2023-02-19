@@ -239,7 +239,11 @@ export function createCalendarHTML(
   weekdaysArray.forEach(weekday => weekdaysContainer.append(weekday))
   calendarDaysArray.forEach(day => daysContainer.append(day))
 
-  // Default to a hidden calendar for input datepickers.
+  /**
+   * Pickers associated with an input will be hidden by default.
+   * Pickers not associated with an input will be shown by default.
+   */
+
   if (isInput && !alwaysShow) {
     calendarContainer.classList.add('dp-dn')
   }

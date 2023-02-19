@@ -162,8 +162,8 @@ export type DatepickerOptions = {
 
   /**
    * By default, the datepicker will hide & show itself automatically depending
-   * on where you click or focus on the page. If you want the calendar to always
-   * be on the screen, use this option.
+   * on where you click on the page. If you want the calendar to always be on
+   * the screen, use this option.
    *
    * Default - false
    */

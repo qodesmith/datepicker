@@ -273,7 +273,7 @@ describe('Callbacks', () => {
       cy.spy(options, 'onShow').as('onShow')
     })
 
-    it('should be called when the input is focused', () => {
+    it('should be called when the input is clicked', () => {
       const picker = datepicker(testElements.singleInput, options)
 
       cy.get('@onShow').should('not.have.been.called')
@@ -283,7 +283,7 @@ describe('Callbacks', () => {
         .should('have.been.calledOnce')
         .should('have.been.calledWith', {
           instance: picker,
-          trigger: 'focusin',
+          trigger: 'click',
           triggerType: 'user',
         })
     })

@@ -412,11 +412,6 @@ function datepicker(
         triggerType: 'imperative',
       })
     },
-
-    /**
-     * TODO - check for the "gotcha" scenario with show / hide.
-     * https://github.com/qodesmith/datepicker#show--hide-gotcha
-     */
     show(): void {
       if (isRemoved) throwAlreadyRemovedError()
 

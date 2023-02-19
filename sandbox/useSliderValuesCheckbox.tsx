@@ -5,7 +5,8 @@ import {initialSliderValues} from './state'
 import {useCallback, useState} from 'react'
 
 export default function useSliderValuesCheckbox(
-  picker: DatepickerInstance | DaterangePickerInstance | null
+  picker: DatepickerInstance | DaterangePickerInstance | null,
+  exemptId?: string
 ) {
   const [isChecked, setIsChecked] = useState(false)
   const [isReset, setIsReset] = useState(false)
@@ -52,7 +53,12 @@ export default function useSliderValuesCheckbox(
   const jsx = (
     <div className="checkbox-container">
       <span className="checkbox-text">check to apply slider styles</span>
-      <input type="checkbox" checked={isChecked} onChange={handleOnChange} />
+      <input
+        type="checkbox"
+        checked={isChecked}
+        onChange={handleOnChange}
+        data-exempt-id={exemptId}
+      />
     </div>
   )
 

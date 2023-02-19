@@ -24,31 +24,46 @@ export default function DatepickerImperativeControls({
     handleToggleCalendar,
     handleToggleOverlay,
   } = useCreateControls(picker)
-  const {alwaysShow} = options
+  const {alwaysShow, exemptIds} = options
+  const [exemptId] = exemptIds ?? []
 
   return (
     <div className="datepicker-imperative-controls">
-      <button onClick={handleLeftArrowClick} disabled={!handleLeftArrowClick}>
+      <button
+        onClick={handleLeftArrowClick}
+        disabled={!handleLeftArrowClick}
+        data-exempt-id={exemptId}>
         ⬅
       </button>
       <button
         onClick={handleRightArrowClick}
         disabled={!handleRightArrowClick}
-        className="arrow-reversed">
+        className="arrow-reversed"
+        data-exempt-id={exemptId}>
         ⬅
       </button>
-      <button onClick={handleShow} disabled={!handleShow || alwaysShow}>
+      <button
+        onClick={handleShow}
+        disabled={!handleShow || alwaysShow}
+        data-exempt-id={exemptId}>
         🙉 Show
       </button>
-      <button onClick={handleHide} disabled={!handleHide || alwaysShow}>
+      <button
+        onClick={handleHide}
+        disabled={!handleHide || alwaysShow}
+        data-exempt-id={exemptId}>
         🙈 Hide
       </button>
       <button
         onClick={handleToggleCalendar}
-        disabled={!handleToggleCalendar || alwaysShow}>
+        disabled={!handleToggleCalendar || alwaysShow}
+        data-exempt-id={exemptId}>
         📆 Toggle Calendar
       </button>
-      <button onClick={handleToggleOverlay} disabled={!handleToggleOverlay}>
+      <button
+        onClick={handleToggleOverlay}
+        disabled={!handleToggleOverlay}
+        data-exempt-id={exemptId}>
         Toggle Overlay
       </button>
     </div>

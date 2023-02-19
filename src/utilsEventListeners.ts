@@ -1,7 +1,5 @@
 import {datepickersMap} from './constants'
 import {
-  DatepickerInstance,
-  DaterangePickerInstance,
   InternalPickerData,
   ListenersMapKey,
   ListenersMapValue,
@@ -10,14 +8,8 @@ import {
 import {getIsInput} from './utils'
 
 let globalListenerDataAttached = false
-const globalListenerEvents = ['click']
 
 function globalListener(e: Event) {
-  // @ts-expect-error This property is potentially added by the user.
-  const exemptPicker = e.__exemptPicker__ as
-    | DatepickerInstance
-    | DaterangePickerInstance
-    | undefined
   const target = e.target as HTMLElement
   const {exemptId} = target.dataset
 
@@ -103,9 +95,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
 
   // GLOBAL LISTENERS
   if (!globalListenerDataAttached) {
-    globalListenerEvents.forEach(eventName => {
-      document.addEventListener(eventName, globalListener)
-    })
+    document.addEventListener('click', globalListener)
     globalListenerDataAttached = true
   }
 
@@ -289,9 +279,7 @@ export function removeEventListeners(internalPickerItem: InternalPickerData) {
   const {listenersMap} = internalPickerItem
 
   if (datepickersMap.size === 0) {
-    globalListenerEvents.forEach(eventName => {
-      document.removeEventListener(eventName, globalListener)
-    })
+    document.removeEventListener('click', globalListener)
     globalListenerDataAttached = false
   }
 

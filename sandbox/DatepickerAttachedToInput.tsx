@@ -9,7 +9,7 @@ export default function DatepickerAttachedToInput() {
   const options: DatepickerOptions = {
     position: 'bl',
     minDate: new Date(),
-    exemptIds: [exemptId],
+    exemptIds: [exemptId, 'row1-slider'],
   }
   const [jsx, picker] = useDatepicker({
     pickerKey: 'DatepickerAttachedToInput',

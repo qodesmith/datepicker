@@ -44,6 +44,7 @@ export default function Slider({
           max={max}
           value={sliderValue}
           onChange={e => setSliderValue(+e.target.value)}
+          data-exempt-id="row1-slider"
         />
         <code className="slider-value">{sliderValue.toFixed(toFixed)}em</code>
       </div>

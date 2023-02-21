@@ -1,4 +1,4 @@
-import {createElement, useRef, useEffect} from 'react'
+import {createElement, useRef, useEffect, useCallback, useMemo} from 'react'
 import {
   DatepickerInstance,
   DatepickerOptions,
@@ -11,7 +11,7 @@ import {datepickerAtomFamily} from './state'
 
 type UseDatepickerProps = {
   pickerKey: string
-  type: 'div' | 'input'
+  type: string
   options?: DatepickerOptions | DaterangePickerOptions
 }
 
@@ -20,27 +20,18 @@ export function useDatepicker({
   type,
   options,
 }: UseDatepickerProps): [JSX.Element, DatepickerInstance | null] {
-  const ref = useRef()
-  const element = createElement(type, {
-    ...(type === 'div' ? {dangerouslySetInnerHTML: {__html: ''}} : {}),
-    ref,
-  })
-
   // Using Recoil in case we want access to the picker anywhere else in the app.
   const [picker, setPicker] = useRecoilState(datepickerAtomFamily(pickerKey))
-  const resetPicker = useResetRecoilState(datepickerAtomFamily(pickerKey))
 
-  useEffect(() => {
-    const pickerInstance = datepicker(ref.current!, options ?? {})
-    setPicker(pickerInstance)
-
-    return () => {
-      // Native picker remove function.
-      pickerInstance.remove()
-
-      // Remove the picker atom from the atomFamily.
-      resetPicker()
-    }
+  // https://tkdodo.eu/blog/avoiding-use-effect-with-callback-refs
+  const refFn = useCallback((domNode: HTMLElement | null) => {
+    setPicker(datepicker(domNode, options ?? {}))
+  }, [])
+  const element = useMemo(() => {
+    return createElement(type, {
+      ...(type === 'div' ? {dangerouslySetInnerHTML: {__html: ''}} : {}),
+      ref: refFn,
+    })
   }, [])
 
   return [element, picker as DatepickerInstance | null]
@@ -48,7 +39,7 @@ export function useDatepicker({
 
 type UseDaterangePickerProps = {
   pickerKey: string
-  type: 'div' | 'input'
+  type: string
   options: DaterangePickerOptions
 }
 

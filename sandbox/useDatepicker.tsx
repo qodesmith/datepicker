@@ -1,4 +1,4 @@
-import {createElement, useRef, useEffect} from 'react'
+import {createElement, useRef, useEffect, ReactNode} from 'react'
 import {
   DatepickerInstance,
   DatepickerOptions,
@@ -12,26 +12,30 @@ import {datepickerAtomFamily} from './state'
 type UseDatepickerProps = {
   pickerKey: string
   type: string
+  selector?: string
   options?: DatepickerOptions | DaterangePickerOptions
 }
 
 export function useDatepicker({
   pickerKey,
   type,
+  selector,
   options = {},
-}: UseDatepickerProps): [JSX.Element, DatepickerInstance | null] {
+}: UseDatepickerProps): [ReactNode, DatepickerInstance | null] {
   const ref = useRef(null)
-  const element = createElement(type, {
-    ...(type === 'div' ? {dangerouslySetInnerHTML: {__html: ''}} : {}),
-    ref,
-  })
+  const reactNode = selector
+    ? null
+    : createElement(type, {
+        ...(type === 'div' ? {dangerouslySetInnerHTML: {__html: ''}} : {}),
+        ref,
+      })
 
   // Using Recoil in case we want access to the picker anywhere else in the app.
   const [picker, setPicker] = useRecoilState(datepickerAtomFamily(pickerKey))
   const resetPicker = useResetRecoilState(datepickerAtomFamily(pickerKey))
 
   useEffect(() => {
-    const picker = datepicker(ref.current, options)
+    const picker = datepicker(selector ?? ref.current, options)
     setPicker(picker)
 
     return () => {
@@ -40,7 +44,7 @@ export function useDatepicker({
     }
   }, [])
 
-  return [element, picker as DatepickerInstance | null]
+  return [reactNode, picker as DatepickerInstance | null]
 }
 
 type UseDaterangePickerProps = {
@@ -53,7 +57,7 @@ export function useDaterangePicker({
   pickerKey,
   type,
   options,
-}: UseDaterangePickerProps): [JSX.Element, DaterangePickerInstance | null] {
+}: UseDaterangePickerProps): [ReactNode, DaterangePickerInstance | null] {
   if (!('id' in options)) {
     throw new Error('No id found for daterange picker.')
   }

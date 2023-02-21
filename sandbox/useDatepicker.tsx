@@ -6,7 +6,7 @@ import {
   DaterangePickerOptions,
 } from '../src/types'
 import datepicker from '../src/datepicker'
-import {useRecoilState, useResetRecoilState} from 'recoil'
+import {useRecoilState} from 'recoil'
 import {datepickerAtomFamily} from './state'
 
 type UseDatepickerProps = {

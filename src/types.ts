@@ -7,7 +7,7 @@ import datepicker from './datepicker'
 type PrettyFxn<T> = T extends (...args: infer A) => infer R
   ? (...args: PrettifyNonRecursive<A>) => PrettifyNonRecursive<R>
   : never
-type PrettifyNonRecursive<T> = T extends Function
+export type PrettifyNonRecursive<T> = T extends Function
   ? PrettyFxn<T>
   : unknown extends T
   ? T

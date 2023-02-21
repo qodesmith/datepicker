@@ -320,7 +320,7 @@ export type SanitizedOptions = (
     >
   >
 
-export type Selector = string | HTMLElement
+export type Selector = string | HTMLElement | null
 
 /**
  * `t`, `r`, `b`, and `l` are all positioned relatively to the input the calendar is attached to.

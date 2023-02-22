@@ -1,5 +1,5 @@
 import {Datepicker, DatepickerOptions} from '../../src/types'
-import {days, testElements, controls, containers} from '../selectors'
+import {days, testElementIds, controls, containers} from '../selectors'
 
 describe('Callbacks', () => {
   let datepicker: Datepicker
@@ -25,7 +25,7 @@ describe('Callbacks', () => {
     })
 
     it('should be called after a date has been selected (and also after deselecting)', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get('@onSelect').should('not.have.been.called')
       cy.get(days.day).first().click()
@@ -52,7 +52,7 @@ describe('Callbacks', () => {
     })
 
     it('should be called after deselecting a date', () => {
-      const picker = datepicker(testElements.singleInput, {
+      const picker = datepicker(testElementIds.singleInput, {
         ...options,
         selectedDate: startDate,
       })
@@ -71,7 +71,7 @@ describe('Callbacks', () => {
     })
 
     it('should be called after calling the `selectDate` method', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get('@onSelect')
         .should('not.have.been.called')
@@ -90,7 +90,7 @@ describe('Callbacks', () => {
     })
 
     it('should be called after calling the `setMin` method (if dates conflict)', () => {
-      const picker = datepicker(testElements.singleInput, {
+      const picker = datepicker(testElementIds.singleInput, {
         ...options,
         selectedDate: startDate,
       })
@@ -123,7 +123,7 @@ describe('Callbacks', () => {
     })
 
     it('should be called after calling the `setMax` method (if dates conflict)', () => {
-      const picker = datepicker(testElements.singleInput, {
+      const picker = datepicker(testElementIds.singleInput, {
         ...options,
         selectedDate: startDate,
       })
@@ -169,7 +169,7 @@ describe('Callbacks', () => {
     })
 
     it('should be called when clicking the arrow buttons', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
       const newDate = new Date(startDate)
       newDate.setMonth(newDate.getMonth() - 1)
 
@@ -198,7 +198,7 @@ describe('Callbacks', () => {
     })
 
     it('should be called after running the `navigate` method', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
       const newDate = new Date(startDate)
       newDate.setFullYear(newDate.getFullYear() + 1)
 
@@ -220,7 +220,7 @@ describe('Callbacks', () => {
     })
 
     it('should be called after running `selectDate` with `changeCalendar: true`', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
       const newDate = new Date(startDate)
       newDate.setFullYear(newDate.getFullYear() + 1)
 
@@ -242,7 +242,7 @@ describe('Callbacks', () => {
     })
 
     it('should not be called after running `selectDate` with `changeCalendar: false`', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
       const newDate = new Date(startDate)
       newDate.setFullYear(newDate.getFullYear() + 1)
 
@@ -256,7 +256,7 @@ describe('Callbacks', () => {
     })
 
     it('should not be called after running `selectDate` with `changeCalendar: true` and no date', () => {
-      const picker = datepicker(testElements.singleInput, {
+      const picker = datepicker(testElementIds.singleInput, {
         ...options,
         selectedDate: startDate,
       })
@@ -274,11 +274,11 @@ describe('Callbacks', () => {
     })
 
     it('should be called when the input is clicked', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get('@onShow').should('not.have.been.called')
       cy.get(containers.calendarContainer).should('not.be.visible')
-      cy.get(testElements.singleInput).click()
+      cy.get(testElementIds.singleInput).click()
       cy.get('@onShow')
         .should('have.been.calledOnce')
         .should('have.been.calledWith', {
@@ -289,7 +289,7 @@ describe('Callbacks', () => {
     })
 
     it('should be called when the `show` method is called', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get('@onShow').should('not.have.been.called')
       cy.get(containers.calendarContainer)
@@ -316,13 +316,13 @@ describe('Callbacks', () => {
     })
 
     it('should be called when a click happens outside the input', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get('@onHide').should('not.have.been.called')
       cy.get(containers.calendarContainer).should('not.be.visible')
-      cy.get(testElements.singleInput).click()
+      cy.get(testElementIds.singleInput).click()
       cy.get(containers.calendarContainer).should('be.visible')
-      cy.get(testElements.unfocus).click()
+      cy.get(testElementIds.unfocus).click()
       cy.get(containers.calendarContainer).should('not.be.visible')
       cy.get('@onHide')
         .should('have.been.calledOnce')
@@ -334,10 +334,10 @@ describe('Callbacks', () => {
     })
 
     it('should be called when the `hide` method is called', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get('@onHide').should('not.have.been.called')
-      cy.get(testElements.singleInput).click()
+      cy.get(testElementIds.singleInput).click()
       cy.get(containers.calendarContainer)
         .should('be.visible')
         .then(() => {

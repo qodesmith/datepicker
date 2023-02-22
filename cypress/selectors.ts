@@ -70,7 +70,7 @@ export const otherCls = {
 
 export const other = clsToSelector(otherCls)
 
-export const testElements = {
+export const testElementIds = {
   // Header
   unfocus: '#unfocus',
 
@@ -91,4 +91,8 @@ export const testElements = {
   rangeInputsContainer: '#range-inputs-container',
   rangeInputStart: '#range-input-start',
   rangeInputEnd: '#range-input-end',
+} as const
+
+export const wackyBits = {
+  idStartingWithNumber: '#1-number-id',
 } as const

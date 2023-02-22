@@ -1,5 +1,5 @@
 import {Datepicker} from '../../src/types'
-import {containers, controls, days, overlay, testElements} from '../selectors'
+import {containers, controls, days, overlay, testElementIds} from '../selectors'
 
 describe('Picker Methods', () => {
   let datepicker: Datepicker
@@ -14,7 +14,7 @@ describe('Picker Methods', () => {
 
   describe('remove', () => {
     it('should remove the calendar from the DOM', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('have.length', 1)
@@ -25,7 +25,7 @@ describe('Picker Methods', () => {
     })
 
     it('should throw an error if called on an already removed instance', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('have.length', 1)
@@ -41,12 +41,12 @@ describe('Picker Methods', () => {
     })
 
     it('should call `removeEventListener` on a number of elements', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.document().then(doc => {
         cy.spy(doc, 'removeEventListener').as('globalListener')
       })
-      cy.get(testElements.singleInput).then(el => {
+      cy.get(testElementIds.singleInput).then(el => {
         cy.spy(el[0], 'removeEventListener').as('inputClickListener')
       })
       cy.get(controls.leftArrow).then(el => {
@@ -91,8 +91,8 @@ describe('Picker Methods', () => {
     })
 
     it('should not call `removeEventListener` on the document if more pickers are left', () => {
-      datepicker(testElements.singleStandalone)
-      const picker = datepicker(testElements.singleInput)
+      datepicker(testElementIds.singleStandalone)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.document()
         .then(doc => {
@@ -106,8 +106,8 @@ describe('Picker Methods', () => {
     })
 
     it('should call `document.removeEventListener` after removing the last picker', () => {
-      const picker1 = datepicker(testElements.singleInput)
-      const picker2 = datepicker(testElements.singleStandalone)
+      const picker1 = datepicker(testElementIds.singleInput)
+      const picker2 = datepicker(testElementIds.singleStandalone)
 
       cy.document().then(doc => {
         cy.spy(doc, 'removeEventListener').as('removeEventListener')
@@ -128,7 +128,7 @@ describe('Picker Methods', () => {
   describe('navigate', () => {
     it('should navigate the calendar to a new date (not select it)', () => {
       const startDate = new Date(2023, 1)
-      const picker = datepicker(testElements.singleInput, {
+      const picker = datepicker(testElementIds.singleInput, {
         alwaysShow: true,
         startDate,
       })
@@ -148,7 +148,7 @@ describe('Picker Methods', () => {
     })
 
     it('should throw an error if called on an already removed instance', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('have.length', 1)
@@ -169,7 +169,7 @@ describe('Picker Methods', () => {
     const options = {startDate, alwaysShow: true}
 
     it('should select a date on the calendar and set `selectedDate` on the picker', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
       const dateToSelect = new Date(startDate)
       dateToSelect.setDate(5)
 
@@ -190,7 +190,10 @@ describe('Picker Methods', () => {
     it('should not select a date below `minDate`', () => {
       const minDate = new Date(startDate)
       minDate.setDate(5)
-      const picker = datepicker(testElements.singleInput, {...options, minDate})
+      const picker = datepicker(testElementIds.singleInput, {
+        ...options,
+        minDate,
+      })
 
       expect(picker.selectedDate).to.be.undefined
 
@@ -210,7 +213,10 @@ describe('Picker Methods', () => {
     it('should not select a date above `maxDate`', () => {
       const maxDate = new Date(startDate)
       maxDate.setMonth(maxDate.getMonth() - 1)
-      const picker = datepicker(testElements.singleInput, {...options, maxDate})
+      const picker = datepicker(testElementIds.singleInput, {
+        ...options,
+        maxDate,
+      })
 
       expect(picker.selectedDate).to.be.undefined
 
@@ -230,7 +236,7 @@ describe('Picker Methods', () => {
     it('should not select a date that is disabled', () => {
       const disabledDate = new Date(startDate)
       disabledDate.setDate(disabledDate.getDate() + 1)
-      const picker = datepicker(testElements.singleInput, {
+      const picker = datepicker(testElementIds.singleInput, {
         ...options,
         disabledDates: [startDate, disabledDate],
       })
@@ -258,7 +264,7 @@ describe('Picker Methods', () => {
     })
 
     it('should not change the calender by default', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
       const newDate = new Date(startDate)
       newDate.setMonth(newDate.getMonth() - 2)
 
@@ -277,7 +283,7 @@ describe('Picker Methods', () => {
     })
 
     it('should change the calender with `changeCalendar: true`', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
       const newDate = new Date(startDate)
       newDate.setMonth(newDate.getMonth() - 2)
 
@@ -296,7 +302,7 @@ describe('Picker Methods', () => {
     })
 
     it('should select a date outside of the current month', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
       const newDate = new Date(startDate)
       newDate.setMonth(newDate.getMonth() - 2)
 
@@ -322,7 +328,7 @@ describe('Picker Methods', () => {
     })
 
     it('should throw an error if called on an already removed instance', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('have.length', 1)
@@ -350,7 +356,7 @@ describe('Picker Methods', () => {
     const options = {startDate, alwaysShow: true}
 
     it('should set a minimum selectable date on the calendar', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get(days.disabledDate)
         .should('have.length', 0)
@@ -362,7 +368,10 @@ describe('Picker Methods', () => {
     })
 
     it('should unset a minimum selectable date', () => {
-      const picker = datepicker(testElements.singleInput, {...options, minDate})
+      const picker = datepicker(testElementIds.singleInput, {
+        ...options,
+        minDate,
+      })
 
       cy.get(days.disabledDate)
         .should('have.length', daysInMonth)
@@ -374,7 +383,7 @@ describe('Picker Methods', () => {
     })
 
     it('should deselect a date if it is out of range', () => {
-      const picker = datepicker(testElements.singleInput, {
+      const picker = datepicker(testElementIds.singleInput, {
         ...options,
         selectedDate: startDate,
       })
@@ -395,7 +404,7 @@ describe('Picker Methods', () => {
     })
 
     it('should throw an error if called on an already removed instance', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('have.length', 1)
@@ -419,7 +428,7 @@ describe('Picker Methods', () => {
     const options = {startDate, alwaysShow: true}
 
     it('should set a maximum selectable date on the calendar', () => {
-      const picker = datepicker(testElements.singleInput, options)
+      const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get(days.disabledDate)
         .should('have.length', 0)
@@ -434,7 +443,10 @@ describe('Picker Methods', () => {
     })
 
     it('should unset a maximum selectable date', () => {
-      const picker = datepicker(testElements.singleInput, {...options, maxDate})
+      const picker = datepicker(testElementIds.singleInput, {
+        ...options,
+        maxDate,
+      })
 
       cy.get(`${days.day}:not(${days.disabledDate})`)
         .should('have.length', maxDateDay)
@@ -446,7 +458,7 @@ describe('Picker Methods', () => {
     })
 
     it('should deselect a date if it is out of range', () => {
-      const picker = datepicker(testElements.singleInput, {
+      const picker = datepicker(testElementIds.singleInput, {
         ...options,
         selectedDate: maxDate,
       })
@@ -467,7 +479,7 @@ describe('Picker Methods', () => {
     })
 
     it('should throw an error if called on an already removed instance', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('have.length', 1)
@@ -485,7 +497,7 @@ describe('Picker Methods', () => {
 
   describe('show', () => {
     it('shows the calendar when called (default calendar view)', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('not.be.visible')
@@ -498,7 +510,7 @@ describe('Picker Methods', () => {
     })
 
     it('shows the calendar when called (default overlay view)', () => {
-      const picker = datepicker(testElements.singleInput, {
+      const picker = datepicker(testElementIds.singleInput, {
         defaultView: 'overlay',
       })
 
@@ -516,7 +528,7 @@ describe('Picker Methods', () => {
     })
 
     it('should throw an error if called on an already removed instance', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('have.length', 1)
@@ -534,10 +546,10 @@ describe('Picker Methods', () => {
 
   describe('hide', () => {
     it('hides the calendar when called', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer).should('not.be.visible')
-      cy.get(testElements.singleInput).click()
+      cy.get(testElementIds.singleInput).click()
       cy.get(containers.calendarContainer)
         .should('be.visible')
         .then(() => {
@@ -547,7 +559,7 @@ describe('Picker Methods', () => {
     })
 
     it('has no effect when `alwayShow: true` is set', () => {
-      const picker = datepicker(testElements.singleInput, {alwaysShow: true})
+      const picker = datepicker(testElementIds.singleInput, {alwaysShow: true})
 
       cy.get(containers.calendarContainer)
         .should('be.visible')
@@ -558,7 +570,7 @@ describe('Picker Methods', () => {
     })
 
     it('should throw an error if called on an already removed instance', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('have.length', 1)
@@ -576,7 +588,7 @@ describe('Picker Methods', () => {
 
   describe('toggleCalendar', () => {
     it('should toggle showing the calendar', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('not.be.visible')
@@ -587,7 +599,7 @@ describe('Picker Methods', () => {
     })
 
     it('should throw an error if called on an already removed instance', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('have.length', 1)
@@ -605,7 +617,7 @@ describe('Picker Methods', () => {
 
   describe('toggleOverlay', () => {
     it('should toggle showing the overlay', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('not.be.visible')
@@ -629,7 +641,7 @@ describe('Picker Methods', () => {
     })
 
     it('should have no effect on an already hidden calendar', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('not.be.visible')
@@ -637,12 +649,12 @@ describe('Picker Methods', () => {
           picker.toggleOverlay()
         })
 
-      cy.get(testElements.singleInput).click()
+      cy.get(testElementIds.singleInput).click()
       cy.get(containers.overlayContainer).should('not.be.visible')
     })
 
     it('should throw an error if called on an already removed instance', () => {
-      const picker = datepicker(testElements.singleInput)
+      const picker = datepicker(testElementIds.singleInput)
 
       cy.get(containers.calendarContainer)
         .should('have.length', 1)

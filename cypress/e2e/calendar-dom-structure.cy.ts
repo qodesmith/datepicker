@@ -4,7 +4,7 @@ import {
   DaterangePickerOptions,
 } from '../../src/types'
 import {
-  testElements,
+  testElementIds,
   containers,
   containersCls,
   controlsCls,
@@ -25,10 +25,13 @@ describe('Calendar DOM Structure', () => {
 
   it('should have the correct DOM structure', () => {
     const options: DatepickerOptions = {startDate: new Date(2023, 1, 15)}
-    const singlePicker = datepicker(testElements.singleInput)
+    const singlePicker = datepicker(testElementIds.singleInput)
     const rangeOptions: DaterangePickerOptions = {...options, id: 1}
-    const rangePicker1 = datepicker(testElements.rangeInputStart, rangeOptions)
-    const rangePicker2 = datepicker(testElements.rangeInputEnd, rangeOptions)
+    const rangePicker1 = datepicker(
+      testElementIds.rangeInputStart,
+      rangeOptions
+    )
+    const rangePicker2 = datepicker(testElementIds.rangeInputEnd, rangeOptions)
     const pickers = [singlePicker, rangePicker1, rangePicker2]
 
     cy.get(containers.calendarContainer).should('have.length', 3)

@@ -1,5 +1,5 @@
 import type {Datepicker, DaterangePickerOptions} from '../../src/types'
-import {containers, testElements} from '../selectors'
+import {containers, testElementIds} from '../selectors'
 
 describe('Attaching to the DOM', () => {
   let datepicker: Datepicker
@@ -18,18 +18,18 @@ describe('Attaching to the DOM', () => {
 
   describe('single calendar', () => {
     it('should attach datepicker to an input', () => {
-      datepicker(testElements.singleInput)
+      datepicker(testElementIds.singleInput)
       cy.get(containers.calendarContainer).should('have.length', 1)
       cy.get(
-        `${testElements.inputSection} ${containers.calendarContainer}`
+        `${testElementIds.inputSection} ${containers.calendarContainer}`
       ).should('exist')
     })
 
     it('should attach a datepicker to a non-input DOM element', () => {
-      datepicker(testElements.singleStandalone)
+      datepicker(testElementIds.singleStandalone)
       cy.get(containers.calendarContainer).should('have.length', 1)
       cy.get(
-        `${testElements.singleStandalone} ${containers.calendarContainer}`
+        `${testElementIds.singleStandalone} ${containers.calendarContainer}`
       ).should('exist')
     })
   })
@@ -37,23 +37,23 @@ describe('Attaching to the DOM', () => {
   describe('daterange', () => {
     it('should attached to inputs', () => {
       const options: DaterangePickerOptions = {id: 1}
-      datepicker(testElements.rangeInputStart, options)
-      datepicker(testElements.rangeInputEnd, options)
+      datepicker(testElementIds.rangeInputStart, options)
+      datepicker(testElementIds.rangeInputEnd, options)
 
       cy.get(containers.calendarContainer).should('have.length', 2)
       cy.get(
-        `${testElements.rangeInputSection} ${containers.calendarContainer}`
+        `${testElementIds.rangeInputSection} ${containers.calendarContainer}`
       ).should('have.length', 2)
     })
 
     it('should attach to a non-input DOM elements', () => {
       const options: DaterangePickerOptions = {id: 1, alwaysShow: true}
-      datepicker(testElements.rangeStandalone1, options)
-      datepicker(testElements.rangeStandalone2, options)
+      datepicker(testElementIds.rangeStandalone1, options)
+      datepicker(testElementIds.rangeStandalone2, options)
 
       cy.get(containers.calendarContainer).should('have.length', 2)
       cy.get(
-        `${testElements.rangeStandaloneSection} ${containers.calendarContainer}`
+        `${testElementIds.rangeStandaloneSection} ${containers.calendarContainer}`
       ).should('have.length', 2)
     })
   })

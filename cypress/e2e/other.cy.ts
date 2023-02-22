@@ -1,5 +1,5 @@
 import {Datepicker} from '../../src/types'
-import {testElements} from '../selectors'
+import {testElementIds} from '../selectors'
 
 describe('Other Tests', () => {
   let datepicker: Datepicker
@@ -18,15 +18,15 @@ describe('Other Tests', () => {
         cy.spy(doc, 'addEventListener').as('globalListener')
       })
       .then(() => {
-        datepicker(testElements.singleInput)
-        datepicker(testElements.singleStandalone)
+        datepicker(testElementIds.singleInput)
+        datepicker(testElementIds.singleStandalone)
       })
 
     cy.get('@globalListener').should('have.been.calledOnce')
   })
 
   it('should have the correct set of properties', () => {
-    const picker = datepicker(testElements.singleInput, {
+    const picker = datepicker(testElementIds.singleInput, {
       selectedDate: new Date(),
     })
     const expectedPropertiesData = [

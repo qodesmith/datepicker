@@ -1,6 +1,6 @@
 import {getType, throwError, throwAlreadyRemovedError} from '../../src/utils'
 
-describe.only('Unit Tests', () => {
+describe('Unit Tests', () => {
   describe('getType', () => {
     it('should return the type of object passed to it', () => {
       expect(getType('Datepicker rulez')).to.equal('String')

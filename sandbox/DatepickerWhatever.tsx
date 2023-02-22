@@ -4,8 +4,8 @@ import {useDatepicker} from './useDatepicker'
 export default function DatepickerWhatever() {
   const [jsx, picker] = useDatepicker({
     pickerKey: 'DatepickerWhatever',
-    type: 'input',
-    // selector: '.hello',
+    type: 'div',
+    selector: '#world',
     options: {alwaysShow: true},
   })
 

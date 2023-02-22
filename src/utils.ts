@@ -56,7 +56,6 @@ function throwSelectedDateMinMaxError(
 
 export function getSelectorData(selector: Selector): SelectorData {
   let element: HTMLElement | null = null
-  const type = getType(selector)
 
   // Find the element via the provided string selector.
   if (typeof selector === 'string') {
@@ -66,29 +65,48 @@ export function getSelectorData(selector: Selector): SelectorData {
      * conditionally use `getElementById`. Also, datepicker doesn't support
      * string selectors when using a shadow DOM, hence why we use `document`.
      */
-    const el =
+    element =
       selector[0] === '#'
         ? document.getElementById(selector.slice(1))
         : document.querySelector<HTMLElement>(selector)
-
-    if (el === null) {
-      throwError(`No element found for selector "${selector}".`)
-    }
-
-    element = el
+  } else {
+    element = selector
   }
 
-  // Here, the user has already passed in an HTML element.
-  if (type.endsWith('Element')) {
-    element = selector as HTMLElement
+  const voidElements = [
+    'area',
+    'base',
+    'br',
+    'col',
+    'embed',
+    'hr',
+    'img',
+    // 'input', // We handle this specifically.
+    'keygen',
+    'link',
+    'meta',
+    'param',
+    'source',
+    'track',
+    'wbr',
+  ]
+
+  if (!element) {
+    throwError('No element found.')
   }
 
+  const nodeName = element.nodeName.toLowerCase()
+  if (voidElements.includes(nodeName)) {
+    throwError(`Using a void element (${nodeName}) is not supported.`)
+  }
+
+  const type = getType(element)
   if (type === 'ShadowRoot') {
     throwError('Using a shadow DOM as your selector is not supported.')
   }
 
-  if (!element) {
-    throwError(`The selector provided is not a valid HTML element: ${type}`)
+  if (element.nodeType !== 1) {
+    throwError('The object passed to datepicker is not an HTML element.')
   }
 
   const rootNode = element.getRootNode()

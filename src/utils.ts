@@ -34,7 +34,9 @@ export function throwError(message: string): never {
 }
 
 export function throwAlreadyRemovedError(): never {
-  throwError("Unable to run a function from a picker that's already removed.")
+  throwError(
+    "Unable to run a function or access properties from a picker that's already removed."
+  )
 }
 
 function throwRangeProperyDifferenceError(
@@ -337,7 +339,8 @@ export function removePickerFromMap(
   const {el} = internalPickerItem.selectorData
   const pickerSet = datepickersMap.get(el)
 
-  if (!pickerSet) return
+  // This shouldn't happen.
+  if (!pickerSet) throwError('No element found for internal picker item.')
 
   if (pickerSet.size === 1) {
     datepickersMap.delete(el)

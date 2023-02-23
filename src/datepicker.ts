@@ -296,12 +296,15 @@ function datepicker(
   // CREATE PUBLIC PICKER DATA
   const publicPicker: DatepickerInstance = {
     get calendarContainer() {
+      if (isRemoved) throwAlreadyRemovedError()
       return pickerElements.calendarContainer
     },
     get currentDate() {
+      if (isRemoved) throwAlreadyRemovedError()
       return new Date(internalPickerItem.currentDate)
     },
     get selectedDate() {
+      if (isRemoved) throwAlreadyRemovedError()
       return internalPickerItem.selectedDate
         ? new Date(internalPickerItem.selectedDate)
         : undefined
@@ -354,6 +357,7 @@ function datepicker(
         // Nothing to do here. See the comment where the rangepicker is created.
       }
 
+      // TODO - what do we do here if 2 pickers are attached to the same container?
       // Remove styles added to the parent element.
       if (selectorData.originalPositionStyle) {
         selectorData.elementForPositioning.style.setProperty(

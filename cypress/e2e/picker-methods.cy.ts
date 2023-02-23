@@ -35,7 +35,7 @@ describe('Picker Methods', () => {
         .should('have.length', 0)
         .then(() => {
           expect(picker.remove).to.throw(
-            "Unable to run a function from a picker that's already removed."
+            "Unable to run a function or access properties from a picker that's already removed."
           )
         })
     })
@@ -123,6 +123,16 @@ describe('Picker Methods', () => {
         })
         .should('have.been.calledOnce')
     })
+
+    it('should execute an optional callback function', () => {
+      const picker1 = datepicker(testElementIds.singleInput)
+      const cb = cy.stub()
+
+      expect(cb).not.to.be.called
+
+      picker1.remove(cb)
+      expect(cb).to.be.calledOnce
+    })
   })
 
   describe('navigate', () => {
@@ -158,7 +168,7 @@ describe('Picker Methods', () => {
         .should('have.length', 0)
         .then(() => {
           expect(picker.navigate).to.throw(
-            "Unable to run a function from a picker that's already removed."
+            "Unable to run a function or access properties from a picker that's already removed."
           )
         })
     })
@@ -338,7 +348,7 @@ describe('Picker Methods', () => {
         .should('have.length', 0)
         .then(() => {
           expect(picker.selectDate).to.throw(
-            "Unable to run a function from a picker that's already removed."
+            "Unable to run a function or access properties from a picker that's already removed."
           )
         })
     })
@@ -414,7 +424,7 @@ describe('Picker Methods', () => {
         .should('have.length', 0)
         .then(() => {
           expect(picker.setMin).to.throw(
-            "Unable to run a function from a picker that's already removed."
+            "Unable to run a function or access properties from a picker that's already removed."
           )
         })
     })
@@ -489,7 +499,7 @@ describe('Picker Methods', () => {
         .should('have.length', 0)
         .then(() => {
           expect(picker.setMax).to.throw(
-            "Unable to run a function from a picker that's already removed."
+            "Unable to run a function or access properties from a picker that's already removed."
           )
         })
     })
@@ -538,7 +548,7 @@ describe('Picker Methods', () => {
         .should('have.length', 0)
         .then(() => {
           expect(picker.show).to.throw(
-            "Unable to run a function from a picker that's already removed."
+            "Unable to run a function or access properties from a picker that's already removed."
           )
         })
     })
@@ -580,7 +590,7 @@ describe('Picker Methods', () => {
         .should('have.length', 0)
         .then(() => {
           expect(picker.hide).to.throw(
-            "Unable to run a function from a picker that's already removed."
+            "Unable to run a function or access properties from a picker that's already removed."
           )
         })
     })
@@ -609,7 +619,7 @@ describe('Picker Methods', () => {
         .should('have.length', 0)
         .then(() => {
           expect(picker.toggleCalendar).to.throw(
-            "Unable to run a function from a picker that's already removed."
+            "Unable to run a function or access properties from a picker that's already removed."
           )
         })
     })
@@ -664,7 +674,7 @@ describe('Picker Methods', () => {
         .should('have.length', 0)
         .then(() => {
           expect(picker.toggleOverlay).to.throw(
-            "Unable to run a function from a picker that's already removed."
+            "Unable to run a function or access properties from a picker that's already removed."
           )
         })
     })

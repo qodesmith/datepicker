@@ -25,7 +25,7 @@ describe('Unit Tests', () => {
   describe('throwAlreadyRemovedError', () => {
     it('should throw an error with a specific message', () => {
       expect(() => throwAlreadyRemovedError()).to.throw(
-        "Unable to run a function from a picker that's already removed."
+        "Unable to run a function or access properties from a picker that's already removed."
       )
     })
   })

@@ -458,7 +458,7 @@ export type DatepickerInstance = {
   readonly calendarContainer: HTMLDivElement
   readonly currentDate: Date
   readonly selectedDate: Date | undefined
-  readonly remove: () => void
+  readonly remove: (cb?: () => void) => void
   readonly navigate: ({date}: {date: Date}) => void
   /**
    * `changeCalendar` is only recognized if `date` was provided.

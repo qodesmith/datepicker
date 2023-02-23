@@ -309,7 +309,7 @@ function datepicker(
         ? new Date(internalPickerItem.selectedDate)
         : undefined
     },
-    remove(): void {
+    remove(cb): void {
       // Ensure the logic below is only executed once.
       if (isRemoved) throwAlreadyRemovedError()
       isRemoved = true
@@ -374,6 +374,8 @@ function datepicker(
       // Remove listeners.
       removeEventListeners(internalPickerItem)
       // TODO - ^^^ move as many private & public picker methods to importable functions like this one.
+
+      cb?.()
     },
     navigate(data): void {
       if (isRemoved) throwAlreadyRemovedError()

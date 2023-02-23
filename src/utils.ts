@@ -528,6 +528,7 @@ export function sanitizeAndCheckAndSyncOptions(
 
   return {
     ...options,
+    noWeekends: !!options?.noWeekends,
     selectedDate,
     minDate,
     maxDate,
@@ -573,4 +574,12 @@ function areValuesPresentAndDifferent<T>(
   }
 
   return false
+}
+
+export function isWeekendDate(date: Date): boolean {
+  const day = date.getDay()
+
+  // 6 - Saturday
+  // 0 - Sunday
+  return day === 6 || day === 0
 }

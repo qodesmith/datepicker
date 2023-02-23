@@ -306,6 +306,7 @@ export type SanitizedOptions = (
 } & Required<
     Pick<
       DatepickerOptions,
+      | 'noWeekends'
       | 'position'
       | 'onShow'
       | 'onHide'
@@ -460,9 +461,6 @@ export type DatepickerInstance = {
   readonly selectedDate: Date | undefined
   readonly remove: (cb?: () => void) => void
   readonly navigate: ({date}: {date: Date}) => void
-  /**
-   * `changeCalendar` is only recognized if `date` was provided.
-   */
   readonly selectDate: (data?: {date?: Date; changeCalendar?: boolean}) => void
   readonly setMin: (data?: {date?: Date}) => void
   readonly setMax: (data?: {date?: Date}) => void

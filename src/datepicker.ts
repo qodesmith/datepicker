@@ -19,6 +19,7 @@ import {
   getSelectorData,
   hasMonthChanged,
   isDateWithinRange,
+  isWeekendDate,
   positionCalendar,
   removePickerFromMap,
   sanitizeAndCheckAndSyncOptions,
@@ -62,6 +63,7 @@ function datepicker(
     disabledDates,
     events,
     position,
+    noWeekends,
     onShow,
     onHide,
     onMonthChange,
@@ -100,6 +102,7 @@ function datepicker(
     isOverlayShowing: options.isOverlayShowing,
     listenersMap: new Map(),
     alwaysShow: !!options?.alwaysShow,
+    noWeekends,
     _navigate({date, trigger, triggerType}) {
       const {currentDate} = internalPickerItem
 
@@ -124,7 +127,10 @@ function datepicker(
         sibling,
         selectedDate: prevSelectedDate,
       } = internalPickerItem
-      const isDateDisabled = date ? disabledDates.has(+stripTime(date)) : false
+      const isWeekendDateDisabled = date && noWeekends && isWeekendDate(date)
+      const isDateDisabled = date
+        ? disabledDates.has(+stripTime(date)) || isWeekendDateDisabled
+        : false
 
       // Do nothing if the date is disabled or out of range.
       if (

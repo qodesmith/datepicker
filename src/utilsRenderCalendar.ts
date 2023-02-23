@@ -1,4 +1,4 @@
-import {isDateWithinRange, stripTime} from './utils'
+import {isDateWithinRange, isWeekendDate, stripTime} from './utils'
 import {InternalPickerData} from './types'
 
 /**
@@ -12,8 +12,15 @@ export function renderCalendar(
 ): void {
   if (!internalPicker) return
 
-  const {currentDate, sibling, selectedDate, minDate, maxDate, disabledDates} =
-    internalPicker
+  const {
+    currentDate,
+    sibling,
+    selectedDate,
+    minDate,
+    maxDate,
+    disabledDates,
+    noWeekends,
+  } = internalPicker
   const currentYear = currentDate.getFullYear()
   const currentMonthNum = currentDate.getMonth()
   const currentMonthName = internalPicker.months[currentMonthNum]
@@ -44,6 +51,7 @@ export function renderCalendar(
     const num = i + 1
     const dateForComparison = new Date(currentYear, currentMonthNum, num)
     const dateNumForComparison = +dateForComparison
+    const isWeekend = isWeekendDate(dateForComparison)
     const dateInRange = isDateWithinRange({
       date: dateForComparison,
       minDate,
@@ -136,7 +144,11 @@ export function renderCalendar(
     }
 
     // Disabled dates.
-    if (!dateInRange || disabledDates.has(dateNumForComparison)) {
+    if (
+      !dateInRange ||
+      disabledDates.has(dateNumForComparison) ||
+      (noWeekends && isWeekend)
+    ) {
       day.classList.add('dp-disabled-date')
     } else {
       day.classList.remove('dp-disabled-date')

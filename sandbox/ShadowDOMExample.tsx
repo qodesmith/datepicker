@@ -54,7 +54,10 @@ class QodesmithElement extends HTMLElement {
   }
 }
 
-// Add this custom element to the global registry once.
-customElements.define('qodesmith-element', QodesmithElement)
+if (!customElements.get('qodesmith-element')) {
+  // Add this custom element to the global registry once.
+  customElements.define('qodesmith-element', QodesmithElement)
+}
+
 // @ts-expect-error We set this globally so it can render.
 window.QodesmithElement = QodesmithElement

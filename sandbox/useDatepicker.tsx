@@ -13,7 +13,7 @@ import {datepickerAtomFamily} from './state'
 
 type UseDatepickerProps = {
   pickerKey: string
-  type: string
+  type?: string
   selector?: Selector
   options?: DatepickerOptions | DaterangePickerOptions
 }
@@ -27,7 +27,7 @@ export function useDatepicker({
   const ref = useRef(null)
   const reactNode = selector
     ? null
-    : createElement(type, {
+    : createElement(type ?? '', {
         ...(type === 'div' ? {dangerouslySetInnerHTML: {__html: ''}} : {}),
         ref,
       })
@@ -37,11 +37,11 @@ export function useDatepicker({
   const resetPicker = useResetRecoilState(datepickerAtomFamily(pickerKey))
 
   useEffect(() => {
-    const picker = datepicker(selector ?? ref.current, options)
-    setPicker(picker)
+    const pickerItem = datepicker(selector ?? ref.current, options)
+    setPicker(pickerItem)
 
     return () => {
-      picker?.remove()
+      pickerItem?.remove()
       resetPicker()
     }
   }, [])

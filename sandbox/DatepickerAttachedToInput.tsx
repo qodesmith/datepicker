@@ -5,14 +5,14 @@ import useSliderValuesCheckbox from './useSliderValuesCheckbox'
 import './datepickerAttachedToInput.scss'
 
 export default function DatepickerAttachedToInput() {
-  const exemptId = 'DatepickerAttachedToInput'
+  const exemptId = 'DatepickerAttachedToInput1'
   const options: DatepickerOptions = {
     position: 'bl',
     minDate: new Date(),
     exemptIds: [exemptId, 'row1-slider'],
   }
   const [jsx, picker] = useDatepicker({
-    pickerKey: 'DatepickerAttachedToInput',
+    pickerKey: 'DatepickerAttachedToInput2',
     type: 'input',
     options,
   })

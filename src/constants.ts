@@ -67,3 +67,21 @@ export const imperativeMethods = [
 ] as const
 
 export const userEvents = ['click', 'keydown', 'input'] as const
+
+export const voidElements = [
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  // 'input', // We handle this specifically.
+  'keygen',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+] as const

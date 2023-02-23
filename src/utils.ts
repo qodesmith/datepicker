@@ -4,6 +4,7 @@ import {
   defaultOptions,
   noop,
   overlayContainerCls,
+  voidElements,
 } from './constants'
 import {
   DatepickerOptions,
@@ -73,31 +74,13 @@ export function getSelectorData(selector: Selector): SelectorData {
     element = selector
   }
 
-  const voidElements = [
-    'area',
-    'base',
-    'br',
-    'col',
-    'embed',
-    'hr',
-    'img',
-    // 'input', // We handle this specifically.
-    'keygen',
-    'link',
-    'meta',
-    'param',
-    'source',
-    'track',
-    'wbr',
-  ]
-
   if (!element) {
     throwError('No element found.')
   }
 
-  const nodeName = element.nodeName.toLowerCase()
+  const nodeName = element.nodeName.toLowerCase() as typeof voidElements[number]
   if (voidElements.includes(nodeName)) {
-    throwError(`Using a void element (${nodeName}) is not supported.`)
+    throwError(`Using a void element <${nodeName}> is not supported.`)
   }
 
   const type = getType(element)
@@ -123,7 +106,7 @@ export function getSelectorData(selector: Selector): SelectorData {
    *   * a shadow DOM
    */
   if (rootNodeType === 'HTMLDocument') {
-    // Elements not in a shadow DOM should always have a parent.
+    // This shouldn't happen - elements should always have a parent.
     if (!parentElement) {
       throwError('No parent to selector found.')
     }
@@ -172,7 +155,10 @@ export function getSelectorData(selector: Selector): SelectorData {
     }
   }
 
-  // We should never get here.
+  /**
+   * We could get here if the root node IS the element:
+   * datepicker(document.createElement('div'))
+   */
   throwError(`Invalid root node found for selector: ${rootNodeType}`)
 }
 

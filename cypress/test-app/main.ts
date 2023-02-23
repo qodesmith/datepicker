@@ -39,5 +39,17 @@ document.querySelector<HTMLDivElement>('#root')!.innerHTML = `
       <div id="range-standalone-one"></div>
       <div id="range-standalone-two"></div>
     </section>
+
+    <section id="other-wacky-bits-section">
+      <h2>Other Wacky Bits</h2>
+      <div id="1-number-id"></div>
+      <div class="wacky-div"></div>
+      <span class="wacky-span"></span>
+      <aside class="wacky-aside"></aside>
+    </section>
+
+    <section id="shadow-section">
+      <h2>Shadow DOM</h2>
+    </section>
   </div>
 `

@@ -94,5 +94,9 @@ export const testElementIds = {
 } as const
 
 export const wackyBits = {
+  wackySection: '#other-wacky-bits-section',
   idStartingWithNumber: '#1-number-id',
+  wackyDiv: '.wacky-div',
+  wackySpan: '.wacky-span',
+  wackyAside: '.wacky-aside',
 } as const

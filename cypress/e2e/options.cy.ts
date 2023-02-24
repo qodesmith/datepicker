@@ -33,6 +33,30 @@ describe('Options', () => {
       )
     })
 
+    it('should be called with a single date object argument', () => {
+      const expectedDate = new Date(startDate)
+      expectedDate.setDate(dayNum)
+      const options = {
+        startDate,
+        alwaysShow: true,
+        formatter(...args) {
+          expect(args[0]).to.deep.equal(expectedDate)
+          expect(args.length).to.equal(1)
+          return ''
+        },
+      }
+      const spy = cy.spy(options, 'formatter')
+      const picker = datepicker(testElementIds.singleInput, options)
+
+      cy.get(testElementIds.singleInput).should('have.value', '')
+      cy.get(days.day)
+        .contains(dayNum)
+        .click()
+        .then(() => {
+          expect(spy).to.be.calledOnce
+        })
+    })
+
     it('should default to calling `date.toDateString()` if no formatter is provided', () => {
       const expectedDate = new Date(startDate)
       expectedDate.setDate(dayNum)
@@ -49,4 +73,6 @@ describe('Options', () => {
       )
     })
   })
+
+  describe('position', () => {})
 })

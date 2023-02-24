@@ -73,9 +73,9 @@ function datepicker(
   let isRemoved = false
   let isPairRemoved = false
 
-  function safeUpdateInput(value: string) {
+  function safeUpdateInput(date?: Date) {
     if (getIsInput(selectorData.el)) {
-      selectorData.el.value = value
+      selectorData.el.value = date ? formatter(stripTime(date)) : ''
     }
   }
 
@@ -166,7 +166,7 @@ function datepicker(
       renderCalendar(sibling)
 
       // Change input.
-      safeUpdateInput(date ? formatter(stripTime(date)) : '')
+      safeUpdateInput(date)
 
       onSelect({
         prevDate: prevSelectedDate ? stripTime(prevSelectedDate) : undefined,
@@ -213,7 +213,7 @@ function datepicker(
       ) {
         internalPickerItem.selectedDate = undefined
 
-        safeUpdateInput('')
+        safeUpdateInput()
 
         onSelect({
           prevDate: selectedDate,
@@ -482,6 +482,11 @@ function datepicker(
    * positionCalendar
    */
   function finalSteps() {
+    // UPDATE INPUT FIELD
+    if (options.selectedDate) {
+      safeUpdateInput(options.selectedDate)
+    }
+
     // STORE PICKER IN MAP
     addPickerToMap(internalPickerItem)
 

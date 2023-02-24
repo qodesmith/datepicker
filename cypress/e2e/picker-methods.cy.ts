@@ -273,6 +273,32 @@ describe('Picker Methods', () => {
         })
     })
 
+    it('should not select a weekend date if `noWeekends` is true', () => {
+      const picker = datepicker(testElementIds.singleInput, {
+        ...options,
+        noWeekends: true,
+      })
+
+      const weekendDate = new Date(startDate)
+      while (weekendDate.getDay() !== 6 && weekendDate.getDay() !== 0) {
+        weekendDate.setDate(weekendDate.getDate() + 1)
+      }
+
+      expect(picker.selectedDate).to.be.undefined
+
+      cy.get(days.selectedDate)
+        .should('have.length', 0)
+        .then(() => {
+          picker.selectDate({date: weekendDate})
+        })
+
+      cy.get(days.selectedDate)
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.selectedDate).to.be.undefined
+        })
+    })
+
     it('should not change the calender by default', () => {
       const picker = datepicker(testElementIds.singleInput, options)
       const newDate = new Date(startDate)

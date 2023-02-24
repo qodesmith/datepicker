@@ -13,9 +13,10 @@ describe('Options', () => {
   })
 
   describe('formatter', () => {
+    const startDate = new Date(2023, 1)
+    const dayNum = 5
+
     it('should sanitize the input field value when selecting a date', () => {
-      const startDate = new Date(2023, 1)
-      const dayNum = 5
       const picker = datepicker(testElementIds.singleInput, {
         startDate,
         alwaysShow: true,
@@ -29,6 +30,22 @@ describe('Options', () => {
       cy.get(testElementIds.singleInput).should(
         'have.value',
         `Year: 2023 Month: 1 Day: ${dayNum}`
+      )
+    })
+
+    it('should default to calling `date.toDateString()` if no formatter is provided', () => {
+      const expectedDate = new Date(startDate)
+      expectedDate.setDate(dayNum)
+      const picker = datepicker(testElementIds.singleInput, {
+        startDate,
+        alwaysShow: true,
+      })
+
+      cy.get(testElementIds.singleInput).should('have.value', '')
+      cy.get(days.day).contains(dayNum).click()
+      cy.get(testElementIds.singleInput).should(
+        'have.value',
+        expectedDate.toDateString()
       )
     })
   })

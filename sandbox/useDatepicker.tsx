@@ -19,6 +19,7 @@ type UseDatepickerProps = {
 }
 
 export function useDatepicker({
+  // TODO - prevent initializing with the same pickerKey more than once.
   pickerKey,
   type,
   selector,

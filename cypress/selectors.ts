@@ -66,6 +66,7 @@ export const otherCls = {
   centered: 'dp-centered',
   arrow: 'dp-arrow',
   disableTransition: 'dp-disable-transition',
+  weekday: 'dp-weekday',
 } as const
 
 export const other = clsToSelector(otherCls)

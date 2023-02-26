@@ -1,5 +1,6 @@
-import {Datepicker, Position} from '../../src/types'
-import {days, testElementIds} from '../selectors'
+import {defaultOptions} from '../../src/constants'
+import {Datepicker, DatepickerOptions, Position} from '../../src/types'
+import {containers, days, other, testElementIds} from '../selectors'
 
 describe('Options', () => {
   let datepicker: Datepicker
@@ -197,6 +198,84 @@ describe('Options', () => {
           )
         })
       })
+    })
+  })
+
+  describe('startDay', () => {
+    it('should adjust the weekedays correctly', () => {
+      const picker = datepicker(testElementIds.singleInput, {
+        startDay: 4,
+        alwaysShow: true,
+      })
+
+      cy.get(containers.weekdaysContainer).should(
+        'have.text',
+        'ThuFriSatSunMonTueWed'
+      )
+    })
+
+    it('should have the correct value for the first weekday', () => {
+      const {days} = defaultOptions
+      function executeTest(startDay: number): void {
+        const picker = datepicker(testElementIds.singleInput, {
+          startDay,
+          alwaysShow: true,
+        })
+
+        cy.get(other.weekday).then($weekdays => {
+          console.log(startDay, days[startDay])
+
+          // The 1st weekday should be the corresponding start day.
+          expect($weekdays[0]).to.have.text(days[startDay])
+
+          if (startDay < 6) {
+            picker.remove(() => {
+              executeTest(startDay + 1)
+            })
+          }
+        })
+      }
+
+      executeTest(0)
+    })
+
+    it('should adjust the calendar days accordingly', () => {
+      const optionsArr: (DatepickerOptions & {column: string})[] = [
+        {startDay: 0, column: '4'},
+        {startDay: 1, column: '3'},
+        {startDay: 2, column: '2'},
+        {startDay: 3, column: '1'},
+        {startDay: 4, column: '7'},
+        {startDay: 5, column: '6'},
+        {startDay: 6, column: '5'},
+      ].map(({startDay, column}) => {
+        return {
+          noWeekends: true,
+          alwaysShow: true,
+          startDate: new Date(2023, 1),
+          startDay,
+          column,
+        }
+      })
+
+      function executTest(index: number) {
+        const {column, ...options} = optionsArr[index]
+        const picker = datepicker(testElementIds.singleInput, options)
+
+        cy.get(days.day)
+          .first()
+          .should('have.text', '1')
+          .should('have.css', 'grid-column-start', column)
+          .then(() => {
+            picker.remove(() => {
+              if (index < optionsArr.length - 1) {
+                executTest(index + 1)
+              }
+            })
+          })
+      }
+
+      executTest(0)
     })
   })
 })

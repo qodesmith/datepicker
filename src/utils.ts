@@ -528,9 +528,15 @@ export function sanitizeAndCheckAndSyncOptions(
   }
 
   const defaultView = options?.defaultView ?? defaultOptions.defaultView
+  const startDay = options?.startDay ?? 0
+
+  if (startDay < 0 || startDay > 6) {
+    throwError('`options.startDay` must be a number between 0 and 6.')
+  }
 
   return {
     ...options,
+    startDay,
     noWeekends: !!options?.noWeekends,
     selectedDate,
     minDate,

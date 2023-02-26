@@ -21,6 +21,8 @@ export type PrettifyNonRecursive<T> = T extends Function
     } & {}
 export type Prettify<T> = T extends Function
   ? PrettyFxn<T>
+  : T extends Date
+  ? Date
   : unknown extends T
   ? T
   : {
@@ -297,34 +299,37 @@ export type DaterangePickerOptions = {
   id: unknown
 } & DatepickerOptions
 
-export type SanitizedOptions = (
-  | Omit<DatepickerOptions, 'disabledDates' | 'events' | 'exemptIds'>
-  | Omit<DaterangePickerOptions, 'disabledDates' | 'events' | 'exemptIds'>
-) & {
-  disabledDates: InternalPickerData['disabledDates']
-  events: InternalPickerData['events']
-  exemptIds: InternalPickerData['exemptIds']
-  startDate: Date
-  months: readonly string[]
-  isOverlayShowing: boolean
-  minMaxDates: InternalPickerData['minMaxDates']
-} & Required<
-    Pick<
-      DatepickerOptions,
-      | 'noWeekends'
-      | 'position'
-      | 'onShow'
-      | 'onHide'
-      | 'onMonthChange'
-      | 'onSelect'
-      | 'formatter'
-      | 'defaultView'
-      | 'customDays'
-      | 'overlayButton'
-      | 'overlayPlaceholder'
-      // | 'alwaysShow' // Do NOT include this.
+export type SanitizedOptions = PrettifyNonRecursive<
+  (
+    | Omit<DatepickerOptions, 'disabledDates' | 'events' | 'exemptIds'>
+    | Omit<DaterangePickerOptions, 'disabledDates' | 'events' | 'exemptIds'>
+  ) & {
+    disabledDates: InternalPickerData['disabledDates']
+    events: InternalPickerData['events']
+    exemptIds: InternalPickerData['exemptIds']
+    startDate: Date
+    months: readonly string[]
+    isOverlayShowing: boolean
+    minMaxDates: InternalPickerData['minMaxDates']
+  } & Required<
+      Pick<
+        DatepickerOptions,
+        | 'noWeekends'
+        | 'position'
+        | 'onShow'
+        | 'onHide'
+        | 'onMonthChange'
+        | 'onSelect'
+        | 'formatter'
+        | 'defaultView'
+        | 'customDays'
+        | 'overlayButton'
+        | 'overlayPlaceholder'
+        | 'startDay'
+        // | 'alwaysShow' // Do NOT include this.
+      >
     >
-  >
+>
 
 export type Selector = string | HTMLElement | null
 

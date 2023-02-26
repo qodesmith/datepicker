@@ -20,6 +20,7 @@ export function renderCalendar(
     maxDate,
     disabledDates,
     noWeekends,
+    startDay,
   } = internalPicker
   const currentYear = currentDate.getFullYear()
   const currentMonthNum = currentDate.getMonth()
@@ -32,6 +33,24 @@ export function renderCalendar(
   const selectedDateNum = selectedDate ? +stripTime(selectedDate) : null
   const today = stripTime(new Date())
   const {start: rangeStart, end: rangeEnd} = internalPicker._getRange()
+
+  // Which day of the week the 1st of the month falls on - 0-indexed (0 - 6).
+  const indexOfFirstOfMonth = new Date(currentYear, currentMonthNum, 1).getDay()
+
+  /**
+   * START DAY, SUNDAY INDEX
+   *         0, 0
+   *         1, 6
+   *         2, 5
+   *         3, 4
+   *         4, 3
+   *         5, 2
+   *         6, 1
+   *
+   * startDay is 0-indexed
+   * Formula: (7 - start index) % 7
+   */
+  const indexOfSunday = (7 - startDay) % 7
 
   /**
    * This class prevents a ghost background fade effect from happening because
@@ -82,13 +101,8 @@ export function renderCalendar(
 
     // Adjust the starting offest of the calendar.
     if (i === 0) {
-      const offset =
-        new Date(
-          dateForComparison.getFullYear(),
-          dateForComparison.getMonth(),
-          1
-        ).getDay() + 1
-      day.style.setProperty('grid-column-start', `${offset}`)
+      const columnStart = ((indexOfFirstOfMonth + indexOfSunday) % 7) + 1
+      day.style.setProperty('grid-column-start', `${columnStart}`)
     }
 
     // Today.

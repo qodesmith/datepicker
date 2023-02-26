@@ -81,9 +81,13 @@ function createCalendarControlElements({
  * `customDays` option was used, the 1st 3 characters will be used for each day.
  * These elements are created once and are intended to be reused for each month
  */
-function createWeekdayElements(
-  weekDays: CreateCalendarInput['customDays']
-): HTMLDivElement[] {
+function createWeekdayElements({
+  weekDays,
+  startDay,
+}: {
+  weekDays: SanitizedOptions['customDays']
+  startDay: SanitizedOptions['startDay']
+}): HTMLDivElement[] {
   const weekdayElements: HTMLDivElement[] = []
 
   for (let i = 0; i < 7; i++) {
@@ -97,6 +101,8 @@ function createWeekdayElements(
   }
 
   return weekdayElements
+    .slice(startDay)
+    .concat(weekdayElements.slice(0, startDay))
 }
 
 /**
@@ -186,10 +192,10 @@ export type PickerElements = {
   overlay: OverlayReturnType
 }
 
+// TODO - can we get rid of this type and deduce things from the internal picker or the options?
 type CreateCalendarInput = {
   date: Date
   customMonths: InternalPickerData['months']
-  customDays: NonNullable<DatepickerOptions['customDays']>
   defaultView: ViewType
   overlayButtonText: InternalPickerData['overlayButtonText']
   overlayPlaceholder: InternalPickerData['overlayPlaceholder']
@@ -212,12 +218,13 @@ export function createCalendarHTML(
     defaultView,
     overlayButton: overlayButtonText,
     overlayPlaceholder,
+    startDay,
   } = options
   const alwaysShow = !!options?.alwaysShow
   const isInput = getIsInput(selectorEl)
   const calendarContainer = document.createElement('div')
   const controls = createCalendarControlElements({date, customMonths})
-  const weekdaysArray = createWeekdayElements(customDays)
+  const weekdaysArray = createWeekdayElements({weekDays: customDays, startDay})
   const weekdaysContainer = document.createElement('div')
   const calendarDaysArray = createCalendarDayElements()
   const daysContainer = document.createElement('div')

@@ -6,7 +6,7 @@ export default function DatepickerWhatever() {
     pickerKey: 'DatepickerWhatever1',
     type: 'div',
     selector: '#world',
-    options: {alwaysShow: true, noWeekends: true},
+    options: {alwaysShow: true, noWeekends: true, startDay: 4},
   })
   const [jsx2, picker2] = useDatepicker({
     pickerKey: 'DatepickerWhatever2',

@@ -97,6 +97,7 @@ function datepicker(
     minDate,
     maxDate,
     minMaxDates,
+    startDay: options.startDay,
     isCalendarShowing: options?.alwaysShow ?? !isInput,
     defaultView: options.defaultView,
     isOverlayShowing: options.isOverlayShowing,

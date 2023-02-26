@@ -7,9 +7,10 @@ import './datepickerAttachedToInput.scss'
 export default function DatepickerAttachedToInput() {
   const exemptId = 'DatepickerAttachedToInput1'
   const options: DatepickerOptions = {
-    position: 'bl',
+    // position: '',
     minDate: new Date(),
     exemptIds: [exemptId, 'row1-slider'],
+    alwaysShow: true,
   }
   const [jsx, picker] = useDatepicker({
     pickerKey: 'DatepickerAttachedToInput2',

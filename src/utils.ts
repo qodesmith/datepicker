@@ -201,14 +201,17 @@ export function positionCalendar(
     })()
     const {top: parentTop, left: parentLeft} =
       selectorData.elementForPositioning.getBoundingClientRect()
+    const parentBorderWidth = +getComputedStyle(
+      selectorData.elementForPositioning
+    ).borderWidth.slice(0, -2)
     const {
       top: inputTop,
       left: inputLeft,
       width: inputWidth,
       height: inputHeight,
     } = selectorData.el.getBoundingClientRect()
-    const relativeTop = inputTop - parentTop
-    const relativeLeft = inputLeft - parentLeft
+    const relativeTop = inputTop - parentTop - parentBorderWidth
+    const relativeLeft = inputLeft - parentLeft - parentBorderWidth
     const [vertical, horizontal] = position.split('')
     const top =
       vertical === 't'

@@ -1,6 +1,6 @@
 import {defaultOptions} from '../../src/constants'
 import {Datepicker, DatepickerOptions, Position} from '../../src/types'
-import {containers, days, other, testElementIds} from '../selectors'
+import {containers, controls, days, other, testElementIds} from '../selectors'
 
 describe('Options', () => {
   let datepicker: Datepicker
@@ -289,8 +289,9 @@ describe('Options', () => {
   })
 
   describe('customDays', () => {
+    const customDays = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+
     it('should replace the default weekday names', () => {
-      const customDays = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
       datepicker(testElementIds.singleInput, {
         alwaysShow: true,
         customDays,
@@ -301,17 +302,72 @@ describe('Options', () => {
 
     it("should throw if the array doens't have 7 values", () => {
       expect(() => {
-        datepicker(testElementIds.singleInput, {customDays: ['a']})
+        datepicker(testElementIds.singleInput, {
+          customDays: customDays.slice(0, -1),
+        })
       }).to.throw('`options.customDays` must be an array of 7 strings.')
       expect(() => {
         datepicker(testElementIds.singleInput, {
-          customDays: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+          customDays: customDays.concat('h'),
         })
       }).to.throw('`options.customDays` must be an array of 7 strings.')
     })
   })
 
-  describe('customMonths', () => {})
+  describe.only('customMonths', () => {
+    const customMonths = 'abcedfghijkl'.split('')
+
+    it('should replace the default month names at the top of the calendar', () => {
+      datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        customMonths,
+        startDate: new Date(2023, 0),
+      })
+
+      function executeTest(index: number): void {
+        cy.get(controls.monthName)
+          .should('have.text', customMonths[index])
+          .then(() => {
+            if (index < 11) {
+              cy.get(controls.rightArrow)
+                .click()
+                .then(() => {
+                  executeTest(index + 1)
+                })
+            }
+          })
+      }
+
+      executeTest(0)
+    })
+
+    it('should replace the default month names in the overlay', () => {
+      datepicker(testElementIds.singleInput, {alwaysShow: true, customMonths})
+
+      cy.get(containers.monthYearContainer)
+        .click()
+        .then(() => {
+          cy.get(containers.overlayMonthsContainer).should(
+            'have.text',
+            customMonths.join('')
+          )
+        })
+    })
+
+    it("should throw if the array doens't have 12 values", () => {
+      expect(() => {
+        datepicker(testElementIds.singleInput, {
+          customMonths: customMonths.slice(0, -1),
+        })
+      }).to.throw('`options.customMonths` must be an array of 12 strings.')
+      expect(() => {
+        datepicker(testElementIds.singleInput, {
+          customMonths: customMonths.concat('z'),
+        })
+      }).to.throw('`options.customMonths` must be an array of 12 strings.')
+    })
+  })
+
   describe('customOverlayMonths', () => {})
   describe('defaultView', () => {})
   describe('overlayButton', () => {})

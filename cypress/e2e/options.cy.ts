@@ -369,8 +369,9 @@ describe('Options', () => {
   })
 
   describe('customOverlayMonths', () => {
-    const customOverlayMonthsLongNames = Array.from({length: 12}, (_, i) =>
-      (101 + i + 'XXXXX').toString()
+    const customOverlayMonthsLongNames = Array.from(
+      {length: 12},
+      (_, i) => `${101 + i}XXXXX`
     )
     // '101' => '112'
     const customOverlayMonths = customOverlayMonthsLongNames.map(val =>
@@ -451,7 +452,30 @@ describe('Options', () => {
     })
   })
 
-  describe('defaultView', () => {})
+  describe('defaultView', () => {
+    it('should default to the calendar view', () => {
+      datepicker(testElementIds.singleInput, {alwaysShow: true})
+      datepicker(testElementIds.singleStandalone, {
+        alwaysShow: true,
+        defaultView: 'calendar',
+      })
+
+      cy.get(containers.overlayContainer)
+        .should('not.be.visible')
+        .should('have.length', 2)
+    })
+
+    it('should show the overlay for the proper value', () => {
+      datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        defaultView: 'overlay',
+      })
+      cy.get(containers.overlayContainer)
+        .should('be.visible')
+        .should('have.length', 1)
+    })
+  })
+
   describe('overlayButton', () => {})
   describe('overlayPlaceholder', () => {})
   describe('events', () => {})

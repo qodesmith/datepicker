@@ -314,7 +314,7 @@ describe('Options', () => {
     })
   })
 
-  describe.only('customMonths', () => {
+  describe('customMonths', () => {
     const customMonths = 'abcedfghijkl'.split('')
 
     it('should replace the default month names at the top of the calendar', () => {
@@ -368,7 +368,89 @@ describe('Options', () => {
     })
   })
 
-  describe('customOverlayMonths', () => {})
+  describe('customOverlayMonths', () => {
+    const customOverlayMonthsLongNames = Array.from({length: 12}, (_, i) =>
+      (101 + i + 'XXXXX').toString()
+    )
+    // '101' => '112'
+    const customOverlayMonths = customOverlayMonthsLongNames.map(val =>
+      val.slice(0, 3)
+    )
+
+    it('should replace the default month names in the overlay', () => {
+      datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        customOverlayMonths,
+      })
+
+      cy.get(containers.monthYearContainer)
+        .click()
+        .then(() => {
+          cy.get(containers.overlayMonthsContainer).should(
+            'have.text',
+            customOverlayMonths.join('')
+          )
+        })
+    })
+
+    it('should override `customMonths` for month names in the overlay', () => {
+      const customMonths = 'abcdefghijkl'.split('')
+      datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        customMonths,
+        customOverlayMonths,
+        startDate: new Date(2023, 0),
+      })
+
+      cy.get(controls.monthName)
+        .should('have.text', customMonths[0])
+        .click()
+        .then(() => {
+          cy.get(containers.overlayMonthsContainer).should(
+            'have.text',
+            customOverlayMonths.join('')
+          )
+        })
+    })
+
+    it('should only use the first 3 characters provided', () => {
+      datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        customOverlayMonths: customOverlayMonthsLongNames,
+      })
+
+      cy.get(containers.monthYearContainer)
+        .click()
+        .then(() => {
+          cy.get(containers.overlayMonthsContainer).should(
+            'have.text',
+
+            // Testing against the shortened names.
+            customOverlayMonths.join('')
+          )
+        })
+    })
+
+    it("should throw if the array doens't have 12 values", () => {
+      expect(() =>
+        datepicker(testElementIds.singleInput, {
+          alwaysShow: true,
+          customOverlayMonths: customOverlayMonths.slice(0, -1),
+        })
+      ).to.throw(
+        '`options.customOverlayMonths` must be an array of 12 strings.'
+      )
+      expect(() =>
+        datepicker(testElementIds.singleInput, {
+          alwaysShow: true,
+          customOverlayMonths: customOverlayMonths.concat('113'),
+        })
+      ).to.throw(
+        '`options.customOverlayMonths` must be an array of 12 strings.'
+      )
+    })
+  })
+
   describe('defaultView', () => {})
   describe('overlayButton', () => {})
   describe('overlayPlaceholder', () => {})

@@ -145,6 +145,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     })
   }
 
+  // TODO - this isn't working when the calendar is in a Shadow DOM.
   // MONTH/YEAR
   const {monthYearContainer} = controls
   setListenersMapItem(

@@ -539,6 +539,11 @@ export function sanitizeAndCheckAndSyncOptions(
     throwError('`options.customDays` must be an array of 7 strings.')
   }
 
+  const months = options?.customMonths ?? defaultOptions.months
+  if (months.length !== 12) {
+    throwError('`options.customMonths` must be an array of 12 strings.')
+  }
+
   return {
     ...options,
     startDay,
@@ -553,7 +558,7 @@ export function sanitizeAndCheckAndSyncOptions(
     startDate: stripTime(options?.startDate ?? new Date()),
     position: options?.position ?? 'tl',
     customDays,
-    months: options?.customMonths ?? defaultOptions.months,
+    months,
     defaultView,
     isOverlayShowing: defaultView === 'overlay',
     overlayButton: options?.overlayButton ?? defaultOptions.overlayButtonText,

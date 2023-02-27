@@ -10,7 +10,7 @@ export default function DatepickerWhatever() {
       alwaysShow: true,
       noWeekends: true,
       startDay: 4,
-      customDays: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
+      customMonths: 'abcdefghijkl'.split(''),
     },
   })
   const [jsx2, picker2] = useDatepicker({

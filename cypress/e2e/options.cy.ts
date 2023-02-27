@@ -288,7 +288,29 @@ describe('Options', () => {
     })
   })
 
-  describe('customDays', () => {})
+  describe('customDays', () => {
+    it('should replace the default weekday names', () => {
+      const customDays = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+      datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        customDays,
+      })
+
+      cy.get(other.weekday).should('have.text', customDays.join(''))
+    })
+
+    it("should throw if the array doens't have 7 values", () => {
+      expect(() => {
+        datepicker(testElementIds.singleInput, {customDays: ['a']})
+      }).to.throw('`options.customDays` must be an array of 7 strings.')
+      expect(() => {
+        datepicker(testElementIds.singleInput, {
+          customDays: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+        })
+      }).to.throw('`options.customDays` must be an array of 7 strings.')
+    })
+  })
+
   describe('customMonths', () => {})
   describe('customOverlayMonths', () => {})
   describe('defaultView', () => {})

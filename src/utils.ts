@@ -534,6 +534,11 @@ export function sanitizeAndCheckAndSyncOptions(
     throwError('`options.startDay` must be a number between 0 and 6.')
   }
 
+  const customDays = (options?.customDays ?? defaultOptions.days).slice()
+  if (customDays.length !== 7) {
+    throwError('`options.customDays` must be an array of 7 strings.')
+  }
+
   return {
     ...options,
     startDay,
@@ -547,7 +552,7 @@ export function sanitizeAndCheckAndSyncOptions(
     exemptIds: new Set(options?.exemptIds ?? []),
     startDate: stripTime(options?.startDate ?? new Date()),
     position: options?.position ?? 'tl',
-    customDays: (options?.customDays ?? defaultOptions.days).slice(),
+    customDays,
     months: options?.customMonths ?? defaultOptions.months,
     defaultView,
     isOverlayShowing: defaultView === 'overlay',

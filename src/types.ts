@@ -123,7 +123,9 @@ export type DatepickerOptions = {
 
   /**
    * You can customize the display of the month name at the top of the calendar
-   * by providing an array of 12 strings.
+   * by providing an array of 12 strings. This will also affect the names of the
+   * months in the overlay - they will be the firt 3 characters of the 12 values
+   * provided here.
    *
    * Default - ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
    */
@@ -133,6 +135,9 @@ export type DatepickerOptions = {
    * You can customize the display of the month names in the overlay view by
    * providing an array of 12 strings. Keep in mind that if the values are too
    * long, it could produce undesired results in the UI.
+   *
+   * In the case that `customMonths` was provided, this value will *only* affect
+   * the overlay month names.
    *
    * Default - The first 3 characters of each item in `customMonths`.
    */
@@ -301,14 +306,16 @@ export type DaterangePickerOptions = {
 
 export type SanitizedOptions = PrettifyNonRecursive<
   (
-    | Omit<DatepickerOptions, 'disabledDates' | 'events' | 'exemptIds'>
-    | Omit<DaterangePickerOptions, 'disabledDates' | 'events' | 'exemptIds'>
+    | Omit<DatepickerOptions, 'disabledDates' | 'events' | 'exemptIds' | 'customDays'>
+    | Omit<DaterangePickerOptions, 'disabledDates' | 'events' | 'exemptIds' | 'customDays'
   ) & {
     disabledDates: InternalPickerData['disabledDates']
     events: InternalPickerData['events']
     exemptIds: InternalPickerData['exemptIds']
     startDate: Date
+    customDays: readonly string[]
     months: readonly string[]
+    overlayMonths: readonly string[]
     isOverlayShowing: boolean
     minMaxDates: InternalPickerData['minMaxDates']
   } & Required<
@@ -322,7 +329,6 @@ export type SanitizedOptions = PrettifyNonRecursive<
         | 'onSelect'
         | 'formatter'
         | 'defaultView'
-        | 'customDays'
         | 'overlayButton'
         | 'overlayPlaceholder'
         | 'startDay'

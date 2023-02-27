@@ -128,7 +128,7 @@ type OverlayReturnType = {
 }
 
 function createCalendarOverlay(
-  customMonths: CreateCalendarInput['customMonths'],
+  overlayMonths: SanitizedOptions['overlayMonths'],
   defaultView: ViewType,
   overlayButtonText: CreateCalendarInput['overlayButtonText'],
   overlayPlaceholder: CreateCalendarInput['overlayPlaceholder']
@@ -146,7 +146,7 @@ function createCalendarOverlay(
     overlayMonthsContainer.append(overlayMonth)
 
     // Overlay month names are limited to 3 characters.
-    overlayMonth.textContent = customMonths[i].slice(0, 3)
+    overlayMonth.textContent = overlayMonths[i].slice(0, 3)
     overlayMonth.dataset.num = `${i}`
   }
 
@@ -214,6 +214,7 @@ export function createCalendarHTML(
   const {
     startDate: date,
     months: customMonths,
+    overlayMonths,
     customDays,
     defaultView,
     overlayButton: overlayButtonText,
@@ -223,13 +224,15 @@ export function createCalendarHTML(
   const alwaysShow = !!options?.alwaysShow
   const isInput = getIsInput(selectorEl)
   const calendarContainer = document.createElement('div')
+  // TODO - turn all these internal function arguments from objects to multiple arguments.
+  // Argument names can be minimized, object properties can't.
   const controls = createCalendarControlElements({date, customMonths})
   const weekdaysArray = createWeekdayElements({weekDays: customDays, startDay})
   const weekdaysContainer = document.createElement('div')
   const calendarDaysArray = createCalendarDayElements()
   const daysContainer = document.createElement('div')
   const overlay = createCalendarOverlay(
-    customMonths,
+    overlayMonths,
     defaultView,
     overlayButtonText,
     overlayPlaceholder

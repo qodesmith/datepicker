@@ -534,14 +534,23 @@ export function sanitizeAndCheckAndSyncOptions(
     throwError('`options.startDay` must be a number between 0 and 6.')
   }
 
-  const customDays = (options?.customDays ?? defaultOptions.days).slice()
+  function throwStringArrayError(propName: string, length: number): never {
+    throwError(`\`options.${propName}\` must be an array of ${length} strings.`)
+  }
+
+  const customDays = options?.customDays ?? defaultOptions.days
   if (customDays.length !== 7) {
-    throwError('`options.customDays` must be an array of 7 strings.')
+    throwStringArrayError('customDays', 7)
   }
 
   const months = options?.customMonths ?? defaultOptions.months
   if (months.length !== 12) {
-    throwError('`options.customMonths` must be an array of 12 strings.')
+    throwStringArrayError('customMonths', 12)
+  }
+
+  const overlayMonths = options?.customOverlayMonths ?? months
+  if (overlayMonths.length !== 12) {
+    throwStringArrayError('customOverlayMonths', 12)
   }
 
   return {
@@ -559,6 +568,7 @@ export function sanitizeAndCheckAndSyncOptions(
     position: options?.position ?? 'tl',
     customDays,
     months,
+    overlayMonths,
     defaultView,
     isOverlayShowing: defaultView === 'overlay',
     overlayButton: options?.overlayButton ?? defaultOptions.overlayButtonText,

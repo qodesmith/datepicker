@@ -277,5 +277,35 @@ describe('Options', () => {
 
       executTest(0)
     })
+
+    it('should throw for values outside 0 - 6', () => {
+      expect(() => {
+        datepicker(testElementIds.singleInput, {startDay: -1})
+      }).to.throw('`options.startDay` must be a number between 0 and 6.')
+      expect(() => {
+        datepicker(testElementIds.singleInput, {startDay: 7})
+      }).to.throw('`options.startDay` must be a number between 0 and 6.')
+    })
   })
+
+  describe('customDays', () => {})
+  describe('customMonths', () => {})
+  describe('customOverlayMonths', () => {})
+  describe('defaultView', () => {})
+  describe('overlayButton', () => {})
+  describe('overlayPlaceholder', () => {})
+  describe('events', () => {})
+  describe('alwaysShow', () => {})
+  describe('selectedDate', () => {})
+  describe('maxDate', () => {})
+  describe('minDate', () => {})
+  describe('startDate', () => {})
+  describe('showAllDates', () => {})
+  describe('respectDisabledReadOnly', () => {})
+  describe('noWeekends', () => {})
+  describe('disabler', () => {})
+  describe('disabledDates', () => {})
+  describe('disableMobile', () => {})
+  describe('disableYearOverlay', () => {})
+  describe('exemptIds', () => {})
 })

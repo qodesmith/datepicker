@@ -513,7 +513,21 @@ describe('Options', () => {
     })
   })
 
-  describe('events', () => {})
+  describe('events', () => {
+    it('should put a blue dot on dates with events', () => {
+      const events = [1, 5, 28].map(num => new Date(2023, 1, num))
+      datepicker(testElementIds.singleInput, {events})
+
+      cy.get(days.event)
+        .should('have.length', events.length)
+        .then($els => {
+          $els.each((i, el) => {
+            expect(el.textContent).to.equal(`${events[i].getDate()}`)
+          })
+        })
+    })
+  })
+
   describe('alwaysShow', () => {})
   describe('selectedDate', () => {})
   describe('maxDate', () => {})

@@ -108,74 +108,48 @@ export function renderCalendar(
     }
 
     // Today.
-    if (+today === dateNumForComparison) {
-      day.classList.add('dp-today')
-    } else {
-      day.classList.remove('dp-today')
-    }
+    addOrRemoveClass(day, 'dp-today', +today === dateNumForComparison)
 
     // Display / display none.
-    if (num <= daysInMonth) {
-      day.classList.remove('dp-dn')
-    } else {
-      day.classList.add('dp-dn')
-    }
+    addOrRemoveClass(day, 'dp-dn', !(num <= daysInMonth))
 
     // Selected date.
-    if (isSelectedDate) {
-      day.classList.add('dp-selected-date')
-    } else {
-      day.classList.remove('dp-selected-date')
-    }
+    addOrRemoveClass(day, 'dp-selected-date', isSelectedDate)
 
     // Event.
-    if (isEvent) {
-      day.classList.add('dp-event')
-    } else {
-      day.classList.remove('dp-event')
-    }
+    addOrRemoveClass(day, 'dp-event', isEvent)
 
     // Range start.
-    if (
+    addOrRemoveClass(
+      day,
+      'dp-range-start',
       isRangeSelected &&
-      rangeStart &&
-      +rangeStart === dateNumForComparison &&
-      !isRangeDatesEqual
-    ) {
-      day.classList.add('dp-range-start')
-    } else {
-      day.classList.remove('dp-range-start')
-    }
+        rangeStart &&
+        +rangeStart === dateNumForComparison &&
+        !isRangeDatesEqual
+    )
 
     // Range end.
-    if (
+    addOrRemoveClass(
+      day,
+      'dp-range-end',
       isRangeSelected &&
-      rangeEnd &&
-      +rangeEnd === dateNumForComparison &&
-      !isRangeDatesEqual
-    ) {
-      day.classList.add('dp-range-end')
-    } else {
-      day.classList.remove('dp-range-end')
-    }
+        rangeEnd &&
+        +rangeEnd === dateNumForComparison &&
+        !isRangeDatesEqual
+    )
 
     // Daterange dates.
-    if (isRangeDate) {
-      day.classList.add('dp-range-date')
-    } else {
-      day.classList.remove('dp-range-date')
-    }
+    addOrRemoveClass(day, 'dp-range-date', isRangeDate)
 
     // Disabled dates.
-    if (
+    addOrRemoveClass(
+      day,
+      'dp-disabled-date',
       !dateInRange ||
-      disabledDates.has(dateNumForComparison) ||
-      (noWeekends && isWeekend)
-    ) {
-      day.classList.add('dp-disabled-date')
-    } else {
-      day.classList.remove('dp-disabled-date')
-    }
+        disabledDates.has(dateNumForComparison) ||
+        (noWeekends && isWeekend)
+    )
   })
 
   // Adjust the month name and year in the calendar controls.
@@ -196,4 +170,12 @@ export function renderCalendar(
       'dp-disable-transition'
     )
   })
+}
+
+function addOrRemoveClass<T extends HTMLElement>(
+  el: T,
+  className: string,
+  condition: boolean | undefined
+): void {
+  el.classList[condition ? 'add' : 'remove'](className)
 }

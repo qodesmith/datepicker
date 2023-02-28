@@ -5,7 +5,7 @@
   "main": "dist/datepicker.min.js",
   "style": "./src/datepicker.scss",
   "scripts": {
-    "build-new": "vite build",
+    "build": "vite build",
     "cy:open": "cypress open --e2e -b chrome",
     "cy:run": "cypress run",
     "dev": "vite",

@@ -21,6 +21,7 @@ export function renderCalendar(
     disabledDates,
     noWeekends,
     startDay,
+    events,
   } = internalPicker
   const currentYear = currentDate.getFullYear()
   const currentMonthNum = currentDate.getMonth()
@@ -70,6 +71,7 @@ export function renderCalendar(
     const num = i + 1
     const dateForComparison = new Date(currentYear, currentMonthNum, num)
     const dateNumForComparison = +dateForComparison
+    const isEvent = events.has(dateNumForComparison)
     const isWeekend = isWeekendDate(dateForComparison)
     const dateInRange = isDateWithinRange({
       date: dateForComparison,
@@ -124,6 +126,13 @@ export function renderCalendar(
       day.classList.add('dp-selected-date')
     } else {
       day.classList.remove('dp-selected-date')
+    }
+
+    // Event.
+    if (isEvent) {
+      day.classList.add('dp-event')
+    } else {
+      day.classList.remove('dp-event')
     }
 
     // Range start.

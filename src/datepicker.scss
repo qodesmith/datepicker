@@ -44,7 +44,7 @@
   // --dp-selected-date-bg: ???
   --dp-disabled-date-color: rgba(127, 127, 127, 0.92);
   // --dp-disabled-date-bg: ???
-  // --dp-day-event-color: ??? // The little dot - namne this the same as the class name.
+  --dp-day-event-color: #07f;
   --dp-overlay-color: var(--dp-color);
   --dp-overlay-bg: rgba(0, 0, 0, 0.5);
 
@@ -245,6 +245,21 @@
   &.dp-disabled-date {
     cursor: not-allowed;
     color: var(--dp-disabled-date-color);
+  }
+
+  &.dp-event {
+    position: relative;
+
+    &:after {
+      content: '';
+      position: absolute;
+      width: calc(var(--dp-width) * 0.025);
+      height: calc(var(--dp-width) * 0.025);
+      border-radius: 50%;
+      background: var(--dp-day-event-color);
+      top: 50%;
+      transform: translate(25%, -50%);
+    }
   }
 }
 

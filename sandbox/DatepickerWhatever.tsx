@@ -8,9 +8,7 @@ export default function DatepickerWhatever() {
     selector: '#world',
     options: {
       alwaysShow: true,
-      noWeekends: true,
-      startDay: 4,
-      customMonths: 'abcdefghijkl'.split(''),
+      events: [1, 3, 5, 20, 28].map(num => new Date(2023, 1, num)),
     },
   })
   const [jsx2, picker2] = useDatepicker({

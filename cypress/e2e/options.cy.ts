@@ -1,6 +1,13 @@
 import {defaultOptions} from '../../src/constants'
 import {Datepicker, DatepickerOptions, Position} from '../../src/types'
-import {containers, controls, days, other, testElementIds} from '../selectors'
+import {
+  containers,
+  controls,
+  days,
+  other,
+  overlay,
+  testElementIds,
+} from '../selectors'
 
 describe('Options', () => {
   let datepicker: Datepicker
@@ -476,8 +483,36 @@ describe('Options', () => {
     })
   })
 
-  describe('overlayButton', () => {})
-  describe('overlayPlaceholder', () => {})
+  describe('overlayButton', () => {
+    it('should have the default text', () => {
+      datepicker(testElementIds.singleInput)
+      cy.get(overlay.submit).should('have.text', 'Submit')
+    })
+
+    it('should set the text on the overlay submit button', () => {
+      const overlayButton = 'Qodesmith'
+      datepicker(testElementIds.singleInput, {overlayButton})
+      cy.get(overlay.submit).should('have.text', overlayButton)
+    })
+  })
+
+  describe('overlayPlaceholder', () => {
+    it('should have the default placeholder', () => {
+      datepicker(testElementIds.singleInput)
+      cy.get(overlay.input).should('have.attr', 'placeholder', 'Enter a year')
+    })
+
+    it('should set the placeholder value', () => {
+      const overlayPlaceholder = 'test'
+      datepicker(testElementIds.singleInput, {overlayPlaceholder})
+      cy.get(overlay.input).should(
+        'have.attr',
+        'placeholder',
+        overlayPlaceholder
+      )
+    })
+  })
+
   describe('events', () => {})
   describe('alwaysShow', () => {})
   describe('selectedDate', () => {})

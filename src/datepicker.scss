@@ -42,7 +42,6 @@
   --dp-selected-date-color: #add8e6;
   --dp-range-date-color: #d4ebf2;
   // --dp-selected-date-bg: ???
-  --dp-disabled-date-color: rgba(127, 127, 127, 0.92);
   // --dp-disabled-date-bg: ???
   --dp-day-event-color: #07f;
   --dp-overlay-color: var(--dp-color);
@@ -244,7 +243,7 @@
 
   &.dp-disabled-date {
     cursor: not-allowed;
-    color: var(--dp-disabled-date-color);
+    opacity: 0.5;
   }
 
   &.dp-event {

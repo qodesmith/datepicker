@@ -2,13 +2,15 @@ import {useMemo} from 'react'
 import {useDatepicker} from './useDatepicker'
 
 export default function DatepickerWhatever() {
+  const dates = [1, 3, 5, 20, 28].map(num => new Date(2023, 1, num))
   const [jsx1, picker1] = useDatepicker({
     pickerKey: 'DatepickerWhatever1',
     type: 'div',
     selector: '#world',
     options: {
       alwaysShow: true,
-      events: [1, 3, 5, 20, 28].map(num => new Date(2023, 1, num)),
+      events: dates,
+      disabledDates: dates,
     },
   })
   const [jsx2, picker2] = useDatepicker({

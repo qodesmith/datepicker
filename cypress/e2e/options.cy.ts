@@ -528,7 +528,61 @@ describe('Options', () => {
     })
   })
 
-  describe('alwaysShow', () => {})
+  describe('alwaysShow', () => {
+    it('should always show the calendar', () => {
+      datepicker(testElementIds.singleInput, {alwaysShow: true})
+
+      cy.get(containers.calendarContainer).should('be.visible')
+      cy.get(testElementIds.unfocus)
+        .click()
+        .then(() => {
+          cy.get(containers.calendarContainer).should('be.visible')
+        })
+    })
+
+    it('should display default behavior when set to `false`', () => {
+      const picker = datepicker(testElementIds.singleInput, {
+        alwaysShow: false,
+      })
+
+      // Explicitly providing false.
+      cy.get(containers.calendarContainer).should('not.be.visible')
+      cy.get(testElementIds.singleInput).click()
+      cy.get(containers.calendarContainer).should('be.visible')
+      cy.get(testElementIds.unfocus).click()
+      cy.get(containers.calendarContainer)
+        .should('not.be.visible')
+        .then(() => {
+          picker.remove()
+          cy.get(containers.calendarContainer)
+            .should('have.length', 0)
+            .then(() => {
+              datepicker(testElementIds.singleInput)
+            })
+        })
+
+      // Default behavior should be the same.
+      cy.get(containers.calendarContainer).should('not.be.visible')
+      cy.get(testElementIds.singleInput).click()
+      cy.get(containers.calendarContainer).should('be.visible')
+      cy.get(testElementIds.unfocus).click()
+      cy.get(containers.calendarContainer).should('not.be.visible')
+    })
+
+    it('should ignore `.hide` when set to `true`', () => {
+      const picker = datepicker(testElementIds.singleInput, {alwaysShow: true})
+
+      cy.get(containers.calendarContainer)
+        .should('be.visible')
+        .then(() => {
+          picker.hide()
+        })
+        .then(() => {
+          cy.get(containers.calendarContainer).should('be.visible')
+        })
+    })
+  })
+
   describe('selectedDate', () => {})
   describe('maxDate', () => {})
   describe('minDate', () => {})

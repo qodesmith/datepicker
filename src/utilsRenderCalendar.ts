@@ -175,7 +175,7 @@ export function renderCalendar(
 function addOrRemoveClass<T extends HTMLElement>(
   el: T,
   className: string,
-  condition: boolean | undefined
+  shouldAdd: boolean | undefined
 ): void {
-  el.classList[condition ? 'add' : 'remove'](className)
+  el.classList[shouldAdd ? 'add' : 'remove'](className)
 }

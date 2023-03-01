@@ -25,7 +25,7 @@ describe('Calendar DOM Structure', () => {
 
   it('should have the correct DOM structure', () => {
     const options: DatepickerOptions = {startDate: new Date(2023, 1, 15)}
-    const singlePicker = datepicker(testElementIds.singleInput)
+    const singlePicker = datepicker(testElementIds.singleInput, options)
     const rangeOptions: DaterangePickerOptions = {...options, id: 1}
     const rangePicker1 = datepicker(
       testElementIds.rangeInputStart,

@@ -583,7 +583,26 @@ describe('Options', () => {
     })
   })
 
-  describe('selectedDate', () => {})
+  describe('selectedDate', () => {
+    it('should start the calendar with a selected date', () => {
+      const day = 28
+      const options: DatepickerOptions = {
+        selectedDate: new Date(2023, 1, day),
+        startDate: new Date(2023, 1),
+      }
+      const picker = datepicker(testElementIds.singleInput, options)
+
+      expect(picker.selectedDate).to.deep.equal(options.selectedDate)
+      cy.get(days.selectedDate)
+        .should('have.length', 1)
+        .should('have.text', day)
+      cy.get(testElementIds.singleInput).should(
+        'have.value',
+        options.selectedDate.toDateString()
+      )
+    })
+  })
+
   describe('maxDate', () => {})
   describe('minDate', () => {})
   describe('startDate', () => {})

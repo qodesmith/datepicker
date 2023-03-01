@@ -403,13 +403,8 @@ export function sanitizeAndCheckAndSyncOptions(
   let disabledDates = new Set((options?.disabledDates ?? []).map(dateToNum))
   let events = new Set((options?.events ?? []).map(dateToNum))
 
-  if (minDate && maxDate) {
-    if (minDate > maxDate) {
-      throwError('"options.minDate" cannot be greater than "options.maxDate"')
-    }
-    if (maxDate < minDate) {
-      throwError('"options.maxDate" cannot be less than "options.minDate"')
-    }
+  if (minDate && maxDate && minDate > maxDate) {
+    throwError('"options.minDate" cannot be greater than "options.maxDate"')
   }
 
   // Only check for conflicts here, not daterange scenarios.

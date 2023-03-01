@@ -230,8 +230,6 @@ describe('Options', () => {
         })
 
         cy.get(other.weekday).then($weekdays => {
-          console.log(startDay, days[startDay])
-
           // The 1st weekday should be the corresponding start day.
           expect($weekdays[0]).to.have.text(days[startDay])
 
@@ -516,7 +514,10 @@ describe('Options', () => {
   describe('events', () => {
     it('should put a blue dot on dates with events', () => {
       const events = [1, 5, 28].map(num => new Date(2023, 1, num))
-      datepicker(testElementIds.singleInput, {events})
+      datepicker(testElementIds.singleInput, {
+        events,
+        startDate: new Date(2023, 1),
+      })
 
       cy.get(days.event)
         .should('have.length', events.length)
@@ -603,8 +604,84 @@ describe('Options', () => {
     })
   })
 
-  describe('maxDate', () => {})
-  describe('minDate', () => {})
+  describe('maxDate', () => {
+    it('should disable selecting dates beyond the date provided', () => {
+      const day = 15
+      const maxDate = new Date(2023, 2, day)
+      const daysInMarch = new Date(2023, 3, 0).getDate()
+      const options: DatepickerOptions = {maxDate, alwaysShow: true}
+      const picker = datepicker(testElementIds.singleInput, options)
+
+      cy.get(days.selectedDate).should('have.length', 0)
+      cy.get(days.disabledDate).should('have.length', daysInMarch - day)
+
+      cy.get(days.day)
+        .contains(`${day + 1}`)
+        .click()
+      cy.get(days.selectedDate)
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.selectedDate).to.be.undefined
+        })
+      cy.get(days.day).contains(`${day}`).click()
+      cy.get(days.selectedDate)
+        .should('have.length', 1)
+        .then(() => {
+          expect(picker.selectedDate).to.deep.equal(maxDate)
+        })
+    })
+
+    it('should throw an error when set below `minDate`', () => {
+      expect(() =>
+        datepicker(testElementIds.singleInput, {
+          minDate: new Date(2023, 2, 15),
+          maxDate: new Date(2023, 2, 1),
+        })
+      ).to.throw('"options.minDate" cannot be greater than "options.maxDate"')
+    })
+  })
+
+  describe('minDate', () => {
+    it('should disable selecting dates prior to the date provided', () => {
+      const day = 15
+      const minDate = new Date(2023, 2, day)
+      const daysInMarch = new Date(2023, 3, 0).getDate()
+      const options: DatepickerOptions = {minDate, alwaysShow: true}
+      const picker = datepicker(testElementIds.singleInput, options)
+
+      cy.get(days.selectedDate).should('have.length', 0)
+      cy.get(days.disabledDate).should('have.length', day - 1)
+      cy.get(`${days.day}:not(${days.disabledDate})`).should(
+        'have.length',
+        daysInMarch - (day - 1)
+      )
+
+      cy.get(days.day)
+        .contains(`${day - 1}`)
+        .click()
+      cy.get(days.selectedDate)
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.selectedDate).to.be.undefined
+        })
+      cy.get(days.day).contains(`${day}`).click()
+      cy.get(days.selectedDate)
+        .should('have.length', 1)
+        .then(() => {
+          expect(picker.selectedDate).to.deep.equal(minDate)
+        })
+    })
+
+    it('should throw an error when set above `maxDate`', () => {
+      expect(() =>
+        datepicker(testElementIds.singleInput, {
+          minDate: new Date(2023, 2, 15),
+          maxDate: new Date(2023, 2, 1),
+        })
+      ).to.throw('"options.minDate" cannot be greater than "options.maxDate"')
+    })
+  })
+
   describe('startDate', () => {})
   describe('showAllDates', () => {})
   describe('respectDisabledReadOnly', () => {})

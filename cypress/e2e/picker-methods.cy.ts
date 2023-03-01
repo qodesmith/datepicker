@@ -439,6 +439,16 @@ describe('Picker Methods', () => {
         })
     })
 
+    it('should throw an error if setting a date > `maxDate`', () => {
+      const picker = datepicker(testElementIds.singleInput, {
+        maxDate: new Date(2023, 2, 1),
+      })
+
+      expect(() => picker.setMin({date: new Date(2023, 2, 15)})).to.throw(
+        '`minDate` cannot be > `maxDate`'
+      )
+    })
+
     it('should throw an error if called on an already removed instance', () => {
       const picker = datepicker(testElementIds.singleInput)
 
@@ -512,6 +522,16 @@ describe('Picker Methods', () => {
         .then(() => {
           expect(picker.selectedDate).to.be.undefined
         })
+    })
+
+    it('should throw an error if setting a date < `minDate`', () => {
+      const picker = datepicker(testElementIds.singleInput, {
+        minDate: new Date(2023, 2, 15),
+      })
+
+      expect(() => picker.setMax({date: new Date(2023, 2, 1)})).to.throw(
+        '`maxDate` cannot be < `minDate`'
+      )
     })
 
     it('should throw an error if called on an already removed instance', () => {

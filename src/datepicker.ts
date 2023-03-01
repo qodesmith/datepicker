@@ -25,6 +25,7 @@ import {
   sanitizeAndCheckAndSyncOptions,
   stripTime,
   throwAlreadyRemovedError,
+  throwError,
 } from './utils'
 import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 
@@ -190,6 +191,16 @@ function datepicker(
     _setMinOrMax(isFirstRun, minOrMax, {date, trigger, triggerType}): void {
       const {minDate, maxDate, sibling} = internalPickerItem
       const dateType = minOrMax === 'min' ? 'minDate' : 'maxDate'
+      const strippedDate = date ? stripTime(date) : undefined
+
+      if (strippedDate) {
+        if (minOrMax === 'min' && maxDate && +strippedDate > +maxDate) {
+          throwError('`minDate` cannot be > `maxDate`')
+        }
+        if (minOrMax === 'max' && minDate && +strippedDate < +minDate) {
+          throwError('`maxDate` cannot be < `minDate`')
+        }
+      }
 
       // TODO - ensure all comments are consistently styled.
       /**
@@ -200,7 +211,7 @@ function datepicker(
       const {selectedDate} = publicPicker
 
       // Update the min/max date.
-      internalPickerItem[dateType] = date ? stripTime(date) : undefined
+      internalPickerItem[dateType] = strippedDate
 
       // Unselect the selected date if it's out of range.
       if (
@@ -208,8 +219,8 @@ function datepicker(
         date &&
         !isDateWithinRange({
           date: selectedDate,
-          minDate: dateType === 'minDate' ? date : minDate,
-          maxDate: dateType === 'maxDate' ? date : maxDate,
+          minDate: dateType === 'minDate' ? strippedDate : minDate,
+          maxDate: dateType === 'maxDate' ? strippedDate : maxDate,
         })
       ) {
         internalPickerItem.selectedDate = undefined

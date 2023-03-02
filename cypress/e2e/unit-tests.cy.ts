@@ -1,4 +1,9 @@
-import {getType, throwError, throwAlreadyRemovedError} from '../../src/utils'
+import {
+  getType,
+  throwError,
+  throwAlreadyRemovedError,
+  getDaysInMonth,
+} from '../../src/utils'
 
 describe('Unit Tests', () => {
   describe('getType', () => {
@@ -27,6 +32,35 @@ describe('Unit Tests', () => {
       expect(() => throwAlreadyRemovedError()).to.throw(
         "Unable to run a function or access properties from a picker that's already removed."
       )
+    })
+  })
+
+  describe('getDaysInMonth', () => {
+    it('should get the days in the month for the date provided', () => {
+      const daysInMonth = getDaysInMonth(new Date(2023, 2))
+      expect(daysInMonth).to.equal(31)
+    })
+
+    it('should get the days in the month n-months away from the date provided in either direction', () => {
+      const date = new Date(2023, 2)
+
+      expect(getDaysInMonth(date, 1)).to.equal(30)
+      expect(getDaysInMonth(date, -1)).to.equal(28)
+      expect(getDaysInMonth(date, 2)).to.equal(31)
+      expect(getDaysInMonth(date, -2)).to.equal(31)
+      expect(getDaysInMonth(date, 3)).to.equal(30)
+      expect(getDaysInMonth(date, -3)).to.equal(31)
+      expect(getDaysInMonth(date, 4)).to.equal(31)
+      expect(getDaysInMonth(date, -4)).to.equal(30)
+      expect(getDaysInMonth(date, 5)).to.equal(31)
+      expect(getDaysInMonth(date, -5)).to.equal(31)
+      expect(getDaysInMonth(date, 6)).to.equal(30)
+      expect(getDaysInMonth(date, -6)).to.equal(30)
+
+      // Testing with a leap years - https://www.timeanddate.com/date/leapyear.html.
+      ;[2020, 2024, 2028, 2032].forEach(year => {
+        expect(getDaysInMonth(new Date(year, 2), -1)).to.equal(29)
+      })
     })
   })
 })

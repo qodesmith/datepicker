@@ -611,3 +611,17 @@ export function isWeekendDate(date: Date): boolean {
   // 0 - Sunday
   return day === 6 || day === 0
 }
+
+/**
+ * Gets the number of days in a given month.
+ *
+ * `adjascentMonth` is optionally used to get the number of days in the month
+ * prior, after, or `n` number of months away in either direction.
+ */
+export function getDaysInMonth(date: Date, adjascentMonth: number = 0): number {
+  return new Date(
+    date.getFullYear(),
+    date.getMonth() + 1 + adjascentMonth,
+    0
+  ).getDate()
+}

@@ -393,6 +393,7 @@ function datepicker(
       removeEventListeners(internalPickerItem)
       // TODO - ^^^ move as many private & public picker methods to importable functions like this one.
 
+      // TODO - should remove be async and we return cb?.()?
       cb?.()
     },
     navigate(data): void {

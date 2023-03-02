@@ -241,8 +241,12 @@ export function hasMonthChanged(prevDate: Date, newDate: Date): boolean {
   return prevMonth !== newMonth
 }
 
-export function stripTime(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+export function stripTime(date: Date, stripDay?: boolean): Date {
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    stripDay ? 1 : date.getDate()
+  )
 }
 
 type IsDateWithinRangeInputType = {
@@ -559,7 +563,7 @@ export function sanitizeAndCheckAndSyncOptions(
     disabledDates,
     events,
     exemptIds: new Set(options?.exemptIds ?? []),
-    startDate: stripTime(options?.startDate ?? new Date()),
+    startDate: stripTime(options?.startDate ?? new Date(), true),
     position: options?.position ?? 'tl',
     customDays,
     months,

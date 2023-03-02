@@ -682,7 +682,24 @@ describe('Options', () => {
     })
   })
 
-  describe('startDate', () => {})
+  describe('startDate', () => {
+    it('should render the calendar month and year based on the date', () => {
+      const startDate = new Date(1986, 5, 11) // <-- What movie released this day??? 😎
+      const picker = datepicker(testElementIds.singleInput, {startDate})
+
+      expect(picker.currentDate).to.deep.equal(new Date(1986, 5))
+      cy.get(controls.monthName).should('have.text', 'June')
+      cy.get(controls.year).should('have.text', '1986')
+    })
+
+    it('should set `currentDate` to the date provided but strip the day of the month', () => {
+      const startDate = new Date(1986, 5, 11) // <-- What movie released this day??? 😎
+      const picker = datepicker(testElementIds.singleInput, {startDate})
+
+      expect(picker.currentDate).to.deep.equal(new Date(1986, 5, 1))
+    })
+  })
+
   describe('showAllDates', () => {})
   describe('respectDisabledReadOnly', () => {})
   describe('noWeekends', () => {})

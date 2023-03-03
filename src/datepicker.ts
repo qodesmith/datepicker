@@ -396,6 +396,7 @@ function datepicker(
       // TODO - should remove be async and we return cb?.()?
       cb?.()
     },
+    // TODO - many methods take a date as the argument, not an object with a date.
     navigate(data): void {
       if (isRemoved) throwAlreadyRemovedError()
 

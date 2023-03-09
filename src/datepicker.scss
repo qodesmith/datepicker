@@ -241,9 +241,16 @@
     text-decoration: underline;
   }
 
-  &.dp-disabled-date {
+  &.dp-disabled-date,
+  &.dp-other-month-day {
     cursor: not-allowed;
     opacity: 0.5;
+  }
+
+  &.dp-other-month-day {
+    &.dp-other-month-day-clickable {
+      cursor: initial;
+    }
   }
 
   &.dp-event {

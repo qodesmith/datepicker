@@ -218,9 +218,19 @@ export type DatepickerOptions = {
    * fall outside the current month. They will be empty squares. Sometimes you
    * want to see those preceding and trailing days. This is the option for you.
    *
+   * Dates are not clickable by default. To make them clickable, use the
+   * `showAllDatesClickable` option.
+   *
    * Default - false
    */
   showAllDates?: boolean
+
+  /**
+   * Makes dates outside the current month (shown with `showAllDates`) clickable.
+   *
+   * Default - false
+   */
+  showAllDatesClickable?: boolean
 
   /**
    * <input />'s can have a `disabled` or `readonly` attribute applied to them.
@@ -306,8 +316,14 @@ export type DaterangePickerOptions = {
 
 export type SanitizedOptions = PrettifyNonRecursive<
   (
-    | Omit<DatepickerOptions, 'disabledDates' | 'events' | 'exemptIds' | 'customDays'>
-    | Omit<DaterangePickerOptions, 'disabledDates' | 'events' | 'exemptIds' | 'customDays'
+    | Omit<
+        DatepickerOptions,
+        'disabledDates' | 'events' | 'exemptIds' | 'customDays'
+      >
+    | Omit<
+        DaterangePickerOptions,
+        'disabledDates' | 'events' | 'exemptIds' | 'customDays'
+      >
   ) & {
     disabledDates: InternalPickerData['disabledDates']
     events: InternalPickerData['events']
@@ -431,7 +447,8 @@ export type InternalPickerData = {
   disabledMobile: boolean // Disable the datepicker on mobile devices. Allows the use of native datepicker if the input type is 'date'.
   isMobile: boolean // 'ontouchstart' in window
   alwaysShow: boolean
-  showAllDates: boolean // Shows a date in every square rendered on the calendar (preceding and trailing month days).
+  showAllDates: DatepickerOptions['showAllDates'] // Shows a date in every square rendered on the calendar (preceding and trailing month days).
+  showAllDatesClickable: DatepickerOptions['showAllDatesClickable']
   respectDisabledReadOnly: boolean // Prevents Datepicker from selecting dates when attached to inputs that are `disabled` or `readonly`.
 
   publicPicker: DatepickerInstance | DaterangePickerInstance // The object returned to the user.

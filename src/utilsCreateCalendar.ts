@@ -2,7 +2,6 @@
 
 import {getOverlayClassName, getIsInput} from './utils'
 import {
-  DatepickerOptions,
   InternalPickerData,
   SanitizedOptions,
   SelectorData,
@@ -190,6 +189,7 @@ export type PickerElements = {
   calendarDaysArray: HTMLDivElement[]
   daysContainer: HTMLDivElement
   overlay: OverlayReturnType
+  showAllDatesData: [HTMLDivElement[], HTMLDivElement[]]
 }
 
 // TODO - can we get rid of this type and deduce things from the internal picker or the options?
@@ -220,6 +220,7 @@ export function createCalendarHTML(
     overlayButton: overlayButtonText,
     overlayPlaceholder,
     startDay,
+    showAllDates,
   } = options
   const alwaysShow = !!options?.alwaysShow
   const isInput = getIsInput(selectorEl)
@@ -230,6 +231,7 @@ export function createCalendarHTML(
   const weekdaysArray = createWeekdayElements({weekDays: customDays, startDay})
   const weekdaysContainer = document.createElement('div')
   const calendarDaysArray = createCalendarDayElements()
+  const showAllDatesData = createShowAllDatesData()
   const daysContainer = document.createElement('div')
   const overlay = createCalendarOverlay(
     overlayMonths,
@@ -238,16 +240,25 @@ export function createCalendarHTML(
     overlayPlaceholder
   )
 
+  // TODO - use Tailwind. Keep current class names and use TW config to map class names to TW classes.
   calendarContainer.className = 'dp-calendar-container'
   weekdaysContainer.className = 'dp-weekdays-container'
   daysContainer.className = 'dp-days-container'
 
   calendarContainer.append(controls.controlsContainer)
   calendarContainer.append(weekdaysContainer)
+  weekdaysContainer.append(...weekdaysArray)
   calendarContainer.append(daysContainer)
+  daysContainer.append(...calendarDaysArray)
   calendarContainer.append(overlay.overlayContainer)
-  weekdaysArray.forEach(weekday => weekdaysContainer.append(weekday))
-  calendarDaysArray.forEach(day => daysContainer.append(day))
+
+  if (showAllDates) {
+    // Befores.
+    daysContainer.prepend(...showAllDatesData[0])
+
+    // Afters.
+    daysContainer.append(...showAllDatesData[1])
+  }
 
   /**
    * Pickers associated with an input will be hidden by default.
@@ -270,8 +281,39 @@ export function createCalendarHTML(
     calendarDaysArray,
     daysContainer,
     overlay,
+    showAllDatesData,
   }
 }
 
+/**
+ * Creates 2 arrays of additional DOM nodes for showing days from the prior and
+ * next months in the leading and trailing spaces.
+ */
+export function createShowAllDatesData(): PickerElements['showAllDatesData'] {
+  const befores: HTMLDivElement[] = []
+  const afters: HTMLDivElement[] = []
+
+  // At most we will display 6 days before / after the month.
+  for (let i = 0; i < 6; i++) {
+    const beforeDiv = document.createElement('div')
+    const afterDiv = document.createElement('div')
+
+    // These div's will always be dimmed liked a disabled date.
+    beforeDiv.className = afterDiv.className = 'dp-day dp-other-month-day'
+
+    // The dates for the days after the current month will never change.
+    afterDiv.textContent = `${i + 1}`
+
+    befores.push(beforeDiv)
+    afters.push(afterDiv)
+  }
+
+  return [befores, afters]
+}
+
+// TODO - turn as many functions into arrow functions - smaller build.
+// Build will strip return from a body with a single return statement.
+
 // TODO - make calendar elements tabable for accessibility.
 // TODO - include aria attributes on calendar elements for accessibility.
+// TODO - make all internal function arguments positional vs single obj? Might reduce build size.

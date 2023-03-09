@@ -2,23 +2,22 @@ import {useMemo} from 'react'
 import {useDatepicker} from './useDatepicker'
 
 export default function DatepickerWhatever() {
-  const dates = [1, 3, 5, 20, 28].map(num => new Date(2023, 1, num))
   const [jsx1, picker1] = useDatepicker({
     pickerKey: 'DatepickerWhatever1',
     type: 'div',
     selector: '#world',
     options: {
       alwaysShow: true,
-      events: dates,
-      disabledDates: dates,
+      showAllDates: true,
+      startDay: 4,
     },
   })
-  const [jsx2, picker2] = useDatepicker({
-    pickerKey: 'DatepickerWhatever2',
-    type: 'div',
-    selector: '#world',
-    options: {alwaysShow: true, selectedDate: new Date()},
-  })
+  // const [jsx2, picker2] = useDatepicker({
+  //   pickerKey: 'DatepickerWhatever2',
+  //   type: 'div',
+  //   selector: '#world',
+  //   options: {alwaysShow: true, selectedDate: new Date()},
+  // })
 
   return (
     <section>
@@ -30,7 +29,7 @@ export default function DatepickerWhatever() {
         dangerouslySetInnerHTML={useMemo(() => ({__html: ''}), [])}
       />
       {jsx1}
-      {jsx2}
+      {/* {jsx2} */}
     </section>
   )
 }

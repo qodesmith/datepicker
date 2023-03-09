@@ -625,3 +625,58 @@ export function getDaysInMonth(date: Date, adjascentMonth: number = 0): number {
     0
   ).getDate()
 }
+
+/**
+ * ROUND ROBIN
+ * Whatever number you want to be the limit (in our case 7 for days of the week)
+ * becomes the modulo. This will iterate through the sequence of 0-based
+ * indicies forwards between 0 and limit - 1.
+ *
+ * Formula - `number % limit` OR `number % 7`
+ *
+ * BACKWARDS ROUND ROBIN
+ * When moving backwards we have to account for negative numbers. Here we are
+ * interested in the difference between the (potentially negative) number and
+ * the limit. That is achieved by an inner `number % limit`.
+ *
+ * Formula = `(limit - (number % limit)) % limit`
+ *
+ * CONCLUSION
+ * As `startDay` increases (from 0 - 6), the index of Sunday does a backwards
+ * round-robin, so we need to use that formula to accurately get the index of
+ * the last day of the month. I.e., we need to account for Sunday possibly not
+ * being the 1st day of the week. Therefore, we have the `getIndexOfSunday` fxn.
+ */
+export const getIndexOfLastDayOfMonth = (
+  date: Date,
+  startDay: number
+): number => {
+  // This index reflects the week normally starting on a Sunday.
+  const lastDayIndex = new Date(
+    date.getFullYear(),
+    date.getMonth() + 1,
+    0
+  ).getDay()
+
+  const limit = 7
+  const number = lastDayIndex + getIndexOfSunday(startDay)
+  return number % limit
+}
+
+/**
+ * INDEX OF SUNDAY
+ *
+ * Calculating Sunday's index requires a backwards round-robin approach because
+ * as the startDay increases (1 - Monday, 2 - Tuesday, etc.), Sunday's 0-based
+ * index moves backwards:
+ *
+ * startDay:       [0, 1, 2, 3, 4, 5, 5]
+ * Sunday's index: [0, 6, 5, 4, 3, 2, 1]
+ *
+ * Formula = `(limit - (number % limit)) % limit`
+ * (see comment above `getIndexOfLastDayOfMonth` for explanation)
+ */
+const getIndexOfSunday = (startDay: number) => {
+  const limit = 7
+  return (limit - (startDay % limit)) % limit
+}

@@ -3,6 +3,7 @@ import {
   throwError,
   throwAlreadyRemovedError,
   getDaysInMonth,
+  getIndexOfLastDayOfMonth,
 } from '../../src/utils'
 
 describe('Unit Tests', () => {
@@ -60,6 +61,41 @@ describe('Unit Tests', () => {
       // Testing with a leap years - https://www.timeanddate.com/date/leapyear.html.
       ;[2020, 2024, 2028, 2032].forEach(year => {
         expect(getDaysInMonth(new Date(year, 2), -1)).to.equal(29)
+      })
+    })
+  })
+
+  describe('getIndexOfLastDayOfMonth', () => {
+    // I manually got these from looking at Google calendar for 2023.
+    const sundayStartDayIndices = [0, 6, 5, 4, 3, 2, 1]
+    const sundayIndicis2023: number[] = [2, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4, 0]
+    const datesData = Array.from({length: 12}).map((_, i) => {
+      return {
+        date: new Date(2023, i),
+        expectedStartDay0Index: sundayIndicis2023[i],
+      }
+    })
+
+    datesData.forEach(({date, expectedStartDay0Index}) => {
+      const displayDate = new Date(
+        date.getFullYear(),
+        date.getMonth() + 1,
+        0
+      ).toLocaleDateString()
+
+      Array.from({length: 7}).forEach((_, startDay) => {
+        const index0 = getIndexOfLastDayOfMonth(date, 0)
+        const index = getIndexOfLastDayOfMonth(date, startDay)
+        const sundayIndex = sundayStartDayIndices[startDay]
+        const expectedIndex = (index0 + sundayIndex) % 7
+
+        it(`${displayDate}, startDay: ${startDay} - should get the 0 - 6 index of the last day of the month respecting startDay (${expectedIndex})`, () => {
+          if (startDay === 0) {
+            expect(index0).to.equal(expectedStartDay0Index)
+          }
+
+          expect(index).to.equal(expectedIndex)
+        })
       })
     })
   })

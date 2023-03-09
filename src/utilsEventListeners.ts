@@ -9,13 +9,18 @@ import {getIsInput} from './utils'
 
 let globalListenerDataAttached = false
 
+const isDisabledDay = (target: HTMLElement, picker: InternalPickerData) => {
+  return target.classList.contains('dp-other-month-day')
+    ? !picker.showAllDatesClickable
+    : target.classList.contains('dp-disabled-date')
+}
+
 function globalListener(e: Event) {
   const target = e.target as HTMLElement
   const {exemptId} = target.dataset
 
   datepickersMap.forEach((pickerSet, el) => {
     const targetIsDay = target.classList.contains('dp-day')
-    const targetIsDisabledDay = target.classList.contains('dp-disabled-date')
 
     // `el` here is the associated input, div, etc., for the picker.
     const triggeredOnInput = getIsInput(el) && el === target
@@ -23,8 +28,10 @@ function globalListener(e: Event) {
     pickerSet.forEach(picker => {
       const {calendarContainer} = picker.publicPicker
       const calContainerHasTarget = calendarContainer.contains(target)
+
       const enabledCalDayClicked =
-        calContainerHasTarget && targetIsDay && !targetIsDisabledDay
+        calContainerHasTarget && targetIsDay && !isDisabledDay(target, picker)
+
       const eventNotAssociatedWithPicker =
         !calContainerHasTarget && !triggeredOnInput
       const isPickerExemptFromClosing =
@@ -105,22 +112,21 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
 
     setListenersMapItem(
       {type: 'click', el: selectorData.el},
-      inputClickListener
-    )
-    function inputClickListener() {
-      // Show this calendar.
-      internalPickerItem._show(showHideData)
+      function inputClickListener() {
+        // Show this calendar.
+        internalPickerItem._show(showHideData)
 
-      // Hide all other calendars.
-      datepickersMap.forEach(pickerSet => {
-        pickerSet.forEach(picker => {
-          if (picker !== internalPickerItem && !picker.alwaysShow) {
-            picker.publicPicker.hide()
-            picker._hide(showHideData)
-          }
+        // Hide all other calendars.
+        datepickersMap.forEach(pickerSet => {
+          pickerSet.forEach(picker => {
+            if (picker !== internalPickerItem && !picker.alwaysShow) {
+              picker.publicPicker.hide()
+              picker._hide(showHideData)
+            }
+          })
         })
-      })
-    }
+      }
+    )
   }
 
   // ARROWS
@@ -155,33 +161,45 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
 
   // DAYS
   const {daysContainer} = pickerElements
-  setListenersMapItem({type: 'click', el: daysContainer}, daysContainerListener)
-  function daysContainerListener(e: MouseEvent) {
-    const {target} = e
-    const currentTarget = e.currentTarget as HTMLDivElement
-    const {classList, textContent} = target as HTMLDivElement
+  setListenersMapItem(
+    {type: 'click', el: daysContainer},
+    function daysContainerListener(e: MouseEvent) {
+      const target = e.target as HTMLDivElement
+      const currentTarget = e.currentTarget as HTMLDivElement
+      const {classList, textContent} = target
 
-    // Do nothing for clicks on empty or disabled days.
-    if (currentTarget === e.target || classList.contains('dp-disabled-date')) {
-      return
+      // Do nothing for clicks on empty or disabled days.
+      if (
+        currentTarget === e.target ||
+        isDisabledDay(target, internalPickerItem)
+      ) {
+        return
+      }
+
+      // Select / de-select a day.
+      let date: Date | undefined
+
+      if (!classList.contains('dp-selected-date')) {
+        const dayNum = Number(textContent as string)
+        const isOtherMonth = target.classList.contains('dp-other-month-day')
+        const monthDirection = isOtherMonth ? (dayNum < 7 ? 1 : -1) : 0
+        const {currentDate} = publicPicker
+        date = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth() + monthDirection,
+          dayNum
+        )
+      }
+
+      internalPickerItem._selectDate({
+        date,
+        trigger: 'click',
+        triggerType: 'user',
+        // No navigation needed when the user is clicking a date on the current calendar.
+        // changeCalendar: false,
+      })
     }
-
-    // Select / de-select a day.
-    const dayNum = Number(textContent as string)
-    let date: Date | undefined
-    if (!classList.contains('dp-selected-date')) {
-      const {currentDate} = publicPicker
-      date = new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNum)
-    }
-
-    internalPickerItem._selectDate({
-      date,
-      trigger: 'click',
-      triggerType: 'user',
-      // No navigation needed when the user is clicking a date on the current calendar.
-      // changeCalendar: false,
-    })
-  }
+  )
 
   // OVERLAY MONTH
   setListenersMapItem(

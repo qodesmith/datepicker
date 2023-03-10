@@ -33,6 +33,7 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - throw error when trying to attach Datepicker to a void element.
 // TODO - should the public instance for rangepickers include `isFirst`?
 // TODO - for internal fxns, see which ones take a single object arg that can be converted to explicit args.
+// TODO - format all comment blocks so they look good for intellisense (just hover over the variable to see it).
 /**
  * TODO - daterange scenarios to handle:
  * - starting with selected date on one of the calendars should adjust min/max dates accordingly
@@ -65,6 +66,7 @@ function datepicker(
     events,
     position,
     noWeekends,
+    showAllDates,
     onShow,
     onHide,
     onMonthChange,
@@ -105,6 +107,7 @@ function datepicker(
     listenersMap: new Map(),
     alwaysShow: !!options?.alwaysShow,
     noWeekends,
+    showAllDates,
     _navigate({date, trigger, triggerType}) {
       const {currentDate} = internalPickerItem
 

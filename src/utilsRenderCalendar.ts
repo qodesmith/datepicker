@@ -1,4 +1,10 @@
-import {isDateWithinRange, isWeekendDate, stripTime} from './utils'
+import {
+  getDaysInMonth,
+  getIndexOfLastDayOfMonth,
+  isDateWithinRange,
+  isWeekendDate,
+  stripTime,
+} from './utils'
 import {InternalPickerData} from './types'
 
 /**
@@ -20,38 +26,41 @@ export function renderCalendar(
     maxDate,
     disabledDates,
     noWeekends,
-    startDay,
+    startDay, // Defaults to 0 => Sunday
     events,
+    showAllDates,
   } = internalPicker
   const currentYear = currentDate.getFullYear()
   const currentMonthNum = currentDate.getMonth()
   const currentMonthName = internalPicker.months[currentMonthNum]
-  const daysInMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-    0
-  ).getDate()
+  const daysInMonth = getDaysInMonth(currentDate)
   const selectedDateNum = selectedDate ? +stripTime(selectedDate) : null
   const today = stripTime(new Date())
   const {start: rangeStart, end: rangeEnd} = internalPicker._getRange()
-
-  // Which day of the week the 1st of the month falls on - 0-indexed (0 - 6).
-  const indexOfFirstOfMonth = new Date(currentYear, currentMonthNum, 1).getDay()
-
+  const lastMonthsLastDayIndex = getIndexOfLastDayOfMonth(
+    new Date(currentYear, currentMonthNum - 1),
+    startDay
+  )
   /**
-   * START DAY, SUNDAY INDEX
-   *         0, 0
-   *         1, 6
-   *         2, 5
-   *         3, 4
-   *         4, 3
-   *         5, 2
-   *         6, 1
+   * Why 0 if `showAllDates` is true?
+   * Because we don't want `grid-column-start` in CSS to do any of the work in
+   * adjusting the 1st of the month. Instead, we will be inserting the correct
+   * amount of DOM nodes before and after the month.
    *
-   * startDay is 0-indexed
-   * Formula: (7 - start index) % 7
+   * Why the 2 +1's?
+   * - lastMonthsLastDayIndex + 1
+   *   - because last month's last day is 1 day behind the 1st of this month.
+   * - (... %7) + 1
+   *   - because we're going from 0-based indices to a 1-based starting number.
+   *   - We need a number from 1 - 7, not 0 - 6.
+   *
+   * Why the `% 7`?
+   * We're dealing with a round-robin set of 7 which are the values 0 - 6. If we
+   * get a value > 6, we want to round-robin it back to the beginning.
    */
-  const indexOfSunday = (7 - startDay) % 7
+  const gridColumnStart = showAllDates
+    ? 0
+    : ((lastMonthsLastDayIndex + 1) % 7) + 1
 
   /**
    * This class prevents a ghost background fade effect from happening because
@@ -103,8 +112,7 @@ export function renderCalendar(
 
     // Adjust the starting offest of the calendar.
     if (i === 0) {
-      const columnStart = ((indexOfFirstOfMonth + indexOfSunday) % 7) + 1
-      day.style.setProperty('grid-column-start', `${columnStart}`)
+      day.style.setProperty('grid-column-start', `${gridColumnStart || ''}`)
     }
 
     // Today.
@@ -152,6 +160,8 @@ export function renderCalendar(
     )
   })
 
+  renderShowAllDatesDays(internalPicker, lastMonthsLastDayIndex)
+
   // Adjust the month name and year in the calendar controls.
   internalPicker.pickerElements.controls.monthName.textContent =
     currentMonthName
@@ -172,10 +182,85 @@ export function renderCalendar(
   })
 }
 
+/**
+ * Utility to add or remove a class name from an element.
+ *
+ * The last argument `shouldAdd` controls wether the class is:
+ * * added (`true`)
+ * * removed (`false`)
+ */
 function addOrRemoveClass<T extends HTMLElement>(
   el: T,
   className: string,
   shouldAdd: boolean | undefined
 ): void {
   el.classList[shouldAdd ? 'add' : 'remove'](className)
+}
+
+const renderShowAllDatesDays = (
+  internalPicker: InternalPickerData,
+  lastIndex: number
+) => {
+  const {pickerElements, currentDate, events, startDay, showAllDates} =
+    internalPicker
+  const {showAllDatesData} = pickerElements
+  if (!showAllDates) return
+
+  const [befores, afters] = showAllDatesData
+  const daysInPriorMonth = getDaysInMonth(currentDate, -1)
+  const currentYear = currentDate.getFullYear()
+  const currentMonthNum = currentDate.getMonth()
+  const todayDateNum = +stripTime(new Date())
+  const updateClasses = (
+    div: HTMLDivElement,
+    isEvent: boolean,
+    isToday: boolean
+  ) => {
+    addOrRemoveClass(div, 'dp-dn', false)
+    addOrRemoveClass(div, 'dp-event', isEvent)
+    addOrRemoveClass(div, 'dp-today', isToday)
+  }
+
+  befores
+    .slice() // Leave the original array in tact.
+    .reverse() // It's easier to reason about the before days in reverse.
+    .forEach((div, i) => {
+      div.textContent = `${daysInPriorMonth - i}`
+
+      // If lastIndex is 6, that means we don't show any prior-month days.
+      if (i > lastIndex || lastIndex === 6) {
+        return addOrRemoveClass(div, 'dp-dn', true)
+      }
+
+      const currentDayNum = daysInPriorMonth - 6 + i + 1
+      const dateForComparison = new Date(
+        currentYear,
+        currentMonthNum - 1,
+        currentDayNum
+      )
+      const dateNumForComparison = +dateForComparison
+
+      updateClasses(
+        div,
+        events.has(dateNumForComparison),
+        todayDateNum === dateNumForComparison
+      )
+    })
+
+  const daysToAdd = 6 - getIndexOfLastDayOfMonth(currentDate, startDay)
+
+  afters.slice().forEach((div, i) => {
+    if (i >= daysToAdd) {
+      return addOrRemoveClass(div, 'dp-dn', true)
+    }
+
+    const dateForComparison = new Date(currentYear, currentMonthNum + 1, i + 1)
+    const dateNumForComparison = +dateForComparison
+
+    updateClasses(
+      div,
+      events.has(dateNumForComparison),
+      todayDateNum === dateNumForComparison
+    )
+  })
 }

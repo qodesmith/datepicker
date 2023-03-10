@@ -37,6 +37,7 @@ export const controls = clsToSelector(controlsCls)
 
 export const daysCls = {
   day: 'dp-day',
+  displayedDays: 'dp-day:not(.dp-dn)',
   disabledDate: 'dp-disabled-date',
   selectedDate: 'dp-selected-date',
   rangeStart: 'dp-range-start',

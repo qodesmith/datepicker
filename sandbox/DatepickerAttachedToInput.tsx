@@ -9,8 +9,8 @@ export default function DatepickerAttachedToInput() {
   const options: DatepickerOptions = {
     position: 'bl',
     minDate: new Date(),
-    showAllDates: true,
-    showAllDatesClickable: true,
+    // showAllDates: true,
+    // showAllDatesClickable: true,
     exemptIds: [exemptId, 'row1-slider'],
     // alwaysShow: true,
   }

@@ -10,6 +10,7 @@ export default function DatepickerWhatever() {
       alwaysShow: true,
       showAllDates: true,
       startDay: 4,
+      startDate: new Date(2022, 4),
     },
   })
   // const [jsx2, picker2] = useDatepicker({

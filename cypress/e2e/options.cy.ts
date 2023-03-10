@@ -700,7 +700,156 @@ describe('Options', () => {
     })
   })
 
-  describe('showAllDates', () => {})
+  describe.only('showAllDates', () => {
+    // Create dates from 2 years ago to now.
+    const today = new Date()
+    const thisYear = today.getFullYear()
+    const thisMonth = today.getMonth()
+    const datesData = Array.from({length: 24}).map((_, i) => {
+      /**
+       * - (-23)
+       *   - because we're dealing with 0-index based months.
+       *   - so the array can be in ascending-date order.
+       * - (+ thisMonth) so we can iterate up to the current month, not January.
+       */
+      const month = -23 + i + thisMonth
+      const startDate = new Date(thisYear, month)
+      return {startDate, expectedColumnStart: startDate.getDay() + 1}
+    })
+
+    describe('when `false` or `undefined`', () => {
+      describe('initializing with new date', () => {
+        datesData.forEach(({startDate, expectedColumnStart}) => {
+          const options: DatepickerOptions = {startDate, alwaysShow: true}
+          const localeDateStr = startDate.toLocaleDateString()
+
+          it(`${localeDateStr} starts the 1st of the month on the correct day`, () => {
+            datepicker(testElementIds.singleInput, options)
+
+            cy.get(days.day)
+              .contains('1')
+              .should('have.css', 'grid-column-start', `${expectedColumnStart}`)
+          })
+
+          it(`${localeDateStr} should have the correct number of DOM nodes for days`, () => {
+            datepicker(testElementIds.singleInput, options)
+            const expectedNumberOfDomNodes = new Date(
+              startDate.getFullYear(),
+              startDate.getMonth() + 1,
+              0
+            ).getDate()
+
+            cy.get(days.displayedDays).should(
+              'have.length',
+              expectedNumberOfDomNodes
+            )
+          })
+        })
+      })
+
+      describe('navigating from current date', () => {
+        it('starts the 1st of the month on the correct day & has the correct number of DOM nodes for days', () => {
+          const picker = datepicker(testElementIds.singleInput, {
+            alwaysShow: true,
+          })
+
+          datesData
+            .slice()
+            .reverse()
+            .forEach(({expectedColumnStart}) => {
+              cy.get(days.day)
+                .contains('1')
+                .should(
+                  'have.css',
+                  'grid-column-start',
+                  `${expectedColumnStart}`
+                )
+                .then(() => {
+                  /**
+                   * This needs to be in a .then because we need to check the
+                   * picker's current date at this point in time, not before.
+                   */
+                  const expectedNumberOfDomNodes = new Date(
+                    picker.currentDate.getFullYear(),
+                    picker.currentDate.getMonth() + 1,
+                    0
+                  ).getDate()
+                  cy.get(days.displayedDays).should(
+                    'have.length',
+                    expectedNumberOfDomNodes
+                  )
+                })
+              cy.get(controls.leftArrow).click()
+            })
+        })
+      })
+    })
+
+    describe('when `true`', () => {
+      describe('initializing with new date', () => {
+        // Iterate through 2 years worth of dates and assert the starting date.
+        // This will ensure we don't have off-by-1 errors.
+        datesData.forEach(({startDate, expectedColumnStart}, i) => {
+          const localeDateStr = startDate.toLocaleDateString()
+          const options: DatepickerOptions = {
+            startDate,
+            alwaysShow: true,
+            showAllDates: true,
+          }
+
+          it(`${localeDateStr} starts the 1st of the month on the correct day`, () => {
+            datepicker(testElementIds.singleInput, options)
+
+            cy.get(days.displayedDays).then($days => {
+              const day = $days[expectedColumnStart - 1]
+              const gridStyle = day.style.getPropertyValue('grid-column-start')
+
+              expect(day.textContent).to.equal('1')
+              expect(gridStyle).to.equal('')
+            })
+          })
+
+          it('should have the correct number of DOM nodes for days', () => {
+            datepicker(testElementIds.singleInput, options)
+
+            cy.get(days.displayedDays).then($days => {
+              // We should always have a multiple of 7 when all days are shown.
+              const results = $days.length % 7
+              expect(results).to.equal(0)
+            })
+          })
+        })
+      })
+
+      describe('navigating from current date', () => {
+        it('starts the 1st of the month on the correct day & has the correct number of DOM nodes for days', () => {
+          datepicker(testElementIds.singleInput, {
+            alwaysShow: true,
+            showAllDates: true,
+          })
+
+          datesData
+            .slice()
+            .reverse()
+            .forEach(({expectedColumnStart}) => {
+              cy.get(days.displayedDays).then($days => {
+                const results = $days.length % 7
+                const day = $days[expectedColumnStart - 1]
+                const gridStyle =
+                  day.style.getPropertyValue('grid-column-start')
+
+                expect(day.textContent).to.equal('1')
+                expect(gridStyle).to.equal('')
+                expect(results).to.equal(0)
+              })
+
+              cy.get(controls.leftArrow).click()
+            })
+        })
+      })
+    })
+  })
+
   describe('respectDisabledReadOnly', () => {})
   describe('noWeekends', () => {})
   describe('disabler', () => {})

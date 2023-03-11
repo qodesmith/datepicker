@@ -239,7 +239,8 @@ export type DatepickerOptions = {
    *
    * Similarly, if you use one of these two attributes with a regular input
    * (`<input type="text" readonly />`), datepicker will show the calendar, but
-   * it will prevent you from selecting a date or changing the input's value.
+   * it will prevent you from selecting a date or changing the input's initial
+   * value.
    *
    * Set this option to `true` if that's what you want. The datepicker calendar
    * will still be functional in that you can change months and enter a year,

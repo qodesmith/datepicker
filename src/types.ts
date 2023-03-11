@@ -233,11 +233,17 @@ export type DatepickerOptions = {
   showAllDatesClickable?: boolean
 
   /**
-   * <input />'s can have a `disabled` or `readonly` attribute applied to them.
-   * In those cases, you might want to prevent Datepicker from selecting a date
-   * and changing the input's value. Set this option to `true` if that's the
-   * case. The calendar will still be functional in that you can change months
-   * and enter a year, but dates will not be selectable (or deselectable).
+   * `<input />`'s can have a `disabled` or `readonly` attribute applied to
+   * them. Native date inputs (`<input type="date" />`) with `disabled` or
+   * `readonly` attributes will not show the HTML calendar associated with them.
+   *
+   * Similarly, if you use one of these two attributes with a regular input
+   * (`<input type="text" readonly />`), datepicker will show the calendar, but
+   * it will prevent you from selecting a date or changing the input's value.
+   *
+   * Set this option to `true` if that's what you want. The datepicker calendar
+   * will still be functional in that you can change months and enter a year,
+   * but datesl will not be selectable (or deselectable).
    *
    * Default - false
    */

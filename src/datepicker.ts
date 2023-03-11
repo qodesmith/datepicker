@@ -34,6 +34,7 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - should the public instance for rangepickers include `isFirst`?
 // TODO - for internal fxns, see which ones take a single object arg that can be converted to explicit args.
 // TODO - format all comment blocks so they look good for intellisense (just hover over the variable to see it).
+// TODO - perhaps focusin/focusout/blur should be used to open pickers for accessibility - currently can't open a picker with a keyboard.
 /**
  * TODO - daterange scenarios to handle:
  * - starting with selected date on one of the calendars should adjust min/max dates accordingly

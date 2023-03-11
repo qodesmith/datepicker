@@ -700,7 +700,7 @@ describe('Options', () => {
     })
   })
 
-  describe.only('showAllDates', () => {
+  describe('showAllDates', () => {
     // Create dates from 2 years ago to now.
     const today = new Date()
     const thisYear = today.getFullYear()
@@ -850,7 +850,28 @@ describe('Options', () => {
     })
   })
 
-  describe('respectDisabledReadOnly', () => {})
+  describe('respectDisabledReadOnly', () => {
+    it('has no effect if the selector is not an input', () => {})
+
+    it("allows the input's initial value to be set", () => {})
+
+    it('allows the calendar to be shown', () => {})
+
+    it('prevents dates from being selected / unselected', () => {})
+
+    it('allows the calendar to navigate via controls', () => {
+      // Clicking control arrows.
+      // Using the overlay year.
+      // Using the overlay month.
+    })
+
+    it('allows the calendar to navigate via the navigate method', () => {})
+
+    it('disables the selectDate method', () => {})
+
+    it("doesn't affect the setMin and setMax methods", () => {})
+  })
+
   describe('noWeekends', () => {})
   describe('disabler', () => {})
   describe('disabledDates', () => {})

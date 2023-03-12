@@ -109,6 +109,7 @@ function datepicker(
     alwaysShow: !!options?.alwaysShow,
     noWeekends,
     showAllDates,
+    respectDisabledReadOnly: options.respectDisabledReadOnly,
     _navigate({date, trigger, triggerType}) {
       const {currentDate} = internalPickerItem
 

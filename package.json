@@ -37,6 +37,7 @@
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.0.1",
     "cypress": "^12.5.1",
+    "cypress-real-events": "^1.7.6",
     "dotenv": "^16.0.3",
     "dotenv-expand": "^10.0.0",
     "eslint": "^8.31.0",

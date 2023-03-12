@@ -55,9 +55,9 @@ function datepicker(
   selector: Selector,
   rawOptions?: DatepickerOptions | DaterangePickerOptions
 ): DatepickerInstance | DaterangePickerInstance {
-  const options = sanitizeAndCheckAndSyncOptions(rawOptions)
   const selectorData = getSelectorData(selector)
   const isInput = getIsInput(selectorData.el)
+  const options = sanitizeAndCheckAndSyncOptions(rawOptions, isInput)
   const {
     startDate,
     minDate,

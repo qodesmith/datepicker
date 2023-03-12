@@ -355,6 +355,7 @@ export type SanitizedOptions = PrettifyNonRecursive<
         | 'overlayButton'
         | 'overlayPlaceholder'
         | 'startDay'
+        | 'respectDisabledReadOnly'
         // | 'alwaysShow' // Do NOT include this.
       >
     >

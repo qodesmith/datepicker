@@ -168,8 +168,9 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       const currentTarget = e.currentTarget as HTMLDivElement
       const {classList, textContent} = target
 
-      // Do nothing for clicks on empty or disabled days.
+      // Do-nothing scenarios.
       if (
+        internalPickerItem.respectDisabledReadOnly ||
         currentTarget === e.target ||
         isDisabledDay(target, internalPickerItem)
       ) {

@@ -396,8 +396,7 @@ export function adjustRangepickerMinMaxDates(
  * there is a conflict. Does this for daterange pickers as well.
  */
 export function sanitizeAndCheckAndSyncOptions(
-  options: DatepickerOptions | DaterangePickerOptions | undefined,
-  isInput: boolean
+  options: DatepickerOptions | DaterangePickerOptions | undefined
 ): SanitizedOptions {
   const selectedDate = options?.selectedDate
     ? stripTime(options?.selectedDate)
@@ -574,9 +573,6 @@ export function sanitizeAndCheckAndSyncOptions(
     overlayButton: options?.overlayButton ?? defaultOptions.overlayButtonText,
     overlayPlaceholder:
       options?.overlayPlaceholder ?? defaultOptions.overlayPlaceholder,
-    respectDisabledReadOnly: isInput
-      ? !!options?.respectDisabledReadOnly
-      : false,
     // TODO - do we need to default these function values to noop?
     onShow: options?.onShow ?? noop,
     onHide: options?.onHide ?? noop,

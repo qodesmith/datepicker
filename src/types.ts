@@ -355,7 +355,6 @@ export type SanitizedOptions = PrettifyNonRecursive<
         | 'overlayButton'
         | 'overlayPlaceholder'
         | 'startDay'
-        | 'respectDisabledReadOnly'
         // | 'alwaysShow' // Do NOT include this.
       >
     >
@@ -457,7 +456,7 @@ export type InternalPickerData = {
   alwaysShow: boolean
   showAllDates: DatepickerOptions['showAllDates'] // Shows a date in every square rendered on the calendar (preceding and trailing month days).
   showAllDatesClickable: DatepickerOptions['showAllDatesClickable']
-  respectDisabledReadOnly: boolean // Prevents Datepicker from selecting dates when attached to inputs that are `disabled` or `readonly`.
+  respectDisabledReadOnly: DatepickerOptions['respectDisabledReadOnly'] // Prevents Datepicker from selecting dates when attached to inputs that are `disabled` or `readonly`.
 
   publicPicker: DatepickerInstance | DaterangePickerInstance // The object returned to the user.
   isFirst?: boolean // Indicates this is the 1st instance in a daterange pair.

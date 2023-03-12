@@ -81,8 +81,13 @@ function submitOverlayYear(
  * `overlayInputOnInputListener` updates the overlay input field's value.
  */
 export function addEventListeners(internalPickerItem: InternalPickerData) {
-  const {listenersMap, pickerElements, selectorData, publicPicker} =
-    internalPickerItem
+  const {
+    listenersMap,
+    pickerElements,
+    selectorData,
+    publicPicker,
+    respectDisabledReadOnly,
+  } = internalPickerItem
   const {controls, overlay} = pickerElements
   const {
     overlayMonthsContainer,
@@ -167,10 +172,16 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       const target = e.target as HTMLDivElement
       const currentTarget = e.currentTarget as HTMLDivElement
       const {classList, textContent} = target
+      const skipForDisabledReadOnly = (() => {
+        return !isInput || !respectDisabledReadOnly
+          ? false
+          : (selectorData.el as HTMLInputElement).disabled ||
+              (selectorData.el as HTMLInputElement).readOnly
+      })()
 
       // Do-nothing scenarios.
       if (
-        internalPickerItem.respectDisabledReadOnly ||
+        skipForDisabledReadOnly ||
         currentTarget === e.target ||
         isDisabledDay(target, internalPickerItem)
       ) {

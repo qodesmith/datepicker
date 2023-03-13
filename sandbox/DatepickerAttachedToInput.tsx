@@ -9,10 +9,12 @@ export default function DatepickerAttachedToInput() {
   const options: DatepickerOptions = {
     position: 'bl',
     minDate: new Date(),
-    // showAllDates: true,
+    showAllDates: true,
     // showAllDatesClickable: true,
     exemptIds: [exemptId, 'row1-slider'],
-    // alwaysShow: true,
+    alwaysShow: true,
+    respectDisabledReadOnly: true,
+    selectedDate: new Date(),
   }
   const [jsx, picker] = useDatepicker({
     pickerKey: 'DatepickerAttachedToInput2',

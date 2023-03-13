@@ -1,5 +1,10 @@
 import {defaultOptions} from '../../src/constants'
-import {Datepicker, DatepickerOptions, Position} from '../../src/types'
+import {
+  Datepicker,
+  DatepickerInstance,
+  DatepickerOptions,
+  Position,
+} from '../../src/types'
 import {
   containers,
   controls,
@@ -851,25 +856,537 @@ describe('Options', () => {
   })
 
   describe('respectDisabledReadOnly', () => {
-    it('has no effect if the selector is not an input', () => {})
+    describe('has no effect if the selector is not an input', () => {
+      let picker: DatepickerInstance
+      const startDate = new Date(2023, 2)
 
-    it("allows the input's initial value to be set", () => {})
+      beforeEach(() => {
+        picker = datepicker(testElementIds.singleStandalone, {
+          respectDisabledReadOnly: true,
+          alwaysShow: true,
+          startDate,
+          disabledDates: [
+            new Date(startDate.getFullYear(), startDate.getMonth(), 2),
+          ],
+        })
+      })
 
-    it('allows the calendar to be shown', () => {})
+      it('can select / deselect dates', () => {
+        cy.get(days.selectedDate)
+          .should('have.length', 0)
+          .then(() => {
+            expect(picker.selectedDate).to.be.undefined
+          })
 
-    it('prevents dates from being selected / unselected', () => {})
+        cy.get(days.day).contains('1').click()
+        cy.get(days.selectedDate)
+          .should('have.length', 1)
+          .then(() => {
+            expect(picker.selectedDate).not.to.be.undefined
+          })
 
-    it('allows the calendar to navigate via controls', () => {
-      // Clicking control arrows.
-      // Using the overlay year.
-      // Using the overlay month.
+        cy.get(days.day).contains('1').click()
+        cy.get(days.selectedDate)
+          .should('have.length', 0)
+          .then(() => {
+            expect(picker.selectedDate).to.be.undefined
+          })
+      })
+
+      it('shows different opacity for enabled / disabled dates', () => {
+        cy.get(days.day).contains('1').should('have.css', 'opacity', '1')
+        cy.get(days.day).contains('2').should('have.css', 'opacity', '0.5')
+      })
+
+      it('has no effect on navigating the calendar', () => {
+        // Calendar can be controlled via controls.
+        cy.get(controls.monthName).should('have.text', 'March')
+        cy.get(controls.rightArrow).click()
+        cy.get(controls.monthName).should('have.text', 'April')
+
+        // Navigate method works.
+        cy.then(() => {
+          picker.navigate({date: new Date(2023, 4)})
+        })
+        cy.get(controls.monthName).should('have.text', 'May')
+      })
     })
 
-    it('allows the calendar to navigate via the navigate method', () => {})
+    describe('used with an input selector', () => {
+      describe('disabled', () => {
+        beforeEach(() => {
+          cy.get(testElementIds.singleInput).then($input => {
+            const input = $input[0] as HTMLInputElement
+            input.disabled = true
+          })
+        })
 
-    it('disables the selectDate method', () => {})
+        it("sets the input's initial value", () => {
+          const selectedDate = new Date()
+          datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate: selectedDate,
+            selectedDate,
+          })
 
-    it("doesn't affect the setMin and setMax methods", () => {})
+          cy.get(testElementIds.singleInput).should(
+            'have.value',
+            selectedDate.toDateString()
+          )
+        })
+
+        it('prevents dates from being selected via click', () => {
+          const startDate = new Date()
+          const picker = datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            alwaysShow: true, // Because `disabled` inputs refuse clicks and focus.
+          })
+
+          // Sanity check.
+          expect(picker.selectedDate).to.be.undefined
+
+          // Clicking a date does not select it.
+          cy.get(days.selectedDate).should('have.length', 0)
+          cy.get(days.day).first().click()
+          cy.get(days.selectedDate).should('have.length', 0)
+          expect(picker.selectedDate).to.be.undefined
+        })
+
+        it('prevents dates from being unselected via click', () => {
+          const selectedDate = new Date()
+          const picker = datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate: selectedDate,
+            selectedDate,
+            alwaysShow: true, // Because `disabled` inputs refuse clicks and focus.
+          })
+
+          // Sanity check.
+          expect(picker.selectedDate).to.deep.equal(
+            new Date(
+              selectedDate.getFullYear(),
+              selectedDate.getMonth(),
+              selectedDate.getDate()
+            )
+          )
+
+          // Clicking a date did not unselect it.
+          cy.get(days.selectedDate).should('have.length', 1).click()
+          cy.get(days.selectedDate).should('have.length', 1)
+          expect(picker.selectedDate).to.deep.equal(
+            new Date(
+              selectedDate.getFullYear(),
+              selectedDate.getMonth(),
+              selectedDate.getDate()
+            )
+          )
+        })
+
+        it("doesn't affect opacity (i.e. same visuals for enabled / disabled dates", () => {
+          const startDate = new Date()
+          datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            disabledDates: [
+              new Date(startDate.getFullYear(), startDate.getMonth(), 2),
+            ],
+            alwaysShow: true, // Because `disabled` inputs refuse clicks and focus.
+          })
+
+          cy.get(days.day).contains('1').should('have.css', 'opacity', '1')
+          cy.get(days.day).contains('2').should('have.css', 'opacity', '0.5')
+        })
+
+        it('allows the calendar to navigate via controls', () => {
+          const startDate = new Date(2023, 2)
+          datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            alwaysShow: true, // Because `disabled` inputs refuse clicks and focus.
+          })
+
+          // Sanity check.
+          cy.get(controls.monthName).should('have.text', 'March')
+
+          // Clicking control arrows.
+          cy.get(controls.leftArrow).click()
+          cy.get(controls.monthName).should('have.text', 'February')
+          cy.get(controls.rightArrow).click()
+          cy.get(controls.monthName).should('have.text', 'March')
+
+          // Using the overlay year.
+          cy.get(controls.year).should('have.text', '2023')
+          cy.get(controls.year).click()
+          cy.get(overlay.input).type('2022')
+          cy.get(overlay.submit).click()
+          cy.get(controls.year).should('have.text', '2022')
+
+          // Using the overlay month.
+          cy.get(controls.monthName).click()
+          cy.get(overlay.month).last().click()
+          cy.get(controls.monthName).should('have.text', 'December')
+        })
+
+        it('allows the calendar to navigate via the navigate method', () => {
+          const startDate = new Date(2023, 2)
+          const picker = datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            alwaysShow: true, // Because `disabled` inputs refuse clicks and focus.
+          })
+
+          // Sanity check.
+          cy.get(controls.monthName).should('have.text', 'March')
+          cy.get(controls.year).should('have.text', '2023')
+
+          cy.then(() => {
+            picker.navigate({date: new Date(2024, 10, 15)})
+          })
+          cy.get(controls.monthName).should('have.text', 'November')
+          cy.get(controls.year).should('have.text', '2024')
+        })
+
+        it("doesn't affect the setMin and setMax methods", () => {
+          const startDate = new Date(2023, 2)
+          const picker = datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            alwaysShow: true, // Because `disabled` inputs refuse clicks and focus.
+          })
+
+          // Sanity check.
+          cy.get(days.disabledDate)
+            .should('have.length', 0)
+            .then(() => {
+              picker.setMin({
+                date: new Date(
+                  startDate.getFullYear(),
+                  startDate.getMonth(),
+                  5
+                ),
+              })
+              picker.setMax({
+                date: new Date(
+                  startDate.getFullYear(),
+                  startDate.getMonth(),
+                  10
+                ),
+              })
+            })
+
+          // Test opacity and class names.
+          cy.get(days.displayedDays).each($day => {
+            const num = +$day.text()
+
+            if (num < 5 || num > 10) {
+              expect($day).to.have.class('dp-disabled-date')
+              expect($day).to.have.css('opacity', '0.5')
+            } else {
+              expect($day).not.to.have.class('dp-disabled-date')
+              expect($day).to.have.css('opacity', '1')
+            }
+          })
+        })
+
+        it('disables the selectDate method', () => {
+          const startDate = new Date(2023, 2)
+          const picker = datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            alwaysShow: true, // Because `disabled` inputs refuse clicks and focus.
+          })
+
+          // Sanity check.
+          expect(picker.selectedDate).to.be.undefined
+          cy.get(days.selectedDate).should('have.length', 0)
+
+          // Set the date with the `selectDate` method.
+          cy.then(() => {
+            picker.selectDate({date: startDate})
+            expect(picker.selectedDate).to.be.undefined
+          })
+          cy.get(days.selectedDate).should('have.length', 0)
+        })
+      })
+
+      describe('readOnly', () => {
+        beforeEach(() => {
+          cy.get(testElementIds.singleInput).then($input => {
+            const input = $input[0] as HTMLInputElement
+            input.readOnly = true
+          })
+        })
+
+        it('allows the calendar to be shown and hidden', () => {
+          const startDate = new Date(2023, 2)
+          datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+          })
+
+          cy.get(containers.calendarContainer).should('not.be.visible')
+          cy.get(testElementIds.singleInput).click()
+          cy.get(containers.calendarContainer).should('be.visible')
+        })
+
+        it("sets the input's initial value", () => {
+          const selectedDate = new Date()
+          datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate: selectedDate,
+            selectedDate,
+          })
+
+          cy.get(testElementIds.singleInput).should(
+            'have.value',
+            selectedDate.toDateString()
+          )
+        })
+
+        it('prevents dates from being selected via click', () => {
+          const startDate = new Date()
+          const picker = datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+          })
+
+          // Sanity check.
+          expect(picker.selectedDate).to.be.undefined
+
+          // Clicking a date does not select it.
+          cy.get(testElementIds.singleInput).click()
+          cy.get(days.selectedDate).should('have.length', 0)
+          cy.get(days.day).first().click()
+          cy.get(days.selectedDate).should('have.length', 0)
+          expect(picker.selectedDate).to.be.undefined
+        })
+
+        it('prevents dates from being unselected via click', () => {
+          const selectedDate = new Date()
+          const picker = datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate: selectedDate,
+            selectedDate,
+          })
+
+          // Sanity check.
+          expect(picker.selectedDate).to.deep.equal(
+            new Date(
+              selectedDate.getFullYear(),
+              selectedDate.getMonth(),
+              selectedDate.getDate()
+            )
+          )
+
+          // Clicking a date did not unselect it.
+          cy.get(testElementIds.singleInput).click()
+          cy.get(days.selectedDate).should('have.length', 1).click()
+          cy.get(days.selectedDate).should('have.length', 1)
+          expect(picker.selectedDate).to.deep.equal(
+            new Date(
+              selectedDate.getFullYear(),
+              selectedDate.getMonth(),
+              selectedDate.getDate()
+            )
+          )
+        })
+
+        it("doesn't affect opacity (i.e. same visuals for enabled / disabled dates", () => {
+          const startDate = new Date()
+          datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            disabledDates: [
+              new Date(startDate.getFullYear(), startDate.getMonth(), 2),
+            ],
+            alwaysShow: true,
+          })
+
+          cy.get(days.day).contains('1').should('have.css', 'opacity', '1')
+          cy.get(days.day).contains('2').should('have.css', 'opacity', '0.5')
+        })
+
+        it('allows the calendar to navigate via controls', () => {
+          const startDate = new Date(2023, 2)
+          datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            alwaysShow: true,
+          })
+
+          // Sanity check.
+          cy.get(controls.monthName).should('have.text', 'March')
+
+          // Clicking control arrows.
+          cy.get(controls.leftArrow).click()
+          cy.get(controls.monthName).should('have.text', 'February')
+          cy.get(controls.rightArrow).click()
+          cy.get(controls.monthName).should('have.text', 'March')
+
+          // Using the overlay year.
+          cy.get(controls.year).should('have.text', '2023')
+          cy.get(controls.year).click()
+          cy.get(overlay.input).type('2022')
+          cy.get(overlay.submit).click()
+          cy.get(controls.year).should('have.text', '2022')
+
+          // Using the overlay month.
+          cy.get(controls.monthName).click()
+          cy.get(overlay.month).last().click()
+          cy.get(controls.monthName).should('have.text', 'December')
+        })
+
+        it('allows the calendar to navigate via the navigate method', () => {
+          const startDate = new Date(2023, 2)
+          const picker = datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            alwaysShow: true,
+          })
+
+          // Sanity check.
+          cy.get(controls.monthName).should('have.text', 'March')
+          cy.get(controls.year).should('have.text', '2023')
+
+          cy.then(() => {
+            picker.navigate({date: new Date(2024, 10, 15)})
+          })
+          cy.get(controls.monthName).should('have.text', 'November')
+          cy.get(controls.year).should('have.text', '2024')
+        })
+
+        it("doesn't affect the setMin and setMax methods", () => {
+          const startDate = new Date(2023, 2)
+          const picker = datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            alwaysShow: true,
+          })
+
+          // Sanity check.
+          cy.get(days.disabledDate)
+            .should('have.length', 0)
+            .then(() => {
+              picker.setMin({
+                date: new Date(
+                  startDate.getFullYear(),
+                  startDate.getMonth(),
+                  5
+                ),
+              })
+              picker.setMax({
+                date: new Date(
+                  startDate.getFullYear(),
+                  startDate.getMonth(),
+                  10
+                ),
+              })
+            })
+
+          // Test opacity and class names.
+          cy.get(days.displayedDays).each($day => {
+            const num = +$day.text()
+
+            if (num < 5 || num > 10) {
+              expect($day).to.have.class('dp-disabled-date')
+              expect($day).to.have.css('opacity', '0.5')
+            } else {
+              expect($day).not.to.have.class('dp-disabled-date')
+              expect($day).to.have.css('opacity', '1')
+            }
+          })
+        })
+
+        it('disables the selectDate method', () => {
+          const startDate = new Date(2023, 2)
+          const picker = datepicker(testElementIds.singleInput, {
+            respectDisabledReadOnly: true,
+            startDate,
+            alwaysShow: true,
+          })
+
+          // Sanity check.
+          expect(picker.selectedDate).to.be.undefined
+          cy.get(days.selectedDate).should('have.length', 0)
+
+          // Set the date with the `selectDate` method.
+          cy.then(() => {
+            picker.selectDate({date: startDate})
+            expect(picker.selectedDate).to.be.undefined
+          })
+          cy.get(days.selectedDate).should('have.length', 0)
+        })
+      })
+
+      describe('adding input attributes after initial activity', () => {
+        // We won't test all scenario's here, but just a few to indicate that
+        // Datepicker actively checks for `disabled` and `readOnly` attributes
+        // prior to acting.
+
+        describe('disabled', () => {
+          it('should not update the text input value', () => {
+            const startDate = new Date(2023, 2)
+            const picker = datepicker(testElementIds.singleInput, {
+              respectDisabledReadOnly: true,
+              startDate,
+              alwaysShow: true, // Because `disabled` inputs refuse clicks and focus.
+            })
+
+            cy.get(testElementIds.singleInput)
+              .should('have.value', '')
+              .then(() => {
+                expect(picker.selectedDate).to.be.undefined
+                picker.selectDate({date: startDate})
+              })
+            cy.get(testElementIds.singleInput)
+              .should('have.value', startDate.toDateString())
+              .then($input => {
+                const input = $input[0] as HTMLInputElement
+                input.disabled = true
+                expect(picker.selectedDate).to.deep.equal(startDate)
+              })
+            cy.get(days.day).contains('5').click()
+            cy.get(testElementIds.singleInput)
+              .should('have.value', startDate.toDateString())
+              .then(() => {
+                expect(picker.selectedDate).to.deep.equal(startDate)
+              })
+          })
+        })
+
+        describe('readOnly', () => {
+          it('should not update the text input value', () => {
+            const startDate = new Date(2023, 2)
+            const picker = datepicker(testElementIds.singleInput, {
+              respectDisabledReadOnly: true,
+              startDate,
+              alwaysShow: true,
+            })
+
+            cy.get(testElementIds.singleInput)
+              .should('have.value', '')
+              .then(() => {
+                expect(picker.selectedDate).to.be.undefined
+                picker.selectDate({date: startDate})
+              })
+            cy.get(testElementIds.singleInput)
+              .should('have.value', startDate.toDateString())
+              .then($input => {
+                const input = $input[0] as HTMLInputElement
+                input.readOnly = true
+                expect(picker.selectedDate).to.deep.equal(startDate)
+              })
+            cy.get(days.day).contains('5').click()
+            cy.get(testElementIds.singleInput)
+              .should('have.value', startDate.toDateString())
+              .then(() => {
+                expect(picker.selectedDate).to.deep.equal(startDate)
+              })
+          })
+        })
+      })
+    })
   })
 
   describe('noWeekends', () => {})

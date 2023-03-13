@@ -9,19 +9,13 @@ import {getIsInput, shouldSkipForDisabledReadOnly} from './utils'
 
 let globalListenerDataAttached = false
 
-const isDisabledDay = (target: HTMLElement, picker: InternalPickerData) => {
-  return target.classList.contains('dp-other-month-day')
-    ? !picker.showAllDatesClickable
-    : target.classList.contains('dp-disabled-date')
-}
-
 function globalListener(e: Event) {
   const target = e.target as HTMLElement
   const {exemptId} = target.dataset
+  const targetIsDay = target.classList.contains('dp-day')
+  const isDisabledDay = target.classList.contains('dp-disabled-date')
 
   datepickersMap.forEach((pickerSet, el) => {
-    const targetIsDay = target.classList.contains('dp-day')
-
     // `el` here is the associated input, div, etc., for the picker.
     const triggeredOnInput = getIsInput(el) && el === target
 
@@ -30,7 +24,7 @@ function globalListener(e: Event) {
       const calContainerHasTarget = calendarContainer.contains(target)
 
       const enabledCalDayClicked =
-        calContainerHasTarget && targetIsDay && !isDisabledDay(target, picker)
+        calContainerHasTarget && targetIsDay && !isDisabledDay
 
       const eventNotAssociatedWithPicker =
         !calContainerHasTarget && !triggeredOnInput
@@ -81,13 +75,8 @@ function submitOverlayYear(
  * `overlayInputOnInputListener` updates the overlay input field's value.
  */
 export function addEventListeners(internalPickerItem: InternalPickerData) {
-  const {
-    listenersMap,
-    pickerElements,
-    selectorData,
-    publicPicker,
-    respectDisabledReadOnly,
-  } = internalPickerItem
+  const {listenersMap, pickerElements, selectorData, publicPicker} =
+    internalPickerItem
   const {controls, overlay} = pickerElements
   const {
     overlayMonthsContainer,
@@ -177,7 +166,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       if (
         shouldSkipForDisabledReadOnly(internalPickerItem) ||
         currentTarget === e.target ||
-        isDisabledDay(target, internalPickerItem)
+        target.classList.contains('dp-disabled-date')
       ) {
         return
       }

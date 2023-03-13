@@ -199,10 +199,16 @@ function addOrRemoveClass<T extends HTMLElement>(
 
 const renderShowAllDatesDays = (
   internalPicker: InternalPickerData,
-  lastIndex: number
+  lastMonthsLastDayIndex: number
 ) => {
-  const {pickerElements, currentDate, events, startDay, showAllDates} =
-    internalPicker
+  const {
+    pickerElements,
+    currentDate,
+    events,
+    startDay,
+    showAllDates,
+    showAllDatesClickable,
+  } = internalPicker
   const {showAllDatesData} = pickerElements
   if (!showAllDates) return
 
@@ -219,6 +225,7 @@ const renderShowAllDatesDays = (
     addOrRemoveClass(div, 'dp-dn', false)
     addOrRemoveClass(div, 'dp-event', isEvent)
     addOrRemoveClass(div, 'dp-today', isToday)
+    addOrRemoveClass(div, 'dp-disabled-date', !showAllDatesClickable)
   }
 
   befores
@@ -227,8 +234,8 @@ const renderShowAllDatesDays = (
     .forEach((div, i) => {
       div.textContent = `${daysInPriorMonth - i}`
 
-      // If lastIndex is 6, that means we don't show any prior-month days.
-      if (i > lastIndex || lastIndex === 6) {
+      // If the index is 6, that means we don't show any prior-month days.
+      if (i > lastMonthsLastDayIndex || lastMonthsLastDayIndex === 6) {
         return addOrRemoveClass(div, 'dp-dn', true)
       }
 

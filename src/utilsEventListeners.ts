@@ -5,7 +5,7 @@ import {
   ListenersMapValue,
   UserEvent,
 } from './types'
-import {getIsInput} from './utils'
+import {getIsInput, shouldSkipForDisabledReadOnly} from './utils'
 
 let globalListenerDataAttached = false
 
@@ -172,16 +172,10 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       const target = e.target as HTMLDivElement
       const currentTarget = e.currentTarget as HTMLDivElement
       const {classList, textContent} = target
-      const skipForDisabledReadOnly = (() => {
-        return !isInput || !respectDisabledReadOnly
-          ? false
-          : (selectorData.el as HTMLInputElement).disabled ||
-              (selectorData.el as HTMLInputElement).readOnly
-      })()
 
       // Do-nothing scenarios.
       if (
-        skipForDisabledReadOnly ||
+        shouldSkipForDisabledReadOnly(internalPickerItem) ||
         currentTarget === e.target ||
         isDisabledDay(target, internalPickerItem)
       ) {

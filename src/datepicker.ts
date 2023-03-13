@@ -23,6 +23,7 @@ import {
   positionCalendar,
   removePickerFromMap,
   sanitizeAndCheckAndSyncOptions,
+  shouldSkipForDisabledReadOnly,
   stripTime,
   throwAlreadyRemovedError,
   throwError,
@@ -35,6 +36,7 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - for internal fxns, see which ones take a single object arg that can be converted to explicit args.
 // TODO - format all comment blocks so they look good for intellisense (just hover over the variable to see it).
 // TODO - perhaps focusin/focusout/blur should be used to open pickers for accessibility - currently can't open a picker with a keyboard.
+// TODO - should the picker methods return the picker instance for chainability?
 /**
  * TODO - daterange scenarios to handle:
  * - starting with selected date on one of the calendars should adjust min/max dates accordingly
@@ -413,6 +415,7 @@ function datepicker(
     },
     selectDate(data): void {
       if (isRemoved) throwAlreadyRemovedError()
+      if (shouldSkipForDisabledReadOnly(internalPickerItem)) return
 
       internalPickerItem._selectDate({
         ...data,

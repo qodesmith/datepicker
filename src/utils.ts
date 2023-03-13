@@ -680,3 +680,15 @@ const getIndexOfSunday = (startDay: number) => {
   const limit = 7
   return (limit - (startDay % limit)) % limit
 }
+
+export const shouldSkipForDisabledReadOnly = (
+  internalPickerItem: InternalPickerData
+) => {
+  const {selectorData, respectDisabledReadOnly} = internalPickerItem
+  const isInput = getIsInput(selectorData.el)
+
+  return !isInput || !respectDisabledReadOnly
+    ? false
+    : (selectorData.el as HTMLInputElement).disabled ||
+        (selectorData.el as HTMLInputElement).readOnly
+}

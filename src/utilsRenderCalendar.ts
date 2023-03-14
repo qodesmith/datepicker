@@ -1,8 +1,8 @@
 import {
   getDaysInMonth,
   getIndexOfLastDayOfMonth,
+  isDateDisabled,
   isDateWithinRange,
-  isWeekendDate,
   stripTime,
 } from './utils'
 import {InternalPickerData} from './types'
@@ -24,8 +24,6 @@ export function renderCalendar(
     selectedDate,
     minDate,
     maxDate,
-    disabledDates,
-    noWeekends,
     startDay, // Defaults to 0 => Sunday
     events,
     showAllDates,
@@ -81,7 +79,6 @@ export function renderCalendar(
     const dateForComparison = new Date(currentYear, currentMonthNum, num)
     const dateNumForComparison = +dateForComparison
     const isEvent = events.has(dateNumForComparison)
-    const isWeekend = isWeekendDate(dateForComparison)
     const dateInRange = isDateWithinRange({
       date: dateForComparison,
       minDate,
@@ -154,9 +151,7 @@ export function renderCalendar(
     addOrRemoveClass(
       day,
       'dp-disabled-date',
-      !dateInRange ||
-        disabledDates.has(dateNumForComparison) ||
-        (noWeekends && isWeekend)
+      !dateInRange || isDateDisabled(dateForComparison, internalPicker)
     )
   })
 
@@ -250,11 +245,10 @@ function updateClassNamesForOtherMonthDay(
   internalPicker: InternalPickerData,
   dateForComparison: Date
 ): void {
-  const {events, disabledDates, showAllDatesClickable, selectedDate} =
-    internalPicker
+  const {events, showAllDatesClickable, selectedDate} = internalPicker
   const isEvent = events.has(+dateForComparison)
   const isToday = +dateForComparison === +stripTime(new Date())
-  const isDisabled = disabledDates.has(+dateForComparison)
+  const isDisabled = isDateDisabled(dateForComparison, internalPicker)
   const isSelectedDate = !!(
     selectedDate && +selectedDate === +dateForComparison
   )

@@ -8,15 +8,12 @@ export default function DatepickerAttachedToInput() {
   const exemptId = 'DatepickerAttachedToInput1'
   const options: DatepickerOptions = {
     position: 'bl',
-    showAllDates: true,
-    showAllDatesClickable: true,
-    startDay: 1,
     exemptIds: [exemptId, 'row1-slider'],
     alwaysShow: true,
-    // respectDisabledReadOnly: true,
-    // selectedDate: new Date(),
-    events: [new Date(2023, 1, 28)],
-    disabledDates: [new Date(2023, 1, 27), new Date(2023, 2, 2)],
+    noWeekends: true,
+    showAllDates: true,
+    showAllDatesClickable: true,
+    // startDay: 1,
   }
   const [jsx, picker] = useDatepicker({
     pickerKey: 'DatepickerAttachedToInput2',

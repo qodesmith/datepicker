@@ -579,6 +579,7 @@ export function sanitizeAndCheckAndSyncOptions(
     onMonthChange: options?.onMonthChange ?? noop,
     onSelect: options?.onSelect ?? noop,
     formatter: options?.formatter ?? defaultFormatter,
+    disabler: (date: Date): boolean => options?.disabler?.(date) ?? false,
   }
 }
 
@@ -610,6 +611,17 @@ export function isWeekendDate(date: Date): boolean {
   // 6 - Saturday
   // 0 - Sunday
   return day === 6 || day === 0
+}
+
+export function isDateDisabled(
+  date: Date,
+  internalPicker: InternalPickerData
+): boolean {
+  const {noWeekends, disabledDates, disabler} = internalPicker
+  const isWeekend = isWeekendDate(date)
+  const isDisabledDate = disabledDates.has(+date) || disabler(date)
+
+  return (noWeekends && isWeekend) || isDisabledDate
 }
 
 /**

@@ -15,6 +15,7 @@ type UseDatepickerProps = {
   pickerKey: string
   type?: string
   selector?: Selector
+  props?: Record<string, unknown>
   options?: DatepickerOptions | DaterangePickerOptions
 }
 
@@ -23,6 +24,7 @@ export function useDatepicker({
   pickerKey,
   type,
   selector,
+  props = {},
   options = {},
 }: UseDatepickerProps): [ReactNode, DatepickerInstance | null] {
   const ref = useRef(null)
@@ -30,6 +32,7 @@ export function useDatepicker({
     ? null
     : createElement(type ?? '', {
         ...(type === 'div' ? {dangerouslySetInnerHTML: {__html: ''}} : {}),
+        ...props,
         ref,
       })
 

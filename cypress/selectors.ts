@@ -45,6 +45,7 @@ export const daysCls = {
   rangeDate: 'dp-range-date',
   today: 'dp-today',
   event: 'dp-event',
+  otherMonthDay: 'dp-other-month-day',
 } as const
 
 export const days = clsToSelector(daysCls)

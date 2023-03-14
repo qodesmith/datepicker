@@ -115,6 +115,7 @@ function datepicker(
     showAllDates,
     showAllDatesClickable: options.showAllDatesClickable,
     respectDisabledReadOnly: options.respectDisabledReadOnly,
+    disabler: options.disabler,
     _navigate({date, trigger, triggerType}) {
       const {currentDate} = internalPickerItem
 

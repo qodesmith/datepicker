@@ -1585,7 +1585,60 @@ describe('Options', () => {
     })
   })
 
-  describe('disabler', () => {})
+  describe('disabler', () => {
+    it("should disable every day that's not the 15th", () => {
+      const picker = datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        disabler(date) {
+          return date.getDate() !== 15
+        },
+      })
+
+      cy.get(days.displayedDays).each($day => {
+        if ($day.text() === '15') {
+          cy.wrap($day).should('not.have.class', daysCls.disabledDate)
+        } else {
+          cy.wrap($day).should('have.class', daysCls.disabledDate)
+        }
+      })
+
+      cy.get(controls.rightArrow).click()
+      cy.get(days.displayedDays).each($day => {
+        if ($day.text() === '15') {
+          cy.wrap($day).should('not.have.class', daysCls.disabledDate)
+        } else {
+          cy.wrap($day).should('have.class', daysCls.disabledDate)
+        }
+      })
+    })
+
+    it('should disabled only the 15th of each month', () => {
+      const picker = datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        disabler(date) {
+          return date.getDate() === 15
+        },
+      })
+
+      cy.get(days.displayedDays).each($day => {
+        if ($day.text() === '15') {
+          cy.wrap($day).should('have.class', daysCls.disabledDate)
+        } else {
+          cy.wrap($day).should('not.have.class', daysCls.disabledDate)
+        }
+      })
+
+      cy.get(controls.rightArrow).click()
+      cy.get(days.displayedDays).each($day => {
+        if ($day.text() === '15') {
+          cy.wrap($day).should('have.class', daysCls.disabledDate)
+        } else {
+          cy.wrap($day).should('not.have.class', daysCls.disabledDate)
+        }
+      })
+    })
+  })
+
   describe('disabledDates', () => {})
   describe('disableMobile', () => {})
   describe('disableYearOverlay', () => {})

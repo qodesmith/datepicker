@@ -355,6 +355,7 @@ export type SanitizedOptions = PrettifyNonRecursive<
         | 'overlayButton'
         | 'overlayPlaceholder'
         | 'startDay'
+        | 'disabler'
         // | 'alwaysShow' // Do NOT include this.
       >
     >
@@ -485,6 +486,7 @@ export type InternalPickerData = {
     data: Omit<CallbackData, 'instance'> & {trigger: 'hide' | UserEvent}
   ): void
   _getRange(): {start: Date | undefined; end: Date | undefined}
+  disabler: SanitizedOptions['disabler']
 
   isCalendarShowing: boolean
   isOverlayShowing: boolean

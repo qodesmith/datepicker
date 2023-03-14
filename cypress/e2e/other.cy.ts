@@ -12,7 +12,6 @@ describe('Other Tests', () => {
     })
   })
 
-  // TODO - refactor tests to only check for disabled class, not having to test for clicks.
   it('should ignore clicks on days with the disabled date class', () => {
     const startDate = new Date(2023, 2)
     const picker = datepicker(testElementIds.singleInput, {

@@ -1639,7 +1639,31 @@ describe('Options', () => {
     })
   })
 
-  describe('disabledDates', () => {})
+  describe('disabledDates', () => {
+    it('should disable any dates provided', () => {
+      const startDate = new Date(2023, 2)
+      const disabledDays = [1, 5, 8, 9, 16, 20]
+      const disabledDates = disabledDays.map(day => {
+        return new Date(2023, 2, day)
+      })
+      const picker = datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        disabledDates,
+        startDate,
+      })
+
+      cy.get(days.displayedDays).each($day => {
+        const dayNum = +$day.text()
+
+        if (disabledDays.includes(dayNum)) {
+          cy.wrap($day).should('have.class', daysCls.disabledDate)
+        } else {
+          cy.wrap($day).should('not.have.class', daysCls.disabledDate)
+        }
+      })
+    })
+  })
+
   describe('disableMobile', () => {})
   describe('disableYearOverlay', () => {})
   describe('exemptIds', () => {})

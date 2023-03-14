@@ -201,14 +201,7 @@ const renderShowAllDatesDays = (
   internalPicker: InternalPickerData,
   lastMonthsLastDayIndex: number
 ) => {
-  const {
-    pickerElements,
-    currentDate,
-    events,
-    startDay,
-    showAllDates,
-    showAllDatesClickable,
-  } = internalPicker
+  const {pickerElements, currentDate, startDay, showAllDates} = internalPicker
   const {showAllDatesData} = pickerElements
   if (!showAllDates) return
 
@@ -216,41 +209,23 @@ const renderShowAllDatesDays = (
   const daysInPriorMonth = getDaysInMonth(currentDate, -1)
   const currentYear = currentDate.getFullYear()
   const currentMonthNum = currentDate.getMonth()
-  const todayDateNum = +stripTime(new Date())
-  const updateClasses = (
-    div: HTMLDivElement,
-    isEvent: boolean,
-    isToday: boolean
-  ) => {
-    addOrRemoveClass(div, 'dp-dn', false)
-    addOrRemoveClass(div, 'dp-event', isEvent)
-    addOrRemoveClass(div, 'dp-today', isToday)
-    addOrRemoveClass(div, 'dp-disabled-date', !showAllDatesClickable)
-  }
 
   befores
     .slice() // Leave the original array in tact.
     .reverse() // It's easier to reason about the before days in reverse.
     .forEach((div, i) => {
-      div.textContent = `${daysInPriorMonth - i}`
+      const currentDayNum = daysInPriorMonth - i
+      div.textContent = `${currentDayNum}`
 
       // If the index is 6, that means we don't show any prior-month days.
       if (i > lastMonthsLastDayIndex || lastMonthsLastDayIndex === 6) {
         return addOrRemoveClass(div, 'dp-dn', true)
       }
 
-      const currentDayNum = daysInPriorMonth - 6 + i + 1
-      const dateForComparison = new Date(
-        currentYear,
-        currentMonthNum - 1,
-        currentDayNum
-      )
-      const dateNumForComparison = +dateForComparison
-
-      updateClasses(
+      updateClassNamesForOtherMonthDay(
         div,
-        events.has(dateNumForComparison),
-        todayDateNum === dateNumForComparison
+        internalPicker,
+        new Date(currentYear, currentMonthNum - 1, currentDayNum)
       )
     })
 
@@ -261,13 +236,36 @@ const renderShowAllDatesDays = (
       return addOrRemoveClass(div, 'dp-dn', true)
     }
 
-    const dateForComparison = new Date(currentYear, currentMonthNum + 1, i + 1)
-    const dateNumForComparison = +dateForComparison
-
-    updateClasses(
+    updateClassNamesForOtherMonthDay(
       div,
-      events.has(dateNumForComparison),
-      todayDateNum === dateNumForComparison
+      internalPicker,
+      new Date(currentYear, currentMonthNum + 1, i + 1)
     )
   })
+}
+
+// TODO - how does this work for range pickers? What about disabled dates because of selected / partially-selected ranges?
+function updateClassNamesForOtherMonthDay(
+  div: HTMLDivElement,
+  internalPicker: InternalPickerData,
+  dateForComparison: Date
+): void {
+  const {events, disabledDates, showAllDatesClickable, selectedDate} =
+    internalPicker
+  const isEvent = events.has(+dateForComparison)
+  const isToday = +dateForComparison === +stripTime(new Date())
+  const isDisabled = disabledDates.has(+dateForComparison)
+  const isSelectedDate = !!(
+    selectedDate && +selectedDate === +dateForComparison
+  )
+
+  addOrRemoveClass(div, 'dp-dn', false)
+  addOrRemoveClass(div, 'dp-event', isEvent)
+  addOrRemoveClass(div, 'dp-today', isToday)
+  addOrRemoveClass(
+    div,
+    'dp-disabled-date',
+    !showAllDatesClickable || isDisabled
+  )
+  addOrRemoveClass(div, 'dp-selected-date', isSelectedDate)
 }

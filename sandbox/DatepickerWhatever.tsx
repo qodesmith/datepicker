@@ -8,7 +8,7 @@ export default function DatepickerWhatever() {
     selector: '#world',
     options: {
       alwaysShow: true,
-      showAllDates: true,
+      // showAllDates: true,
       startDay: 4,
       startDate: new Date(2022, 4),
     },

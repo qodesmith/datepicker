@@ -38,6 +38,7 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - perhaps focusin/focusout/blur should be used to open pickers for accessibility - currently can't open a picker with a keyboard.
 // TODO - should the picker methods return the picker instance for chainability?
 // TODO - change cursor to pointer for showAllDatesClickable days.
+// TODO - consistent code style - get rid of consts and use function declarations instead. Come back later to optimize for library size.
 /**
  * TODO - daterange scenarios to handle:
  * - starting with selected date on one of the calendars should adjust min/max dates accordingly

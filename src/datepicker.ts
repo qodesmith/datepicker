@@ -39,6 +39,7 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - should the picker methods return the picker instance for chainability?
 // TODO - change cursor to pointer for showAllDatesClickable days.
 // TODO - consistent code style - get rid of consts and use function declarations instead. Come back later to optimize for library size.
+// TODO - wrap disabler fxn internally and use it to check noWeekends, disabledDates, etc., so we only ever run disabler(date) when rendering days.
 /**
  * TODO - daterange scenarios to handle:
  * - starting with selected date on one of the calendars should adjust min/max dates accordingly

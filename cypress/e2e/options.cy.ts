@@ -9,6 +9,7 @@ import {
   containers,
   controls,
   days,
+  daysCls,
   other,
   overlay,
   testElementIds,
@@ -723,6 +724,19 @@ describe('Options', () => {
     })
 
     describe('when `false` or `undefined`', () => {
+      it('should not show dates before or after the current month', () => {
+        const startDate = new Date(2023, 2)
+        const expectedDays = new Date(
+          startDate.getFullYear(),
+          startDate.getMonth() + 1,
+          0
+        ).getDate()
+        datepicker(testElementIds.singleInput, {alwaysShow: true, startDate})
+
+        cy.get(days.displayedDays).should('have.length', expectedDays)
+        cy.get(days.displayedDays).first().should('have.text', '1')
+      })
+
       describe('initializing with new date', () => {
         datesData.forEach(({startDate, expectedColumnStart}) => {
           const options: DatepickerOptions = {startDate, alwaysShow: true}
@@ -791,6 +805,51 @@ describe('Options', () => {
     })
 
     describe('when `true`', () => {
+      it('should show background for a selected date', () => {
+        const startDate = new Date(2023, 2, 1)
+        const selectedDate = new Date(2023, 2, 0)
+        datepicker(testElementIds.singleInput, {
+          showAllDates: true,
+          selectedDate,
+          startDate,
+          alwaysShow: true,
+        })
+
+        cy.get(days.selectedDate)
+          .should('have.length', 1)
+          .should('not.have.css', 'backgroundColor', 'rgba(0, 0, 0, 0)')
+      })
+
+      it('should show events in other month days', () => {
+        datepicker(testElementIds.singleInput, {
+          showAllDates: true,
+          alwaysShow: true,
+          startDate: new Date(2023, 2),
+          events: [new Date(2023, 1, 28)],
+        })
+
+        cy.get(days.event)
+          .should('have.length', 1)
+          .should('have.text', '28')
+          .should('have.class', daysCls.otherMonthDay)
+          .should('have.css', 'opacity', '0.5')
+      })
+
+      it('should show today in other month days as bold and highlighted', () => {
+        const today = new Date(2023, 1, 28)
+
+        cy.clock(+today).then(() => {
+          datepicker(testElementIds.singleInput, {
+            startDate: new Date(2023, 2),
+            alwaysShow: true,
+            showAllDates: true,
+          })
+        })
+        cy.get(days.today)
+          .should('have.length', 1)
+          .should('have.class', daysCls.otherMonthDay)
+      })
+
       describe('initializing with new date', () => {
         // Iterate through 2 years worth of dates and assert the starting date.
         // This will ensure we don't have off-by-1 errors.
@@ -851,6 +910,69 @@ describe('Options', () => {
               cy.get(controls.leftArrow).click()
             })
         })
+      })
+    })
+  })
+
+  describe('showAllDatesClickable', () => {
+    describe('when `false` or `undefined`', () => {
+      it('should disable dates shown outside the current month (i.e. not-clickable)', () => {
+        const picker = datepicker(testElementIds.singleInput, {
+          showAllDates: true,
+          showAllDatesClickable: false,
+          startDate: new Date(2023, 2),
+          alwaysShow: true,
+        })
+
+        cy.get(days.selectedDate)
+          .should('have.length', 0)
+          .then(() => {
+            expect(picker.selectedDate).to.be.undefined
+          })
+
+        cy.get(days.displayedDays)
+          .first()
+          .should('have.text', '26')
+          .should('have.class', daysCls.disabledDate)
+          .click()
+        cy.get(days.selectedDate)
+          .should('have.length', 0)
+          .then(() => {
+            expect(picker.selectedDate).to.be.undefined
+          })
+      })
+    })
+
+    describe('when `true`', () => {
+      it('should enable dates shown outside the current month (i.e. clickable)', () => {
+        const dateToSelect = new Date(2023, 1, 26)
+        const picker = datepicker(testElementIds.singleInput, {
+          showAllDates: true,
+          showAllDatesClickable: true,
+          startDate: new Date(2023, 2),
+          alwaysShow: true,
+        })
+
+        cy.get(testElementIds.singleInput).should('have.value', '')
+        cy.get(days.selectedDate)
+          .should('have.length', 0)
+          .then(() => {
+            expect(picker.selectedDate).to.be.undefined
+          })
+
+        cy.get(days.displayedDays)
+          .first()
+          .should('have.text', dateToSelect.getDate().toString())
+          .click()
+        cy.get(days.selectedDate)
+          .should('have.length', 1)
+          .then(() => {
+            expect(picker.selectedDate).to.deep.equal(dateToSelect)
+          })
+        cy.get(testElementIds.singleInput).should(
+          'have.value',
+          dateToSelect.toDateString()
+        )
       })
     })
   })
@@ -1080,10 +1202,10 @@ describe('Options', () => {
             const num = +$day.text()
 
             if (num < 5 || num > 10) {
-              expect($day).to.have.class('dp-disabled-date')
+              expect($day).to.have.class(daysCls.disabledDate)
               expect($day).to.have.css('opacity', '0.5')
             } else {
-              expect($day).not.to.have.class('dp-disabled-date')
+              expect($day).not.to.have.class(daysCls.disabledDate)
               expect($day).to.have.css('opacity', '1')
             }
           })
@@ -1289,10 +1411,10 @@ describe('Options', () => {
             const num = +$day.text()
 
             if (num < 5 || num > 10) {
-              expect($day).to.have.class('dp-disabled-date')
+              expect($day).to.have.class(daysCls.disabledDate)
               expect($day).to.have.css('opacity', '0.5')
             } else {
-              expect($day).not.to.have.class('dp-disabled-date')
+              expect($day).not.to.have.class(daysCls.disabledDate)
               expect($day).to.have.css('opacity', '1')
             }
           })

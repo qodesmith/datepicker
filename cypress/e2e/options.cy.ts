@@ -1511,7 +1511,80 @@ describe('Options', () => {
     })
   })
 
-  describe('noWeekends', () => {})
+  describe('noWeekends', () => {
+    it('should disable Sundays and Saturdays', () => {
+      const weekendDays = ['4', '5', '11', '12', '18', '19', '25', '26']
+      const picker = datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        noWeekends: true,
+        startDate: new Date(2023, 2),
+      })
+
+      // Click all the weekend days.
+      weekendDays.forEach(dayNum => {
+        cy.get(days.day)
+          .contains(dayNum)
+          .should('have.class', daysCls.disabledDate)
+          .click()
+          .then(() => {
+            expect(picker.selectedDate).to.be.undefined
+            cy.get(days.selectedDate).should('have.length', 0)
+          })
+      })
+
+      // Sanity check.
+      cy.get(days.day)
+        .contains('3')
+        .click()
+        .then(() => {
+          expect(picker.selectedDate).to.deep.equal(new Date(2023, 2, 3))
+          cy.get(days.selectedDate).should('have.length', 1)
+        })
+    })
+
+    it('should disabled Sundays and Saturdays in other month days', () => {
+      const weekendDays = ['4', '5', '11', '12', '18', '19', '25', '26']
+      const picker = datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        noWeekends: true,
+        startDate: new Date(2023, 2),
+        showAllDates: true,
+        showAllDatesClickable: true,
+      })
+
+      // Sanity check.
+      cy.get(days.selectedDate)
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.selectedDate).to.be.undefined
+        })
+
+      // Click Sunday in other month.
+      cy.get(days.displayedDays)
+        .first()
+        .should('have.text', '26')
+        .should('have.class', daysCls.disabledDate)
+        .click()
+      cy.get(days.selectedDate)
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.selectedDate).to.be.undefined
+        })
+
+      // Click Saturday in other month.
+      cy.get(days.displayedDays)
+        .last()
+        .should('have.text', '1')
+        .should('have.class', daysCls.disabledDate)
+        .click()
+      cy.get(days.selectedDate)
+        .should('have.length', 0)
+        .then(() => {
+          expect(picker.selectedDate).to.be.undefined
+        })
+    })
+  })
+
   describe('disabler', () => {})
   describe('disabledDates', () => {})
   describe('disableMobile', () => {})

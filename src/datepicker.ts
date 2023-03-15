@@ -324,6 +324,8 @@ function datepicker(
         end: internalPickerItem.isFirst ? selectedDate2 : selectedDate1,
       }
     },
+    // This will be overwritten below but satisfies TS here.
+    publicPicker: {} as DatepickerInstance,
   }
 
   // CREATE PUBLIC PICKER DATA

@@ -13,7 +13,9 @@ export default function DatepickerAttachedToInput() {
     noWeekends: true,
     showAllDates: true,
     showAllDatesClickable: true,
-    // startDay: 1,
+    startDay: 1,
+    disableYearOverlay: true,
+    defaultView: 'overlay',
   }
   const [jsx, picker] = useDatepicker({
     pickerKey: 'DatepickerAttachedToInput2',
@@ -21,6 +23,8 @@ export default function DatepickerAttachedToInput() {
     options,
   })
   const checkbox = useSliderValuesCheckbox(picker, exemptId)
+
+  window.x = picker
 
   return (
     <section>

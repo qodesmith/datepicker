@@ -73,6 +73,7 @@ function datepicker(
     position,
     noWeekends,
     showAllDates,
+    disableYearOverlay,
     onShow,
     onHide,
     onMonthChange,
@@ -93,6 +94,7 @@ function datepicker(
 
   // CREATE INTERNAL PICKER DATA
   // TODO - should this be called `privatePicker` to keep in line with `publicPicker`?
+  // TODO - should we just spread the options object here and overwrite values that need it?
   const internalPickerItem: InternalPickerData = {
     selectorData,
     pickerElements,
@@ -109,6 +111,7 @@ function datepicker(
     startDay: options.startDay,
     isCalendarShowing: options?.alwaysShow ?? !isInput,
     defaultView: options.defaultView,
+    disableYearOverlay,
     isOverlayShowing: options.isOverlayShowing,
     listenersMap: new Map(),
     alwaysShow: !!options?.alwaysShow,
@@ -473,12 +476,16 @@ function datepicker(
     toggleOverlay(): void {
       if (isRemoved) throwAlreadyRemovedError()
 
-      const {isCalendarShowing, isOverlayShowing, defaultView} =
-        internalPickerItem
+      const {
+        isCalendarShowing,
+        isOverlayShowing,
+        defaultView,
+        disableYearOverlay,
+      } = internalPickerItem
       const {overlay, calendarContainer} = pickerElements
       const {input, overlaySubmitButton} = overlay
 
-      if (!isCalendarShowing) return
+      if (!isCalendarShowing || disableYearOverlay) return
 
       const overlayCls = getOverlayClassName({
         action: 'overlayToggle',

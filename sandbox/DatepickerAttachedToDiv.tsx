@@ -7,7 +7,6 @@ export default function DatepickerAttachedToDiv() {
   const exemptId = 'DatepickerAttachedToDiv'
   const options: DatepickerOptions = {
     exemptIds: [exemptId, 'row1-slider'],
-    // alwaysShow: true,
   }
 
   // TODO - why does this picker initially show?

@@ -574,7 +574,8 @@ export function sanitizeAndCheckAndSyncOptions(
     defaultView,
     disableYearOverlay,
     isOverlayShowing: defaultView === 'overlay',
-    overlayButton: options?.overlayButton ?? defaultOptions.overlayButtonText,
+    overlayButtonText:
+      options?.overlayButtonText ?? defaultOptions.overlayButtonText,
     overlayPlaceholder:
       options?.overlayPlaceholder ?? defaultOptions.overlayPlaceholder,
     // TODO - do we need to default these function values to noop?

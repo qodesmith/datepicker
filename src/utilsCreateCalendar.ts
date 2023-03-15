@@ -133,7 +133,7 @@ type OverlayReturnType = {
 function createCalendarOverlay(
   overlayMonths: SanitizedOptions['overlayMonths'],
   defaultView: ViewType,
-  overlayButtonText: CreateCalendarInput['overlayButtonText'],
+  overlayButtonText: SanitizedOptions['overlayButtonText'],
   overlayPlaceholder: CreateCalendarInput['overlayPlaceholder']
 ): OverlayReturnType {
   const overlayContainer = document.createElement('div')
@@ -201,8 +201,8 @@ type CreateCalendarInput = {
   date: Date
   customMonths: InternalPickerData['months']
   defaultView: ViewType
-  overlayButtonText: InternalPickerData['overlayButtonText']
-  overlayPlaceholder: InternalPickerData['overlayPlaceholder']
+  overlayButtonText: SanitizedOptions['overlayButtonText']
+  overlayPlaceholder: SanitizedOptions['overlayPlaceholder']
   selectorEl: SelectorData['el']
   alwaysShow: InternalPickerData['alwaysShow']
 }
@@ -221,7 +221,7 @@ export function createCalendarHTML(
     overlayMonths,
     customDays,
     defaultView,
-    overlayButton: overlayButtonText,
+    overlayButtonText,
     overlayPlaceholder,
     startDay,
     showAllDates,

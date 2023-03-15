@@ -11,7 +11,8 @@
     "dev": "vite",
     "dev-test": "vite --mode test",
     "test": "node runTests.js --type run",
-    "test:open": "node runTests.js --type open"
+    "test:open": "node runTests.js --type open",
+    "tsc": "tsc src/*.ts --noemit"
   },
   "keywords": [
     "datepicker",

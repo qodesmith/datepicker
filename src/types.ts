@@ -157,7 +157,7 @@ export type DatepickerOptions = {
    *
    * Default - 'Submit'
    */
-  overlayButton?: string
+  overlayButtonText?: string
 
   /**
    * Custom placeholder text for the year overlay.
@@ -342,7 +342,7 @@ export type SanitizedOptions = PrettifyNonRecursive<
         | 'onSelect'
         | 'formatter'
         | 'defaultView'
-        | 'overlayButton'
+        | 'overlayButtonText'
         | 'overlayPlaceholder'
         | 'startDay'
         | 'disabler'

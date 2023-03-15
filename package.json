@@ -12,7 +12,7 @@
     "dev-test": "vite --mode test",
     "test": "node runTests.js --type run",
     "test:open": "node runTests.js --type open",
-    "tsc": "tsc src/*.ts --noemit"
+    "tsc": "tsc --project tsconfig.json --noemit"
   },
   "keywords": [
     "datepicker",

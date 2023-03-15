@@ -526,7 +526,10 @@ export function sanitizeAndCheckAndSyncOptions(
     }
   }
 
-  const defaultView = options?.defaultView ?? defaultOptions.defaultView
+  const disableYearOverlay = options?.disableYearOverlay
+  const defaultView: ViewType = disableYearOverlay
+    ? 'calendar'
+    : options?.defaultView ?? defaultOptions.defaultView
   const startDay = options?.startDay ?? 0
 
   if (startDay < 0 || startDay > 6) {
@@ -569,6 +572,7 @@ export function sanitizeAndCheckAndSyncOptions(
     months,
     overlayMonths,
     defaultView,
+    disableYearOverlay,
     isOverlayShowing: defaultView === 'overlay',
     overlayButton: options?.overlayButton ?? defaultOptions.overlayButtonText,
     overlayPlaceholder:

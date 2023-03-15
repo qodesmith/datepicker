@@ -1664,7 +1664,6 @@ describe('Options', () => {
     })
   })
 
-  describe('disableMobile', () => {})
   describe('disableYearOverlay', () => {})
   describe('exemptIds', () => {})
 })

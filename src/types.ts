@@ -278,16 +278,6 @@ export type DatepickerOptions = {
   disabledDates?: Date[]
 
   /**
-   * Optionally disable Datepicker on mobile devices. This is handy if you'd
-   * like to trigger the mobile device's native date picker instead. If that's
-   * the case, make sure to use an input with a type of "date" -
-   * <input type="date" />
-   *
-   * Default - false
-   */
-  disableMobile?: boolean
-
-  /**
    * Clicking the year or month name on the calendar triggers an overlay to
    * show, allowing you to enter a year manually. If you want to disable this
    * feature, set this option to `true`.
@@ -452,7 +442,6 @@ export type InternalPickerData = {
   overlayPlaceholder: string
   overlayButtonText: string
   disableOverlay: boolean
-  disabledMobile: boolean // Disable the datepicker on mobile devices. Allows the use of native datepicker if the input type is 'date'.
   isMobile: boolean // 'ontouchstart' in window
   alwaysShow: boolean
   showAllDates: DatepickerOptions['showAllDates'] // Shows a date in every square rendered on the calendar (preceding and trailing month days).

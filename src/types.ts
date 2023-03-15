@@ -429,6 +429,7 @@ export type InternalPickerData = {
    */
   currentDate: Date
 
+  // TODO - how many of these types should come from DatepickerOptions?
   startDate: Date
   selectedDate: Date | undefined
   disabledDates: Set<number>
@@ -441,7 +442,7 @@ export type InternalPickerData = {
   overlayMonths: string[] // Will also be sliced to 1st 3 characters.
   overlayPlaceholder: string
   overlayButtonText: string
-  disableOverlay: boolean
+  disableYearOverlay: DatepickerOptions['disableYearOverlay']
   isMobile: boolean // 'ontouchstart' in window
   alwaysShow: boolean
   showAllDates: DatepickerOptions['showAllDates'] // Shows a date in every square rendered on the calendar (preceding and trailing month days).

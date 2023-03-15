@@ -26,10 +26,12 @@ type ControlElementsReturnType = {
 type CreateControlElementsInputType = {
   date: Date
   customMonths: CreateCalendarInput['customMonths']
+  disableYearOverlay: SanitizedOptions['disableYearOverlay']
 }
 function createCalendarControlElements({
   date,
   customMonths,
+  disableYearOverlay,
 }: CreateControlElementsInputType): ControlElementsReturnType {
   const controlsContainer = document.createElement('div')
   const leftArrow = document.createElement('div')
@@ -54,7 +56,9 @@ function createCalendarControlElements({
   controlsContainer.className = 'dp-controls-container'
   leftArrow.className = 'dp-arrow dp-arrow-left'
   rightArrow.className = 'dp-arrow dp-arrow-right'
-  monthYearContainer.className = 'dp-month-year-container'
+  monthYearContainer.className = `dp-month-year-container${
+    disableYearOverlay ? ' dp-disabled' : ''
+  }`
   monthName.className = 'dp-month-name'
   year.className = 'dp-year'
 
@@ -221,13 +225,18 @@ export function createCalendarHTML(
     overlayPlaceholder,
     startDay,
     showAllDates,
+    disableYearOverlay,
   } = options
   const alwaysShow = !!options?.alwaysShow
   const isInput = getIsInput(selectorEl)
   const calendarContainer = document.createElement('div')
   // TODO - turn all these internal function arguments from objects to multiple arguments.
   // Argument names can be minimized, object properties can't.
-  const controls = createCalendarControlElements({date, customMonths})
+  const controls = createCalendarControlElements({
+    date,
+    customMonths,
+    disableYearOverlay,
+  })
   const weekdaysArray = createWeekdayElements({weekDays: customDays, startDay})
   const weekdaysContainer = document.createElement('div')
   const calendarDaysArray = createCalendarDayElements()

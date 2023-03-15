@@ -24,8 +24,6 @@ export default function DatepickerAttachedToInput() {
   })
   const checkbox = useSliderValuesCheckbox(picker, exemptId)
 
-  window.x = picker
-
   return (
     <section>
       {checkbox}

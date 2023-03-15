@@ -124,21 +124,24 @@
   grid-template-columns: min-content min-content;
   gap: 0.5em;
   position: relative;
-  cursor: pointer;
 
-  &:after {
-    content: '';
-    width: 100%;
-    border-bottom: 1px solid;
-    position: absolute;
-    top: 85%;
-    opacity: 0;
-    transition: opacity var(--dp-transition-time);
-  }
+  &:not(.dp-disabled) {
+    cursor: pointer;
 
-  &:hover {
     &:after {
-      opacity: 0.5;
+      content: '';
+      width: 100%;
+      border-bottom: 1px solid;
+      position: absolute;
+      top: 85%;
+      opacity: 0;
+      transition: opacity var(--dp-transition-time);
+    }
+
+    &:hover {
+      &:after {
+        opacity: 0.5;
+      }
     }
   }
 }

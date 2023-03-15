@@ -1664,6 +1664,25 @@ describe('Options', () => {
     })
   })
 
-  describe('disableYearOverlay', () => {})
+  describe('disableYearOverlay', () => {
+    it("should disable opening the overlay and force the default view to 'calendar'", () => {
+      const picker = datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        disableYearOverlay: true,
+        defaultView: 'overlay',
+      })
+
+      cy.get(containers.monthYearContainer).should('have.class', 'dp-disabled')
+      cy.get(containers.overlayContainer).should('not.be.visible')
+      cy.get(controls.year).click()
+      cy.get(containers.overlayContainer)
+        .should('not.be.visible')
+        .then(() => {
+          picker.toggleOverlay()
+        })
+      cy.get(containers.overlayContainer).should('not.be.visible')
+    })
+  })
+
   describe('exemptIds', () => {})
 })

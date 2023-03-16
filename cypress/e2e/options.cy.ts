@@ -1684,5 +1684,45 @@ describe('Options', () => {
     })
   })
 
-  describe('exemptIds', () => {})
+  describe('exemptIds', () => {
+    it('should not prevent un-associated pickers from closing when clicked', () => {
+      cy.get(testElementIds.unfocus)
+        .then($el => {
+          $el.attr('data-exempt-id', 'exempt')
+        })
+        .then(() => {
+          datepicker(testElementIds.singleInput)
+        })
+
+      // Clicking an element that's not exempt closes the picker.
+      cy.get(containers.calendarContainer).should('not.be.visible')
+      cy.get(testElementIds.singleInput).click()
+      cy.get(containers.calendarContainer).should('be.visible')
+      cy.get(testElementIds.unfocus).click()
+      cy.get(containers.calendarContainer).should('not.be.visible')
+    })
+
+    it('should prevent an associated picker from closing when clicked', () => {
+      const id = 'exempt'
+
+      cy.get(testElementIds.unfocus)
+        .then($el => {
+          $el.attr('data-exempt-id', id)
+        })
+        .then(() => {
+          datepicker(testElementIds.singleInput, {exemptIds: [id]})
+        })
+
+      // Clicking the exempted element doesn't close the picker.
+      cy.get(containers.calendarContainer).should('not.be.visible')
+      cy.get(testElementIds.singleInput).click()
+      cy.get(containers.calendarContainer).should('be.visible')
+      cy.get(testElementIds.unfocus).click()
+      cy.get(containers.calendarContainer).should('be.visible')
+
+      // Clicking an element that's not exempt closes the picker.
+      cy.get(testElementIds.singleStandalone).click()
+      cy.get(containers.calendarContainer).should('not.be.visible')
+    })
+  })
 })

@@ -613,7 +613,9 @@ function datepicker(
      * setters themselves. So we do the following instead:
      */
     const rangepicker: DaterangePickerInstance = Object.create(
-      Object.getPrototypeOf(publicPicker),
+      // Use the basic object prototype.
+      {},
+      // Add all properties, including getters and setters, from these objects.
       {
         ...Object.getOwnPropertyDescriptors(publicPicker),
         ...Object.getOwnPropertyDescriptors(rangepickerProps),

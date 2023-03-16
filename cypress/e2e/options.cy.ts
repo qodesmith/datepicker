@@ -487,16 +487,16 @@ describe('Options', () => {
     })
   })
 
-  describe('overlayButton', () => {
+  describe('overlayButtonText', () => {
     it('should have the default text', () => {
       datepicker(testElementIds.singleInput)
       cy.get(overlay.submit).should('have.text', 'Submit')
     })
 
     it('should set the text on the overlay submit button', () => {
-      const overlayButton = 'Qodesmith'
-      datepicker(testElementIds.singleInput, {overlayButton})
-      cy.get(overlay.submit).should('have.text', overlayButton)
+      const overlayButtonText = 'Qodesmith'
+      datepicker(testElementIds.singleInput, {overlayButtonText})
+      cy.get(overlay.submit).should('have.text', overlayButtonText)
     })
   })
 

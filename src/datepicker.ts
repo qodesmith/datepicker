@@ -31,7 +31,6 @@ import {
 import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 
 // TODO - allow daterange pickers to have the same selector element except for inputs.
-// TODO - throw error when trying to attach Datepicker to a void element.
 // TODO - should the public instance for rangepickers include `isFirst`?
 // TODO - for internal fxns, see which ones take a single object arg that can be converted to explicit args.
 // TODO - format all comment blocks so they look good for intellisense (just hover over the variable to see it).

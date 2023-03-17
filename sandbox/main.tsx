@@ -33,10 +33,10 @@ if (!shouldRenderReactApp) {
   document.body.innerHTML = documentHtml
 
   const picker = datepicker('#dp', {exemptIds: ['controls']})
-
   const controls = document.querySelector(
     '.datepicker-imperative-controls'
   ) as HTMLDivElement
+
   if (controls) {
     controls.addEventListener('click', e => {
       const {id} = e.target as HTMLButtonElement

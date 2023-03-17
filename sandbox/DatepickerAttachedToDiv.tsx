@@ -9,7 +9,6 @@ export default function DatepickerAttachedToDiv() {
     exemptIds: [exemptId, 'row1-slider'],
   }
 
-  // TODO - why does this picker initially show?
   const [jsx, picker] = useDatepicker({
     pickerKey: exemptId,
     type: 'div',

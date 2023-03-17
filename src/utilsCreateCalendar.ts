@@ -63,11 +63,8 @@ function createCalendarControlElements({
   year.className = 'dp-year'
 
   // Append all elements to their containers.
-  monthYearContainer.append(monthName)
-  monthYearContainer.append(year)
-  controlsContainer.append(leftArrow)
-  controlsContainer.append(monthYearContainer)
-  controlsContainer.append(rightArrow)
+  monthYearContainer.append(monthName, year)
+  controlsContainer.append(leftArrow, monthYearContainer, rightArrow)
 
   return {
     controlsContainer,
@@ -154,11 +151,12 @@ function createCalendarOverlay(
   }
 
   // Append all the elements to their containers.
-  inputContainer.append(input)
-  inputContainer.append(overlayClose)
-  overlayContainer.append(inputContainer)
-  overlayContainer.append(overlayMonthsContainer)
-  overlayContainer.append(overlaySubmitButton)
+  inputContainer.append(input, overlayClose)
+  overlayContainer.append(
+    inputContainer,
+    overlayMonthsContainer,
+    overlaySubmitButton
+  )
 
   inputContainer.className = 'dp-overlay-input-container'
   input.className = 'dp-overlay-input'
@@ -254,12 +252,14 @@ export function createCalendarHTML(
   weekdaysContainer.className = 'dp-weekdays-container'
   daysContainer.className = 'dp-days-container'
 
-  calendarContainer.append(controls.controlsContainer)
-  calendarContainer.append(weekdaysContainer)
+  calendarContainer.append(
+    controls.controlsContainer,
+    weekdaysContainer,
+    daysContainer,
+    overlay.overlayContainer
+  )
   weekdaysContainer.append(...weekdaysArray)
-  calendarContainer.append(daysContainer)
   daysContainer.append(...calendarDaysArray)
-  calendarContainer.append(overlay.overlayContainer)
 
   if (showAllDates) {
     // Befores.

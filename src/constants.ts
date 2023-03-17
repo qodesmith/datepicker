@@ -13,10 +13,6 @@ export const sides: Sides = {
   c: 'c',
 } as const
 
-/**
- * The default callback functions (onSelect, etc.) will be a noop function. Using this variable so we can simply reference the same function. Also, this allows us to check if the callback is a noop function by doing a `=== noop` anywhere we like.
- */
-// TODO - do we actually need this noop?
 export function noop() {}
 
 export function defaultFormatter(date: Date): string {

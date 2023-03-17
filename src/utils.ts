@@ -578,7 +578,6 @@ export function sanitizeAndCheckAndSyncOptions(
       options?.overlayButtonText ?? defaultOptions.overlayButtonText,
     overlayPlaceholder:
       options?.overlayPlaceholder ?? defaultOptions.overlayPlaceholder,
-    // TODO - do we need to default these function values to noop?
     onShow: options?.onShow ?? noop,
     onHide: options?.onHide ?? noop,
     onMonthChange: options?.onMonthChange ?? noop,

@@ -664,10 +664,7 @@ export function getDaysInMonth(date: Date, adjascentMonth: number = 0): number {
  * the last day of the month. I.e., we need to account for Sunday possibly not
  * being the 1st day of the week. Therefore, we have the `getIndexOfSunday` fxn.
  */
-export const getIndexOfLastDayOfMonth = (
-  date: Date,
-  startDay: number
-): number => {
+export function getIndexOfLastDayOfMonth(date: Date, startDay: number): number {
   // This index reflects the week normally starting on a Sunday.
   const lastDayIndex = new Date(
     date.getFullYear(),
@@ -693,14 +690,14 @@ export const getIndexOfLastDayOfMonth = (
  * Formula = `(limit - (number % limit)) % limit`
  * (see comment above `getIndexOfLastDayOfMonth` for explanation)
  */
-const getIndexOfSunday = (startDay: number) => {
+function getIndexOfSunday(startDay: number) {
   const limit = 7
   return (limit - (startDay % limit)) % limit
 }
 
-export const shouldSkipForDisabledReadOnly = (
+export function shouldSkipForDisabledReadOnly(
   internalPickerItem: InternalPickerData
-) => {
+) {
   const {selectorData, respectDisabledReadOnly} = internalPickerItem
   const isInput = getIsInput(selectorData.el)
 

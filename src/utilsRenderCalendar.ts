@@ -192,10 +192,10 @@ function addOrRemoveClass<T extends HTMLElement>(
   el.classList[shouldAdd ? 'add' : 'remove'](className)
 }
 
-const renderShowAllDatesDays = (
+function renderShowAllDatesDays(
   internalPicker: InternalPickerData,
   lastMonthsLastDayIndex: number
-) => {
+) {
   const {pickerElements, currentDate, startDay, showAllDates} = internalPicker
   const {showAllDatesData} = pickerElements
   if (!showAllDates) return

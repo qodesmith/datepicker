@@ -5,7 +5,7 @@ import App from './App'
 import './main.scss'
 import datepicker from '../src/datepicker'
 
-const shouldRenderReactApp = false
+const shouldRenderReactApp = true
 
 if (shouldRenderReactApp) {
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
@@ -31,6 +31,9 @@ if (!shouldRenderReactApp) {
     <div id="dp"></div>
   `
   document.body.innerHTML = documentHtml
+
+  // @ts-expect-error - giving global access to play around in devtools.
+  window.datepicker = datepicker
 
   const picker = datepicker('#dp', {exemptIds: ['controls']})
   const controls = document.querySelector(

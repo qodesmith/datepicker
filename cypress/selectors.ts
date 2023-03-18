@@ -1,4 +1,4 @@
-import {Prettify} from '../src/types'
+import {ExpandRecursively} from '../src/types'
 
 type SelectorsObj<T extends Record<any, string>> = {
   [K in keyof T]: `.${T[K]}`
@@ -6,11 +6,11 @@ type SelectorsObj<T extends Record<any, string>> = {
 
 function clsToSelector<T extends Record<any, string>>(
   obj: T
-): Prettify<SelectorsObj<T>> {
+): ExpandRecursively<SelectorsObj<T>> {
   return Object.keys(obj).reduce((acc, key: keyof T) => {
     acc[key] = `.${obj[key]}`
     return acc
-  }, {} as SelectorsObj<T>) as Prettify<SelectorsObj<T>>
+  }, {} as SelectorsObj<T>) as ExpandRecursively<SelectorsObj<T>>
 }
 
 export const containersCls = {

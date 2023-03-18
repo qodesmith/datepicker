@@ -9,24 +9,26 @@ import datepicker from './datepicker'
  * with the user potentially having set some class names themselves.
  */
 
-type PrettyFxn<T> = T extends (...args: infer A) => infer R
-  ? (...args: PrettifyNonRecursive<A>) => PrettifyNonRecursive<R>
+type ExpandFxn<T> = T extends (...args: infer A) => infer R
+  ? (...args: Expand<A>) => Expand<R>
   : never
-export type PrettifyNonRecursive<T> = T extends Function
-  ? PrettyFxn<T>
-  : unknown extends T
-  ? T
-  : {
-      [K in keyof T]: T[K]
-    } & {}
-export type Prettify<T> = T extends Function
-  ? PrettyFxn<T>
+export type Expand<T> = T extends Function
+  ? ExpandFxn<T>
   : T extends Date
   ? Date
   : unknown extends T
   ? T
   : {
-      [K in keyof T]: Prettify<T[K]>
+      [K in keyof T]: T[K]
+    } & {}
+export type ExpandRecursively<T> = T extends Function
+  ? ExpandFxn<T>
+  : T extends Date
+  ? Date
+  : unknown extends T
+  ? T
+  : {
+      [K in keyof T]: ExpandRecursively<T[K]>
     } & {}
 
 export type Datepicker = typeof datepicker
@@ -311,7 +313,7 @@ export type DaterangePickerOptions = {
   id: unknown
 } & DatepickerOptions
 
-export type SanitizedOptions = PrettifyNonRecursive<
+export type SanitizedOptions = Expand<
   (
     | Omit<
         DatepickerOptions,
@@ -476,10 +478,7 @@ export type InternalPickerData = {
   isCalendarShowing: boolean
   isOverlayShowing: boolean
   defaultView: ViewType
-  listenersMap: Map<
-    PrettifyNonRecursive<ListenersMapKey>,
-    PrettifyNonRecursive<ListenersMapValue>
-  >
+  listenersMap: Map<Expand<ListenersMapKey>, Expand<ListenersMapValue>>
 }
 
 export type DatepickerInstance = {

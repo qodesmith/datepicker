@@ -4,7 +4,7 @@ import {
   DatepickerOptions,
   DaterangePickerInstance,
   DaterangePickerOptions,
-  PrettifyNonRecursive,
+  Expand,
   Selector,
 } from '../src/types'
 import datepicker from '../src/datepicker'
@@ -53,7 +53,7 @@ export function useDatepicker({
   return [reactNode, picker as DatepickerInstance | null]
 }
 
-type UseDaterangePickerProps = PrettifyNonRecursive<
+type UseDaterangePickerProps = Expand<
   Omit<UseDatepickerProps, 'options'> & {
     options: DaterangePickerOptions
   }

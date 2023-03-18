@@ -13,7 +13,8 @@
     "test": "node runTests.js --type run",
     "test:open": "node runTests.js --type open",
     "tsc": "tsc --project tsconfig.json --noemit",
-    "test:tsc": "tsc --project ./cypress/tsconfig.json --noemit"
+    "tsc:test": "tsc --project ./cypress/tsconfig.json --noemit",
+    "tsc:all": "npm run tsc && npm run tsc:test"
   },
   "keywords": [
     "datepicker",

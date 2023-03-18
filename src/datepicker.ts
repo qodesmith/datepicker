@@ -11,6 +11,7 @@ import './datepicker.scss'
 import {createCalendarHTML} from './utilsCreateCalendar'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
+  addClassNames,
   addPickerToMap,
   adjustRangepickerMinMaxDates,
   getIsInput,
@@ -136,7 +137,7 @@ function datepicker(
         })
       }
     },
-    // TODO add intellisense comments to all these internal methods.
+    // TODO - add intellisense comments to all these internal methods.
     _selectDate({date, changeCalendar, trigger, triggerType}) {
       const {
         currentDate,
@@ -273,10 +274,13 @@ function datepicker(
       }
       pickerElements.calendarContainer.classList.remove('dp-dn')
       positionCalendar(internalPickerItem, position, isInput)
-      pickerElements.overlay.overlayContainer.className = getOverlayClassName({
-        action: 'calendarOpen',
-        defaultView,
-      })
+      addClassNames(
+        pickerElements.overlay.overlayContainer,
+        getOverlayClassName({
+          action: 'calendarOpen',
+          defaultView,
+        })
+      )
 
       if (shouldOverlayShow) {
         pickerElements.overlay.input.focus()
@@ -488,24 +492,27 @@ function datepicker(
 
       if (!isCalendarShowing || disableYearOverlay) return
 
-      const overlayCls = getOverlayClassName({
-        action: 'overlayToggle',
-        defaultView,
-        isOverlayShowing,
-      })
-
       if (isOverlayShowing) {
         calendarContainer.classList.remove('dp-blur')
         input.blur()
       } else {
         calendarContainer.classList.add('dp-blur')
-        overlaySubmitButton.disabled = true
         input.value = ''
         input.focus()
+
+        // Set to false in the event listener as the user types a year value.
+        overlaySubmitButton.disabled = true
       }
 
       internalPickerItem.isOverlayShowing = !isOverlayShowing
-      overlay.overlayContainer.className = overlayCls
+      addClassNames(
+        overlay.overlayContainer,
+        getOverlayClassName({
+          action: 'overlayToggle',
+          defaultView,
+          isOverlayShowing,
+        })
+      )
     },
   }
 

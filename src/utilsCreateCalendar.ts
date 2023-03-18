@@ -320,9 +320,6 @@ export function createShowAllDatesData(): PickerElements['showAllDatesData'] {
   return [befores, afters]
 }
 
-// TODO - turn as many functions into arrow functions - smaller build.
-// Build will strip return from a body with a single return statement.
-
 // TODO - make calendar elements tabable for accessibility.
 // TODO - include aria attributes on calendar elements for accessibility.
 // TODO - make all internal function arguments positional vs single obj? Might reduce build size.

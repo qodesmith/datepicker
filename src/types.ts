@@ -2,12 +2,7 @@ import {PickerElements} from './utilsCreateCalendar'
 import {imperativeMethods, userEvents} from './constants'
 import datepicker from './datepicker'
 
-/**
- * TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
- * TODO - make sure all class updates are classList.add/remove and not setting
- * the class name wholesale (except during creation) to avoid clashes
- * with the user potentially having set some class names themselves.
- */
+// TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
 
 type ExpandFxn<T> = T extends (...args: infer A) => infer R
   ? (...args: Expand<A>) => Expand<R>

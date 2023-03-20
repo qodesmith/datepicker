@@ -28,8 +28,6 @@ export function defaultFormatter(date: Date): string {
  */
 export const datepickersMap = new Map<HTMLElement, Set<InternalPickerData>>()
 
-export const overlayContainerCls = 'dp-overlay-container'
-
 export const overlayShownCls = 'dp-overlay-shown'
 
 export const defaultOptions = {
@@ -52,15 +50,6 @@ export const defaultOptions = {
     'December',
   ],
 } as const
-
-export const imperativeMethods = [
-  'selectDate',
-  'setMin',
-  'setMax',
-  'navigate',
-  'show',
-  'hide',
-] as const
 
 export const userEvents = ['click', 'keydown', 'input'] as const
 

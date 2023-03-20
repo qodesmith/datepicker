@@ -293,7 +293,7 @@ export function getOverlayClassName({
       break
   }
 
-  return `${overlayContainerCls} ${otherCls}`.trim()
+  return `dp-overlay-container ${otherCls}`.trim()
 }
 
 /**

@@ -1,5 +1,5 @@
 import {PickerElements} from './utilsCreateCalendar'
-import {imperativeMethods, userEvents} from './constants'
+import {userEvents} from './constants'
 import datepicker from './datepicker'
 
 // TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
@@ -28,7 +28,13 @@ export type ExpandRecursively<T> = T extends Function
 
 export type Datepicker = typeof datepicker
 export type TriggerType = 'user' | 'imperative'
-export type ImperativeMethod = typeof imperativeMethods[number]
+export type ImperativeMethod =
+  | 'selectDate'
+  | 'setMin'
+  | 'setMax'
+  | 'navigate'
+  | 'show'
+  | 'hide'
 export type UserEvent = typeof userEvents[number]
 export type Trigger = ImperativeMethod | UserEvent
 type CallbackData = {

@@ -20,7 +20,7 @@ export default defineConfig(({mode}) => {
       lib: {
         entry: resolve(__dirname, 'src/datepicker.ts'),
         name: 'datepicker',
-        fileName: 'dp',
+        fileName: 'datepicker',
       },
     },
     clearScreen: !isTest,

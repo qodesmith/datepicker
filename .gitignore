@@ -7,5 +7,6 @@ package-lock.json
 node_modules
 /cypress/videos
 /cypress/screenshots
+/cypress/downloads
 dist
 dist-old

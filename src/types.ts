@@ -59,27 +59,29 @@ export type DatepickerOptions = {
    * Callback function after a date has been selected. It will receive the previous and newly selected dates. If `newDate` is `undefined`, that means the calendar date has been de-selected.
    */
   onSelect?(
-    onSelectOptions: CallbackData & {
-      prevDate: Date | undefined
-      newDate: Date | undefined
-    }
+    onSelectOptions: Expand<
+      CallbackData & {
+        prevDate: Date | undefined
+        newDate: Date | undefined
+      }
+    >
   ): void
 
   /**
    * Callback function when the calendar is shown.
    */
-  onShow?(data: CallbackData): void
+  onShow?(data: Expand<CallbackData>): void
 
   /**
    * Callback function when the calendar is hidden.
    */
-  onHide?(data: CallbackData): void
+  onHide?(data: Expand<CallbackData>): void
 
   /**
    * Callback function when the month has changed.
    */
   onMonthChange?(
-    onMonthChangeOptions: CallbackData & {prevDate: Date; newDate: Date}
+    onMonthChangeOptions: Expand<CallbackData & {prevDate: Date; newDate: Date}>
   ): void
 
   /**
@@ -90,6 +92,17 @@ export type DatepickerOptions = {
    * NOTE: The formatter function will only run if the datepicker instance is associated with an <input> field.
    */
   formatter?(date: Date): string
+
+  /**
+   * Sometimes you need more control over which dates to disable. The
+   * `disabledDates` option is limited to an explicit array of dates and the
+   * `noWeekends` option is limited to Saturdays & Sundays. Provide a function
+   * that takes a JavaScript date as it's only argument and returns `true` if
+   * the date should be disabled. When the calendar builds, each date will be
+   * run through this function to determine whether or not it should be
+   * disabled.
+   */
+  disabler?(date: Date): boolean
 
   /**
    * If you would like to render the calendar inside the provided selector,
@@ -261,17 +274,6 @@ export type DatepickerOptions = {
    * Default - false
    */
   noWeekends?: boolean
-
-  /**
-   * Sometimes you need more control over which dates to disable. The
-   * `disabledDates` option is limited to an explicit array of dates and the
-   * `noWeekends` option is limited to Saturdays & Sundays. Provide a function
-   * that takes a JavaScript date as it's only argument and returns `true` if
-   * the date should be disabled. When the calendar builds, each date will be
-   * run through this function to determine whether or not it should be
-   * disabled.
-   */
-  disabler?(date: Date): boolean
 
   /**
    * Provide an array of JS date objects that will be disabled on the calendar.
@@ -452,26 +454,32 @@ export type InternalPickerData = {
   sibling?: InternalPickerData // Just a reference to the other internal object in the daterange pair.
 
   _navigate(
-    data: Parameters<DatepickerInstance['navigate']>[0] &
-      Pick<CallbackData, 'triggerType'> & {trigger: 'navigate' | UserEvent}
+    data: Expand<
+      Parameters<DatepickerInstance['navigate']>[0] &
+        Pick<CallbackData, 'triggerType'> & {trigger: 'navigate' | UserEvent}
+    >
   ): void
   _selectDate(
-    data: Parameters<DatepickerInstance['selectDate']>[0] &
-      Pick<CallbackData, 'triggerType'> & {trigger: 'selectDate' | UserEvent}
+    data: Expand<
+      Parameters<DatepickerInstance['selectDate']>[0] &
+        Pick<CallbackData, 'triggerType'> & {trigger: 'selectDate' | UserEvent}
+    >
   ): void
   _setMinOrMax(
     isFirstRun: boolean,
     minOrMax: 'min' | 'max',
-    data: Pick<CallbackData, 'triggerType'> & {
-      date?: Date
-      trigger: 'setMin' | 'setMax' | UserEvent
-    }
+    data: Expand<
+      Pick<CallbackData, 'triggerType'> & {
+        date?: Date
+        trigger: 'setMin' | 'setMax' | UserEvent
+      }
+    >
   ): void
   _show(
-    data: Omit<CallbackData, 'instance'> & {trigger: 'show' | UserEvent}
+    data: Expand<Omit<CallbackData, 'instance'> & {trigger: 'show' | UserEvent}>
   ): void
   _hide(
-    data: Omit<CallbackData, 'instance'> & {trigger: 'hide' | UserEvent}
+    data: Expand<Omit<CallbackData, 'instance'> & {trigger: 'hide' | UserEvent}>
   ): void
   _getRange(): {start: Date | undefined; end: Date | undefined}
   disabler: SanitizedOptions['disabler']

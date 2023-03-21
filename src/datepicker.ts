@@ -11,7 +11,6 @@ import './datepicker.scss'
 import {createCalendarHTML} from './utilsCreateCalendar'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
-  addClassNames,
   addPickerToMap,
   adjustRangepickerMinMaxDates,
   getIsInput,
@@ -274,13 +273,10 @@ function datepicker(
       }
       pickerElements.calendarContainer.classList.remove('dp-dn')
       positionCalendar(internalPickerItem, position, isInput)
-      addClassNames(
-        pickerElements.overlay.overlayContainer,
-        getOverlayClassName({
-          action: 'calendarOpen',
-          defaultView,
-        })
-      )
+      pickerElements.overlay.overlayContainer.className = getOverlayClassName({
+        action: 'calendarOpen',
+        defaultView,
+      })
 
       if (shouldOverlayShow) {
         pickerElements.overlay.input.focus()
@@ -504,15 +500,13 @@ function datepicker(
         overlaySubmitButton.disabled = true
       }
 
+      overlay.overlayContainer.className = getOverlayClassName({
+        action: 'overlayToggle',
+        defaultView,
+        isOverlayShowing,
+      })
+
       internalPickerItem.isOverlayShowing = !isOverlayShowing
-      addClassNames(
-        overlay.overlayContainer,
-        getOverlayClassName({
-          action: 'overlayToggle',
-          defaultView,
-          isOverlayShowing,
-        })
-      )
     },
   }
 

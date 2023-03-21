@@ -297,16 +297,6 @@ export function getOverlayClassName({
 }
 
 /**
- * A helper function that allows us to avoid setting className directly on an
- * element which will preserve any class names the user may have added.
- */
-export function addClassNames(el: HTMLElement, classNames: string): void {
-  classNames.split('').forEach(name => {
-    el.classList.add(name)
-  })
-}
-
-/**
  * Checks if a picker already exists on a given element. If so, it throws.
  */
 function checkForExistingPickerOnElement(el: HTMLElement): void {

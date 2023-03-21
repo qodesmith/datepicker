@@ -1,12 +1,12 @@
 // TODO - don't export any functions that aren't consumed anywhere.
 
-import {getOverlayClassName, getIsInput} from './utils'
-import {
+import type {
   InternalPickerData,
   SanitizedOptions,
   SelectorData,
   ViewType,
 } from './types'
+import {getOverlayClassName, getIsInput} from './utils'
 
 const arrowSVG = `
   <svg viewBox="0 0 24 24">

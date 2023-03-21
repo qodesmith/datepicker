@@ -1,10 +1,10 @@
-import {datepickersMap} from './constants'
-import {
+import type {
   InternalPickerData,
   ListenersMapKey,
   ListenersMapValue,
   UserEvent,
 } from './types'
+import {datepickersMap} from './constants'
 import {getIsInput, shouldSkipForDisabledReadOnly} from './utils'
 
 let globalListenerDataAttached = false

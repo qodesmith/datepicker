@@ -1,3 +1,4 @@
+import type {InternalPickerData} from './types'
 import {
   getDaysInMonth,
   getIndexOfLastDayOfMonth,
@@ -5,7 +6,6 @@ import {
   isDateWithinRange,
   stripTime,
 } from './utils'
-import {InternalPickerData} from './types'
 
 /**
  * TODO - make function accept undefined and move conditional logic here.

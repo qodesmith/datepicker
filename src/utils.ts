@@ -1,12 +1,4 @@
-import {
-  datepickersMap,
-  defaultFormatter,
-  defaultOptions,
-  noop,
-  overlayContainerCls,
-  voidElements,
-} from './constants'
-import {
+import type {
   DatepickerOptions,
   DaterangePickerOptions,
   InternalPickerData,
@@ -16,6 +8,13 @@ import {
   SelectorData,
   ViewType,
 } from './types'
+import {
+  datepickersMap,
+  defaultFormatter,
+  defaultOptions,
+  noop,
+  voidElements,
+} from './constants'
 
 /**
  * Returns the type of an item.

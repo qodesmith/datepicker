@@ -7,7 +7,8 @@
   "types": "dist/datepicker.d.ts",
   "style": "./src/datepicker.scss",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && npm run build:scss",
+    "build:scss": "sass src/datepicker.scss dist/datepicker.css --style=compressed --no-source-map",
     "cy:open": "cypress open --e2e -b chrome",
     "cy:run": "cypress run",
     "dev": "vite",

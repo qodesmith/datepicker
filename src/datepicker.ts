@@ -5,9 +5,16 @@ import type {
   Selector,
   DatepickerInstance,
   DaterangePickerInstance,
-} from './types'
 
-import './datepicker.scss'
+  // For exporting
+  Datepicker,
+  ViewType,
+  Position,
+  ImperativeMethod,
+  UserEvent,
+  Trigger,
+  TriggerType,
+} from './types'
 import {createCalendarHTML} from './utilsCreateCalendar'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
@@ -639,3 +646,19 @@ function datepicker(
 }
 
 export default datepicker
+export type {
+  Datepicker,
+  Selector,
+  DatepickerOptions,
+  DaterangePickerOptions,
+  DatepickerInstance,
+  DaterangePickerInstance,
+
+  // Option types:
+  ViewType,
+  Position,
+  ImperativeMethod,
+  UserEvent,
+  Trigger,
+  TriggerType,
+}

@@ -551,8 +551,9 @@ type DaterangePickerInstanceOnlyProps = {
   readonly isFirst: boolean | undefined
 }
 
-export type DaterangePickerInstance = DatepickerInstance &
-  DaterangePickerInstanceOnlyProps
+export type DaterangePickerInstance = Expand<
+  DatepickerInstance & DaterangePickerInstanceOnlyProps
+>
 
 export type SelectorData = {
   el: HTMLElement

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import {RecoilRoot} from 'recoil'
 import App from './App'
 import './main.scss'
+import '../src/datepicker.scss'
 import datepicker from '../src/datepicker'
 
 const shouldRenderReactApp = true

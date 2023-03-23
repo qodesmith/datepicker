@@ -2,7 +2,9 @@
   "name": "js-datepicker",
   "version": "5.18.2",
   "description": "Get a date with JavaScript! A datepicker with no dependencies.",
-  "main": "dist/datepicker.min.js",
+  "main": "dist/datepicker.js",
+  "module": "dist/datepicker.mjs",
+  "types": "dist/datepicker.d.ts",
   "style": "./src/datepicker.scss",
   "scripts": {
     "build": "vite build",
@@ -49,6 +51,7 @@
     "sass": "^1.57.1",
     "start-server-and-test": "^1.15.4",
     "typescript": "^4.9.4",
-    "vite": "^4.0.4"
+    "vite": "^4.0.4",
+    "vite-plugin-dts": "^2.1.0"
   }
 }

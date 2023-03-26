@@ -1,7 +1,7 @@
 import {Datepicker} from '../../src/types'
 import {containers, controls, days, overlay, testElementIds} from '../selectors'
 
-describe('Picker Methods', () => {
+describe('Picker Instance Properties', () => {
   let datepicker: Datepicker
 
   beforeEach(() => {
@@ -9,6 +9,93 @@ describe('Picker Methods', () => {
     cy.window().then(global => {
       // @ts-ignore this will be available.
       datepicker = global.datepicker
+    })
+  })
+
+  it('should have the correct set of properties', () => {
+    const picker = datepicker(testElementIds.singleInput, {
+      selectedDate: new Date(),
+    })
+    const expectedPropertiesData = [
+      {propertyName: 'calendarContainer', type: '[object HTMLDivElement]'},
+      {propertyName: 'currentDate', type: '[object Date]'},
+      {propertyName: 'selectedDate', type: '[object Date]'},
+      {propertyName: 'remove', type: '[object Function]'},
+      {propertyName: 'navigate', type: '[object Function]'},
+      {propertyName: 'selectDate', type: '[object Function]'},
+      {propertyName: 'setMin', type: '[object Function]'},
+      {propertyName: 'setMax', type: '[object Function]'},
+      {propertyName: 'show', type: '[object Function]'},
+      {propertyName: 'hide', type: '[object Function]'},
+      {propertyName: 'toggleCalendar', type: '[object Function]'},
+      {propertyName: 'toggleOverlay', type: '[object Function]'},
+    ]
+    const expectedPropertyNames = expectedPropertiesData.map(
+      ({propertyName}) => propertyName
+    )
+
+    expect(Object.keys(picker)).to.have.members(expectedPropertyNames)
+
+    expectedPropertiesData.forEach(({propertyName, type}) => {
+      const property = picker[propertyName]
+      expect({}.toString.call(property)).to.equal(type)
+    })
+  })
+
+  describe('After being removed', () => {
+    it('should throw if trying to access one of the properties (non-methods)', () => {
+      const propertyNames = ['calendarContainer', 'currentDate', 'selectedDate']
+      const picker = datepicker(testElementIds.singleInput)
+
+      propertyNames.forEach(prop => {
+        expect(() => picker[prop]).not.to.throw
+      })
+
+      picker.remove()
+
+      propertyNames.forEach(prop => {
+        expect(() => picker[prop]).to.throw(
+          "Unable to run a function or access properties from a picker that's already removed."
+        )
+      })
+    })
+  })
+
+  describe('calendarContainer', () => {
+    it('should have a `calendarcontainer` property matching the element found in the DOM', () => {
+      const picker = datepicker(testElementIds.singleInput)
+
+      cy.get(containers.calendarContainer).then($el => {
+        expect($el[0]).to.equal(picker.calendarContainer)
+      })
+    })
+  })
+
+  describe('currentDate', () => {
+    it('should match the month and year of the initialized date', () => {
+      const startDate = new Date(2023, 2, 25)
+      const expectedCurrentDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        1
+      )
+      const picker = datepicker(testElementIds.singleInput, {startDate})
+
+      expect(picker.currentDate).to.deep.equal(expectedCurrentDate)
+    })
+  })
+
+  describe('selectedDate', () => {
+    it('should be undefined when starting a vanilla calendar', () => {
+      const picker = datepicker(testElementIds.singleInput)
+      expect(picker.selectedDate).to.be.undefined
+    })
+
+    it('should match the `selectedDate` initialization option', () => {
+      const selectedDate = new Date(2023, 2, 25)
+      const picker = datepicker(testElementIds.singleInput, {selectedDate})
+
+      expect(picker.selectedDate).to.deep.equal(selectedDate)
     })
   })
 

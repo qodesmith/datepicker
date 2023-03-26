@@ -94,36 +94,28 @@ function useCreateControls(
       }
 
     return {
-      handleLeftArrowClick(e) {
+      handleLeftArrowClick() {
         const {currentDate} = picker
-        picker.navigate({
-          date: new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth() - 1,
-            1
-          ),
-        })
+        picker.navigate(
+          new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+        )
       },
-      handleRightArrowClick(e) {
+      handleRightArrowClick() {
         const {currentDate} = picker
-        picker.navigate({
-          date: new Date(
-            currentDate.getFullYear(),
-            currentDate.getMonth() + 1,
-            1
-          ),
-        })
+        picker.navigate(
+          new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+        )
       },
-      handleShow(e) {
+      handleShow() {
         picker.show()
       },
-      handleHide(e) {
+      handleHide() {
         picker.hide()
       },
-      handleToggleCalendar(e) {
+      handleToggleCalendar() {
         picker.toggleCalendar()
       },
-      handleToggleOverlay(e) {
+      handleToggleOverlay() {
         picker.toggleOverlay()
       },
     }

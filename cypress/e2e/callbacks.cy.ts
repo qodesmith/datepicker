@@ -205,7 +205,7 @@ describe('Callbacks', () => {
       cy.get('@onMonthChange')
         .should('not.have.been.called')
         .then(() => {
-          picker.navigate({date: newDate})
+          picker.navigate(newDate)
         })
 
       cy.get('@onMonthChange')

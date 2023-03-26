@@ -236,7 +236,7 @@ describe('Picker Instance Properties', () => {
       cy.get(controls.year)
         .should('have.text', '2023')
         .then(() => {
-          picker.navigate({date: new Date(2024, 0)})
+          picker.navigate(new Date(2024, 0))
         })
       cy.get(controls.monthName).should('have.text', 'January')
       cy.get(controls.year)
@@ -444,7 +444,7 @@ describe('Picker Instance Properties', () => {
       cy.get(days.selectedDate)
         .should('have.length', 0)
         .then(() => {
-          picker.navigate({date: newDate})
+          picker.navigate(newDate)
         })
 
       cy.get(controls.monthName).should('have.text', 'December')

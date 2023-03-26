@@ -1028,7 +1028,7 @@ describe('Options', () => {
 
         // Navigate method works.
         cy.then(() => {
-          picker.navigate({date: new Date(2023, 4)})
+          picker.navigate(new Date(2023, 4))
         })
         cy.get(controls.monthName).should('have.text', 'May')
       })
@@ -1163,7 +1163,7 @@ describe('Options', () => {
           cy.get(controls.year).should('have.text', '2023')
 
           cy.then(() => {
-            picker.navigate({date: new Date(2024, 10, 15)})
+            picker.navigate(new Date(2024, 10, 15))
           })
           cy.get(controls.monthName).should('have.text', 'November')
           cy.get(controls.year).should('have.text', '2024')
@@ -1372,7 +1372,7 @@ describe('Options', () => {
           cy.get(controls.year).should('have.text', '2023')
 
           cy.then(() => {
-            picker.navigate({date: new Date(2024, 10, 15)})
+            picker.navigate(new Date(2024, 10, 15))
           })
           cy.get(controls.monthName).should('have.text', 'November')
           cy.get(controls.year).should('have.text', '2024')

@@ -50,7 +50,7 @@ if (!shouldRenderReactApp) {
         case 'next':
           const date = new Date(picker.currentDate)
           date.setMonth(date.getMonth() + (id === 'next' ? 1 : -1))
-          picker.navigate({date})
+          picker.navigate(date)
           break
         case 'show':
           picker.show()

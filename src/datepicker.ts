@@ -418,11 +418,11 @@ function datepicker(
       cb?.()
     },
     // TODO - many methods take a date as the argument, not an object with a date.
-    navigate(data): void {
+    navigate(date): void {
       if (isRemoved) throwAlreadyRemovedError()
 
       internalPickerItem._navigate({
-        ...data,
+        date,
         trigger: 'navigate',
         triggerType: 'imperative',
       })

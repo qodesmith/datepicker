@@ -455,8 +455,10 @@ export type InternalPickerData = {
 
   _navigate(
     data: Expand<
-      Parameters<DatepickerInstance['navigate']>[0] &
-        Pick<CallbackData, 'triggerType'> & {trigger: 'navigate' | UserEvent}
+      {
+        date: Date
+        trigger: 'navigate' | UserEvent
+      } & Pick<CallbackData, 'triggerType'>
     >
   ): void
   _selectDate(
@@ -495,7 +497,7 @@ export type DatepickerInstance = {
   readonly currentDate: Date
   readonly selectedDate: Date | undefined
   readonly remove: (cb?: () => void) => void
-  readonly navigate: ({date}: {date: Date}) => void
+  readonly navigate: (date: Date) => void
   readonly selectDate: (data?: {date?: Date; changeCalendar?: boolean}) => void
   readonly setMin: (data?: {date?: Date}) => void
   readonly setMax: (data?: {date?: Date}) => void

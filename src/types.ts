@@ -505,7 +505,7 @@ export type DatepickerInstance = {
   readonly toggleOverlay: () => void
 }
 
-type DaterangePickerInstanceOnlyProps = {
+export type DaterangePickerInstanceOnlyProps = {
   /**
    * This method is only available on daterange pickers. It will return an
    * object with `start` and `end` properties whose values are JavaScript date
@@ -526,7 +526,7 @@ type DaterangePickerInstanceOnlyProps = {
    * and remove them both at once.
    *
    */
-  readonly removePair: () => void
+  readonly removePair: (cb?: () => void) => void
 
   /**
    * Daterange pickers are "connected" via the `id` property. This can be any

@@ -14,6 +14,7 @@ import type {
   UserEvent,
   Trigger,
   TriggerType,
+  DaterangePickerInstanceOnlyProps,
 } from './types'
 import {createCalendarHTML} from './utilsCreateCalendar'
 import {renderCalendar} from './utilsRenderCalendar'
@@ -46,6 +47,7 @@ import {addEventListeners, removeEventListeners} from './utilsEventListeners'
 // TODO - change cursor to pointer for showAllDatesClickable days.
 // TODO - consistent code style - get rid of consts and use function declarations instead. Come back later to optimize for library size.
 // TODO - wrap disabler fxn internally and use it to check noWeekends, disabledDates, etc., so we only ever run disabler(date) when rendering days.
+// TODO - is it possible to avoid reading from / relying on public picker properties internally?
 /**
  * TODO - daterange scenarios to handle:
  * - starting with selected date on one of the calendars should adjust min/max dates accordingly
@@ -416,7 +418,6 @@ function datepicker(
       removeEventListeners(internalPickerItem)
       // TODO - ^^^ move as many private & public picker methods to importable functions like this one.
 
-      // TODO - should remove be async and we return cb?.()?
       cb?.()
     },
     // TODO - many methods take a date as the argument, not an object with a date.
@@ -573,7 +574,7 @@ function datepicker(
       sibling.sibling = internalPickerItem
     }
 
-    const rangepickerProps = {
+    const rangepickerProps: DaterangePickerInstanceOnlyProps = {
       /**
        * When an object is frozen with Object.freeze, JavaScript will throw
        * errors in strict mode when trying to delete properties or update
@@ -596,7 +597,7 @@ function datepicker(
 
         return internalPickerItem._getRange()
       },
-      removePair(): void {
+      removePair(cb) {
         if (isPairRemoved || isRemoved) throwAlreadyRemovedError()
 
         isPairRemoved = true
@@ -609,6 +610,8 @@ function datepicker(
         if (internalPickerItem.sibling) {
           internalPickerItem.sibling.publicPicker.remove()
         }
+
+        cb?.()
       },
     }
 

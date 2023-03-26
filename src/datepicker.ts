@@ -24,6 +24,7 @@ import {
   getIsInput,
   getOverlayClassName,
   getRangepickers,
+  getSelectedDate,
   getSelectorData,
   hasMonthChanged,
   isDateWithinRange,
@@ -322,10 +323,8 @@ function datepicker(
       })
     },
     _getRange() {
-      const selectedDate1 = publicPicker.selectedDate
-      const selectedDate2 = internalPickerItem.sibling?.selectedDate
-        ? new Date(internalPickerItem.sibling.selectedDate)
-        : undefined
+      const selectedDate1 = getSelectedDate(internalPickerItem)
+      const selectedDate2 = getSelectedDate(internalPickerItem.sibling)
 
       return {
         start: internalPickerItem.isFirst ? selectedDate1 : selectedDate2,
@@ -348,9 +347,7 @@ function datepicker(
     },
     get selectedDate() {
       if (isRemoved) throwAlreadyRemovedError()
-      return internalPickerItem.selectedDate
-        ? new Date(internalPickerItem.selectedDate)
-        : undefined
+      return getSelectedDate(internalPickerItem)
     },
     remove(cb): void {
       // Ensure the logic below is only executed once.

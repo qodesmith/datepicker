@@ -704,3 +704,11 @@ export function shouldSkipForDisabledReadOnly(
     : (selectorData.el as HTMLInputElement).disabled ||
         (selectorData.el as HTMLInputElement).readOnly
 }
+
+export function getSelectedDate(
+  internalPickerItem: InternalPickerData | undefined
+): Date | undefined {
+  return internalPickerItem?.selectedDate
+    ? new Date(internalPickerItem.selectedDate)
+    : undefined
+}

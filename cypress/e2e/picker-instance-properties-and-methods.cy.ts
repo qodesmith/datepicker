@@ -33,8 +33,10 @@ describe('Picker Instance Properties', () => {
     const expectedPropertyNames = expectedPropertiesData.map(
       ({propertyName}) => propertyName
     )
+    const pickerPropNames = Object.keys(picker)
 
-    expect(Object.keys(picker)).to.have.members(expectedPropertyNames)
+    expect(pickerPropNames).to.have.members(expectedPropertyNames)
+    expect(pickerPropNames.length).to.equal(expectedPropertyNames.length)
 
     expectedPropertiesData.forEach(({propertyName, type}) => {
       const property = picker[propertyName]

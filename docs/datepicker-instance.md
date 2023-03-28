@@ -1,5 +1,24 @@
 # Datepicker Instance
 
+**Methods:**
+
+- [remove](#remove)
+- [removePair](#removepair)
+- [navigate](#navigate)
+- [selectDate](#selectdate)
+- [setMin](#setmin)
+- [setMax](#setmax)
+- [show](#show)
+- [hide](#hide)
+- [toggleCalendar](#togglecalendar)
+- [toggleOverlay](#toggleoverlay)
+
+**Properties:**
+
+- [calendarContainer](#calendarcontainer)
+- [currentDate](#currentdate)
+- [selectedDate](#selecteddate)
+
 Each instance of Datepicker has methods to allow you to programmatically control
 the calendar. There are also a number of helpful properties for convenience.
 
@@ -267,4 +286,41 @@ picker.toggleOverlay()
 
 // Overlay state is now hiding.
 picker.toggleOverlay()
+```
+
+## calendarContainer
+
+The containing `<div>` html element that houses the entire calendar.\
+
+### Type Declaration
+
+```typescript
+{
+  calendarContainer: HTMLDivElement
+}
+```
+
+## currentDate
+
+The current date rendered on the calendar. This property will always have a value.
+
+### Type Declaration
+
+```typescript
+{
+  currentDate: Date
+}
+```
+
+## selectedDate
+
+The selected date - a JS `Date` object. If no date is selected, this value will
+be `undefined`.
+
+### Type Declaration
+
+```typescript
+{
+  selectedDate: Date | undefined
+}
 ```

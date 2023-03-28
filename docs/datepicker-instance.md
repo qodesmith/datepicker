@@ -171,3 +171,51 @@ picker.setMax(
   new Date(today.getFullYear(), today.getMonth(), today.getDate() + 14)
 )
 ```
+
+## show
+
+<!-- TODO - Add link to the exemptIds docs. -->
+
+Allows you to programmatically show the calendar.
+
+_NOTE: please see the exemptIds option when attaching this method to an event
+handler, such as a button click._
+
+### Type Declaration
+
+```typescript
+show(): void
+```
+
+### Example
+
+```javascript
+const picker = datepicker(selector)
+
+// Show the picker.
+picker.show()
+```
+
+## hide
+
+<!-- TODO - Add link to the exemptIds docs. -->
+
+Allows you to programmatically hide the calendar.
+
+_NOTE: please see the exemptIds option when attaching this method to an event
+handler, such as a button click._
+
+### Type Declaration
+
+```typescript
+hide(): void
+```
+
+### Example
+
+```javascript
+const picker = datepicker(selector)
+
+// Hide the picker.
+picker.hide()
+```

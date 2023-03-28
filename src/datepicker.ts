@@ -438,7 +438,7 @@ function datepicker(
         triggerType: 'imperative',
       })
     },
-    setMin(data): void {
+    setMin(date): void {
       if (isRemoved) throwAlreadyRemovedError()
 
       // TODO - handle scenario where we're in the middle of picking a range.
@@ -446,7 +446,7 @@ function datepicker(
 
       // TODO - handle scenario when a date is already selected on a rangepicker pair.
       internalPickerItem._setMinOrMax(true, 'min', {
-        ...data,
+        date,
         trigger: 'setMin',
         triggerType: 'imperative',
       })

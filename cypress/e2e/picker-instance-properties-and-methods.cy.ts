@@ -486,7 +486,7 @@ describe('Picker Instance Properties', () => {
       cy.get(days.disabledDate)
         .should('have.length', 0)
         .then(() => {
-          picker.setMin({date: minDate})
+          picker.setMin(minDate)
         })
 
       cy.get(days.disabledDate).should('have.length', daysInMonth)
@@ -518,7 +518,7 @@ describe('Picker Instance Properties', () => {
       cy.get(days.selectedDate)
         .should('have.length', 1)
         .then(() => {
-          picker.setMin({date: minDate})
+          picker.setMin(minDate)
         })
 
       cy.get(days.selectedDate)
@@ -533,7 +533,7 @@ describe('Picker Instance Properties', () => {
         maxDate: new Date(2023, 2, 1),
       })
 
-      expect(() => picker.setMin({date: new Date(2023, 2, 15)})).to.throw(
+      expect(() => picker.setMin(new Date(2023, 2, 15))).to.throw(
         '`minDate` cannot be > `maxDate`'
       )
     })
@@ -568,7 +568,7 @@ describe('Picker Instance Properties', () => {
       cy.get(days.disabledDate)
         .should('have.length', 0)
         .then(() => {
-          picker.setMax({date: maxDate})
+          picker.setMax(maxDate)
         })
 
       cy.get(`${days.day}:not(${days.disabledDate})`).should(
@@ -603,7 +603,7 @@ describe('Picker Instance Properties', () => {
       cy.get(days.selectedDate)
         .should('have.length', 1)
         .then(() => {
-          picker.setMax({date: startDate})
+          picker.setMax(startDate)
         })
 
       cy.get(days.selectedDate)
@@ -618,7 +618,7 @@ describe('Picker Instance Properties', () => {
         minDate: new Date(2023, 2, 15),
       })
 
-      expect(() => picker.setMax({date: new Date(2023, 2, 1)})).to.throw(
+      expect(() => picker.setMax(new Date(2023, 2, 1))).to.throw(
         '`maxDate` cannot be < `minDate`'
       )
     })

@@ -1181,20 +1181,12 @@ describe('Options', () => {
           cy.get(days.disabledDate)
             .should('have.length', 0)
             .then(() => {
-              picker.setMin({
-                date: new Date(
-                  startDate.getFullYear(),
-                  startDate.getMonth(),
-                  5
-                ),
-              })
-              picker.setMax({
-                date: new Date(
-                  startDate.getFullYear(),
-                  startDate.getMonth(),
-                  10
-                ),
-              })
+              picker.setMin(
+                new Date(startDate.getFullYear(), startDate.getMonth(), 5)
+              )
+              picker.setMax(
+                new Date(startDate.getFullYear(), startDate.getMonth(), 10)
+              )
             })
 
           // Test opacity and class names.
@@ -1390,20 +1382,12 @@ describe('Options', () => {
           cy.get(days.disabledDate)
             .should('have.length', 0)
             .then(() => {
-              picker.setMin({
-                date: new Date(
-                  startDate.getFullYear(),
-                  startDate.getMonth(),
-                  5
-                ),
-              })
-              picker.setMax({
-                date: new Date(
-                  startDate.getFullYear(),
-                  startDate.getMonth(),
-                  10
-                ),
-              })
+              picker.setMin(
+                new Date(startDate.getFullYear(), startDate.getMonth(), 5)
+              )
+              picker.setMax(
+                new Date(startDate.getFullYear(), startDate.getMonth(), 10)
+              )
             })
 
           // Test opacity and class names.

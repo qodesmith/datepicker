@@ -100,7 +100,7 @@ describe('Callbacks', () => {
         .then(() => {
           const unaffectedMinDate = new Date(startDate)
           unaffectedMinDate.setDate(unaffectedMinDate.getDate() - 1)
-          picker.setMin({date: unaffectedMinDate})
+          picker.setMin(unaffectedMinDate)
         })
 
       cy.get('@onSelect')
@@ -108,7 +108,7 @@ describe('Callbacks', () => {
         .then(() => {
           const minDate = new Date(startDate)
           minDate.setDate(minDate.getDate() + 1)
-          picker.setMin({date: minDate})
+          picker.setMin(minDate)
         })
 
       cy.get('@onSelect')
@@ -133,7 +133,7 @@ describe('Callbacks', () => {
         .then(() => {
           const unaffectedMaxDate = new Date(startDate)
           unaffectedMaxDate.setDate(unaffectedMaxDate.getDate() + 1)
-          picker.setMax({date: unaffectedMaxDate})
+          picker.setMax(unaffectedMaxDate)
         })
 
       cy.get('@onSelect')
@@ -141,7 +141,7 @@ describe('Callbacks', () => {
         .then(() => {
           const maxDate = new Date(startDate)
           maxDate.setDate(maxDate.getDate() - 1)
-          picker.setMax({date: maxDate})
+          picker.setMax(maxDate)
         })
 
       cy.get('@onSelect')

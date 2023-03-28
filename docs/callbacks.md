@@ -1,16 +1,26 @@
 # Callback Options
 
-Callback functions are triggered both by the user interacting with the calendar in the DOM _and_ the developer using the imperative instance methods.
+Callback functions are triggered both by the user interacting with the calendar
+in the DOM _and_ the developer using the imperative
+[instance methods](./datepicker-instance.md) (i.e. show, hide, setMin, etc.).
 
-Each callback function receives a single object with relevant data to the type of callback it is, along with 3 common values:
+Each callback function receives a single object with relevant data to the type
+of callback it is, along with 3 common values:
 
-1. `instance` - the datepicker instance. This is mostly just for convenience. It can be helpful for daterange pickers because you can check which instance is being triggered with the `instance.isFirst` property.
+1. `instance` - the datepicker instance. This is mostly just for convenience. It
+can be helpful for daterange pickers because you can check which instance in the
+pair is being triggered with the `instance.isFirst` property.
 <!-- TODO - figure out if we're using the isFirst property to distinguish range pickers. -->
-2. `trigger` - the source of what triggered the callback. This can be imperative methods, such as `selectDate` and `show` or user interactions with the DOM, such as `click`.
-3. `triggerType` - the category of what triggered the callback - `user` or `imperative`.
+2. `trigger` - the source of what triggered the callback. This can be imperative
+   methods, such as `selectDate` and `show` or user interactions with the DOM, such
+   as `click`.
+3. `triggerType` - the category of what triggered the callback - `user` or
+`imperative`.
 <!-- TODO - list out all possible values for trigger. -->
 
-`trigger` and `triggerType` give you the ability to have finer control over your callback logic. These values let you filter for specific scenarios if you want. Example:
+`trigger` and `triggerType` give you the ability to have finer control over your
+callback logic. These values let you filter for specific scenarios if you want.
+Example:
 
 ```javascript
 onSelect({prevDate, nextDate, trigger, triggerType}) {
@@ -27,7 +37,9 @@ onSelect({prevDate, nextDate, trigger, triggerType}) {
 
 ## onSelect
 
-Callback function triggered after a date has been selected. It will receive the previous and newly selected dates. If `newDate` is `undefined`, that means the calendar date has been de-selected.
+Callback function triggered after a date has been selected. It will receive the
+previous and newly selected dates. If `newDate` is `undefined`, that means the
+calendar date has been de-selected.
 
 ### Type Declaration
 

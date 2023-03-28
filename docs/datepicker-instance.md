@@ -105,3 +105,69 @@ picker.selectDate(new Date(2023, 2, 20))
 // Unselect the date.
 picker.selectDate()
 ```
+
+## setMin
+
+<!-- TODO - link the word daterange to docs on dateranges as well as the word id. -->
+
+Allows you to programmatically set the minimum selectable date or unset it. If
+the instance is part of a daterange instance (see the id option) then the other
+instance will be changed as well. To unset a minimum date, simply run the
+function with no arguments.
+
+### Type Declaration
+
+```typescript
+setMin(date?: Date): void
+```
+
+### Example
+
+```javascript
+const picker = datepicker(selector)
+
+// Set the minimum to January 1st, 2023.
+picker.setMin(new Date(2023, 0, 1))
+
+// Remove the minimum date.
+picker.setMin()
+
+// Set the minimum to 2 weeks prior to today.
+const today = new Date()
+picker.setMax(
+  new Date(today.getFullYear(), today.getMonth(), today.getDate() - 14)
+)
+```
+
+## setMax
+
+<!-- TODO - link the word daterange to docs on dateranges as well as the word id. -->
+
+Allows you to programmatically set the maximum selectable date or unset it. If
+the instance is part of a daterange instance (see the id option) then the other
+instance will be changed as well. To unset a maximum date, simply run the
+function with no arguments.
+
+### Type Declaration
+
+```typescript
+setMax(date?: Date): void
+```
+
+### Example
+
+```javascript
+const picker = datepicker(selector)
+
+// Set the maximum to December 31st, 2023.
+picker.setMax(new Date(2023, 11, 31))
+
+// Remove the maximum date.
+picker.setMax()
+
+// Set the maximum to 2 weeks from today.
+const today = new Date()
+picker.setMax(
+  new Date(today.getFullYear(), today.getMonth(), today.getDate() + 14)
+)
+```

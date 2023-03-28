@@ -3,7 +3,6 @@
 **Methods:**
 
 - [remove](#remove)
-- [removePair](#removepair)
 - [navigate](#navigate)
 - [selectDate](#selectdate)
 - [setMin](#setmin)
@@ -13,11 +12,21 @@
 - [toggleCalendar](#togglecalendar)
 - [toggleOverlay](#toggleoverlay)
 
+**Daterange-only Methods:**
+
+- [removePair](#removepair)
+- [getRange](#getrange)
+
 **Properties:**
 
 - [calendarContainer](#calendarcontainer)
 - [currentDate](#currentdate)
 - [selectedDate](#selecteddate)
+
+**Daterange-only Properties:**
+
+- [id](#id)
+- [isFirst](#isfirst)
 
 Each instance of Datepicker has methods to allow you to programmatically control
 the calendar. There are also a number of helpful properties for convenience.
@@ -43,33 +52,6 @@ picker.remove()
 
 // Using a callback.
 picker.remove(() => console.log('Picker has been removed!'))
-```
-
-## removePair
-
-_Only available on daterange picker instances._
-
-This method removes both calendars from the DOM that are associated with the two
-pickers in a daterange. It optionally takes a callback function as its only
-argument. You can call `removePair` on either picker instance.
-
-### Type Declaration
-
-```typescript
-removePair(callback()?: void): void
-```
-
-### Example
-
-```javascript
-const pickerStart = datepicker(selector1, {id: 1})
-const pickerEnd = datepicker(selector2, {id: 1})
-
-// Call the method on either instance, it doesn't matter.
-pickerStart.removePair()
-
-// Using a callback.
-pickerStart.removePair(() => console.log('Both pickers have been removed!'))
 ```
 
 ## navigate
@@ -288,6 +270,62 @@ picker.toggleOverlay()
 picker.toggleOverlay()
 ```
 
+## removePair
+
+_Only available on daterange picker instances._
+
+This method removes both calendars from the DOM that are associated with the two
+pickers in a daterange. It optionally takes a callback function as its only
+argument. You can call `removePair` on either picker instance.
+
+### Type Declaration
+
+```typescript
+removePair(callback()?: void): void
+```
+
+### Example
+
+```javascript
+const pickerStart = datepicker(selector1, {id: 1})
+const pickerEnd = datepicker(selector2, {id: 1})
+
+// Call the method on either instance, it doesn't matter.
+pickerStart.removePair()
+
+// Using a callback.
+pickerStart.removePair(() => console.log('Both pickers have been removed!'))
+```
+
+## getRange
+
+_Only available on daterange picker instances._
+
+Since daterange pickers essentially have _two_ selected dates, this method
+returns an object with the `start` and `end` selected dates. If one (or both) of
+the dates are not selected yet, their values will be `undefined`. Calling this
+method on either of the pickers in the daterange pair will return the same data.
+
+### Type Declaration
+
+```typescript
+getRange(): {
+  start: Date | undefined;
+  end: Date | undefined;
+}
+```
+
+### Example
+
+```javascript
+const pickerStart = datepicker(selector1, {id: 1})
+const pickerEnd = datepicker(selector2, {id: 1})
+
+// Both calls will return the same data.
+pickerStart.getRange()
+pickerEnd.getRange()
+```
+
 ## calendarContainer
 
 The containing `<div>` html element that houses the entire calendar.\
@@ -322,5 +360,35 @@ be `undefined`.
 ```typescript
 {
   selectedDate: Date | undefined
+}
+```
+
+## id
+
+_Only available on daterange picker instances._
+
+Daterange pickers are connected by the `id` property. Only 2 pickers ever share
+the same `id`. The value can be anything, hence it is `unknown`.
+
+## Type Declaration
+
+```typescript
+{
+  id: unknown
+}
+```
+
+## isFirst
+
+_Only available on daterange picker instances._
+
+This property indicates which picker in a daterange pair represents the _first_
+picker, or the "start" picker.
+
+## Type Declaration
+
+```typescript
+{
+  isFirst: boolean
 }
 ```

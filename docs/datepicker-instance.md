@@ -11,7 +11,7 @@ function as its only argument.
 ### Type Declaration
 
 ```typescript
-remove(cb?: () => void): void
+remove(callback()?: void): void
 ```
 
 ### Example
@@ -37,7 +37,7 @@ argument. You can call `removePair` on either picker instance.
 ### Type Declaration
 
 ```typescript
-removePair(cb?: () => void): void
+removePair(callback()?: void): void
 ```
 
 ### Example
@@ -72,4 +72,36 @@ const picker = datepicker(selector, {startDate: new Date(2023, 0)})
 
 // Now the calendar will be rendered at February 2024.
 picker.navigate(new Date(2024, 1))
+```
+
+## selectDate
+
+Allows you to programmatically select or unselect a date on the calendar. Pass
+a JS date as the first argument to select a date. If that date is a different
+month/year from the current month/year, you can navigate to the new date by
+passing `true` as the 2nd argument. To _unselect_ a date, simply call the method
+with no arguments.
+
+### Type Declaration
+
+```typescript
+selectDate(date?: Date, changeCalendar? boolean): void
+```
+
+### Example
+
+```javascript
+const picker = datepicker(selector, {startDate: new Date(2023, 0)})
+
+// January 15th, 2023 will be selected.
+picker.selectDate(new Date(2023, 0, 15))
+
+// The calendar will navigate to the month of the selected date - February 2023.
+picker.selectDate(new Date(2023, 1, 1), true)
+
+// Select a date outside of the currently display month/year without navigating.
+picker.selectDate(new Date(2023, 2, 20))
+
+// Unselect the date.
+picker.selectDate()
 ```

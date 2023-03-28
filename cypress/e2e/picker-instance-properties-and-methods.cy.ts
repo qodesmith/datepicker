@@ -277,7 +277,7 @@ describe('Picker Instance Properties', () => {
       cy.get(days.selectedDate)
         .should('have.length', 0)
         .then(() => {
-          picker.selectDate({date: dateToSelect})
+          picker.selectDate(dateToSelect)
           expect(picker.selectedDate).to.deep.equal(dateToSelect)
         })
 
@@ -299,7 +299,7 @@ describe('Picker Instance Properties', () => {
       cy.get(days.selectedDate)
         .should('have.length', 0)
         .then(() => {
-          picker.selectDate({date: startDate})
+          picker.selectDate(startDate)
         })
 
       cy.get(days.selectedDate)
@@ -322,7 +322,7 @@ describe('Picker Instance Properties', () => {
       cy.get(days.selectedDate)
         .should('have.length', 0)
         .then(() => {
-          picker.selectDate({date: startDate})
+          picker.selectDate(startDate)
         })
 
       cy.get(days.selectedDate)
@@ -345,14 +345,14 @@ describe('Picker Instance Properties', () => {
       cy.get(days.selectedDate)
         .should('have.length', 0)
         .then(() => {
-          picker.selectDate({date: startDate})
+          picker.selectDate(startDate)
         })
 
       cy.get(days.selectedDate)
         .should('have.length', 0)
         .then(() => {
           expect(picker.selectedDate).to.be.undefined
-          picker.selectDate({date: disabledDate})
+          picker.selectDate(disabledDate)
         })
 
       cy.get(days.selectedDate)
@@ -378,7 +378,7 @@ describe('Picker Instance Properties', () => {
       cy.get(days.selectedDate)
         .should('have.length', 0)
         .then(() => {
-          picker.selectDate({date: weekendDate})
+          picker.selectDate(weekendDate)
         })
 
       cy.get(days.selectedDate)
@@ -399,7 +399,7 @@ describe('Picker Instance Properties', () => {
       cy.get(controls.year)
         .should('have.text', '2023')
         .then(() => {
-          picker.selectDate({date: newDate})
+          picker.selectDate(newDate)
           expect(picker.selectedDate).to.deep.equal(newDate)
         })
 
@@ -418,7 +418,7 @@ describe('Picker Instance Properties', () => {
       cy.get(controls.year)
         .should('have.text', '2023')
         .then(() => {
-          picker.selectDate({date: newDate, changeCalendar: true})
+          picker.selectDate(newDate, true)
           expect(picker.selectedDate).to.deep.equal(newDate)
         })
 
@@ -437,7 +437,7 @@ describe('Picker Instance Properties', () => {
       cy.get(controls.year)
         .should('have.text', '2023')
         .then(() => {
-          picker.selectDate({date: newDate})
+          picker.selectDate(newDate)
           expect(picker.selectedDate).to.deep.equal(newDate)
         })
 

@@ -463,8 +463,11 @@ export type InternalPickerData = {
   ): void
   _selectDate(
     data: Expand<
-      Parameters<DatepickerInstance['selectDate']>[0] &
-        Pick<CallbackData, 'triggerType'> & {trigger: 'selectDate' | UserEvent}
+      {
+        date?: Date
+        changeCalendar?: boolean
+        trigger: 'selectDate' | UserEvent
+      } & Pick<CallbackData, 'triggerType'>
     >
   ): void
   _setMinOrMax(
@@ -498,7 +501,7 @@ export type DatepickerInstance = {
   readonly selectedDate: Date | undefined
   readonly remove: (cb?: () => void) => void
   readonly navigate: (date: Date) => void
-  readonly selectDate: (data?: {date?: Date; changeCalendar?: boolean}) => void
+  readonly selectDate: (date?: Date, changeCalendar?: boolean) => void
   readonly setMin: (data?: {date?: Date}) => void
   readonly setMax: (data?: {date?: Date}) => void
   readonly show: () => void

@@ -1225,7 +1225,7 @@ describe('Options', () => {
 
           // Set the date with the `selectDate` method.
           cy.then(() => {
-            picker.selectDate({date: startDate})
+            picker.selectDate(startDate)
             expect(picker.selectedDate).to.be.undefined
           })
           cy.get(days.selectedDate).should('have.length', 0)
@@ -1434,7 +1434,7 @@ describe('Options', () => {
 
           // Set the date with the `selectDate` method.
           cy.then(() => {
-            picker.selectDate({date: startDate})
+            picker.selectDate(startDate)
             expect(picker.selectedDate).to.be.undefined
           })
           cy.get(days.selectedDate).should('have.length', 0)
@@ -1459,7 +1459,7 @@ describe('Options', () => {
               .should('have.value', '')
               .then(() => {
                 expect(picker.selectedDate).to.be.undefined
-                picker.selectDate({date: startDate})
+                picker.selectDate(startDate)
               })
             cy.get(testElementIds.singleInput)
               .should('have.value', startDate.toDateString())
@@ -1490,7 +1490,7 @@ describe('Options', () => {
               .should('have.value', '')
               .then(() => {
                 expect(picker.selectedDate).to.be.undefined
-                picker.selectDate({date: startDate})
+                picker.selectDate(startDate)
               })
             cy.get(testElementIds.singleInput)
               .should('have.value', startDate.toDateString())

@@ -427,12 +427,13 @@ function datepicker(
         triggerType: 'imperative',
       })
     },
-    selectDate(data): void {
+    selectDate(date, changeCalendar): void {
       if (isRemoved) throwAlreadyRemovedError()
       if (shouldSkipForDisabledReadOnly(internalPickerItem)) return
 
       internalPickerItem._selectDate({
-        ...data,
+        date,
+        changeCalendar,
         trigger: 'selectDate',
         triggerType: 'imperative',
       })

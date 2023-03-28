@@ -76,7 +76,7 @@ describe('Callbacks', () => {
       cy.get('@onSelect')
         .should('not.have.been.called')
         .then(() => {
-          picker.selectDate({date: startDate})
+          picker.selectDate(startDate)
         })
       cy.get('@onSelect')
         .should('have.been.calledOnce')
@@ -227,7 +227,7 @@ describe('Callbacks', () => {
       cy.get('@onMonthChange')
         .should('not.have.been.called')
         .then(() => {
-          picker.selectDate({date: newDate, changeCalendar: true})
+          picker.selectDate(newDate, true)
         })
 
       cy.get('@onMonthChange')
@@ -249,7 +249,7 @@ describe('Callbacks', () => {
       cy.get('@onMonthChange')
         .should('not.have.been.called')
         .then(() => {
-          picker.selectDate({date: newDate, changeCalendar: false})
+          picker.selectDate(newDate, false)
         })
 
       cy.get('@onMonthChange').should('not.have.been.called')
@@ -261,7 +261,7 @@ describe('Callbacks', () => {
         selectedDate: startDate,
       })
 
-      picker.selectDate({changeCalendar: true})
+      picker.selectDate(undefined, true)
       cy.get('@onMonthChange').should('not.have.been.called')
     })
   })

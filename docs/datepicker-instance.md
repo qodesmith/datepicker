@@ -52,3 +52,24 @@ pickerStart.removePair()
 // Using a callback.
 pickerStart.removePair(() => console.log('Both pickers have been removed!'))
 ```
+
+## navigate
+
+Programmatically navigate the calendar to the date you provide. This doesn't
+select a date, it simply changes the displayed calendar to a different month.
+
+### Type Declaration
+
+```typescript
+navigate(date: Date): void
+```
+
+### Example
+
+```javascript
+// The calendar will be rendered at January 2023.
+const picker = datepicker(selector, {startDate: new Date(2023, 0)})
+
+// Now the calendar will be rendered at February 2024.
+picker.navigate(new Date(2024, 1))
+```

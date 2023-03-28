@@ -219,3 +219,52 @@ const picker = datepicker(selector)
 // Hide the picker.
 picker.hide()
 ```
+
+## toggleCalendar
+
+This method is a combination of the `show` and `hide` methods. Calling it will
+toggle showing or hiding the calendar depending on the calendars current state.
+
+### Type Declaration
+
+```typescript
+toggleCalendar(): void
+```
+
+### Example
+
+```javascript
+// The calendar will initially be hidden (if attached to an input).
+const picker = datepicker(selector)
+
+// Calendar state is now showing.
+picker.toggleCalendar()
+
+// Calendar state is now hiding.
+picker.toggleCalendar()
+```
+
+## toggleOverlay
+
+A way to programmatically show and hide the overlay. Calling this method when
+the calendar is hidden will have no effect.
+
+### Type Declaration
+
+```typescript
+toggleOverlay(): void
+```
+
+### Example
+
+```javascript
+// Using alwaysShow to highlight how toggleOverlay works when the calendar is showing.
+// The overlay will initially be hidden.
+const picker = datepicker(selector, {alwaysShow: true})
+
+// Overlay state is now showing.
+picker.toggleOverlay()
+
+// Overlay state is now hiding.
+picker.toggleOverlay()
+```

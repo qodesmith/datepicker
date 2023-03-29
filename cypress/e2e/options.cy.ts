@@ -377,7 +377,7 @@ describe('Options', () => {
       datepicker(testElementIds.singleInput, {
         alwaysShow: true,
         customMonths,
-        customOverlayMonths: 'aaaaaaaaaaaa'.split(''),
+        customOverlayMonths: 'a'.repeat(12).split(''),
       })
 
       cy.get(containers.overlayMonthsContainer).should(

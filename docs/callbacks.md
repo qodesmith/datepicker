@@ -12,8 +12,8 @@ can be helpful for daterange pickers because you can check which instance in the
 pair is being triggered with the `instance.isFirst` property.
 <!-- TODO - figure out if we're using the isFirst property to distinguish range pickers. -->
 2. `trigger` - the source of what triggered the callback. This can be imperative
-   methods, such as `selectDate` and `show` or user interactions with the DOM, such
-   as `click`.
+   methods, such as `selectDate` and `show` or user interactions with the DOM,
+   such as `click`.
 3. `triggerType` - the category of what triggered the callback - `user` or
 `imperative`.
 <!-- TODO - list out all possible values for trigger. -->
@@ -33,6 +33,22 @@ onSelect({prevDate, nextDate, trigger, triggerType}) {
 
   // Your logic here...
 }
+```
+
+### Common Value Types
+
+```typescript
+type TriggerType = 'user' | 'imperative'
+type Trigger =
+  | 'click'
+  | 'keydown'
+  | 'input'
+  | 'selectDate'
+  | 'setMin'
+  | 'setMax'
+  | 'navigate'
+  | 'show'
+  | 'hide'
 ```
 
 ## onSelect

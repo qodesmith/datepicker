@@ -167,3 +167,13 @@ _NOTE: Long values will affect the overlay UI layout._
 | ---------------------------- | -------------------------------------------------------------------------------------- |
 | yes                          | The 1st 3 characters of each value in [customMonths](custommonths)                     |
 | no                           | `['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']` |
+
+### Example
+
+<!-- prettier-ignore-start -->
+```javascript
+const picker = datepicker(selector, {
+  customOverlayMonths: ['😀', '😂', '😎', '😍', '🤩', '😜', '😬', '😳', '🤪', '🤓 ', '😝', '😮']
+})
+```
+<!-- prettier-ignore-end -->

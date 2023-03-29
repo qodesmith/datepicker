@@ -96,7 +96,7 @@ starts on a day other than Sunday.
 
 ```typescript
 {
-  customDays?: string[] // Should be an array of 7 strings
+  customDays?: string[] // Must be an array of 7 strings
 }
 ```
 
@@ -115,9 +115,13 @@ const picker = datepicker(selector, {
 You can customize the display of the month name at the top of the calendar by
 providing an array of 12 strings.
 
+_NOTE: if you provide `customMonths` but not [customOverlayMonths](customoverlaymonths),
+the 1st 3 characters of each value in `customMonths` will be used for the
+overlay months._
+
 ```typescript
 {
-  customMonths?: string[] // Should be an array of 12 strings
+  customMonths?: string[] // Must be an array of 12 strings
 }
 ```
 
@@ -143,3 +147,23 @@ const picker = datepicker(selector, {
   ],
 })
 ```
+
+## customOverlayMonths
+
+You can customize the display of the month names in the overlay view by
+providing an array of 12 strings.
+
+_NOTE: Long values will affect the overlay UI layout._
+
+```typescript
+{
+  customOverlayMonths?: string[] // Must be an array of 12 strings
+}
+```
+
+**Default value:**
+
+| [customMonths](custommonths) | Default value                                                                          |
+| ---------------------------- | -------------------------------------------------------------------------------------- |
+| yes                          | The 1st 3 characters of each value in [customMonths](custommonths)                     |
+| no                           | `['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']` |

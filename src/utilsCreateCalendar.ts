@@ -143,11 +143,9 @@ function createCalendarOverlay(
   for (let i = 0; i < 12; i++) {
     const overlayMonth = document.createElement('div')
     overlayMonth.className = 'dp-overlay-month'
-    overlayMonthsContainer.append(overlayMonth)
-
-    // Overlay month names are limited to 3 characters.
-    overlayMonth.textContent = overlayMonths[i].slice(0, 3)
+    overlayMonth.textContent = overlayMonths[i]
     overlayMonth.dataset.num = `${i}`
+    overlayMonthsContainer.append(overlayMonth)
   }
 
   // Append all the elements to their containers.

@@ -549,7 +549,12 @@ export function sanitizeAndCheckAndSyncOptions(
     throwStringArrayError('customMonths', 12)
   }
 
-  const overlayMonths = options?.customOverlayMonths ?? months
+  const overlayMonths =
+    options?.customOverlayMonths ??
+    // If only customMonths is provided, the overlay gets the 1st 3 characters.
+    (options?.customMonths
+      ? options.customMonths.map(name => name.slice(0, 3))
+      : defaultOptions.customOverlayMonths)
   if (overlayMonths.length !== 12) {
     throwStringArrayError('customOverlayMonths', 12)
   }

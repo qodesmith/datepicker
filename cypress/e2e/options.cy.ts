@@ -355,14 +355,35 @@ describe('Options', () => {
     it('should replace the default month names in the overlay', () => {
       datepicker(testElementIds.singleInput, {alwaysShow: true, customMonths})
 
-      cy.get(containers.monthYearContainer)
-        .click()
-        .then(() => {
-          cy.get(containers.overlayMonthsContainer).should(
-            'have.text',
-            customMonths.join('')
-          )
-        })
+      cy.get(containers.overlayMonthsContainer).should(
+        'have.text',
+        customMonths.join('')
+      )
+    })
+
+    it('should populate the overlay with a truncated version (1st 3 characters) when no `customOverlayMonths` is provided', () => {
+      datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        customMonths: 'abcdefg '.repeat(12).trim().split(' '),
+      })
+
+      cy.get(containers.overlayMonthsContainer).should(
+        'have.text',
+        'abc'.repeat(12)
+      )
+    })
+
+    it('should have no effect on `customOverlayMonths` if that option is provided', () => {
+      datepicker(testElementIds.singleInput, {
+        alwaysShow: true,
+        customMonths,
+        customOverlayMonths: 'aaaaaaaaaaaa'.split(''),
+      })
+
+      cy.get(containers.overlayMonthsContainer).should(
+        'have.text',
+        'a'.repeat(12)
+      )
     })
 
     it("should throw if the array doens't have 12 values", () => {
@@ -425,7 +446,7 @@ describe('Options', () => {
         })
     })
 
-    it('should only use the first 3 characters provided', () => {
+    it('should use all characters provided (i.e. not just the 1st 3)', () => {
       datepicker(testElementIds.singleInput, {
         alwaysShow: true,
         customOverlayMonths: customOverlayMonthsLongNames,
@@ -438,7 +459,7 @@ describe('Options', () => {
             'have.text',
 
             // Testing against the shortened names.
-            customOverlayMonths.join('')
+            customOverlayMonthsLongNames.join('')
           )
         })
     })

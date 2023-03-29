@@ -30,25 +30,27 @@ export const datepickersMap = new Map<HTMLElement, Set<InternalPickerData>>()
 
 export const overlayShownCls = 'dp-overlay-shown'
 
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
 export const defaultOptions = {
   defaultView: 'calendar',
   overlayPlaceholder: 'Enter a year',
   overlayButtonText: 'Submit',
   days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-  months: [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ],
+  months,
+  customOverlayMonths: months.map(name => name.slice(0, 3)),
 } as const
 
 export const userEvents = ['click', 'keydown', 'input'] as const

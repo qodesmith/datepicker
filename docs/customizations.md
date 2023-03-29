@@ -96,7 +96,7 @@ starts on a day other than Sunday.
 
 ```typescript
 {
-  customDays?: string[] // Should be an array of 7 values
+  customDays?: string[] // Should be an array of 7 strings
 }
 ```
 
@@ -107,5 +107,39 @@ starts on a day other than Sunday.
 ```javascript
 const picker = datepicker(selector, {
   customDays: ['天', '一', '二', '三', '四', '五', '六'],
+})
+```
+
+## customMonths
+
+You can customize the display of the month name at the top of the calendar by
+providing an array of 12 strings.
+
+```typescript
+{
+  customMonths?: string[] // Should be an array of 12 strings
+}
+```
+
+**Default value:** `['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']`
+
+### Example
+
+```javascript
+const picker = datepicker(selector, {
+  customMonths: [
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre',
+  ],
 })
 ```

@@ -53,3 +53,35 @@ type Position = 'tl' | 'tr' | 'bl' | 'br' | 'mc'
 | `'mc'` | mobile center |
 
 <!-- TODO - add some screenshots -->
+
+## startDay
+
+Specify the day of the week your calendar starts on. 0 = Sunday, 1 = Monday,
+etc. Plays nice with the [customDays](#customdays) option.
+
+### Type Declaration
+
+```typescript
+{
+  startDay?: number // Should be 0 - 6
+}
+```
+
+**Default value:** `0` (Sunday sdtarts the week)
+
+| Value | Day       |
+| ----- | --------- |
+| 0     | Sunday    |
+| 1     | Monday    |
+| 2     | Tuesday   |
+| 3     | Wednesday |
+| 4     | Thursday  |
+| 5     | Friday    |
+| 6     | Saturday  |
+
+### Example
+
+```javascript
+// Start the week on Tuesday.
+const picker = datepicker(selector, {startDay: 2})
+```

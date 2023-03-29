@@ -1,3 +1,5 @@
+<!-- TODO - add images to examples where applicable. -->
+
 # Customizations
 
 These options help you customize the calendar to your suit your needs. Some of these are especially helpful if you're using a language other than English.
@@ -16,9 +18,7 @@ formatter({date: Date, instance: DatepickerInstance}): string
 formatter({date: Date, instance: DaterangePickerInstance}): string
 ```
 
-**Default value:** `undefined`
-
-_NOTE: The default input value will be `date.toDateString()`._
+**Default value:** `({date}) => date.toDateString()`
 
 ### Example
 
@@ -84,4 +84,28 @@ etc. Plays nice with the [customDays](#customdays) option.
 ```javascript
 // Start the week on Tuesday.
 const picker = datepicker(selector, {startDay: 2})
+```
+
+## customDays
+
+You can customize the display of days on the calendar by providing an array of 7
+values. This can be used with the [startDay](#startday) option if your week
+starts on a day other than Sunday.
+
+### Type Declaration
+
+```typescript
+{
+  customDays?: string[] // Should be an array of 7 values
+}
+```
+
+**Default value:** `['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']`
+
+### Example
+
+```javascript
+const picker = datepicker(selector, {
+  customDays: ['天', '一', '二', '三', '四', '五', '六'],
+})
 ```

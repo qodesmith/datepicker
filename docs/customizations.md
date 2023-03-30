@@ -1,4 +1,5 @@
 <!-- TODO - add images to examples where applicable. -->
+<!-- TODO - add TOC linking to all options below. -->
 
 # Customizations
 
@@ -119,6 +120,8 @@ _NOTE: if you provide `customMonths` but not [customOverlayMonths](customoverlay
 the 1st 3 characters of each value in `customMonths` will be used for the
 overlay months._
 
+### Type declaration
+
 ```typescript
 {
   customMonths?: string[] // Must be an array of 12 strings
@@ -155,6 +158,8 @@ providing an array of 12 strings.
 
 _NOTE: Long values will affect the overlay UI layout._
 
+### Type declaration
+
 ```typescript
 {
   customOverlayMonths?: string[] // Must be an array of 12 strings
@@ -177,3 +182,28 @@ const picker = datepicker(selector, {
 })
 ```
 <!-- prettier-ignore-end -->
+
+## defaultView
+
+There are 2 views associateed with datepicker:
+
+- `'calendar'` - the default view, showing a calendar.
+- `'overlay'` - the view showing the month picker and year input.
+
+With this option, you can set which view is shown by default.
+
+### Type declaration
+
+```typescript
+{
+  defaultView: 'calendar' | 'overlay'
+}
+```
+
+**Default value:** `'calendar'`
+
+### Example
+
+```javascript
+const picker = datepicker(selector, {defaultView: 'overlay'})
+```

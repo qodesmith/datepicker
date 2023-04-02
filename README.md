@@ -132,34 +132,42 @@ Each option is _optional_ and any default values are specified.
     <td></td>
     <td><a href="./docs/customizations.md#formatter">formatter</a></td>
     <td><a href="./docs/settings.md#mindate">minDate</a></td>
+    <td></td>
   </tr>
   <tr>
     <td></td>
     <td><a href="./docs/customizations.md#customoverlaymonths">customOverlayMonths</a></td>
     <td><a href="./docs/settings.md#selecteddate">selectedDate</a></td>
+    <td></td>
   </tr>
   <tr>
     <td></td>
     <td><a href="./docs/customizations.md#defaultview">defaultView</a></td>
     <td><a href="./docs/settings.md#showalldates">showAllDates</a></td>
+    <td></td>
   </tr>
   <tr>
     <td></td>
     <td><a href="./docs/customizations.md#overlaybuttontext">overlayButtonText</a></td>
     <td><a href="./docs/settings.md#showalldatesclickable">showAllDatesClickable</a></td>
+    <td></td>
   </tr>
   <tr>
     <td></td>
     <td><a href="./docs/customizations.md#overlayplaceholder">overlayPlaceholder</a></td>
     <td><a href="./docs/settings.md#startdate">startDate</a></td>
+    <td></td>
   </tr>
   <tr>
     <td></td>
     <td><a href="./docs/customizations.md#position">position</a></td>
     <td><a href="./docs/settings.md#respectdisabledreadonly">respectDisabledReadOnly</a></td>
+    <td></td>
   </tr>
   <tr>
     <td></td>
     <td><a href="./docs/customizations.md#startday">startDay</a></td>
+    <td></td>
+    <td></td>
   </tr>
 </table>

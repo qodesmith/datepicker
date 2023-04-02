@@ -98,10 +98,10 @@ Each option is _optional_ and any default values are specified.
   <!-- HEADER -->
   <thead>
     <tr>
-      <th><strong>Callbacks</strong></th>
-      <th><strong>Customizations</strong></th>
-      <th><strong>Settings</strong></th>
-      <th><strong>Disabling Things</strong></th>
+      <th align="left"><strong>Callbacks</strong></th>
+      <th align="left"><strong>Customizations</strong></th>
+      <th align="left"><strong>Settings</strong></th>
+      <th align="left"><strong>Disabling Things</strong></th>
     </tr>
   </thead>
 

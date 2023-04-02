@@ -94,84 +94,15 @@ the methods and properties below.
 Datepicker has a load of options, so we'll break them down by catagories.
 Each option is _optional_ and any default values are specified.
 
-<table>
-  <!-- HEADER -->
-  <thead>
-    <tr>
-      <th align="left"><strong>Callbacks</strong></th>
-      <th align="left"><strong>Customizations</strong></th>
-      <th align="left"><strong>Settings</strong></th>
-      <th align="left"><strong>Disabling Things</strong></th>
-    </tr>
-  </thead>
-
-  <!-- ROWS -->
-  <tbody>
-    <tr>
-      <td><a href="./docs/callbacks.md#onhide">onHide</a></td>
-      <td><a href="./docs/customizations.md#customdays">customDays</a></td>
-      <td><a href="./docs/settings.md#alwaysshow">alwaysShow</a></td>
-      <td><a href="./docs/disabling-things.md#disableyearoverlay">disableYearOverlay</a></td>
-    </tr>
-    <tr>
-      <td><a href="./docs/callbacks.md#onmonthchange">onMonthChange</a></td>
-      <td><a href="./docs/customizations.md#custommonths">customMonths</a></td>
-      <td><a href="./docs/settings.md#events">events</a></td>
-      <td><a href="./docs/disabling-things.md#disableddates">disabledDates</a></td>
-    </tr>
-    <tr>
-      <td><a href="./docs/callbacks.md#onselect">onSelect</a></td>
-      <td><a href="./docs/customizations.md#customoverlaymonths">customOverlayMonths</a></td>
-      <td><a href="./docs/settings.md#exemptids">exemptIds</a></td>
-      <td><a href="./docs/disabling-things.md#disabler">disabler</a></td>
-    </tr>
-    <tr>
-      <td><a href="./docs/callbacks.md#onshow">onShow</a></td>
-      <td><a href="./docs/customizations.md#defaultview">defaultView</a></td>
-      <td><a href="./docs/settings.md#maxdate">maxDate</a></td>
-      <td><a href="./docs/disabling-things.md#noweekends">noWeekends</a></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td><a href="./docs/customizations.md#formatter">formatter</a></td>
-      <td><a href="./docs/settings.md#mindate">minDate</a></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td><a href="./docs/customizations.md#customoverlaymonths">customOverlayMonths</a></td>
-      <td><a href="./docs/settings.md#selecteddate">selectedDate</a></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td><a href="./docs/customizations.md#defaultview">defaultView</a></td>
-      <td><a href="./docs/settings.md#showalldates">showAllDates</a></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td><a href="./docs/customizations.md#overlaybuttontext">overlayButtonText</a></td>
-      <td><a href="./docs/settings.md#showalldatesclickable">showAllDatesClickable</a></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td><a href="./docs/customizations.md#overlayplaceholder">overlayPlaceholder</a></td>
-      <td><a href="./docs/settings.md#startdate">startDate</a></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td><a href="./docs/customizations.md#position">position</a></td>
-      <td><a href="./docs/settings.md#respectdisabledreadonly">respectDisabledReadOnly</a></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td><a href="./docs/customizations.md#startday">startDay</a></td>
-      <td></td>
-      <td></td>
-    </tr>
-  </tbody>
-</table>
+| Callbacks                                          | Customizations                                                      | Settings                                                              | Disabling Things                                                    |
+| -------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| [onHide](./docs/callbacks.md#onhide)               | [customDays](./docs/customizations.md#customdays)                   | [alwaysShow](./docs/settings.md#alwaysshow)                           | [disableYearOverlay](./docs/disabling-things.md#disableyearoverlay) |
+| [onMonthChange](./docs/callbacks.md#onmonthchange) | [customMonths](./docs/customizations.md#custommonths)               | [events](./docs/settings.md#events)                                   | [disabledDates](./docs/disabling-things.md#disableddates)           |
+| [onSelect](./docs/callbacks.md#onselect)           | [customOverlayMonths](./docs/customizations.md#customoverlaymonths) | [exemptIds](./docs/settings.md#exepmtids)                             | [disabler](./docs/disabling-things.md#disabler)                     |
+| [onShow](./docs/callbacks.md#onshow)               | [defaultView](./docs/customizations.md#defaultview)                 | [maxDate](./docs/settings.md#maxdate)                                 | [noWeekends](./docs/disabling-things.md#noweekends)                 |
+|                                                    | [formatter](./docs/callbacks.md#formatter)                          | [minDate](./docs/settings.md#mindate)                                 |                                                                     |
+|                                                    | [overlayButtonText](./docs/callbacks.md#overlaybuttontext)          | [selectedDate](./docs/settings.md#selecteddate)                       |                                                                     |
+|                                                    | [overplayPlaceholder](./docs/callbacks.md#overlayplaceholder)       | [showAllDates](./docs/settings.md#showalldates)                       |                                                                     |
+|                                                    | [position](./docs/callbacks.md#position)                            | [showAllDatesClickable](./docs/settings.md#showalldatesclickable)     |                                                                     |
+|                                                    | [startDay](./docs/callbacks.md#startday)                            | [startDate](./docs/settings.md#startdate)                             |                                                                     |
+|                                                    |                                                                     | [respectDisabledReadOnly](./docs/settings.md#respectdisabledreadonly) |

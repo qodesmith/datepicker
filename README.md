@@ -95,15 +95,18 @@ Datepicker has a load of options, so we'll break them down by catagories.
 Each option is _optional_ and any default values are specified.
 
 <table>
+  <thead style="font-size:1.3em">
   <!-- HEADER -->
-  <tr style="font-size:1.3em">
+  <tr>
     <th>Callbacks</th>
     <th>Customizations</th>
     <th>Settings</th>
     <th>Disabling Things</th>
   </tr>
+  </thead>
 
   <!-- ROWS -->
+  <tbody>
   <tr>
     <td><a href="./docs/callbacks.md#onhide">onHide</a></td>
     <td><a href="./docs/customizations.md#customdays">customDays</a></td>
@@ -170,4 +173,5 @@ Each option is _optional_ and any default values are specified.
     <td></td>
     <td></td>
   </tr>
+  </tbody>
 </table>

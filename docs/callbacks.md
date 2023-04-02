@@ -51,6 +51,63 @@ type Trigger =
   | 'hide'
 ```
 
+## onHide
+
+Callback function triggered every time the calendar goes from shown to hidden.
+
+### Type Declaration
+
+```typescript
+onHide(data: {
+  // Common arguments.
+  instance: DatepickerInstance
+  trigger: Trigger
+  triggerType: TriggerType
+}): void
+```
+
+**Default value:** `undefined`
+
+### Example
+
+```javascript
+const picker = datepicker(selector, {
+  onHide({instance, trigger, triggerType}) {
+    // Your logic here...
+  },
+})
+```
+
+## onMonthChange
+
+Callback function triggered after the month has changed visually on the calendar.
+
+### Type Declaration
+
+```typescript
+onMonthChange(data: {
+  prevDate: Date | undefined
+  newDate: Date | undefined
+
+  // Common arguments.
+  instance: DatepickerInstance
+  trigger: Trigger
+  triggerType: TriggerType
+}): void
+```
+
+**Default value:** `undefined`
+
+### Example
+
+```javascript
+const picker = datepicker(selector, {
+  onMonthChange({prevDate, nextDate, instance, trigger, triggerType}) {
+    // Your logic here...
+  },
+})
+```
+
 ## onSelect
 
 Callback function triggered after a date has been selected. It will receive the
@@ -101,36 +158,6 @@ const picker = datepicker(selector, {
 })
 ```
 
-## onMonthChange
-
-Callback function triggered after the month has changed visually on the calendar.
-
-### Type Declaration
-
-```typescript
-onMonthChange(data: {
-  prevDate: Date | undefined
-  newDate: Date | undefined
-
-  // Common arguments.
-  instance: DatepickerInstance
-  trigger: Trigger
-  triggerType: TriggerType
-}): void
-```
-
-**Default value:** `undefined`
-
-### Example
-
-```javascript
-const picker = datepicker(selector, {
-  onMonthChange({prevDate, nextDate, instance, trigger, triggerType}) {
-    // Your logic here...
-  },
-})
-```
-
 ## onShow
 
 Callback function triggered every time the calendar goes from hidden to shown.
@@ -153,33 +180,6 @@ onShow(data: {
 ```javascript
 const picker = datepicker(selector, {
   onShow({instance, trigger, triggerType}) {
-    // Your logic here...
-  },
-})
-```
-
-## onHide
-
-Callback function triggered every time the calendar goes from shown to hidden.
-
-### Type Declaration
-
-```typescript
-onHide(data: {
-  // Common arguments.
-  instance: DatepickerInstance
-  trigger: Trigger
-  triggerType: TriggerType
-}): void
-```
-
-**Default value:** `undefined`
-
-### Example
-
-```javascript
-const picker = datepicker(selector, {
-  onHide({instance, trigger, triggerType}) {
     // Your logic here...
   },
 })

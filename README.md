@@ -12,7 +12,9 @@
 
 [![npm version](https://badge.fury.io/js/js-datepicker.svg)](https://badge.fury.io/js/js-datepicker)
 
-Get a date with JavaScript! Or a daterange, but that's not a good pun. Datepicker is simple to use, looks sexy on the screen, and has **no dependencies** 😎 A calendar pops up and you pick a date. #Boom.
+Get a date with JavaScript! Or a daterange, but that's not a good pun.
+Datepicker is simple to use, looks sexy on the screen, and has
+**no dependencies** 😎 A calendar pops up and you pick a date. #Boom.
 
 <!-- TODO - insert picture of Datepicker here. -->
 
@@ -54,7 +56,9 @@ And include datepicker.min.js just above your closing `</body>` tag:
 </body>
 ```
 
-If you downloaded the package via zip file from Github, these files are located in the dist folder. Otherwise, you can use the Unpkg CDN as shown in the examples above.
+If you downloaded the package via zip file from Github, these files are located
+in the dist folder. Otherwise, you can use the Unpkg CDN as shown in the
+examples above.
 
 # Basic Usage
 
@@ -76,14 +80,86 @@ function datepicker(
 
 Datepicker takes 2 arguments:
 
-- `selector` - a string or a DOM element that Datepicker will attach to in the DOM. In the case where the selector is an `<input>` element, Datepicker will be attached to the input's parent element.
-- `options` - an optional object representing all the bells & whistles you can tweak with Datepicker. More on that [below](#options).
+- `selector` - a string or a DOM element that Datepicker will attach to in the
+  DOM. In the case where the selector is an `<input>` element, Datepicker will be
+  attached to the input's parent element.
+- `options` - an optional object representing all the bells & whistles you can
+  tweak with Datepicker. More on that [below](#options).
 
-The return value of the `datepicker` function is the datepicker _instance_. See the methods and properties below.
+The return value of the `datepicker` function is the datepicker _instance_. See
+the methods and properties below.
 
 # Options
 
-Datepicker has a load of options, so we'll break them down by catagories. Each option is _optional_ and any default values are specified.
+Datepicker has a load of options, so we'll break them down by catagories.
+Each option is _optional_ and any default values are specified.
 
-- [callback functions](./docs/callbacks.md)
-  - [onSelect](./docs/callbacks.md#onselect)
+<table>
+  <!-- HEADER -->
+  <tr>
+    <th><a href="./docs/callbacks.md">Callbacks</a></th>
+    <th><a href="./docs/customizations.md">Customizations</a></th>
+    <th><a href="./docs/settings.md">Settings</a></th>
+    <th><a href="./docs/disabling-things.md">Disabling Things</a></th>
+  </tr>
+
+  <!-- ROWS -->
+  <tr>
+    <td><a href="./docs/callbacks.md#onhide">onHide</a></td>
+    <td><a href="./docs/customizations.md#customdays">customDays</a></td>
+    <td><a href="./docs/settings.md#alwaysshow">alwaysShow</a></td>
+    <td><a href="./docs/disabling-things.md#disableyearoverlay">disableYearOverlay</a></td>
+  </tr>
+  <tr>
+    <td><a href="./docs/callbacks.md#onmonthchange">onMonthChange</a></td>
+    <td><a href="./docs/customizations.md#custommonths">customMonths</a></td>
+    <td><a href="./docs/settings.md#events">events</a></td>
+    <td><a href="./docs/disabling-things.md#disableddates">disabledDates</a></td>
+  </tr>
+  <tr>
+    <td><a href="./docs/callbacks.md#onselect">onSelect</a></td>
+    <td><a href="./docs/customizations.md#customoverlaymonths">customOverlayMonths</a></td>
+    <td><a href="./docs/settings.md#exemptids">exemptIds</a></td>
+    <td><a href="./docs/disabling-things.md#disabler">disabler</a></td>
+  </tr>
+  <tr>
+    <td><a href="./docs/callbacks.md#onshow">onShow</a></td>
+    <td><a href="./docs/customizations.md#defaultview">defaultView</a></td>
+    <td><a href="./docs/settings.md#maxdate">maxDate</a></td>
+    <td><a href="./docs/disabling-things.md#noweekends">noWeekends</a></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><a href="./docs/customizations.md#formatter">formatter</a></td>
+    <td><a href="./docs/settings.md#mindate">minDate</a></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><a href="./docs/customizations.md#customoverlaymonths">customOverlayMonths</a></td>
+    <td><a href="./docs/settings.md#selecteddate">selectedDate</a></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><a href="./docs/customizations.md#defaultview">defaultView</a></td>
+    <td><a href="./docs/settings.md#showalldates">showAllDates</a></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><a href="./docs/customizations.md#overlaybuttontext">overlayButtonText</a></td>
+    <td><a href="./docs/settings.md#showalldatesclickable">showAllDatesClickable</a></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><a href="./docs/customizations.md#overlayplaceholder">overlayPlaceholder</a></td>
+    <td><a href="./docs/settings.md#startdate">startDate</a></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><a href="./docs/customizations.md#position">position</a></td>
+    <td><a href="./docs/settings.md#respectdisabledreadonly">respectDisabledReadOnly</a></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><a href="./docs/customizations.md#startday">startDay</a></td>
+  </tr>
+</table>

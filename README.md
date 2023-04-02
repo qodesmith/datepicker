@@ -96,11 +96,11 @@ Each option is _optional_ and any default values are specified.
 
 <table>
   <!-- HEADER -->
-  <tr>
-    <th><a href="./docs/callbacks.md">Callbacks</a></th>
-    <th><a href="./docs/customizations.md">Customizations</a></th>
-    <th><a href="./docs/settings.md">Settings</a></th>
-    <th><a href="./docs/disabling-things.md">Disabling Things</a></th>
+  <tr style="font-size:1.3em">
+    <th>Callbacks</th>
+    <th>Customizations</th>
+    <th>Settings</th>
+    <th>Disabling Things</th>
   </tr>
 
   <!-- ROWS -->

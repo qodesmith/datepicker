@@ -92,7 +92,8 @@ the methods and properties below.
 # Options
 
 Datepicker has a load of options, so we'll break them down by catagories.
-Each option is _optional_ and any default values are specified.
+Each option is _optional_ and any default values will be specified on their
+respective pages.
 
 | Callbacks                                          | Customizations                                                      | Settings                                                              | Disabling Things                                                    |
 | -------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------- |

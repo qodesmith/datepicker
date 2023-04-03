@@ -272,7 +272,7 @@ export type DatepickerOptions = ExpandRecursively<{
    *
    * Set this option to `true` if that's what you want. The datepicker calendar
    * will still be functional in that you can change months and enter a year,
-   * but datesl will not be selectable (or deselectable).
+   * but dates will not be selectable (or deselectable).
    *
    * Default - false
    */

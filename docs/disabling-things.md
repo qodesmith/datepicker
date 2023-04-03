@@ -63,7 +63,7 @@ Sometimes you need more control over which dates are disabled. The
 [disabledDates](#disableddates) option is limited to an explicit array of dates
 and the [noWeekends](#nowweekends) option is limited to Saturdays & Sundays.
 Provide a function that takes a JavaScript date as it's only argument and
-returns `true` if the date should be disabled. When the calendar builds, each
+returns `true` if the date should be disabled. When the calendar renders, each
 date will be run through this function to determine whether or not it should be
 disabled.
 

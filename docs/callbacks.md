@@ -1,5 +1,10 @@
 # Callback Options
 
+- [onHide](./docs/callbacks.md#onhide)
+- [onMonthChange](./docs/callbacks.md#onmonthchange)
+- [onSelect](./docs/callbacks.md#onselect)
+- [onShow](./docs/callbacks.md#onshow)
+
 Callback functions are triggered both by the user interacting with the calendar
 in the DOM _and_ the developer using the imperative
 [instance methods](./datepicker-instance.md) (i.e. show, hide, setMin, etc.).

@@ -55,6 +55,22 @@ type CallbackData = {
 }
 
 export type DatepickerOptions = ExpandRecursively<{
+  ///////////////
+  // CALLBACKS //
+  ///////////////
+
+  /**
+   * Callback function when the calendar is hidden.
+   */
+  onHide?(data: Expand<CallbackData>): void
+
+  /**
+   * Callback function when the month has changed.
+   */
+  onMonthChange?(
+    onMonthChangeOptions: Expand<CallbackData & {prevDate: Date; newDate: Date}>
+  ): void
+
   /**
    * Callback function after a date has been selected. It will receive the previous and newly selected dates. If `newDate` is `undefined`, that means the calendar date has been de-selected.
    */
@@ -72,61 +88,9 @@ export type DatepickerOptions = ExpandRecursively<{
    */
   onShow?(data: Expand<CallbackData>): void
 
-  /**
-   * Callback function when the calendar is hidden.
-   */
-  onHide?(data: Expand<CallbackData>): void
-
-  /**
-   * Callback function when the month has changed.
-   */
-  onMonthChange?(
-    onMonthChangeOptions: Expand<CallbackData & {prevDate: Date; newDate: Date}>
-  ): void
-
-  /**
-   * Using an input field with your datepicker? Want to customize its value
-   * anytime a date is selected? Provide a function that returns a string to set
-   * the input value with.
-   *
-   * NOTE: The formatter function will only run if the datepicker instance is associated with an <input> field.
-   */
-  formatter?(date: Date): string
-
-  /**
-   * Sometimes you need more control over which dates to disable. The
-   * `disabledDates` option is limited to an explicit array of dates and the
-   * `noWeekends` option is limited to Saturdays & Sundays. Provide a function
-   * that takes a JavaScript date as it's only argument and returns `true` if
-   * the date should be disabled. When the calendar builds, each date will be
-   * run through this function to determine whether or not it should be
-   * disabled.
-   */
-  disabler?(date: Date): boolean
-
-  /**
-   * If you would like to render the calendar inside the provided selector,
-   * don't provide a value for this option. Providing a value for this option
-   * positions the calendar relative to the <input> field (or other element)
-   * it's associated with.
-   * This can be 1 of 5 values: 'tr', 'tl', 'br', 'bl', 'mc' representing
-   * top-right, top-left, bottom-right, bottom-left, and mobile-centered.
-   * Datepicker will position itself accordingly relative to the element you
-   * reference in the 1st argument. For a value of 'mc', Datepicker will
-   * position itself fixed, smack in the middle of the screen.
-   * This can be desirable for mobile devices.
-   *
-   * Default - undefined
-   */
-  position?: Position
-
-  /**
-   * Specify the day of the week your calendar starts on. 0 = Sunday,
-   * 1 = Monday, etc. Plays nice with the `customDays` option.
-   *
-   * Default - 0
-   */
-  startDay?: number
+  ////////////////////
+  // CUSTOMIZATIONS //
+  ////////////////////
 
   /**
    * You can customize the display of days on the calendar by providing an array
@@ -169,6 +133,15 @@ export type DatepickerOptions = ExpandRecursively<{
   defaultView?: ViewType
 
   /**
+   * Using an input field with your datepicker? Want to customize its value
+   * anytime a date is selected? Provide a function that returns a string to set
+   * the input value with.
+   *
+   * NOTE: The formatter function will only run if the datepicker instance is associated with an <input> field.
+   */
+  formatter?(date: Date): string
+
+  /**
    * Custom text for the year overlay submit button.
    *
    * Default - 'Submit'
@@ -183,10 +156,32 @@ export type DatepickerOptions = ExpandRecursively<{
   overlayPlaceholder?: string
 
   /**
-   * An array of dates which indicate something is happening - a meeting,
-   * birthday, etc. I.e. an event.
+   * If you would like to render the calendar inside the provided selector,
+   * don't provide a value for this option. Providing a value for this option
+   * positions the calendar relative to the <input> field (or other element)
+   * it's associated with.
+   * This can be 1 of 5 values: 'tr', 'tl', 'br', 'bl', 'mc' representing
+   * top-right, top-left, bottom-right, bottom-left, and mobile-centered.
+   * Datepicker will position itself accordingly relative to the element you
+   * reference in the 1st argument. For a value of 'mc', Datepicker will
+   * position itself fixed, smack in the middle of the screen.
+   * This can be desirable for mobile devices.
+   *
+   * Default - undefined
    */
-  events?: Date[]
+  position?: Position
+
+  /**
+   * Specify the day of the week your calendar starts on. 0 = Sunday,
+   * 1 = Monday, etc. Plays nice with the `customDays` option.
+   *
+   * Default - 0
+   */
+  startDay?: number
+
+  //////////////
+  // SETTINGS //
+  //////////////
 
   /**
    * By default, the datepicker will hide & show itself automatically depending
@@ -198,11 +193,21 @@ export type DatepickerOptions = ExpandRecursively<{
   alwaysShow?: boolean
 
   /**
-   * This will start the calendar with a date already selected. If Datepicker is
-   * used with an <input> element, that field will be populated with this date
-   * as well.
+   * An array of dates which indicate something is happening - a meeting,
+   * birthday, etc. I.e. an event.
    */
-  selectedDate?: Date
+  events?: Date[]
+
+  /**
+   * Represents DOM elements with the attribute `data-exempt-id`. Any DOM
+   * element with this attribute that matches one of the ids in this set will
+   * not cause the picker to close if clicked on. This is helpful in setting
+   * up buttons that trigger the picker's methods. For example, clicking those
+   * buttons should not cause the calendar to hide.
+   *
+   * Default - undefined
+   */
+  exemptIds?: string[]
 
   /**
    * This will be the maximum threshold of selectable dates. Anything after it
@@ -223,11 +228,11 @@ export type DatepickerOptions = ExpandRecursively<{
   minDate?: Date
 
   /**
-   * The date you provide will determine the month that the calendar starts on.
-   *
-   * Default - today's month
+   * This will start the calendar with a date already selected. If Datepicker is
+   * used with an <input> element, that field will be populated with this date
+   * as well.
    */
-  startDate?: Date
+  selectedDate?: Date
 
   /**
    * By default, the datepicker will not put date numbers on calendar days that
@@ -249,6 +254,13 @@ export type DatepickerOptions = ExpandRecursively<{
   showAllDatesClickable?: boolean
 
   /**
+   * The date you provide will determine the month that the calendar starts on.
+   *
+   * Default - today's month
+   */
+  startDate?: Date
+
+  /**
    * `<input />`'s can have a `disabled` or `readonly` attribute applied to
    * them. Native date inputs (`<input type="date" />`) with `disabled` or
    * `readonly` attributes will not show the HTML calendar associated with them.
@@ -266,21 +278,9 @@ export type DatepickerOptions = ExpandRecursively<{
    */
   respectDisabledReadOnly?: boolean
 
-  /**
-   * Provide `true` to disable selecting weekends. Weekends are Saturday &
-   * Sunday. If your weekends are a set of different days or you need more
-   * control over disabled dates, check out the `disabler` option.
-   *
-   * Default - false
-   */
-  noWeekends?: boolean
-
-  /**
-   * Provide an array of JS date objects that will be disabled on the calendar.
-   * This array cannot include the same date as `selectedDate`. If you need more
-   * control over which dates are disabled, see the `disabler` option.
-   */
-  disabledDates?: Date[]
+  //////////////////////
+  // DISABLING THINGS //
+  //////////////////////
 
   /**
    * Clicking the year or month name on the calendar triggers an overlay to
@@ -292,15 +292,31 @@ export type DatepickerOptions = ExpandRecursively<{
   disableYearOverlay?: boolean
 
   /**
-   * Represents DOM elements with the attribute `data-exempt-id`. Any DOM
-   * element with this attribute that matches one of the ids in this set will
-   * not cause the picker to close if clicked on. This is helpful in setting
-   * up buttons that trigger the picker's methods. For example, clicking those
-   * buttons should not cause the calendar to hide.
-   *
-   * Default - undefined
+   * Provide an array of JS date objects that will be disabled on the calendar.
+   * This array cannot include the same date as `selectedDate`. If you need more
+   * control over which dates are disabled, see the `disabler` option.
    */
-  exemptIds?: string[]
+  disabledDates?: Date[]
+
+  /**
+   * Sometimes you need more control over which dates to disable. The
+   * `disabledDates` option is limited to an explicit array of dates and the
+   * `noWeekends` option is limited to Saturdays & Sundays. Provide a function
+   * that takes a JavaScript date as it's only argument and returns `true` if
+   * the date should be disabled. When the calendar builds, each date will be
+   * run through this function to determine whether or not it should be
+   * disabled.
+   */
+  disabler?(date: Date): boolean
+
+  /**
+   * Provide `true` to disable selecting weekends. Weekends are Saturday &
+   * Sunday. If your weekends are a set of different days or you need more
+   * control over disabled dates, check out the `disabler` option.
+   *
+   * Default - false
+   */
+  noWeekends?: boolean
 }>
 
 export type DaterangePickerOptions = {

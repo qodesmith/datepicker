@@ -10,6 +10,8 @@ import {
   controlsCls,
   daysCls,
   overlayCls,
+  days,
+  overlay,
 } from '../selectors'
 
 describe('Calendar DOM Structure', () => {
@@ -183,6 +185,30 @@ describe('Calendar DOM Structure', () => {
         .next()
         .should('have.attr', 'data-num', '11')
         .should('have.text', 'Dec')
+    })
+  })
+
+  it('should have data-num attributes for all calendar days', () => {
+    const picker1 = datepicker(testElementIds.singleInput)
+    const picker2 = datepicker(testElementIds.singleStandalone, {
+      showAllDates: true,
+    })
+
+    cy.get(days.day).each($day => {
+      const textContentNum = Number($day.text())
+      const dataNum = Number($day.attr('data-num'))
+
+      expect(textContentNum).to.equal(dataNum)
+      expect(textContentNum).not.to.be.NaN
+      expect(dataNum).not.to.be.NaN
+    })
+  })
+
+  it('should have data-num attributes for all months in the overlay', () => {
+    const picker = datepicker(testElementIds.singleInput)
+
+    cy.get(overlay.month).each(($month, i) => {
+      expect($month.attr('data-num')).to.equal(`${i}`)
     })
   })
 })

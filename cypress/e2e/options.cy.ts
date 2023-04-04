@@ -1730,4 +1730,46 @@ describe('Options', () => {
       cy.get(containers.calendarContainer).should('not.be.visible')
     })
   })
+
+  describe('formatDay', () => {
+    it('should customize the calendar day numbers', () => {
+      const picker = datepicker(testElementIds.singleInput, {
+        formatDay(num) {
+          if (num === 1 || num === 15) return '!'
+          return num.toString()
+        },
+      })
+
+      cy.get(days.day)
+        .filter(':contains("!")')
+        .should('have.length', 2)
+        .each(($day, i) => {
+          expect($day.attr('data-num')).to.equal(i === 0 ? '1' : '15')
+        })
+    })
+  })
+
+  describe.only('formatYear', () => {
+    it('should customize the calendar year', () => {
+      const startDate = new Date()
+      const expectedYear = startDate
+        .getFullYear()
+        .toString()
+        .split('')
+        .reverse()
+        .join('')
+      const picker = datepicker(testElementIds.singleInput, {
+        startDate,
+        alwaysShow: true,
+        formatYear(num) {
+          return num.toString().split('').reverse().join('')
+        },
+      })
+
+      cy.get(controls.year).should('have.text', expectedYear).click()
+      cy.get(overlay.input).type('1234')
+      cy.get(overlay.submit).click()
+      cy.get(controls.year).should('have.text', '4321')
+    })
+  })
 })

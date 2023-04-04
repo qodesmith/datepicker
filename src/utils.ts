@@ -10,6 +10,7 @@ import type {
 } from './types'
 import {
   datepickersMap,
+  defaultDayYearFormatter,
   defaultFormatter,
   defaultOptions,
   noop,
@@ -586,6 +587,8 @@ export function sanitizeAndCheckAndSyncOptions(
     onHide: options?.onHide ?? noop,
     onMonthChange: options?.onMonthChange ?? noop,
     onSelect: options?.onSelect ?? noop,
+    formatDay: options?.formatDay ?? defaultDayYearFormatter,
+    formatYear: options?.formatYear ?? defaultDayYearFormatter,
     formatter: options?.formatter ?? defaultFormatter,
     disabler: (date: Date): boolean => options?.disabler?.(date) ?? false,
   }

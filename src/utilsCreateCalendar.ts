@@ -22,17 +22,12 @@ type ControlElementsReturnType = {
   monthName: HTMLDivElement
   year: HTMLDivElement
 }
-
-type CreateControlElementsInputType = {
-  date: Date
-  customMonths: CreateCalendarInput['customMonths']
-  disableYearOverlay: SanitizedOptions['disableYearOverlay']
-}
 function createCalendarControlElements({
-  date,
-  customMonths,
+  startDate,
+  months,
   disableYearOverlay,
-}: CreateControlElementsInputType): ControlElementsReturnType {
+  formatYear,
+}: SanitizedOptions): ControlElementsReturnType {
   const controlsContainer = document.createElement('div')
   const leftArrow = document.createElement('div')
   const rightArrow = document.createElement('div')
@@ -41,12 +36,12 @@ function createCalendarControlElements({
   const year = document.createElement('div')
 
   // Month
-  const monthText = customMonths[date.getMonth()]
+  const monthText = months[startDate.getMonth()]
   monthName.textContent = monthText
 
   // Year
-  const fullYear = date.getFullYear()
-  year.textContent = `${fullYear}`
+  const fullYear = startDate.getFullYear()
+  year.textContent = formatYear(fullYear)
 
   // Arrows
   leftArrow.innerHTML = arrowSVG
@@ -82,12 +77,9 @@ function createCalendarControlElements({
  * These elements are created once and are intended to be reused for each month
  */
 function createWeekdayElements({
-  weekDays,
+  customDays,
   startDay,
-}: {
-  weekDays: SanitizedOptions['customDays']
-  startDay: SanitizedOptions['startDay']
-}): HTMLDivElement[] {
+}: SanitizedOptions): HTMLDivElement[] {
   const weekdayElements: HTMLDivElement[] = []
 
   for (let i = 0; i < 7; i++) {
@@ -95,7 +87,7 @@ function createWeekdayElements({
     el.className = 'dp-weekday'
 
     // Weekday names are limited to 3 characters.
-    el.textContent = weekDays[i].slice(0, 3)
+    el.textContent = customDays[i].slice(0, 3)
 
     weekdayElements.push(el)
   }
@@ -109,13 +101,19 @@ function createWeekdayElements({
  * Creates an array of divs representing the days in a given month. These
  * elements will be created once and are intended to be reused for each month.
  */
-function createCalendarDayElements(): HTMLDivElement[] {
-  return Array.from({length: 31}).map((_, i) => {
-    const day = document.createElement('div')
-    day.className = 'dp-day'
-    day.textContent = `${i + 1}`
-    return day
-  })
+function createCalendarDayElements(
+  formatDay: SanitizedOptions['formatDay']
+): HTMLDivElement[] {
+  return Array(31)
+    .fill(null)
+    .map((_, i) => {
+      const day = document.createElement('div')
+      const num = i + 1
+      day.className = 'dp-day'
+      day.dataset.num = `${num}`
+      day.textContent = formatDay(num)
+      return day
+    })
 }
 
 type OverlayReturnType = {
@@ -127,12 +125,12 @@ type OverlayReturnType = {
   overlaySubmitButton: HTMLButtonElement
 }
 
-function createCalendarOverlay(
-  overlayMonths: SanitizedOptions['overlayMonths'],
-  defaultView: ViewType,
-  overlayButtonText: SanitizedOptions['overlayButtonText'],
-  overlayPlaceholder: CreateCalendarInput['overlayPlaceholder']
-): OverlayReturnType {
+function createCalendarOverlay({
+  overlayMonths,
+  defaultView,
+  overlayButtonText,
+  overlayPlaceholder,
+}: SanitizedOptions): OverlayReturnType {
   const overlayContainer = document.createElement('div')
   const inputContainer = document.createElement('div')
   const input = document.createElement('input')
@@ -211,39 +209,19 @@ export function createCalendarHTML(
   selectorEl: SelectorData['el'],
   options: SanitizedOptions
 ): PickerElements {
-  const {
-    startDate: date,
-    months: customMonths,
-    overlayMonths,
-    customDays,
-    defaultView,
-    overlayButtonText,
-    overlayPlaceholder,
-    startDay,
-    showAllDates,
-    disableYearOverlay,
-  } = options
+  const {defaultView, showAllDates, formatDay} = options
   const alwaysShow = !!options?.alwaysShow
   const isInput = getIsInput(selectorEl)
   const calendarContainer = document.createElement('div')
   // TODO - turn all these internal function arguments from objects to multiple arguments.
   // Argument names can be minimized, object properties can't.
-  const controls = createCalendarControlElements({
-    date,
-    customMonths,
-    disableYearOverlay,
-  })
-  const weekdaysArray = createWeekdayElements({weekDays: customDays, startDay})
+  const controls = createCalendarControlElements(options)
+  const weekdaysArray = createWeekdayElements(options)
   const weekdaysContainer = document.createElement('div')
-  const calendarDaysArray = createCalendarDayElements()
-  const showAllDatesData = createShowAllDatesData()
+  const calendarDaysArray = createCalendarDayElements(formatDay)
+  const showAllDatesData = createShowAllDatesData(formatDay)
   const daysContainer = document.createElement('div')
-  const overlay = createCalendarOverlay(
-    overlayMonths,
-    defaultView,
-    overlayButtonText,
-    overlayPlaceholder
-  )
+  const overlay = createCalendarOverlay(options)
 
   // TODO - use Tailwind. Keep current class names and use TW config to map class names to TW classes.
   calendarContainer.className = 'dp-calendar-container'
@@ -296,7 +274,9 @@ export function createCalendarHTML(
  * Creates 2 arrays of additional DOM nodes for showing days from the prior and
  * next months in the leading and trailing spaces.
  */
-export function createShowAllDatesData(): PickerElements['showAllDatesData'] {
+export function createShowAllDatesData(
+  formatDay: SanitizedOptions['formatDay']
+): PickerElements['showAllDatesData'] {
   const befores: HTMLDivElement[] = []
   const afters: HTMLDivElement[] = []
 
@@ -309,7 +289,9 @@ export function createShowAllDatesData(): PickerElements['showAllDatesData'] {
     beforeDiv.className = afterDiv.className = 'dp-day dp-other-month-day'
 
     // The dates for the days after the current month will never change.
-    afterDiv.textContent = `${i + 1}`
+    const num = i + 1
+    afterDiv.dataset.num = `${num}`
+    afterDiv.textContent = formatDay(num)
 
     befores.push(beforeDiv)
     afters.push(afterDiv)

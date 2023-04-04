@@ -19,6 +19,10 @@ export function defaultFormatter(date: Date): string {
   return date.toDateString()
 }
 
+export function defaultDayYearFormatter(num: number): string {
+  return `${num}`
+}
+
 /**
  * This map will contain all the created datepickers that haven't been removed.
  * It maps the datepicker element (not the calendar HTML, but the DOM element

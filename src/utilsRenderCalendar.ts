@@ -27,6 +27,7 @@ export function renderCalendar(
     startDay, // Defaults to 0 => Sunday
     events,
     showAllDates,
+    formatYear,
   } = internalPicker
   const currentYear = currentDate.getFullYear()
   const currentMonthNum = currentDate.getMonth()
@@ -39,6 +40,7 @@ export function renderCalendar(
     new Date(currentYear, currentMonthNum - 1),
     startDay
   )
+
   /**
    * Why 0 if `showAllDates` is true?
    * Because we don't want `grid-column-start` in CSS to do any of the work in
@@ -160,7 +162,8 @@ export function renderCalendar(
   // Adjust the month name and year in the calendar controls.
   internalPicker.pickerElements.controls.monthName.textContent =
     currentMonthName
-  internalPicker.pickerElements.controls.year.textContent = `${currentYear}`
+  internalPicker.pickerElements.controls.year.textContent =
+    formatYear(currentYear)
 
   /**
    * Removing the class inside requestAnimationFrame gives the DOM time to paint
@@ -196,7 +199,8 @@ function renderShowAllDatesDays(
   internalPicker: InternalPickerData,
   lastMonthsLastDayIndex: number
 ) {
-  const {pickerElements, currentDate, startDay, showAllDates} = internalPicker
+  const {pickerElements, currentDate, startDay, showAllDates, formatDay} =
+    internalPicker
   const {showAllDatesData} = pickerElements
   if (!showAllDates) return
 
@@ -210,7 +214,8 @@ function renderShowAllDatesDays(
     .reverse() // It's easier to reason about the before days in reverse.
     .forEach((div, i) => {
       const currentDayNum = daysInPriorMonth - i
-      div.textContent = `${currentDayNum}`
+      div.dataset.num = `${currentDayNum}`
+      div.textContent = formatDay(currentDayNum)
 
       // If the index is 6, that means we don't show any prior-month days.
       if (i > lastMonthsLastDayIndex || lastMonthsLastDayIndex === 6) {

@@ -133,11 +133,22 @@ export type DatepickerOptions = ExpandRecursively<{
   defaultView?: ViewType
 
   /**
+   * This option gives you the ability to format the day numbers on the calendar.
+   */
+  formatDay?(day: number): string
+
+  /**
+   * This option gives you the ability to format the year on the calendar.
+   */
+  formatYear?(year: number): string
+
+  /**
    * Using an input field with your datepicker? Want to customize its value
    * anytime a date is selected? Provide a function that returns a string to set
    * the input value with.
    *
-   * NOTE: The formatter function will only run if the datepicker instance is associated with an <input> field.
+   * NOTE: The formatter function will only run if the datepicker instance is
+   * associated with an <input> field.
    */
   formatter?(date: Date): string
 
@@ -361,6 +372,8 @@ export type SanitizedOptions = Expand<
         | 'onHide'
         | 'onMonthChange'
         | 'onSelect'
+        | 'formatDay'
+        | 'formatYear'
         | 'formatter'
         | 'defaultView'
         | 'overlayButtonText'
@@ -503,6 +516,8 @@ export type InternalPickerData = {
     data: Expand<Omit<CallbackData, 'instance'> & {trigger: 'hide' | UserEvent}>
   ): void
   _getRange(): {start: Date | undefined; end: Date | undefined}
+  formatDay: SanitizedOptions['formatDay']
+  formatYear: SanitizedOptions['formatYear']
   disabler: SanitizedOptions['disabler']
 
   isCalendarShowing: boolean

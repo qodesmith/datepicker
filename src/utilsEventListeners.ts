@@ -160,7 +160,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     function daysContainerListener(e: MouseEvent) {
       const target = e.target as HTMLDivElement
       const currentTarget = e.currentTarget as HTMLDivElement
-      const {classList, textContent} = target
+      const {classList, dataset} = target
 
       // Do-nothing scenarios.
       if (
@@ -175,7 +175,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
       let date: Date | undefined
 
       if (!classList.contains('dp-selected-date')) {
-        const dayNum = Number(textContent as string)
+        const dayNum = Number(dataset.num)
         const isOtherMonth = target.classList.contains('dp-other-month-day')
         const monthDirection = isOtherMonth ? (dayNum < 7 ? 1 : -1) : 0
         const {currentDate} = publicPicker
@@ -213,7 +213,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     }
 
     // TODO - consistent code - Number(...) or +(...)
-    const monthNum = +((e.target as HTMLDivElement).dataset.num as string)
+    const monthNum = Number((e.target as HTMLDivElement).dataset.num)
     const {currentDate} = publicPicker
 
     // Only navigate if a different month has been clicked.

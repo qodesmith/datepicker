@@ -8,9 +8,15 @@ export default function DatepickerWhatever() {
     selector: '#world',
     options: {
       alwaysShow: true,
-      // showAllDates: true,
-      startDay: 4,
-      startDate: new Date(2022, 4),
+      showAllDates: true,
+      showAllDatesClickable: true,
+      formatDay(num) {
+        if (num === 1) return '!'
+        return num.toString()
+      },
+      formatYear(num) {
+        return num.toString().split('').reverse().join('')
+      },
     },
   })
   // const [jsx2, picker2] = useDatepicker({

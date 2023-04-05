@@ -202,7 +202,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     monthsContainerListener
   )
   function monthsContainerListener(e: MouseEvent) {
-    const {isOverlayShowing} = internalPickerItem
+    const {isOverlayShowing, pickerElements} = internalPickerItem
 
     /*
       Disallow clicks while the overlay is closing, avoid clicks that aren't on
@@ -215,10 +215,16 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     // TODO - consistent code - Number(...) or +(...)
     const monthNum = Number((e.target as HTMLDivElement).dataset.num)
     const {currentDate} = publicPicker
+    const overlayInputValue = pickerElements.overlay.input.value.trim()
+
+    // Clicking a month should consider the year input as well.
+    const year = overlayInputValue
+      ? +overlayInputValue // TODO - provide a way to input a localized year but translate it to a regular year.
+      : currentDate.getFullYear()
 
     // Only navigate if a different month has been clicked.
     if (monthNum !== currentDate.getMonth()) {
-      const date = new Date(currentDate.getFullYear(), monthNum, 1)
+      const date = new Date(year, monthNum, 1)
       internalPickerItem._navigate({
         date,
         trigger: 'click',

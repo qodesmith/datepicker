@@ -13,6 +13,7 @@ import {
   defaultDayYearFormatter,
   defaultFormatter,
   defaultOptions,
+  defaultUnformatYear,
   noop,
   voidElements,
 } from './constants'
@@ -589,6 +590,7 @@ export function sanitizeAndCheckAndSyncOptions(
     onSelect: options?.onSelect ?? noop,
     formatDay: options?.formatDay ?? defaultDayYearFormatter,
     formatYear: options?.formatYear ?? defaultDayYearFormatter,
+    unformatYear: options?.unformatYear ?? defaultUnformatYear,
     formatter: options?.formatter ?? defaultFormatter,
     disabler: (date: Date): boolean => options?.disabler?.(date) ?? false,
   }

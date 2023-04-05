@@ -138,7 +138,8 @@ export type DatepickerOptions = ExpandRecursively<{
   formatDay?(day: number): string
 
   /**
-   * This option gives you the ability to format the year on the calendar.
+   * This option gives you the ability to format the year on the calendar from
+   * the value that JavaScript date's give you to whatever you'd like.
    */
   formatYear?(year: number): string
 
@@ -189,6 +190,13 @@ export type DatepickerOptions = ExpandRecursively<{
    * Default - 0
    */
   startDay?: number
+
+  /**
+   * This function will be used to convert the user's input in the overlay input
+   * field back to a value that JavaScript date's can consume. You should
+   * provide this option if you are using the `formatYear` option as well.
+   */
+  unformatYear?(foramttedYear: string): number
 
   //////////////
   // SETTINGS //
@@ -374,6 +382,7 @@ export type SanitizedOptions = Expand<
         | 'onSelect'
         | 'formatDay'
         | 'formatYear'
+        | 'unformatYear'
         | 'formatter'
         | 'defaultView'
         | 'overlayButtonText'
@@ -518,6 +527,7 @@ export type InternalPickerData = {
   _getRange(): {start: Date | undefined; end: Date | undefined}
   formatDay: SanitizedOptions['formatDay']
   formatYear: SanitizedOptions['formatYear']
+  unformatYear: SanitizedOptions['unformatYear']
   disabler: SanitizedOptions['disabler']
 
   isCalendarShowing: boolean

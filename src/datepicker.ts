@@ -130,6 +130,7 @@ function datepicker(
     respectDisabledReadOnly: options.respectDisabledReadOnly,
     formatDay: options.formatDay,
     formatYear: options.formatYear,
+    unformatYear: options.unformatYear,
     disabler: options.disabler,
     _navigate({date, trigger, triggerType}) {
       const {currentDate} = internalPickerItem

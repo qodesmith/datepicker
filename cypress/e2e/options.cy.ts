@@ -1749,7 +1749,7 @@ describe('Options', () => {
     })
   })
 
-  describe.only('formatYear', () => {
+  describe('formatYear', () => {
     it('should customize the calendar year', () => {
       const startDate = new Date()
       const expectedYear = startDate
@@ -1768,8 +1768,10 @@ describe('Options', () => {
 
       cy.get(controls.year).should('have.text', expectedYear).click()
       cy.get(overlay.input).type('1234')
-      cy.get(overlay.submit).click()
+      cy.get(overlay.month).last().click()
       cy.get(controls.year).should('have.text', '4321')
+      cy.get(controls.rightArrow).click()
+      cy.get(controls.year).should('have.text', '5321')
     })
   })
 })

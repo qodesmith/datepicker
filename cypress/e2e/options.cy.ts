@@ -1774,4 +1774,28 @@ describe('Options', () => {
       cy.get(controls.year).should('have.text', '5321')
     })
   })
+
+  describe('unformatYear', () => {
+    it("should take the overlay input and return a number used to drive datepicker's current date", () => {
+      const startDate = new Date(2023, 3)
+      const picker = datepicker(testElementIds.singleInput, {
+        startDate,
+        alwaysShow: true,
+        formatYear(year) {
+          return year.toString().split('').reverse().join('')
+        },
+        unformatYear(formattedYear) {
+          return +formattedYear.split('').reverse().join('')
+        },
+      })
+
+      cy.get(controls.year).should('have.text', '3202').click()
+      cy.get(overlay.input).type('4202{enter}')
+      cy.get(controls.year)
+        .should('have.text', '4202')
+        .then(() => {
+          expect(picker.currentDate.getFullYear()).to.equal(2024)
+        })
+    })
+  })
 })

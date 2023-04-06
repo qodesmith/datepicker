@@ -45,16 +45,16 @@ function submitOverlayYear(
   internalPickerItem: InternalPickerData,
   eventType: 'click' | 'keydown'
 ) {
-  const {publicPicker, pickerElements} = internalPickerItem
+  const {publicPicker, pickerElements, unformatYear} = internalPickerItem
   const {overlay} = pickerElements
-  const overlayInput = overlay.input
   const {currentDate} = publicPicker
+  const overlayInputValue = overlay.input.value.trim()
 
-  if (!overlayInput.value) {
+  if (!overlayInputValue) {
     return
   }
 
-  const year = Number(overlayInput.value)
+  const year = unformatYear(overlayInputValue)
 
   // If the same year is entered, simply close the overlay.
   if (year !== currentDate.getFullYear()) {
@@ -215,18 +215,21 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     // TODO - consistent code - Number(...) or +(...)
     const monthNum = Number((e.target as HTMLDivElement).dataset.num)
     const {currentDate} = publicPicker
+    const currentYear = currentDate.getFullYear()
     const overlayInputValue = pickerElements.overlay.input.value.trim()
 
     // Clicking a month should consider the year input as well.
-    const year = overlayInputValue
+    const newYear = overlayInputValue
       ? unformatYear(overlayInputValue)
-      : currentDate.getFullYear()
+      : currentYear
+
+    const shouldNavigate =
+      monthNum !== currentDate.getMonth() || currentYear !== newYear
 
     // Only navigate if a different month has been clicked.
-    if (monthNum !== currentDate.getMonth()) {
-      const date = new Date(year, monthNum, 1)
+    if (shouldNavigate) {
       internalPickerItem._navigate({
-        date,
+        date: new Date(newYear, monthNum),
         trigger: 'click',
         triggerType: 'user',
       })

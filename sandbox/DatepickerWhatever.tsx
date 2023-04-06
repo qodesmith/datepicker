@@ -14,8 +14,11 @@ export default function DatepickerWhatever() {
         if (num === 1) return '!'
         return num.toString()
       },
-      formatYear(num) {
-        return num.toString().split('').reverse().join('')
+      formatYear(year) {
+        return year.toString().split('').reverse().join('')
+      },
+      unformatYear(formattedYear) {
+        return +formattedYear.split('').reverse().join('')
       },
     },
   })

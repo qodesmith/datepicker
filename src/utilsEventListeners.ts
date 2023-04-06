@@ -59,7 +59,7 @@ function submitOverlayYear(
   // If the same year is entered, simply close the overlay.
   if (year !== currentDate.getFullYear()) {
     internalPickerItem._navigate({
-      date: new Date(year, currentDate.getMonth(), 1),
+      date: new Date(year, currentDate.getMonth()),
       trigger: eventType,
       triggerType: 'user',
     })

@@ -151,6 +151,7 @@ export type DatepickerOptions = ExpandRecursively<{
    * NOTE: The formatter function will only run if the datepicker instance is
    * associated with an <input> field.
    */
+  // TODO - change this to `formatInputValue`
   formatter?(date: Date): string
 
   /**

@@ -11,11 +11,10 @@ export default function DatepickerWhatever() {
       showAllDates: true,
       showAllDatesClickable: true,
       formatDay(num) {
-        if (num === 1) return '!'
-        return num.toString()
+        return num.toLocaleString('ar-EG')
       },
       formatYear(year) {
-        return year.toString().split('').reverse().join('')
+        return year.toLocaleString('ar-EG')
       },
       unformatYear(formattedYear) {
         return +formattedYear.split('').reverse().join('')

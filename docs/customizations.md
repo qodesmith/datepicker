@@ -3,15 +3,18 @@
 
 # Customizations
 
-- [customDays](./docs/customizations.md#customdays)
-- [customMonths](./docs/customizations.md#custommonths)
-- [customOverlayMonths](./docs/customizations.md#customoverlaymonths)
-- [defaultView](./docs/customizations.md#defaultview)
-- [formatter](./docs/callbacks.md#formatter)
-- [overlayButtonText](./docs/callbacks.md#overlaybuttontext)
-- [overplayPlaceholder](./docs/callbacks.md#overlayplaceholder)
-- [position](./docs/callbacks.md#position)
-- [startDay](./docs/callbacks.md#startday)
+- [customDays](#customdays)
+- [customMonths](#custommonths)
+- [customOverlayMonths](#customoverlaymonths)
+- [defaultView](#defaultview)
+- [formatDay](#formatday)
+- [formatYear](#formatyear)
+- [formatter](#formatter)
+- [overlayButtonText](#overlaybuttontext)
+- [overplayPlaceholder](#overlayplaceholder)
+- [position](#position)
+- [startDay](#startday)
+- [unformatYear](#unformatyear)
 
 These options help you customize the calendar to your suit your needs. Some of
 these are especially helpful if you're using a language other than English.
@@ -137,6 +140,57 @@ With this option, you can set which view is shown by default.
 const picker = datepicker(selector, {defaultView: 'overlay'})
 ```
 
+## formatDay
+
+This option gives you the ability to customize the calendar day numbers.
+Datepicker will use the return value of this function to display the day on
+the calendar. The function will receive a number (obviously a value from 1 - 31)
+and should return a string.
+
+### Type Declaration
+
+```typescript
+formatDay(day: number): string
+```
+
+**Default value:** `(day) => day.toString()`
+
+### Example
+
+```javascript
+const picker = datepicker(selector, {
+  formatDay(dayNum) {
+    // Convert the number to Arabic.
+    return dayNum.toLocaleString('ar-EG')
+  },
+})
+```
+
+## formatYear
+
+This option gives you the ability to customize the year. Datepicker will use the
+return value of this function to display the year on the calendar. The function
+will receive a number and should return a string.
+
+### Type Declaration
+
+```typescript
+formatYear(year: number): string
+```
+
+**Default value:** `(year) => year.toString()`
+
+### Example
+
+```javascript
+const picker = datepicker(selector, {
+  formatYear(yearNum) {
+    // Convert the number to Arabic.
+    return yearNum.toLocaleString('ar-EG')
+  },
+})
+```
+
 ## formatter
 
 If you're using an input field with your datepicker, this function allows you to
@@ -257,4 +311,30 @@ etc. Plays nice with the [customDays](#customdays) option.
 ```javascript
 // Start the week on Tuesday.
 const picker = datepicker(selector, {startDay: 2})
+```
+
+## unformatYear
+
+If you are using a different format for the year (i.e. the
+[formatYear](#formatyear) option), this option is essentially the opposite. Use
+this function to allow the user to type a _formatted year_ into the overlay
+year input field. This function will be used to convert the user's input back to
+a value that a JavaScript date constructor can consume.
+
+### Type Declaration
+
+```typescript
+unformatYear(foramttedYear: string): number
+```
+
+**Default value:** `(value) => Number(value)`
+
+### Example
+
+```javascript
+const picker = datepicker(selector, {
+  unformatYear(formattedYear) {
+    // Your logic here...
+  },
+})
 ```

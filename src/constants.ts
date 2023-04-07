@@ -15,7 +15,7 @@ export const sides: Sides = {
 
 export function noop() {}
 
-export function defaultFormatter(date: Date): string {
+export function defaultInputValueFormatter(date: Date): string {
   return date.toDateString()
 }
 

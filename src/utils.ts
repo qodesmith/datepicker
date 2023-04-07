@@ -11,7 +11,7 @@ import type {
 import {
   datepickersMap,
   defaultDayYearFormatter,
-  defaultFormatter,
+  defaultInputValueFormatter,
   defaultOptions,
   defaultUnformatYear,
   noop,
@@ -591,7 +591,7 @@ export function sanitizeAndCheckAndSyncOptions(
     formatDay: options?.formatDay ?? defaultDayYearFormatter,
     formatYear: options?.formatYear ?? defaultDayYearFormatter,
     unformatYear: options?.unformatYear ?? defaultUnformatYear,
-    formatter: options?.formatter ?? defaultFormatter,
+    formatter: options?.formatter ?? defaultInputValueFormatter,
     disabler: (date: Date): boolean => options?.disabler?.(date) ?? false,
   }
 }

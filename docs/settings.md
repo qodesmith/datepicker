@@ -2,16 +2,16 @@
 
 # Settings
 
-- [alwaysShow](./docs/settings.md#alwaysshow)
-- [events](./docs/settings.md#events)
-- [exemptIds](./docs/settings.md#exepmtids)
-- [maxDate](./docs/settings.md#maxdate)
-- [minDate](./docs/settings.md#mindate)
-- [selectedDate](./docs/settings.md#selecteddate)
-- [showAllDates](./docs/settings.md#showalldates)
-- [showAllDatesClickable](./docs/settings.md#showalldatesclickable)
-- [startDate](./docs/settings.md#startdate)
-- [respectDisabledReadOnly](./docs/settings.md#respectdisabledreadonly)
+- [alwaysShow](#alwaysshow)
+- [events](#events)
+- [exemptIds](#exepmtids)
+- [maxDate](#maxdate)
+- [minDate](#mindate)
+- [selectedDate](#selecteddate)
+- [showAllDates](#showalldates)
+- [showAllDatesClickable](#showalldatesclickable)
+- [startDate](#startdate)
+- [respectDisabledReadOnly](#respectdisabledreadonly)
 
 Use these options to set the calendar the way you want.
 

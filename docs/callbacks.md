@@ -1,9 +1,9 @@
 # Callback Options
 
-- [onHide](./docs/callbacks.md#onhide)
-- [onMonthChange](./docs/callbacks.md#onmonthchange)
-- [onSelect](./docs/callbacks.md#onselect)
-- [onShow](./docs/callbacks.md#onshow)
+- [onHide](#onhide)
+- [onMonthChange](#onmonthchange)
+- [onSelect](#onselect)
+- [onShow](#onshow)
 
 Callback functions are triggered both by the user interacting with the calendar
 in the DOM _and_ the developer using the imperative

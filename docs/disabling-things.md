@@ -1,9 +1,9 @@
 # Disabling Things
 
-- [disableYearOverlay](./docs/disabling-things.md#disableyearoverlay)
-- [disabledDates](./docs/disabling-things.md#disableddates)
-- [disabler](./docs/disabling-things.md#disabler)
-- [noWeekends](./docs/disabling-things.md#noweekends)
+- [disableYearOverlay](#disableyearoverlay)
+- [disabledDates](#disableddates)
+- [disabler](#disabler)
+- [noWeekends](#noweekends)
 
 These options are all associated with disabling various aspects of the calendar.
 

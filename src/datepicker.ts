@@ -87,14 +87,14 @@ function datepicker(
     onHide,
     onMonthChange,
     onSelect,
-    formatter,
+    formatInputValue,
   } = options
   let isRemoved = false
   let isPairRemoved = false
 
   function safeUpdateInput(date?: Date) {
     if (getIsInput(selectorData.el)) {
-      selectorData.el.value = date ? formatter(stripTime(date)) : ''
+      selectorData.el.value = date ? formatInputValue(stripTime(date)) : ''
     }
   }
 

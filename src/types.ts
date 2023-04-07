@@ -138,21 +138,20 @@ export type DatepickerOptions = ExpandRecursively<{
   formatDay?(day: number): string
 
   /**
-   * This option gives you the ability to format the year on the calendar from
-   * the value that JavaScript date's give you to whatever you'd like.
-   */
-  formatYear?(year: number): string
-
-  /**
    * Using an input field with your datepicker? Want to customize its value
    * anytime a date is selected? Provide a function that returns a string to set
    * the input value with.
    *
-   * NOTE: The formatter function will only run if the datepicker instance is
-   * associated with an <input> field.
+   * NOTE: The formatInputValue function will only run if the datepicker
+   * instance is associated with an <input> field.
    */
-  // TODO - change this to `formatInputValue`
-  formatter?(date: Date): string
+  formatInputValue?(date: Date): string
+
+  /**
+   * This option gives you the ability to format the year on the calendar from
+   * the value that JavaScript date's give you to whatever you'd like.
+   */
+  formatYear?(year: number): string
 
   /**
    * Custom text for the year overlay submit button.
@@ -384,7 +383,7 @@ export type SanitizedOptions = Expand<
         | 'formatDay'
         | 'formatYear'
         | 'unformatYear'
-        | 'formatter'
+        | 'formatInputValue'
         | 'defaultView'
         | 'overlayButtonText'
         | 'overlayPlaceholder'

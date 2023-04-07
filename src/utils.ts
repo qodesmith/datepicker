@@ -591,7 +591,7 @@ export function sanitizeAndCheckAndSyncOptions(
     formatDay: options?.formatDay ?? defaultDayYearFormatter,
     formatYear: options?.formatYear ?? defaultDayYearFormatter,
     unformatYear: options?.unformatYear ?? defaultUnformatYear,
-    formatter: options?.formatter ?? defaultInputValueFormatter,
+    formatInputValue: options?.formatInputValue ?? defaultInputValueFormatter,
     disabler: (date: Date): boolean => options?.disabler?.(date) ?? false,
   }
 }

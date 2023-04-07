@@ -26,7 +26,7 @@ describe('Options', () => {
     })
   })
 
-  describe('formatter', () => {
+  describe('formatInputValue', () => {
     const startDate = new Date(2023, 1)
     const dayNum = 5
 
@@ -34,7 +34,7 @@ describe('Options', () => {
       const picker = datepicker(testElementIds.singleInput, {
         startDate,
         alwaysShow: true,
-        formatter(date) {
+        formatInputValue(date) {
           return `Year: ${date.getFullYear()} Month: ${date.getMonth()} Day: ${date.getDate()}`
         },
       })
@@ -53,13 +53,13 @@ describe('Options', () => {
       const options = {
         startDate,
         alwaysShow: true,
-        formatter(...args) {
+        formatInputValue(...args) {
           expect(args[0]).to.deep.equal(expectedDate)
           expect(args.length).to.equal(1)
           return ''
         },
       }
-      const spy = cy.spy(options, 'formatter')
+      const spy = cy.spy(options, 'formatInputValue')
       const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get(testElementIds.singleInput).should('have.value', '')
@@ -71,7 +71,7 @@ describe('Options', () => {
         })
     })
 
-    it('should default to calling `date.toDateString()` if no formatter is provided', () => {
+    it('should default to calling `date.toDateString()` if no formatInputValue is provided', () => {
       const expectedDate = new Date(startDate)
       expectedDate.setDate(dayNum)
       const picker = datepicker(testElementIds.singleInput, {
@@ -636,7 +636,11 @@ describe('Options', () => {
       const day = 15
       const maxDate = new Date(2023, 2, day)
       const daysInMarch = new Date(2023, 3, 0).getDate()
-      const options: DatepickerOptions = {maxDate, alwaysShow: true}
+      const options: DatepickerOptions = {
+        maxDate,
+        alwaysShow: true,
+        startDate: maxDate,
+      }
       const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get(days.selectedDate).should('have.length', 0)
@@ -673,7 +677,11 @@ describe('Options', () => {
       const day = 15
       const minDate = new Date(2023, 2, day)
       const daysInMarch = new Date(2023, 3, 0).getDate()
-      const options: DatepickerOptions = {minDate, alwaysShow: true}
+      const options: DatepickerOptions = {
+        minDate,
+        alwaysShow: true,
+        startDate: minDate,
+      }
       const picker = datepicker(testElementIds.singleInput, options)
 
       cy.get(days.selectedDate).should('have.length', 0)

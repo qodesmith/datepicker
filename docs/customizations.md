@@ -8,8 +8,8 @@
 - [customOverlayMonths](#customoverlaymonths)
 - [defaultView](#defaultview)
 - [formatDay](#formatday)
+- [formatInputValue](#formatinputvalue)
 - [formatYear](#formatyear)
-- [formatter](#formatter)
 - [overlayButtonText](#overlaybuttontext)
 - [overplayPlaceholder](#overlayplaceholder)
 - [position](#position)
@@ -166,6 +166,34 @@ const picker = datepicker(selector, {
 })
 ```
 
+## formatInputValue
+
+If you're using an input field with your datepicker, this function allows you to
+customize the format of the input's value. Datepicker will use the return value
+of this function to set the input value.
+
+### Type Declaration
+
+```typescript
+// Regular datepicker.
+formatInputValue({date: Date, instance: DatepickerInstance}): string
+
+// Daterange picker.
+formatInputValue({date: Date, instance: DaterangePickerInstance}): string
+```
+
+**Default value:** `({date}) => date.toDateString()`
+
+### Example
+
+```javascript
+const picker = datepicker(selector, {
+  formatter(date) {
+    return date.toLocaleDateString()
+  },
+})
+```
+
 ## formatYear
 
 This option gives you the ability to customize the year. Datepicker will use the
@@ -187,34 +215,6 @@ const picker = datepicker(selector, {
   formatYear(yearNum) {
     // Convert the number to Arabic.
     return yearNum.toLocaleString('ar-EG')
-  },
-})
-```
-
-## formatter
-
-If you're using an input field with your datepicker, this function allows you to
-customize the format of the input's value. Datepicker will use the return value
-of this function to set the input value.
-
-### Type Declaration
-
-```typescript
-// Regular datepicker.
-formatter({date: Date, instance: DatepickerInstance}): string
-
-// Daterange picker.
-formatter({date: Date, instance: DaterangePickerInstance}): string
-```
-
-**Default value:** `({date}) => date.toDateString()`
-
-### Example
-
-```javascript
-const picker = datepicker(selector, {
-  formatter(date) {
-    return date.toLocaleDateString()
   },
 })
 ```

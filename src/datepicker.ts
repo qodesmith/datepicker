@@ -649,7 +649,7 @@ function datepicker(
   return publicPicker
 }
 
-export default datepicker
+export {datepicker}
 export type {
   Datepicker,
   Selector,

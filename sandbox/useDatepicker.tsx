@@ -7,7 +7,7 @@ import {
   Expand,
   Selector,
 } from '../src/types'
-import datepicker from '../src/datepicker'
+import {datepicker} from '../src/datepicker'
 import {useRecoilState, useResetRecoilState} from 'recoil'
 import {datepickerAtomFamily} from './state'
 

@@ -1,4 +1,4 @@
-import datepicker from '../src/datepicker'
+import {datepicker} from '../src/datepicker'
 import {DatepickerInstance} from '../src/types'
 
 export default function ShadowDOMExample() {

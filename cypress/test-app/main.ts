@@ -1,6 +1,6 @@
 import '../../src/datepicker.scss'
 import './test-app.scss'
-import datepicker from '../../src/datepicker'
+import {datepicker} from '../../src/datepicker'
 
 /**
  * To access datepicker withing the correct context, we first make it a global

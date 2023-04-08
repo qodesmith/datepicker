@@ -1,6 +1,7 @@
 import Data from './Data'
 import DatepickerAttachedToDiv from './DatepickerAttachedToDiv'
 import DatepickerAttachedToInput from './DatepickerAttachedToInput'
+import DatepickerMultiple from './DatepickerMultiple'
 import DatepickerOLDAttachedToInput from './DatepickerOLDAttachedToInput'
 import DatepickerWhatever from './DatepickerWhatever'
 import DaterangePickers from './DaterangePickers'
@@ -18,6 +19,7 @@ export default function NewApp() {
       <ShadowDOMExample />
       <DaterangePickersOLD />
       <DatepickerWhatever />
+      <DatepickerMultiple />
     </div>
   )
 }

@@ -1,0 +1,12 @@
+.datepicker-multiple {
+  grid-column: span 3;
+
+  .container {
+    display: flex;
+    gap: 1em;
+  }
+}
+
+.datepicker-multiple-selector-target {
+  display: flex;
+}

@@ -84,7 +84,6 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
     overlaySubmitButton,
     input: overlayInput,
   } = overlay
-  const isInput = getIsInput(selectorData.el)
 
   function setListenersMapItem(
     {type, el}: ListenersMapKey,
@@ -101,7 +100,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
   }
 
   // INPUT ELEMENT
-  if (isInput) {
+  if (selectorData.isInput) {
     const showHideData = {trigger: 'click', triggerType: 'user'} as const
 
     setListenersMapItem(

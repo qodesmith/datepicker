@@ -1,12 +1,7 @@
 // TODO - don't export any functions that aren't consumed anywhere.
 
-import type {
-  InternalPickerData,
-  SanitizedOptions,
-  SelectorData,
-  ViewType,
-} from './types'
-import {getOverlayClassName, getIsInput} from './utils'
+import type {SanitizedOptions} from './types'
+import {getOverlayClassName} from './utils'
 
 const arrowSVG = `
   <svg viewBox="0 0 24 24">
@@ -190,28 +185,17 @@ export type PickerElements = {
   showAllDatesData: [HTMLDivElement[], HTMLDivElement[]]
 }
 
-// TODO - can we get rid of this type and deduce things from the internal picker or the options?
-type CreateCalendarInput = {
-  date: Date
-  customMonths: InternalPickerData['months']
-  defaultView: ViewType
-  overlayButtonText: SanitizedOptions['overlayButtonText']
-  overlayPlaceholder: SanitizedOptions['overlayPlaceholder']
-  selectorEl: SelectorData['el']
-  alwaysShow: InternalPickerData['alwaysShow']
-}
 /**
  * This function creates the calendar HTML but doesn't add all the necessary
  * classes for calendar days (i.e. selected date, disabled dates, etc.).
  * Calendar days are fully processed in `renderCalendar`.
  */
 export function createCalendarHTML(
-  selectorEl: SelectorData['el'],
+  isInput: boolean,
   options: SanitizedOptions
 ): PickerElements {
   const {defaultView, showAllDates, formatDay} = options
   const alwaysShow = !!options?.alwaysShow
-  const isInput = getIsInput(selectorEl)
   const calendarContainer = document.createElement('div')
   // TODO - turn all these internal function arguments from objects to multiple arguments.
   // Argument names can be minimized, object properties can't.

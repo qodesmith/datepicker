@@ -602,22 +602,52 @@ export type DaterangePickerInstance = Expand<
 >
 
 export type SelectorData = {
-  el: HTMLElement
+  /**
+   * If the selector is an input, this will be the parent element or, in the
+   * case of a Shadow DOM, possibly the associated custom element.
+   *
+   * If the selector is not an element, then this will be the selector itself.
+   * I.e., `containingElement` and `el` will be the same element.
+   */
+  containingElement: HTMLElement
 
   /**
-   * The main use of datepicker is to associate it with an element (an <input /> in most cases) and have it positioned relative to that element. In order to accomplish this, a parent element needs to be explicitly positioned. This property is that element. If it doesn't contain any positioning already, `position: relative` will be added to it.
+   * When Datepicker is associated with an input element, the calendar needs to
+   * be positioned relative to that input. In order to accomplish this, the
+   * input's parent element needs to be explicitly positioned.
+   *
+   * If the input's parent element doesn't contain any positioning already,
+   * inline styles of `position: relative` will be added to it. This function
+   * is a closure that captures all the necessary context in order to safely
+   * undo any styling datepicker has applied.
    */
-  elementForPositioning: HTMLElement
+  revertStyling?(): void
+} & (
+  | {
+      /**
+       * Indicates wether the associated selector represents an input element.
+       */
+      isInput: true
 
-  /**
-   * The value of having run `getComputedStyle(elementForPositioning)`.
-   */
-  calculatedPosition: string
+      /**
+       * The element associated with the datepicker calendar. For any non-input
+       * elements, the calendar will become its child.
+       */
+      el: HTMLInputElement
+      revertStyling(): void
+    }
+  | {
+      /**
+       * Indicates wether the associated selector represents an input element.
+       */
+      isInput: false
 
-  /**
-   * If the parent element already had an inline style set for position, this will be that value. Otherwise, it will be null.
-   */
-  originalPositionStyle: string | null
-  shadowDom: ShadowRoot | null
-  customElement: Element | null
-}
+      /**
+       * The element associated with the datepicker calendar. For any non-input
+       * element, the calendar will become its child.
+       *
+       * For non-input elements, `el` and `containingElement` will be equal.
+       */
+      el: HTMLElement
+    }
+)

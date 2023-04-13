@@ -71,7 +71,7 @@ function datepicker(
 ): DatepickerInstance | DaterangePickerInstance {
   const options = sanitizeAndCheckAndSyncOptions(rawOptions)
   const selectorData = getSelectorData(selector)
-  const isInput = getIsInput(selectorData.el)
+  const {isInput} = selectorData
   const {
     startDate,
     minDate,
@@ -93,13 +93,13 @@ function datepicker(
   let isPairRemoved = false
 
   function safeUpdateInput(date?: Date) {
-    if (getIsInput(selectorData.el)) {
+    if (isInput) {
       selectorData.el.value = date ? formatInputValue(stripTime(date)) : ''
     }
   }
 
   // CREATE CALENDAR HTML
-  const pickerElements = createCalendarHTML(selectorData.el, options)
+  const pickerElements = createCalendarHTML(isInput, options)
 
   // CREATE INTERNAL PICKER DATA
   // TODO - should this be called `privatePicker` to keep in line with `publicPicker`?
@@ -285,7 +285,7 @@ function datepicker(
         pickerElements.calendarContainer.classList.add('dp-blur')
       }
       pickerElements.calendarContainer.classList.remove('dp-dn')
-      positionCalendar(internalPickerItem, position, isInput)
+      positionCalendar(internalPickerItem, position)
       pickerElements.overlay.overlayContainer.className = getOverlayClassName({
         action: 'calendarOpen',
         defaultView,
@@ -400,19 +400,8 @@ function datepicker(
         // Nothing to do here. See the comment where the rangepicker is created.
       }
 
-      // TODO - what do we do here if 2 pickers are attached to the same container?
-      // Remove styles added to the parent element.
-      if (selectorData.originalPositionStyle) {
-        selectorData.elementForPositioning.style.setProperty(
-          'position',
-          selectorData.originalPositionStyle
-        )
-      } else {
-        selectorData.elementForPositioning.style.removeProperty('position')
-        if (selectorData.elementForPositioning.getAttribute('style') === '') {
-          selectorData.elementForPositioning.removeAttribute('style')
-        }
-      }
+      // Remove styles added to the input's parent element.
+      selectorData.revertStyling?.()
 
       // Remove listeners.
       removeEventListeners(internalPickerItem)
@@ -545,11 +534,10 @@ function datepicker(
     renderCalendar(internalPickerItem)
 
     // ADD THE CALENDAR TO THE DOM
-    const container = isInput ? selectorData.el.parentElement : selectorData.el
-    container?.append(pickerElements.calendarContainer)
+    selectorData.containingElement.append(pickerElements.calendarContainer)
 
     // UPDATE CALENDAR POSITION
-    positionCalendar(internalPickerItem, position, isInput)
+    positionCalendar(internalPickerItem, position)
   }
 
   // Rangepicker.

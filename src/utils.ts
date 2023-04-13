@@ -59,7 +59,7 @@ function throwSelectedDateMinMaxError(
 }
 
 export function getSelectorData(selector: Selector): SelectorData {
-  let element: HTMLElement | null = null
+  let element: HTMLElement | HTMLInputElement | null = null
 
   // Find the element via the provided string selector.
   if (typeof selector === 'string') {
@@ -77,92 +77,126 @@ export function getSelectorData(selector: Selector): SelectorData {
     element = selector
   }
 
+  // 🚫 Check if the selector isn't found.
   if (!element) {
     throwError('No element found.')
   }
 
+  // 🚫 Check for void elements.
   const nodeName = element.nodeName.toLowerCase() as typeof voidElements[number]
   if (voidElements.includes(nodeName)) {
     throwError(`Using a void element <${nodeName}> is not supported.`)
   }
 
+  // 🚫 Check for ShadowRoot as the selector.
   const type = getType(element)
   if (type === 'ShadowRoot') {
     throwError('Using a shadow DOM as your selector is not supported.')
   }
 
+  // 🚫 Check for non-element node.
   if (element.nodeType !== 1) {
     throwError('The object passed to datepicker is not an HTML element.')
   }
 
   const rootNode = element.getRootNode()
   const rootNodeType = getType(rootNode)
-  const parentElement = element.parentElement
+  const isInput = getIsInput(element)
 
   // Inputs are the only elements that can't have multiple datepickers.
   // TODO - remove/adjust this once allowing multiple pickers per same element.
   checkForExistingPickerOnElement(element)
 
   /**
-   * There are only 2 possible root (top-level) nodes supported:
-   *   * document
-   *   * a shadow DOM
-   */
-  if (rootNodeType === 'HTMLDocument') {
-    // This shouldn't happen - elements should always have a parent.
-    if (!parentElement) {
-      throwError('No parent to selector found.')
-    }
-
-    const calculatedPosition = getComputedStyle(parentElement).position
-    const originalStyle = parentElement.getAttribute('style')
-    const originalPositionStyle = originalStyle ? calculatedPosition : null
-    if (calculatedPosition === '' || calculatedPosition === 'static') {
-      parentElement.style.setProperty('position', 'relative')
-    }
-
-    return {
-      el: element,
-      elementForPositioning: parentElement,
-      calculatedPosition,
-      originalPositionStyle,
-      shadowDom: null,
-      customElement: null,
-    }
-  }
-
-  if (rootNodeType === 'ShadowRoot') {
-    const customElement = (rootNode as ShadowRoot).host as HTMLElement
-    const elementForPositioning = element.parentElement ?? customElement
-    const calculatedPosition = getComputedStyle(elementForPositioning).position
-    const originalStyle = elementForPositioning.getAttribute('style')
-    const originalPositionStyle = originalStyle ? calculatedPosition : null
-
-    if (calculatedPosition === '' || calculatedPosition === 'static') {
-      elementForPositioning.style.setProperty('position', 'relative')
-    }
-
-    /**
-     * In the case of the selector being a direct child of the shadow DOM, we
-     * won't be able to apply css positioning styles to the parent which would
-     * be the shadow DOM itself. Rather, we move one step further up the chain
-     * and apply those styles to the custom element rendered in the DOM.
-     */
-    return {
-      el: element,
-      elementForPositioning,
-      calculatedPosition,
-      originalPositionStyle,
-      shadowDom: rootNode as ShadowRoot,
-      customElement,
-    }
-  }
-
-  /**
-   * We could get here if the root node IS the element:
+   * Only 2 possible root (top-level) nodes are supported:
+   *   - document
+   *   - a shadow DOM
+   *
+   * 🚫 We could end up in a situation where the root node IS the element:
    * datepicker(document.createElement('div'))
    */
-  throwError(`Invalid root node found for selector: ${rootNodeType}`)
+  if (rootNodeType !== 'HTMLDocument' && rootNodeType !== 'ShadowRoot') {
+    throwError(`Invalid root node found for selector: ${rootNodeType}`)
+  }
+
+  const containingElement: HTMLElement = (() => {
+    if (isInput) {
+      const {parentElement} = element
+
+      /**
+       * In the case of the selector being a direct child of the shadow DOM, we
+       * won't be able to apply css positioning styles to the parent which would
+       * be the shadow DOM itself. Rather, we move one step further up the chain
+       * and apply those styles to the custom element rendered in the DOM.
+       */
+      if (rootNodeType === 'ShadowRoot') {
+        const customElement = (rootNode as ShadowRoot).host as HTMLElement
+        return parentElement ?? customElement
+      }
+
+      // This shouldn't happen - document children should always have a parent.
+      if (!parentElement) {
+        throwError('No parent to selector found.')
+      }
+
+      return parentElement
+    }
+
+    return element
+  })()
+
+  if (isInput) {
+    const hasStyleAttribute = !!containingElement.getAttribute('style')
+    const positionComesFromStyleAttribue =
+      hasStyleAttribute && containingElement.style.position !== ''
+    const currentPosition = getComputedStyle(containingElement).position
+    const hasDefaultPositioning =
+      currentPosition === '' || currentPosition === 'static'
+
+    if (hasDefaultPositioning) {
+      containingElement.style.position = 'relative'
+    }
+
+    return {
+      isInput,
+      el: element as HTMLInputElement,
+      containingElement,
+
+      /**
+       * Style scenarios to account for:
+       * - No / empty style attribute:
+       *    - Lacks CSS positioning (i.e. has "default" position)
+       *      - Add inline style position | remove inline style position only (user may have added inline styles afterwards).
+       *    - Has CSS positioning (inputParentPosition !== '' or 'static')
+       *      - Do nothing
+       * - Explicit style attribute:
+       *    - Does not have position
+       *      - Add inline style position | remove inline style position only (thereby preserving the user's original inline styling).
+       *    - Has position
+       *      - Restore the original position value.
+       */
+      revertStyling() {
+        switch (true) {
+          // STYLE ATTRIBUTE, HAS POSITION
+          case positionComesFromStyleAttribue:
+            // Restore the original inline style position.
+            containingElement.style.position = currentPosition
+            break
+          // STYLE ATTRIBUTE, NO POSITION
+          // NO STYLE ATTRIBUTE, DEFAULT POSITION
+          case hasDefaultPositioning:
+            // Remove inline position style.
+            containingElement.style.position = ''
+        }
+      },
+    }
+  }
+
+  return {
+    isInput,
+    el: element,
+    containingElement,
+  }
 }
 
 /**
@@ -173,13 +207,12 @@ export function getSelectorData(selector: Selector): SelectorData {
  */
 export function positionCalendar(
   internalPickerItem: InternalPickerData,
-  position: Position,
-  isInput: Boolean
+  position: Position
 ) {
   const {selectorData, pickerElements} = internalPickerItem
   const {calendarContainer} = pickerElements
 
-  if (isInput) {
+  if (selectorData.isInput) {
     if (position === 'mc') {
       return calendarContainer.classList.add('dp-centered')
     }
@@ -192,7 +225,7 @@ export function positionCalendar(
      * size of the calendar could alter the input field's size prior to us
      * taking measurements. Absolute positioning prior to measuring avoids this.
      */
-    calendarContainer.style.setProperty('position', 'absolute')
+    calendarContainer.style.position = 'absolute'
 
     const [calendarWidth, calendarHeight] = (() => {
       const {width, height} = getComputedStyle(calendarContainer)
@@ -201,9 +234,9 @@ export function positionCalendar(
       return [width, height].map(v => +v.slice(0, -2))
     })()
     const {top: parentTop, left: parentLeft} =
-      selectorData.elementForPositioning.getBoundingClientRect()
+      selectorData.containingElement.getBoundingClientRect()
     const parentBorderWidth = +getComputedStyle(
-      selectorData.elementForPositioning
+      selectorData.containingElement
     ).borderWidth.slice(0, -2)
     const {
       top: inputTop,
@@ -223,8 +256,8 @@ export function positionCalendar(
         ? px(relativeLeft) // 'l'
         : px(relativeLeft + inputWidth - calendarWidth) // 'r'
 
-    calendarContainer.style.setProperty('top', top)
-    calendarContainer.style.setProperty('left', left)
+    calendarContainer.style.top = top
+    calendarContainer.style.left = left
   }
 }
 
@@ -707,12 +740,9 @@ export function shouldSkipForDisabledReadOnly(
   internalPickerItem: InternalPickerData
 ) {
   const {selectorData, respectDisabledReadOnly} = internalPickerItem
-  const isInput = getIsInput(selectorData.el)
+  const {isInput, el} = selectorData
 
-  return !isInput || !respectDisabledReadOnly
-    ? false
-    : (selectorData.el as HTMLInputElement).disabled ||
-        (selectorData.el as HTMLInputElement).readOnly
+  return isInput && respectDisabledReadOnly ? el.disabled || el.readOnly : false
 }
 
 export function getSelectedDate(

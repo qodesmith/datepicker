@@ -1,6 +1,6 @@
 import './datepickerMultiple.scss'
 
-import {useCallback, useEffect, useRef, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import type {DatepickerInstance, DatepickerOptions} from '../src/types'
 import {datepicker} from '../src/datepicker'
 
@@ -29,9 +29,9 @@ export default function DatepickerMultiple() {
       setPicker3(inputPicker1)
 
       return () => {
-        divPicker1?.remove()
-        divPicker2?.remove()
-        inputPicker1?.remove()
+        divPicker1.remove()
+        divPicker2.remove()
+        inputPicker1.remove()
       }
     }
   }, [divRef.current, inputRef.current])

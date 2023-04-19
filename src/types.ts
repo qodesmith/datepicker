@@ -1,32 +1,9 @@
-import {PickerElements} from './utilsCreateCalendar'
+import type {PickerElements} from './utilsCreateCalendar'
+import type {Expand, ExpandRecursively} from './types/expand'
 import {userEvents} from './constants'
 import {datepicker} from './datepicker'
 
 // TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
-
-type ExpandFxn<T> = T extends (...args: infer A) => infer R
-  ? (...args: Expand<A>) => Expand<R>
-  : never
-export type Expand<T> = T extends Function
-  ? ExpandFxn<T>
-  : T extends Date
-  ? Date
-  : unknown extends T
-  ? T
-  : {
-      [K in keyof T]: T[K]
-    } & {}
-export type ExpandRecursively<T> = T extends Function
-  ? ExpandFxn<T>
-  : T extends Date
-  ? Date
-  : T extends HTMLElement
-  ? T
-  : unknown extends T
-  ? T
-  : {
-      [K in keyof T]: ExpandRecursively<T[K]>
-    } & {}
 
 export type Datepicker = typeof datepicker
 export type TriggerType = 'user' | 'imperative'

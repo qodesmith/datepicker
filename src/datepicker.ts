@@ -15,13 +15,13 @@ import type {
   Trigger,
   TriggerType,
   DaterangePickerInstanceOnlyProps,
+  DaterangePickerInstancePair,
 } from './types'
 import {createCalendarHTML} from './utilsCreateCalendar'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
   addPickerToMap,
   adjustRangepickerMinMaxDates,
-  getIsInput,
   getOverlayClassName,
   getRangepickers,
   getSelectedDate,
@@ -133,7 +133,7 @@ function datepicker(
     unformatYear: options.unformatYear,
     disabler: options.disabler,
     _navigate({date, trigger, triggerType}) {
-      const {currentDate} = internalPickerItem
+      const {currentDate, publicPicker} = internalPickerItem
 
       internalPickerItem.currentDate = stripTime(date)
       renderCalendar(internalPickerItem)
@@ -155,6 +155,7 @@ function datepicker(
         currentDate,
         sibling,
         selectedDate: prevSelectedDate,
+        publicPicker,
       } = internalPickerItem
       const isWeekendDateDisabled = date && noWeekends && isWeekendDate(date)
       const isDateDisabled = date
@@ -216,7 +217,7 @@ function datepicker(
       }
     },
     _setMinOrMax(isFirstRun, minOrMax, {date, trigger, triggerType}): void {
-      const {minDate, maxDate, sibling} = internalPickerItem
+      const {minDate, maxDate, sibling, publicPicker} = internalPickerItem
       const dateType = minOrMax === 'min' ? 'minDate' : 'maxDate'
       const strippedDate = date ? stripTime(date) : undefined
 
@@ -277,7 +278,7 @@ function datepicker(
         return
       }
 
-      const {defaultView} = internalPickerItem
+      const {defaultView, publicPicker} = internalPickerItem
       const shouldOverlayShow = defaultView === 'overlay'
 
       internalPickerItem.isOverlayShowing = shouldOverlayShow
@@ -322,7 +323,7 @@ function datepicker(
       onHide({
         trigger,
         triggerType,
-        instance: publicPicker,
+        instance: internalPickerItem.publicPicker,
       })
     },
     _getRange() {
@@ -467,9 +468,9 @@ function datepicker(
       if (isRemoved) throwAlreadyRemovedError()
 
       if (internalPickerItem.isCalendarShowing) {
-        publicPicker.hide()
+        internalPickerItem.publicPicker.hide()
       } else {
-        publicPicker.show()
+        internalPickerItem.publicPicker.show()
       }
     },
     toggleOverlay(): void {
@@ -581,6 +582,11 @@ function datepicker(
       get isFirst() {
         return isPairRemoved || isRemoved ? undefined : isFirst
       },
+      get sibling() {
+        return (
+          isFirst ? rangepickers[1].publicPicker : rangepickers[0].publicPicker
+        ) as DaterangePickerInstance
+      },
       getRange() {
         if (isPairRemoved || isRemoved) throwAlreadyRemovedError()
 
@@ -590,7 +596,7 @@ function datepicker(
         if (isPairRemoved || isRemoved) throwAlreadyRemovedError()
 
         isPairRemoved = true
-        publicPicker.remove()
+        internalPickerItem.publicPicker.remove()
 
         /**
          * Conditionally call this because sibling.remove() may have already
@@ -645,6 +651,7 @@ export type {
   DaterangePickerOptions,
   DatepickerInstance,
   DaterangePickerInstance,
+  DaterangePickerInstancePair,
 
   // Option types:
   ViewType,

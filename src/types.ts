@@ -20,6 +20,8 @@ export type ExpandRecursively<T> = T extends Function
   ? ExpandFxn<T>
   : T extends Date
   ? Date
+  : T extends HTMLElement
+  ? T
   : unknown extends T
   ? T
   : {
@@ -39,20 +41,34 @@ export type UserEvent = typeof userEvents[number]
 export type Trigger = ImperativeMethod | UserEvent
 type CallbackData = {
   /**
-   * The explicit source of what triggered the callback. This can be imperative methods, such as `selectDate` and `show` or user interactions with the DOM, such as `click`.
+   * The explicit source of what triggered the callback. This can be imperative
+   * methods, such as `selectDate` and `show` or user interactions with the DOM,
+   * such as `click`.
    */
   trigger: Trigger
 
   /**
-   * The category source of what triggered the callback. `user` for user interactions with the DOM, such as `click`, or `imperative` for imperative methods, such as `selectDate` or `show`.
+   * The category source of what triggered the callback. `user` for user
+   * interactions with the DOM, such as `click`, or `imperative` for imperative
+   * methods, such as `selectDate` or `show`.
    */
   triggerType: TriggerType
 
   /**
-   * Providing the datepicker instance as a convenience. This allows the user to avoid having to import the instance from wherever it was created.
+   * Providing the datepicker instance as a convenience. This allows the user to
+   * avoid having to import the instance from wherever it was created.
    */
   instance: DatepickerInstance
 }
+type RangeCallbackData = Expand<
+  {
+    /**
+     * Providing the datepicker instance as a convenience. This allows the user
+     * to avoid having to import the instance from wherever it was created.
+     */
+    instance: DaterangePickerInstance
+  } & Omit<CallbackData, 'instance'>
+>
 
 export type DatepickerOptions = ExpandRecursively<{
   ///////////////
@@ -62,31 +78,33 @@ export type DatepickerOptions = ExpandRecursively<{
   /**
    * Callback function when the calendar is hidden.
    */
-  onHide?(data: Expand<CallbackData>): void
+  onHide?(data: CallbackData): void
 
   /**
    * Callback function when the month has changed.
    */
   onMonthChange?(
-    onMonthChangeOptions: Expand<CallbackData & {prevDate: Date; newDate: Date}>
+    onMonthChangeOptions: Expand<{prevDate: Date; newDate: Date} & CallbackData>
   ): void
 
   /**
-   * Callback function after a date has been selected. It will receive the previous and newly selected dates. If `newDate` is `undefined`, that means the calendar date has been de-selected.
+   * Callback function after a date has been selected. It will receive the
+   * previous and newly selected dates. If `newDate` is `undefined`, that means
+   * the calendar date has been de-selected.
    */
   onSelect?(
     onSelectOptions: Expand<
-      CallbackData & {
+      {
         prevDate: Date | undefined
         newDate: Date | undefined
-      }
+      } & CallbackData
     >
   ): void
 
   /**
    * Callback function when the calendar is shown.
    */
-  onShow?(data: Expand<CallbackData>): void
+  onShow?(data: CallbackData): void
 
   ////////////////////
   // CUSTOMIZATIONS //
@@ -336,20 +354,62 @@ export type DatepickerOptions = ExpandRecursively<{
    * Default - false
    */
   noWeekends?: boolean
+
+  /**
+   * THIS PROPERTY ISN'T INTENDED FOR PUBLIC USE.
+   *
+   * It is used internally to  wire up a rangepicker (2 datepickers connected).
+   * While it's possibly to do this manually yourself, please use the
+   * `rangepicker` function instead.
+   */
+  _id?: unknown
 }>
 
-export type DaterangePickerOptions = {
-  /**
-   * This can be any value aside from `undefined`.
-   *
-   * Now we're getting fancy! If you want to link two instances together to help
-   * form a daterange picker, this is your option. Only two picker instances can
-   * share an `id`. The datepicker instance declared first will be considered
-   * the "start" picker in the range. There's a fancy `getRange` method for you
-   * to use as well.
-   */
-  id: unknown
-} & DatepickerOptions
+export type DaterangePickerOptions = ExpandRecursively<
+  {
+    ///////////////
+    // CALLBACKS //
+    ///////////////
+
+    /**
+     * Callback function when the calendar is hidden.
+     */
+    onHide?(data: RangeCallbackData): void
+
+    /**
+     * Callback function when the month has changed.
+     */
+    onMonthChange?(
+      onMonthChangeOptions: Expand<
+        {prevDate: Date; newDate: Date} & RangeCallbackData
+      >
+    ): void
+
+    /**
+     * Callback function after a date has been selected. It will receive the
+     * previous and newly selected dates. If `newDate` is `undefined`, that
+     * means the calendar date has been de-selected.
+     */
+    onSelect?(
+      onSelectOptions: Expand<
+        {
+          prevDate: Date | undefined
+          newDate: Date | undefined
+        } & RangeCallbackData
+      >
+    ): void
+
+    /**
+     * Callback function when the calendar is shown.
+     */
+    onShow?(data: RangeCallbackData): void
+  } & Omit<
+    DatepickerOptions,
+    'onHide' | 'onMonthChange' | 'onSelect' | 'onShow'
+  >
+>
+
+export type DaterangeOptionsArg = DatepickerOptions | DatepickerOptions[]
 
 export type SanitizedOptions = Expand<
   (
@@ -372,29 +432,38 @@ export type SanitizedOptions = Expand<
     isOverlayShowing: boolean
     minMaxDates: InternalPickerData['minMaxDates']
   } & Required<
-      Pick<
-        DatepickerOptions,
-        | 'noWeekends'
-        | 'position'
-        | 'onShow'
-        | 'onHide'
-        | 'onMonthChange'
-        | 'onSelect'
-        | 'formatDay'
-        | 'formatYear'
-        | 'unformatYear'
-        | 'formatInputValue'
-        | 'defaultView'
-        | 'overlayButtonText'
-        | 'overlayPlaceholder'
-        | 'startDay'
-        | 'disabler'
-        // | 'alwaysShow' // Do NOT include this.
+      Omit<
+        Pick<
+          DatepickerOptions,
+          | 'noWeekends'
+          | 'position'
+          | 'onShow'
+          | 'onHide'
+          | 'onMonthChange'
+          | 'onSelect'
+          | 'formatDay'
+          | 'formatYear'
+          | 'unformatYear'
+          | 'formatInputValue'
+          | 'defaultView'
+          | 'overlayButtonText'
+          | 'overlayPlaceholder'
+          | 'startDay'
+          | 'disabler'
+        >,
+        // Prevent 'alwaysShow' from being included in the required props above.
+        'alwaysShow'
       >
     >
 >
 
 export type Selector = string | HTMLElement | null
+export type RangeSelector =
+  | string
+  | [string, string]
+  | HTMLElement
+  | [HTMLElement, HTMLElement]
+  | null
 
 /**
  * `t`, `r`, `b`, and `l` are all positioned relatively to the input the calendar is attached to.
@@ -560,13 +629,6 @@ export type DaterangePickerInstanceOnlyProps = {
   readonly getRange: () => ReturnType<InternalPickerData['_getRange']>
 
   /**
-   * If two datepickers have the same `id` option then this property will be
-   * available and refer to the other instance.
-   */
-  // TODO - do we need a public reference to sibling?
-  // sibling?: DaterangePickerInstance
-
-  /**
    * This method exists because it's possible to individually remove one of the
    * instances in a daterange pair. For convenience, you can call this method
    * and remove them both at once.
@@ -595,11 +657,21 @@ export type DaterangePickerInstanceOnlyProps = {
    * pair is removed.
    */
   readonly isFirst: boolean | undefined
+
+  /**
+   * A reference to the other picker in this rangepicker pair.
+   */
+  readonly sibling: DaterangePickerInstance
 }
 
 export type DaterangePickerInstance = Expand<
   DatepickerInstance & DaterangePickerInstanceOnlyProps
 >
+
+export type DaterangePickerInstancePair = [
+  DaterangePickerInstance,
+  DaterangePickerInstance
+]
 
 export type SelectorData = {
   /**

@@ -445,7 +445,6 @@ export function sanitizeAndCheckAndSyncOptions(
     throwError('"options.minDate" cannot be greater than "options.maxDate"')
   }
 
-  // Only check for conflicts here, not daterange scenarios.
   if (selectedDate) {
     if (minDate && selectedDate < minDate) {
       throwError('"options.selectedDate" cannot be less than "options.minDate"')

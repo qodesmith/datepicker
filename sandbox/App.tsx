@@ -11,15 +11,15 @@ import ShadowDOMExample from './ShadowDOMExample'
 export default function NewApp() {
   return (
     <div className="main-grid">
-      <Data />
+      {/* <Data />
       <DatepickerAttachedToDiv />
       <DatepickerAttachedToInput />
-      <DatepickerOLDAttachedToInput />
+      <DatepickerOLDAttachedToInput /> */}
       <DaterangePickers />
-      <ShadowDOMExample />
+      {/* <ShadowDOMExample />
       <DaterangePickersOLD />
       <DatepickerWhatever />
-      <DatepickerMultiple />
+      <DatepickerMultiple /> */}
     </div>
   )
 }

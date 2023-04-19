@@ -1,7 +1,7 @@
 import type {
   DatepickerOptions,
   DaterangePickerOptions,
-  InternalPickerData,
+  PrivatePicker,
   Position,
   SanitizedOptions,
   Selector,
@@ -206,7 +206,7 @@ export function getSelectorData(selector: Selector): SelectorData {
  * This should run AFTER the calendar is rendered to the DOM! Otherwise, you'll get 'auto' as a value for height.
  */
 export function positionCalendar(
-  internalPickerItem: InternalPickerData,
+  internalPickerItem: PrivatePicker,
   position: Position
 ) {
   const {selectorData, pickerElements} = internalPickerItem
@@ -307,7 +307,7 @@ export function isDateWithinRange({
 type GetOverlayClassInputType = {
   action: 'initialize' | 'calendarOpen' | 'overlayToggle'
   defaultView: ViewType
-  isOverlayShowing?: InternalPickerData['isOverlayShowing']
+  isOverlayShowing?: PrivatePicker['isOverlayShowing']
 }
 export function getOverlayClassName({
   action,
@@ -342,11 +342,11 @@ function checkForExistingPickerOnElement(el: HTMLElement): void {
 }
 
 /**
- * Returns an ordered array of InternalPickerData objects that are rangepickers
+ * Returns an ordered array of PrivatePicker objects that are rangepickers
  * for a given id.
  */
-export function getRangepickers(id: unknown): InternalPickerData[] {
-  const rangepickers: InternalPickerData[] = []
+export function getRangepickers(id: unknown): PrivatePicker[] {
+  const rangepickers: PrivatePicker[] = []
 
   datepickersMap.forEach(pickerSet => {
     pickerSet.forEach(picker => {
@@ -363,7 +363,7 @@ export function getRangepickers(id: unknown): InternalPickerData[] {
   return rangepickers
 }
 
-export function addPickerToMap(internalPickerItem: InternalPickerData): void {
+export function addPickerToMap(internalPickerItem: PrivatePicker): void {
   const {el} = internalPickerItem.selectorData
   const pickerSet = datepickersMap.get(el)
 
@@ -374,9 +374,7 @@ export function addPickerToMap(internalPickerItem: InternalPickerData): void {
   }
 }
 
-export function removePickerFromMap(
-  internalPickerItem: InternalPickerData
-): void {
+export function removePickerFromMap(internalPickerItem: PrivatePicker): void {
   const {el} = internalPickerItem.selectorData
   const pickerSet = datepickersMap.get(el)
 
@@ -399,7 +397,7 @@ export function getIsInput(el: unknown): el is HTMLInputElement {
  * min/max date.
  */
 export function adjustRangepickerMinMaxDates(
-  picker: InternalPickerData,
+  picker: PrivatePicker,
   date: Date | undefined
 ): void {
   if (!picker.sibling) return
@@ -660,7 +658,7 @@ export function isWeekendDate(date: Date): boolean {
 
 export function isDateDisabled(
   date: Date,
-  internalPicker: InternalPickerData
+  internalPicker: PrivatePicker
 ): boolean {
   const {noWeekends, disabledDates, disabler} = internalPicker
   const isWeekend = isWeekendDate(date)
@@ -736,7 +734,7 @@ function getIndexOfSunday(startDay: number) {
 }
 
 export function shouldSkipForDisabledReadOnly(
-  internalPickerItem: InternalPickerData
+  internalPickerItem: PrivatePicker
 ) {
   const {selectorData, respectDisabledReadOnly} = internalPickerItem
   const {isInput, el} = selectorData
@@ -745,7 +743,7 @@ export function shouldSkipForDisabledReadOnly(
 }
 
 export function getSelectedDate(
-  internalPickerItem: InternalPickerData | undefined
+  internalPickerItem: PrivatePicker | undefined
 ): Date | undefined {
   return internalPickerItem?.selectedDate
     ? new Date(internalPickerItem.selectedDate)

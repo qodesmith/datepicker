@@ -1,7 +1,7 @@
 import type {Expand, ExpandRecursively} from './types/expand'
 import {userEvents} from './constants'
 import {datepicker} from './datepicker'
-import {InternalPickerData} from './types/privatePicker'
+import {PrivatePicker} from './types/privatePicker'
 
 // TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
 
@@ -399,15 +399,15 @@ export type SanitizedOptions = Expand<
         'disabledDates' | 'events' | 'exemptIds' | 'customDays'
       >
   ) & {
-    disabledDates: InternalPickerData['disabledDates']
-    events: InternalPickerData['events']
-    exemptIds: InternalPickerData['exemptIds']
+    disabledDates: PrivatePicker['disabledDates']
+    events: PrivatePicker['events']
+    exemptIds: PrivatePicker['exemptIds']
     startDate: Date
     customDays: readonly string[]
     months: readonly string[]
     overlayMonths: readonly string[]
     isOverlayShowing: boolean
-    minMaxDates: InternalPickerData['minMaxDates']
+    minMaxDates: PrivatePicker['minMaxDates']
   } & Required<
       Omit<
         Pick<
@@ -489,7 +489,7 @@ export type DaterangePickerInstanceOnlyProps = {
    * object with `start` and `end` properties whose values are JavaScript date
    * objects representing what the user selected on both calendars.
    */
-  readonly getRange: () => ReturnType<InternalPickerData['_getRange']>
+  readonly getRange: () => ReturnType<PrivatePicker['_getRange']>
 
   /**
    * This method exists because it's possible to individually remove one of the

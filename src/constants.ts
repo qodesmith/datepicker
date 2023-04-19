@@ -1,4 +1,4 @@
-import {InternalPickerData, Sides} from './types'
+import {PrivatePicker, Sides} from './types'
 
 /**
  * `t`, `r`, `b`, and `l` are all positioned relatively to the input the calendar is attached to.
@@ -34,7 +34,7 @@ export function defaultUnformatYear(formattedYear: string): number {
  * use a set because multiple datepickers can be attached to the same element
  * except in case of inputs. Inputs have a 1:1 relationship with datepickers.
  */
-export const datepickersMap = new Map<HTMLElement, Set<InternalPickerData>>()
+export const datepickersMap = new Map<HTMLElement, Set<PrivatePicker>>()
 
 export const overlayShownCls = 'dp-overlay-shown'
 

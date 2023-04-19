@@ -1,4 +1,4 @@
-import type {InternalPickerData} from './types'
+import type {PrivatePicker} from './types'
 import {
   getDaysInMonth,
   getIndexOfLastDayOfMonth,
@@ -14,7 +14,7 @@ import {
  * calendar data (i.e. selected date, min/max dates, current month, etc.).
  */
 export function renderCalendar(
-  internalPicker: InternalPickerData | undefined
+  internalPicker: PrivatePicker | undefined
 ): void {
   if (!internalPicker) return
 
@@ -196,7 +196,7 @@ function addOrRemoveClass<T extends HTMLElement>(
 }
 
 function renderShowAllDatesDays(
-  internalPicker: InternalPickerData,
+  internalPicker: PrivatePicker,
   lastMonthsLastDayIndex: number
 ) {
   const {pickerElements, currentDate, startDay, showAllDates, formatDay} =
@@ -247,7 +247,7 @@ function renderShowAllDatesDays(
 // TODO - how does this work for range pickers? What about disabled dates because of selected / partially-selected ranges?
 function updateClassNamesForOtherMonthDay(
   div: HTMLDivElement,
-  internalPicker: InternalPickerData,
+  internalPicker: PrivatePicker,
   dateForComparison: Date
 ): void {
   const {events, showAllDatesClickable, selectedDate} = internalPicker

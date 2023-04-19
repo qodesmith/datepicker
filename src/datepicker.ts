@@ -1,6 +1,5 @@
 import type {
   DatepickerOptions,
-  InternalPickerData,
   DaterangePickerOptions,
   Selector,
   DatepickerInstance,
@@ -38,6 +37,7 @@ import {
   throwError,
 } from './utils'
 import {addEventListeners, removeEventListeners} from './utilsEventListeners'
+import {PrivatePicker} from './types/privatePicker'
 
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - should the public instance for rangepickers include `isFirst`?
@@ -104,7 +104,7 @@ function datepicker(
   // CREATE INTERNAL PICKER DATA
   // TODO - should this be called `privatePicker` to keep in line with `publicPicker`?
   // TODO - should we just spread the options object here and overwrite values that need it?
-  const internalPickerItem: InternalPickerData = {
+  const internalPickerItem: PrivatePicker = {
     selectorData,
     pickerElements,
     // TODO - is it safe to destructure these values instead?

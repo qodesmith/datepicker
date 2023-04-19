@@ -79,7 +79,7 @@ export type ListenersMapValue = (e: any) => void
 export type ListenersMapKey = {type: keyof HTMLElementEventMap; el: HTMLElement}
 
 // TODO - remove properties not needed.
-export type InternalPickerData = {
+export type PrivatePicker = {
   /**
    * All the existing DOM elements associated with the calendar.
    */
@@ -131,7 +131,7 @@ export type InternalPickerData = {
 
   publicPicker: DatepickerInstance | DaterangePickerInstance // The object returned to the user.
   isFirst?: boolean // Indicates this is the 1st instance in a daterange pair.
-  sibling?: InternalPickerData // Just a reference to the other internal object in the daterange pair.
+  sibling?: PrivatePicker // Just a reference to the other internal object in the daterange pair.
 
   _navigate(
     data: Expand<

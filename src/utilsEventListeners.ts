@@ -1,5 +1,5 @@
 import type {
-  InternalPickerData,
+  PrivatePicker,
   ListenersMapKey,
   ListenersMapValue,
   UserEvent,
@@ -42,7 +42,7 @@ function globalListener(e: Event) {
 }
 
 function submitOverlayYear(
-  internalPickerItem: InternalPickerData,
+  internalPickerItem: PrivatePicker,
   eventType: 'click' | 'keydown'
 ) {
   const {publicPicker, pickerElements, unformatYear} = internalPickerItem
@@ -74,7 +74,7 @@ function submitOverlayYear(
  *
  * `overlayInputOnInputListener` updates the overlay input field's value.
  */
-export function addEventListeners(internalPickerItem: InternalPickerData) {
+export function addEventListeners(internalPickerItem: PrivatePicker) {
   const {listenersMap, pickerElements, selectorData, publicPicker} =
     internalPickerItem
   const {controls, overlay} = pickerElements
@@ -297,7 +297,7 @@ export function addEventListeners(internalPickerItem: InternalPickerData) {
   }
 }
 
-export function removeEventListeners(internalPickerItem: InternalPickerData) {
+export function removeEventListeners(internalPickerItem: PrivatePicker) {
   const {listenersMap} = internalPickerItem
 
   if (datepickersMap.size === 0) {

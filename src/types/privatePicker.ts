@@ -85,6 +85,7 @@ export type PrivatePicker = {
    */
   selectorData: SelectorData
 
+  // TODO - Should we have a PrivateRangePicker item to house this instead?
   /**
    * This property will only be present on rangepickers.
    */

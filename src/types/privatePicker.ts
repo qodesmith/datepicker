@@ -1,13 +1,14 @@
-import {
+import type {
   DatepickerInstance,
   DatepickerOptions,
   DaterangePickerInstance,
   SanitizedOptions,
 } from '../types'
-import {PickerElements} from '../utilsCreateCalendar'
-import {Expand} from './expand'
-import {CallbackData, UserEvent, ViewType} from './options'
-import {SelectorData} from './selectorData'
+import type {PickerElements} from '../utilsCreateCalendar'
+import type {Expand} from './expand'
+import type {ViewType} from './options'
+import type {SelectorData} from './selectorData'
+import type {CallbackData, UserEvent} from './callbackData'
 
 /*
   TODO - how do we strongly type this? 

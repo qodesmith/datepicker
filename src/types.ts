@@ -1,52 +1,12 @@
 import type {Expand, ExpandRecursively} from './types/expand'
 import type {PrivatePicker} from './types/privatePicker'
 import type {Position, ViewType} from './types/options'
-import {userEvents} from './constants'
 import {datepicker} from './datepicker'
+import {CallbackData, RangeCallbackData} from './types/callbackData'
 
 // TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
 
 export type Datepicker = typeof datepicker
-export type TriggerType = 'user' | 'imperative'
-export type ImperativeMethod =
-  | 'selectDate'
-  | 'setMin'
-  | 'setMax'
-  | 'navigate'
-  | 'show'
-  | 'hide'
-export type UserEvent = (typeof userEvents)[number]
-export type Trigger = ImperativeMethod | UserEvent
-type CallbackData = {
-  /**
-   * The explicit source of what triggered the callback. This can be imperative
-   * methods, such as `selectDate` and `show` or user interactions with the DOM,
-   * such as `click`.
-   */
-  trigger: Trigger
-
-  /**
-   * The category source of what triggered the callback. `user` for user
-   * interactions with the DOM, such as `click`, or `imperative` for imperative
-   * methods, such as `selectDate` or `show`.
-   */
-  triggerType: TriggerType
-
-  /**
-   * Providing the datepicker instance as a convenience. This allows the user to
-   * avoid having to import the instance from wherever it was created.
-   */
-  instance: DatepickerInstance
-}
-type RangeCallbackData = Expand<
-  {
-    /**
-     * Providing the datepicker instance as a convenience. This allows the user
-     * to avoid having to import the instance from wherever it was created.
-     */
-    instance: DaterangePickerInstance
-  } & Omit<CallbackData, 'instance'>
->
 
 export type DatepickerOptions = ExpandRecursively<{
   ///////////////

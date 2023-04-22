@@ -1,4 +1,5 @@
-import {PrivatePicker, Sides} from './types'
+import {Sides} from './types'
+import {PrivatePicker} from './types/privatePicker'
 
 /**
  * `t`, `r`, `b`, and `l` are all positioned relatively to the input the calendar is attached to.

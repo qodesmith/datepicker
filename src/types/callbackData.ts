@@ -1,5 +1,6 @@
+import type {Expand} from './expand'
+import type {DatepickerInstance, DaterangePickerInstance} from '../types'
 import {userEvents} from '../constants'
-import {DatepickerInstance} from '../types'
 
 /**
  * Data passed to the various user callback functions.
@@ -25,6 +26,16 @@ export type CallbackData = {
    */
   instance: DatepickerInstance
 }
+
+export type RangeCallbackData = Expand<
+  {
+    /**
+     * Providing the datepicker instance as a convenience. This allows the user
+     * to avoid having to import the instance from wherever it was created.
+     */
+    instance: DaterangePickerInstance
+  } & Omit<CallbackData, 'instance'>
+>
 
 export type UserEvent = (typeof userEvents)[number]
 export type Trigger = ImperativeMethod | UserEvent

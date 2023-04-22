@@ -1,11 +1,5 @@
-import type {
-  DatepickerOptions,
-  DaterangePickerOptions,
-  Position,
-  Selector,
-  ViewType,
-} from './types'
-import type {SanitizedOptions} from './types/options'
+import type {DatepickerOptions, DaterangePickerOptions, Selector} from './types'
+import type {Position, SanitizedOptions, ViewType} from './types/options'
 import type {SelectorData} from './types/selectorData'
 import type {PrivatePicker} from './types/privatePicker'
 import {

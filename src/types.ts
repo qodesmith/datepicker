@@ -1,7 +1,8 @@
 import type {Expand, ExpandRecursively} from './types/expand'
+import type {PrivatePicker} from './types/privatePicker'
+import type {Position, ViewType} from './types/options'
 import {userEvents} from './constants'
 import {datepicker} from './datepicker'
-import {PrivatePicker} from './types/privatePicker'
 
 // TODO - ensure all types are being used. Remove export if not being consumed elsewhere.
 
@@ -407,20 +408,6 @@ export type Sides = {
   l: 'left'
   c: 'c'
 }
-
-/**
- * The position of the calendar relative to its associated input field. This option will have no effect if the picker isn't associated with an input field.
- * The `mc` option is special in that it will center the calendar in the middle of the screen. This can be useful for mobile devices.
- *
- * `tl` - top left
- * `tr` - top right
- * `bl` - bottom left
- * `br` - bottom right
- * `mc` - mobile centered (centered in the middle of the screen for mobile devices)
- */
-export type Position = 'tl' | 'tr' | 'bl' | 'br' | 'mc'
-
-export type ViewType = 'calendar' | 'overlay'
 
 export type DatepickerInstance = {
   readonly calendarContainer: HTMLDivElement

@@ -7,8 +7,6 @@ import type {
 
   // For exporting
   Datepicker,
-  ViewType,
-  Position,
   ImperativeMethod,
   UserEvent,
   Trigger,
@@ -16,6 +14,7 @@ import type {
   DaterangePickerInstanceOnlyProps,
   DaterangePickerInstancePair,
 } from './types'
+import type {PrivatePicker} from './types/privatePicker'
 import {createCalendarHTML} from './utilsCreateCalendar'
 import {renderCalendar} from './utilsRenderCalendar'
 import {
@@ -37,7 +36,7 @@ import {
   throwError,
 } from './utils'
 import {addEventListeners, removeEventListeners} from './utilsEventListeners'
-import {PrivatePicker} from './types/privatePicker'
+import {Position, ViewType} from './types/options'
 
 // TODO - allow daterange pickers to have the same selector element except for inputs.
 // TODO - should the public instance for rangepickers include `isFirst`?

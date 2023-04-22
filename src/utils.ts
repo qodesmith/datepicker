@@ -1,13 +1,13 @@
 import type {
   DatepickerOptions,
   DaterangePickerOptions,
-  PrivatePicker,
   Position,
-  SanitizedOptions,
   Selector,
-  SelectorData,
   ViewType,
 } from './types'
+import type {SanitizedOptions} from './types/options'
+import type {SelectorData} from './types/selectorData'
+import type {PrivatePicker} from './types/privatePicker'
 import {
   datepickersMap,
   defaultDayYearFormatter,
@@ -83,7 +83,8 @@ export function getSelectorData(selector: Selector): SelectorData {
   }
 
   // 🚫 Check for void elements.
-  const nodeName = element.nodeName.toLowerCase() as typeof voidElements[number]
+  const nodeName =
+    element.nodeName.toLowerCase() as (typeof voidElements)[number]
   if (voidElements.includes(nodeName)) {
     throwError(`Using a void element <${nodeName}> is not supported.`)
   }

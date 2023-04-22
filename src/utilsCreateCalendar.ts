@@ -1,6 +1,6 @@
 // TODO - don't export any functions that aren't consumed anywhere.
 
-import type {SanitizedOptions} from './types'
+import {SanitizedOptions} from './types/options'
 import {getOverlayClassName} from './utils'
 
 const arrowSVG = `

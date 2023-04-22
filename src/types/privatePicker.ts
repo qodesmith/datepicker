@@ -2,11 +2,10 @@ import type {
   DatepickerInstance,
   DatepickerOptions,
   DaterangePickerInstance,
-  SanitizedOptions,
 } from '../types'
 import type {PickerElements} from '../utilsCreateCalendar'
 import type {Expand} from './expand'
-import type {ViewType} from './options'
+import type {SanitizedOptions, ViewType} from './options'
 import type {SelectorData} from './selectorData'
 import type {CallbackData, UserEvent} from './callbackData'
 

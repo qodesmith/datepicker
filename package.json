@@ -1,9 +1,10 @@
 {
   "name": "js-datepicker",
-  "version": "5.18.3",
+  "version": "5.18.4",
   "description": "Get a date with JavaScript! A datepicker with no dependencies.",
   "main": "dist/datepicker.min.js",
   "style": "./src/datepicker.scss",
+  "types": "datepicker.d.ts",
   "scripts": {
     "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --env.prod",
     "test": "start-server-and-test start http-get://localhost:9001 start-cypress-test",

@@ -939,7 +939,7 @@ function selectDay(target, instance, deselect) {
   var sibling = instance.sibling
 
   // Prevent Datepicker from selecting (or deselecting) dates.
-  if ((el.disabled || el.readOnly) && instance.respectDisabledReadOnly) return
+  if (instance.respectDisabledReadOnly && (el.matches(':disabled') || el.readOnly)) return
 
   // Keep track of the currently selected date.
   instance.dateSelected = deselect ? undefined : new Date(instance.currentYear, instance.currentMonth, num)
